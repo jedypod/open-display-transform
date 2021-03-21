@@ -1,0 +1,397 @@
+set cut_paste_input [stack 0]
+Group {
+ inputs 0
+ name HueSwatchesSix
+ postage_stamp true
+ addUserKnob {20 HueSwatchesSix_tab l HueSwatchesSix}
+ addUserKnob {7 saturation}
+ addUserKnob {3 patch_size}
+ patch_size 256
+}
+ Group {
+  inputs 0
+  name Swatch7
+  label "\[value value]"
+  note_font Helvetica
+  xpos 1060
+  ypos 292
+  postage_stamp true
+  addUserKnob {20 User}
+  addUserKnob {41 value l color T Multiply17.value}
+  addUserKnob {3 size}
+  size {{parent.patch_size}}
+ }
+  Constant {
+   inputs 0
+   format "512 512 0 0 512 512 1 square_512"
+   name Constant13
+   note_font Helvetica
+   xpos 1155
+   ypos 666
+   postage_stamp false
+  }
+  Reformat {
+   type "to box"
+   box_width {{parent.size}}
+   name Reformat1
+   note_font Helvetica
+   xpos 1155
+   ypos 690
+  }
+  Expression {
+   channel0 rgba
+   expr0 x/width
+   name Expression14
+   note_font Helvetica
+   xpos 1155
+   ypos 714
+  }
+  Multiply {
+   channels rgba
+   value {1 0 1 1}
+   name Multiply17
+   note_font Helvetica
+   xpos 1155
+   ypos 754
+  }
+  Expression {
+   channel0 {none none none rgba.alpha}
+   expr0 y/height
+   name Expression15
+   note_font Helvetica
+   xpos 1155
+   ypos 785
+  }
+  Output {
+   name Output1
+   xpos 1155
+   ypos 891
+  }
+ end_group
+ Group {
+  inputs 0
+  name Swatch8
+  label "\[value value]"
+  note_font Helvetica
+  xpos 950
+  ypos 292
+  postage_stamp true
+  addUserKnob {20 User}
+  addUserKnob {41 value l color T Multiply17.value}
+  addUserKnob {3 size}
+  size {{parent.patch_size}}
+ }
+  Constant {
+   inputs 0
+   format "512 512 0 0 512 512 1 square_512"
+   name Constant13
+   note_font Helvetica
+   xpos 1155
+   ypos 666
+   postage_stamp false
+  }
+  Reformat {
+   type "to box"
+   box_width {{parent.size}}
+   name Reformat1
+   note_font Helvetica
+   xpos 1155
+   ypos 690
+  }
+  Expression {
+   channel0 rgba
+   expr0 x/width
+   name Expression14
+   note_font Helvetica
+   xpos 1155
+   ypos 714
+  }
+  Multiply {
+   channels rgba
+   value {1 1 0 1}
+   name Multiply17
+   note_font Helvetica
+   xpos 1155
+   ypos 754
+  }
+  Expression {
+   channel0 {none none none rgba.alpha}
+   expr0 y/height
+   name Expression15
+   note_font Helvetica
+   xpos 1155
+   ypos 785
+  }
+  Output {
+   name Output1
+   xpos 1155
+   ypos 891
+  }
+ end_group
+ Group {
+  inputs 0
+  name Swatch10
+  label "\[value value]"
+  note_font Helvetica
+  xpos 840
+  ypos 292
+  postage_stamp true
+  addUserKnob {20 User}
+  addUserKnob {41 value l color T Multiply17.value}
+  addUserKnob {3 size}
+  size {{parent.patch_size}}
+ }
+  Constant {
+   inputs 0
+   format "512 512 0 0 512 512 1 square_512"
+   name Constant13
+   note_font Helvetica
+   xpos 1155
+   ypos 666
+   postage_stamp false
+  }
+  Reformat {
+   type "to box"
+   box_width {{parent.size}}
+   name Reformat1
+   note_font Helvetica
+   xpos 1155
+   ypos 690
+  }
+  Expression {
+   channel0 rgba
+   expr0 x/width
+   name Expression14
+   note_font Helvetica
+   xpos 1155
+   ypos 714
+  }
+  Multiply {
+   channels rgba
+   value {0 1 1 1}
+   name Multiply17
+   note_font Helvetica
+   xpos 1155
+   ypos 754
+  }
+  Expression {
+   channel0 {none none none rgba.alpha}
+   expr0 y/height
+   name Expression15
+   note_font Helvetica
+   xpos 1155
+   ypos 785
+  }
+  Output {
+   name Output1
+   xpos 1155
+   ypos 891
+  }
+ end_group
+ Group {
+  inputs 0
+  name Swatch9
+  label "\[value value]"
+  note_font Helvetica
+  xpos 730
+  ypos 292
+  postage_stamp true
+  addUserKnob {20 User}
+  addUserKnob {41 value l color T Multiply17.value}
+  addUserKnob {3 size}
+  size {{parent.patch_size}}
+ }
+  Constant {
+   inputs 0
+   format "512 512 0 0 512 512 1 square_512"
+   name Constant13
+   note_font Helvetica
+   xpos 1155
+   ypos 666
+   postage_stamp false
+  }
+  Reformat {
+   type "to box"
+   box_width {{parent.size}}
+   name Reformat1
+   note_font Helvetica
+   xpos 1155
+   ypos 690
+  }
+  Expression {
+   channel0 rgba
+   expr0 x/width
+   name Expression14
+   note_font Helvetica
+   xpos 1155
+   ypos 714
+  }
+  Multiply {
+   channels rgba
+   value {0 0 1 1}
+   name Multiply17
+   note_font Helvetica
+   xpos 1155
+   ypos 754
+  }
+  Expression {
+   channel0 {none none none rgba.alpha}
+   expr0 y/height
+   name Expression15
+   note_font Helvetica
+   xpos 1155
+   ypos 785
+  }
+  Output {
+   name Output1
+   xpos 1155
+   ypos 891
+  }
+ end_group
+ Group {
+  inputs 0
+  name Swatch12
+  label "\[value value]"
+  note_font Helvetica
+  xpos 620
+  ypos 292
+  postage_stamp true
+  addUserKnob {20 User}
+  addUserKnob {41 value l color T Multiply17.value}
+  addUserKnob {3 size}
+  size {{parent.patch_size}}
+ }
+  Constant {
+   inputs 0
+   format "512 512 0 0 512 512 1 square_512"
+   name Constant13
+   note_font Helvetica
+   xpos 1155
+   ypos 666
+   postage_stamp false
+  }
+  Reformat {
+   type "to box"
+   box_width {{parent.size}}
+   name Reformat1
+   note_font Helvetica
+   xpos 1155
+   ypos 690
+  }
+  Expression {
+   channel0 rgba
+   expr0 x/width
+   name Expression14
+   note_font Helvetica
+   xpos 1155
+   ypos 714
+  }
+  Multiply {
+   channels rgba
+   value {0 1 0 1}
+   name Multiply17
+   note_font Helvetica
+   xpos 1155
+   ypos 754
+  }
+  Expression {
+   channel0 {none none none rgba.alpha}
+   expr0 y/height
+   name Expression15
+   note_font Helvetica
+   xpos 1155
+   ypos 785
+  }
+  Output {
+   name Output1
+   xpos 1155
+   ypos 891
+  }
+ end_group
+ Group {
+  inputs 0
+  name Swatch11
+  label "\[value value]"
+  note_font Helvetica
+  xpos 510
+  ypos 292
+  postage_stamp true
+  addUserKnob {20 User}
+  addUserKnob {41 value l color T Multiply17.value}
+  addUserKnob {3 size}
+  size {{parent.patch_size}}
+ }
+  Constant {
+   inputs 0
+   format "512 512 0 0 512 512 1 square_512"
+   name Constant13
+   note_font Helvetica
+   xpos 1155
+   ypos 666
+   postage_stamp false
+  }
+  Reformat {
+   type "to box"
+   box_width {{parent.size}}
+   name Reformat1
+   note_font Helvetica
+   xpos 1155
+   ypos 690
+  }
+  Expression {
+   channel0 rgba
+   expr0 x/width
+   name Expression14
+   note_font Helvetica
+   xpos 1155
+   ypos 714
+  }
+  Multiply {
+   channels rgba
+   value {1 0 0 1}
+   name Multiply17
+   note_font Helvetica
+   xpos 1155
+   ypos 754
+  }
+  Expression {
+   channel0 {none none none rgba.alpha}
+   expr0 y/height
+   name Expression15
+   note_font Helvetica
+   xpos 1155
+   ypos 785
+  }
+  Output {
+   name Output1
+   xpos 1155
+   ypos 891
+  }
+ end_group
+ ContactSheet {
+  inputs 6
+  width {{width*columns}}
+  height {{height/pixel_aspect*rows}}
+  rows 6
+  columns 1
+  roworder TopBottom
+  name ContactSheet4
+  note_font Helvetica
+  xpos 510
+  ypos 441
+ }
+ Saturation {
+  saturation {{parent.saturation}}
+  mode Maximum
+  maskChannelInput rgba.alpha
+  name Saturation1
+  note_font Helvetica
+  xpos 510
+  ypos 555
+ }
+ Output {
+  name Output
+  xpos 510
+  ypos 620
+ }
+end_group

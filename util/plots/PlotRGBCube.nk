@@ -1,0 +1,423 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name PlotRGBCube
+ addUserKnob {20 PlotRGBCube_tab l PlotRGBCube}
+ addUserKnob {6 plot_input l "plot input" t "plot input pixels" -STARTLINE}
+ plot_input true
+ addUserKnob {6 rgb_cube l "rgb cube" t "enable rgb cube" -STARTLINE}
+ rgb_cube true
+ addUserKnob {6 achromatic_up l "achromatic up" t "orient cube such that achromatic axis is up" -STARTLINE}
+ achromatic_up true
+ addUserKnob {7 exposure R -8 8}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {4 view M {top side perspective}}
+ view perspective
+ addUserKnob {22 minus_rot l - T "rot = nuke.thisNode()\['rotate']\nrot.setValue(rot.getValue()-30)" +STARTLINE}
+ addUserKnob {22 plus_rot l + -STARTLINE T "rot = nuke.thisNode()\['rotate']\nrot.setValue(rot.getValue()+30)"}
+ addUserKnob {7 x_rot l "persp xrot" t "if view is perspective: rotate x  between 0 and -90" R -1 1}
+ x_rot 0.5
+ addUserKnob {7 rotate R 0 360}
+ rotate 180
+ addUserKnob {6 high_quality l "high quality" t "enable high quality rendering" +STARTLINE}
+ high_quality true
+ addUserKnob {7 point_detail l "point detail" t "point detail of the position to points "}
+ point_detail 1
+ addUserKnob {41 box_width l width/height T Reformat26.box_width}
+ addUserKnob {41 box_height l "" -STARTLINE T Reformat26.box_height}
+ addUserKnob {22 set_viewer_color l "set 3d view black" t "set 3d viewer to have a black background" T "prefs = nuke.toNode('preferences')\ncol = prefs\['viewer_bg_color_3D']\ncol.setValue(0)" +STARTLINE}
+}
+ Axis2 {
+  inputs 0
+  display off
+  selectable false
+  translate {0 1 0}
+  rotate {{-parent.x_rot*90} {parent.rotate} 0}
+  name Axis1
+  xpos -470
+  ypos 270
+ }
+ Camera2 {
+  display off
+  selectable false
+  translate {0 0 3.5}
+  name PERSP
+  xpos -470
+  ypos 390
+ }
+ Axis2 {
+  inputs 0
+  display off
+  selectable false
+  translate {0 0.8660254038 0}
+  rotate {0 {parent.rotate} 0}
+  name Axis2
+  xpos -360
+  ypos 270
+ }
+ Camera2 {
+  display off
+  selectable false
+  translate {0 0 2}
+  projection_mode orthographic
+  focal 14
+  name ORTHO_SIDE
+  xpos -360
+  ypos 390
+ }
+ Camera2 {
+  inputs 0
+  display off
+  selectable false
+  translate {0 6 0}
+  rotate {-90 {parent.rotate} 0}
+  projection_mode orthographic
+  focal 14
+  name ORTHO_TOP
+  xpos -250
+  ypos 390
+ }
+ Switch {
+  inputs 3
+  which {{parent.view}}
+  name SwitchView
+  xpos -260
+  ypos 501
+ }
+ Dot {
+  name Dot1
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -226
+  ypos 534
+ }
+ Dot {
+  name Dot4
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -6
+  ypos 534
+ }
+set Na0ea9e20 [stack 0]
+ Input {
+  inputs 0
+  name Input
+  xpos -150
+  ypos 50
+ }
+ Multiply {
+  channels rgb
+  value {{pow(2,e)} {pow(2,e)} {pow(2,e)} 1}
+  name Exposure
+  xpos -150
+  ypos 140
+  addUserKnob {20 User}
+  addUserKnob {7 e R -8 8}
+  e {{parent.exposure}}
+ }
+ PositionToPoints2 {
+  display textured
+  selectable false
+  render_mode textured
+  cast_shadow false
+  receive_shadow false
+  P_channel rgb
+  detail {{parent.point_detail}}
+  pointSize 1
+  name PositionToPoints7
+  xpos -150
+  ypos 200
+  disable {{!parent.plot_input}}
+ }
+ Dot {
+  name Dot2
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -116
+  ypos 294
+ }
+ Group {
+  inputs 0
+  name RGBCubeAlt2
+  xpos 70
+  ypos 141
+  disable {{!parent.rgb_cube}}
+  addUserKnob {20 User}
+  addUserKnob {6 top_half l "top half" +STARTLINE}
+  top_half true
+  addUserKnob {6 posterize -STARTLINE}
+  posterize true
+ }
+  Group {
+   inputs 0
+   name HueSweep_4
+   xpos 1170
+   ypos 657
+   hide_input true
+   postage_stamp true
+   addUserKnob {20 User}
+   addUserKnob {6 white +STARTLINE}
+   addUserKnob {6 black +STARTLINE}
+   black true
+  }
+   Constant {
+    inputs 0
+    format "256 256 0 0 256 256 1 square_256"
+    name Constant15
+    xpos 1160
+    ypos 651
+    postage_stamp false
+   }
+set Nf3abd20 [stack 0]
+   Expression {
+    expr1 1-x/width
+    expr2 x/width
+    name Expression28
+    label "green/red\n"
+    xpos 1280
+    ypos 712
+    postage_stamp true
+   }
+push $Nf3abd20
+   Expression {
+    expr0 1-x/width
+    expr1 x/width
+    name Expression19
+    label "green/red\n"
+    xpos 1160
+    ypos 712
+    postage_stamp true
+   }
+push $Nf3abd20
+   Expression {
+    expr0 x/width
+    expr2 1-x/width
+    name Expression21
+    label "green/red\n"
+    xpos 1040
+    ypos 712
+    postage_stamp true
+   }
+   ContactSheet {
+    inputs 3
+    width {{width*columns}}
+    height {{height/pixel_aspect*rows}}
+    rows 1
+    columns 3
+    roworder TopBottom
+    name ContactSheet3
+    xpos 1160
+    ypos 831
+   }
+   Shuffle {
+    alpha white
+    name Shuffle1
+    xpos 1160
+    ypos 861
+   }
+   Dot {
+    name Dot1
+    note_font "Helvetica Bold"
+    note_font_size 24
+    note_font_color 0xff
+    xpos 1194
+    ypos 894
+   }
+set Nd773da90 [stack 0]
+   Expression {
+    expr3 (y/height-0.5)*2
+    name Expression2
+    xpos 1040
+    ypos 951
+   }
+push $Nd773da90
+   Expression {
+    expr3 1-y/(height/2)
+    name Expression1
+    xpos 1040
+    ypos 891
+   }
+push $Nd773da90
+   Fill {
+    inputs 1+1
+    color {0 0 0 1}
+    name Fill2
+    xpos 1160
+    ypos 937
+    disable {{!parent.black}}
+   }
+   Fill {
+    inputs 1+1
+    color {1 1 1 1}
+    name Fill1
+    xpos 1160
+    ypos 981
+    disable {{!parent.white}}
+   }
+   Output {
+    name Output1
+    xpos 1160
+    ypos 1070
+   }
+  end_group
+  Group {
+   name Exposure4
+   tile_color 0x79a9ffff
+   xpos 1170
+   ypos 770
+   addUserKnob {20 Exposure}
+   addUserKnob {18 exposure R -8 8}
+   exposure 4
+   addUserKnob {6 exposure_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  }
+   Input {
+    inputs 0
+    name Inputmask
+    xpos 120
+    ypos -9
+    number 1
+   }
+   Input {
+    inputs 0
+    name Input
+    xpos -40
+    ypos -81
+   }
+   Multiply {
+    inputs 1+1
+    channels rgb
+    value {{"pow(2, parent.exposure)"} {"pow(2, parent.exposure)"} {"pow(2, parent.exposure)"} {"pow(2, parent.exposure)"}}
+    name _EXPOSURE_
+    xpos -40
+    ypos -9
+   }
+   Output {
+    name Output1
+    xpos -40
+    ypos 63
+   }
+  end_group
+  Clamp {
+   channels rgba
+   name Clamp18
+   xpos 1170
+   ypos 801
+  }
+  Posterize {
+   channels rgba
+   Colors 64
+   name Posterize1
+   xpos 1170
+   ypos 831
+   disable {{!parent.posterize}}
+  }
+  Dot {
+   name Dot1
+   note_font "Helvetica Bold"
+   note_font_size 24
+   note_font_color 0xff
+   xpos 1204
+   ypos 924
+  }
+set Na0ec3b20 [stack 0]
+  Expression {
+   expr0 1-r
+   expr1 1-g
+   expr2 1-b
+   channel3 none
+   name Complement1
+   xpos 1060
+   ypos 921
+  }
+push $Na0ec3b20
+  ContactSheet {
+   inputs 2
+   width {{width*columns}}
+   height {{height/pixel_aspect*rows}}
+   rows 2
+   columns 1
+   roworder TopBottom
+   name ContactSheet1
+   xpos 1170
+   ypos 951
+   disable {{!parent.top_half}}
+  }
+  Output {
+   name Output
+   xpos 1170
+   ypos 1010
+  }
+ end_group
+ PositionToPoints2 {
+  display textured
+  selectable false
+  render_mode textured
+  cast_shadow false
+  receive_shadow false
+  P_channel rgb
+  detail 1
+  pointSize 1
+  name PositionToPoints8
+  xpos 70
+  ypos 200
+  disable {{!parent.rgb_cube}}
+ }
+ Scene {
+  inputs 2
+  name Scene3
+  xpos 80
+  ypos 270
+  disable {{!parent.plot_input}}
+ }
+ TransformGeo {
+  rotate {{"-degrees(atan(sqrt(1/2))) "} 0 45}
+  name OrientAchromatic
+  xpos 70
+  ypos 381
+  disable {{!parent.achromatic_up}}
+ }
+push $Na0ea9e20
+ Scene {
+  inputs 2
+  name Scene4
+  xpos 80
+  ypos 510
+ }
+ Constant {
+  inputs 0
+  format "256 256 0 0 256 256 1 square_256"
+  name Constant9
+  xpos 180
+  ypos 621
+  postage_stamp false
+ }
+ Reformat {
+  type "to box"
+  box_width 2048
+  box_height {{box_width}}
+  box_fixed true
+  black_outside true
+  name Reformat26
+  xpos 180
+  ypos 651
+ }
+ ScanlineRender {
+  inputs 3
+  conservative_shader_sampling false
+  samples {{parent.high_quality?6:1}}
+  shutteroffset centred
+  stochastic_samples {{parent.high_quality?12:1}}
+  motion_vectors_type distance
+  name ScanlineRender
+  xpos 70
+  ypos 651
+ }
+ Output {
+  name Output
+  xpos 70
+  ypos 920
+ }
+end_group
