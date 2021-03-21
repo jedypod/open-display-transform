@@ -1,0 +1,153 @@
+set cut_paste_input [stack 0]
+Group {
+ inputs 0
+ name HueSwatch
+ label "\[value value]"
+ postage_stamp true
+ addUserKnob {20 User}
+ addUserKnob {41 value l color T Multiply17.value}
+ addUserKnob {41 saturation T Saturation1.saturation}
+ addUserKnob {3 size}
+ size 1024
+}
+ Constant {
+  inputs 0
+  format "512 512 0 0 512 512 1 square_512"
+  name Constant13
+  note_font Helvetica
+  xpos 1155
+  ypos 666
+  postage_stamp false
+ }
+ Reformat {
+  type "to box"
+  box_width {{parent.size}}
+  name Reformat1
+  note_font Helvetica
+  xpos 1155
+  ypos 689
+ }
+ Expression {
+  channel0 rgba
+  expr0 x/width
+  name Expression14
+  note_font Helvetica
+  xpos 1155
+  ypos 719
+ }
+ Multiply {
+  channels rgba
+  value {0 0 1 1}
+  name Multiply17
+  note_font Helvetica
+  xpos 1155
+  ypos 755
+ }
+ Expression {
+  channel0 {none none none rgba.alpha}
+  expr0 y/height
+  name Expression15
+  note_font Helvetica
+  xpos 1155
+  ypos 785
+ }
+ Saturation {
+  mode Maximum
+  maskChannelInput rgba.alpha
+  name Saturation1
+  note_font Helvetica
+  xpos 1155
+  ypos 822
+ }
+ Output {
+  name Output1
+  xpos 1155
+  ypos 891
+ }
+end_group
+Dot {
+ name Dot1
+ note_font "Helvetica Bold"
+ note_font_size 24
+ note_font_color 0xff
+ selected true
+ xpos 874
+ ypos -816
+}
+set Nbedafa0 [stack 0]
+Group {
+ name HueRotate8
+ note_font Helvetica
+ selected true
+ xpos 730
+ ypos -819
+ addUserKnob {20 HueRotate_tab l HueRotate}
+ addUserKnob {22 minus l - T "n = nuke.thisNode()\nrot = n\['rotate']\nrot.setValue(rot.getValue()-30)" +STARTLINE}
+ addUserKnob {22 plus l + -STARTLINE T "n = nuke.thisNode()\nrot = n\['rotate']\nrot.setValue(rot.getValue()+30)"}
+ addUserKnob {7 rotate t "hue angle in degrees to rotate input colors" R 0 360}
+ rotate 120
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -40
+  ypos 20
+ }
+ Expression {
+  temp_name0 M
+  temp_expr0 max(r,g,b)
+  temp_name1 m
+  temp_expr1 min(r,g,b)
+  temp_name2 C
+  temp_expr2 M-m
+  expr0 (60*(C==0?0:M==r?((g-b)/C+6)%6:M==g?(b-r)/C+2:M==b?(r-g)/C+4:0))/360
+  expr1 M==0?0:C/M
+  expr2 M
+  name RGB_to_HSV
+  xpos -40
+  ypos 80
+ }
+ Expression {
+  expr0 (r+shift)%1
+  name Rotate
+  note_font Helvetica
+  xpos -40
+  ypos 141
+  addUserKnob {20 User}
+  addUserKnob {7 shift}
+  shift {{radians(rotate)/pi/2}}
+ }
+ Expression {
+  temp_name0 C
+  temp_expr0 b*g
+  temp_name1 X
+  temp_expr1 C*(1-abs((r*6)%2-1))
+  temp_name2 m
+  temp_expr2 b-C
+  expr0 (r<1/6?C:r<2/6?X:r<3/6?0:r<4/6?0:r<5/6?X:C)+m
+  expr1 (r<1/6?X:r<2/6?C:r<3/6?C:r<4/6?X:r<5/6?0:0)+m
+  expr2 (r<1/6?0:r<2/6?0:r<3/6?X:r<4/6?C:r<5/6?C:X)+m
+  name HSV_to_RGB
+  xpos -40
+  ypos 200
+ }
+ Output {
+  name Output
+  xpos -40
+  ypos 260
+ }
+end_group
+push $Nbedafa0
+ContactSheet {
+ inputs 2
+ width {{width*columns}}
+ height {{height/pixel_aspect*rows}}
+ rows 1
+ columns 2
+ roworder TopBottom
+ name ContactSheet4
+ note_font Helvetica
+ selected true
+ xpos 840
+ ypos -789
+}

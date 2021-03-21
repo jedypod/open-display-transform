@@ -1,0 +1,67 @@
+set cut_paste_input [stack 0]
+Group {
+ inputs 0
+ name RGBCube
+ postage_stamp true
+ addUserKnob {20 User}
+ addUserKnob {41 Colors l samples T Posterize1.Colors}
+}
+ ColorWheel {
+  inputs 0
+  format "256 256 0 0 256 256 1 square_256"
+  centerSaturation 1
+  centerValue 0
+  name ColorWheel3
+  note_font Helvetica
+  xpos 1156
+  ypos 72
+  postage_stamp false
+ }
+ Unpremult {
+  name Unpremult2
+  note_font Helvetica
+  xpos 1156
+  ypos 102
+ }
+ ColorWheel {
+  inputs 0
+  format "256 256 0 0 256 256 1 square_256"
+  name ColorWheel2
+  note_font Helvetica
+  xpos 1036
+  ypos 72
+  postage_stamp false
+ }
+ Unpremult {
+  name Unpremult1
+  note_font Helvetica
+  xpos 1036
+  ypos 102
+ }
+ ContactSheet {
+  inputs 2
+  width {{width*columns}}
+  height {{height/pixel_aspect*rows}}
+  rows 1
+  columns 2
+  roworder TopBottom
+  name ContactSheet3
+  note_font Helvetica
+  xpos 1036
+  ypos 132
+ }
+ Posterize {
+  channels rgb
+  Colors 32
+  name Posterize1
+  label "\[value Colors] Samples"
+  note_font Helvetica
+  xpos 1036
+  ypos 186
+ }
+ Output {
+  name Output1
+  xpos 1036
+  ypos 286
+ }
+end_group

@@ -1,0 +1,102 @@
+set cut_paste_input [stack 0]
+Group {
+ inputs 0
+ name HueSweep
+ postage_stamp true
+ addUserKnob {20 HueSweep_tab l HueSweep}
+ addUserKnob {41 format T Constant8.format}
+ addUserKnob {7 e l exposure t "exposure, in stops, to brighten above pivot, and to darken below pivot.\n\ntotal exposure range is 2 * exposure" R 0 8}
+ e 5
+ addUserKnob {7 pivot}
+ pivot 1
+ addUserKnob {7 saturation t "adjust saturation of overall hue sweep"}
+ saturation 1
+ addUserKnob {26 ""}
+ addUserKnob {6 posterize +STARTLINE}
+ addUserKnob {3 samples}
+ samples 4
+ addUserKnob {7 sample_sat l "sample sat" t "adjust saturation of each sample"}
+ sample_sat 0.9
+}
+ Constant {
+  inputs 0
+  format "2048 1024 0 0 2048 1024 1 latlong_2k"
+  name Constant8
+  note_font Helvetica
+  xpos 1160
+  ypos 591
+  postage_stamp false
+ }
+ Expression {
+  expr0 x<width/3?x/(width/3):x<width/3*2?1-(x-width/3)/(width/3):0
+  expr1 x<width/3?1-x/(width/3):x>width/3*2?(x-width/3*2)/(width/3):0
+  expr2 x>width/3&&x<width/3*2?(x-width/3)/(width/3):x>width/3*2?1-(x-width/3*2)/(width/3):0
+  expr3 1
+  name Expression10
+  label "hue sweep"
+  note_font Helvetica
+  xpos 1160
+  ypos 645
+ }
+ Posterize {
+  channels rgb
+  Colors {{parent.samples}}
+  name Posterize1
+  note_font Helvetica
+  xpos 1160
+  ypos 711
+  disable {{!parent.posterize}}
+ }
+ Dot {
+  name Dot1
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos 1194
+  ypos 774
+ }
+set Nb6f4be0 [stack 0]
+ Expression {
+  temp_name0 w
+  temp_expr0 width/(samples*3)
+  expr3 (x%w)/w
+  name Expression2
+  note_font Helvetica
+  xpos 1040
+  ypos 771
+ }
+push $Nb6f4be0
+ Saturation {
+  inputs 1+1
+  saturation {{parent.sample_sat}}
+  mode Maximum
+  name Saturation1
+  note_font Helvetica
+  xpos 1160
+  ypos 810
+  disable {{!parent.posterize}}
+ }
+ Expression {
+  expr0 r*pow(2,(y/height-pivot)*2*e)
+  expr1 g*pow(2,(y/height-pivot)*2*e)
+  expr2 b*pow(2,(y/height-pivot)*2*e)
+  name Expression1
+  label exposure
+  note_font Helvetica
+  xpos 1160
+  ypos 855
+ }
+ Saturation {
+  saturation {{parent.saturation}}
+  mode Maximum
+  name Saturation2
+  note_font Helvetica
+  xpos 1160
+  ypos 911
+ }
+ Output {
+  name Output
+  xpos 1160
+  ypos 994
+ }
+end_group
