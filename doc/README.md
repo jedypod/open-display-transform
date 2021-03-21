@@ -34,6 +34,8 @@ We can do this in Nuke using a PositionToPoints node, or by using the included P
 
 If we rotate this cube 45 degrees on the Z axis and `-degrees(atan(sqrt(0.5))) ` on the X axis, we can orient the cube such that the achromatic axis is aligned to the vertical Y axis. This is useful for visualization.
 
+![RGBCube_achromatic_up](/cave/dev/github/opendrt/open-display-transform-master/doc/img/RGBCube_achromatic_up.png)
+
 Here we visualize the above per-channel tonemapped image of the hue swatches, looking directly down the achromatic axis from the top through an orthographic camera. 
 
 ![plot_hueswatches-per-channel_top](./img/plot_hueswatches-per-channel_top.jpg)
@@ -72,4 +74,70 @@ Even when viewed from the side. If our goal is to engineer the behavior that we 
 
 The Nuke script that was used to generate these plot images is available here if you wish to view it in more detail: [plot_hueswatches-chromaticity-preserving_vs_per-channel.nk](./img/plot_hueswatches-chromaticity-preserving_vs_per-channel.nk) 
 
+# RGB Ratios Model
+
+The model  I'm using is based on the concept of splitting RGB into a norm that represents the achromatic axis, or the neutral values, and RGB ratios that represent the color information. Operating independently on color and luminance is valuable because it lets us control chroma, hue and luminance separately. 
+
+Let's put some pictures to these ideas. Here again are our set of 24 hue swatches.
+
+![HueSwatches24_01_rgb](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_01_rgb.png)
+
+If we take the `max(r,g,b)` norm of these rgb values, we get a representation of the achromatic axis. This shows us luminance separated from color.
+
+![HueSwatches24_02_maxrgb](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_02_maxrgb.png)
+
+Using the norm we can extract the inverse rgb ratios. There are a couple of different ways to do this: 
+
+```
+norm = max(r, max(g, b))
+
+# option 1: calculate inverse rgb ratios directly
+inverse_rgb_rats = (norm - rgb) / norm
+
+# option 2: calculate rgb ratios
+rgb_rats = rgb / norm
+inverse_rgb_rats = 1.0 - rgb_rats
+```
+
+Inverse rgb ratios represent the achromatic value at 0.0, and represent increasing chroma in the complementary hue directions (essentially cyan, magenta, yellow saturation). A inverse rgb ratio of 1.0 is at the RGB gamut prism boundary. We exploited this facet of this model for the gamut mapping algorithm.
+
+![HueSwatches24_03_inverse_rgb_ratios](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_03_inverse_rgb_ratios.png)
+
+If you take the `max(r,g,b)` of the inverse RGB ratios you get a hexagonal representation of chroma. Interestingly this is identical to `max(r,g,b) - min(r,g,b)` which is identical to S in hexagonal HSV.
+
+![HueSwatches24_04_hexagonal_saturation](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_04_hexagonal_saturation.png)
+
+Instead of taking the `max(r,g,b)` if we weight the inverse rgb ratios by the luminance weights for the rendering gamut, we get a weighted representation of the chroma. This is useful because it is desireable in a display rendering transform to control the behavior of different hue regions according to this perceptual  facet. For example, yellow and green should desaturate more quickly than blues and reds. Similarly blues and reds should appear darker at lower luminance levels, and brighter at higher luminance levels to maintain a natural appearance, at least with the subjective testing that I have done.
+
+![HueSwatches24_05_inverse_rgb_ratios_luminance_weights](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_05_inverse_rgb_ratios_luminance_weights.png)
+
+"Forward" rgb ratios are also useful. They look like this. Instead of the achromatic axis being at 0.0, it is at 1.0. This means we can multiply these values to get a "more intense" color in certain regions. I'm not sure how to describe this properly, but it seems like an important facet of this model to achieve vibrant color.
+
+![HueSwatches24_07_rgb_ratios](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_07_rgb_ratios.png)
+
 # Engineering a Path to White
+
+Here is one method to engineer a path to white for high intensity input colors. This time we'll remove the chroma ramp, and keep fully saturated color from top to bottom.
+
+![HueSwatches24_demo_01](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_demo_01.png)
+
+And then we will expose up our image to get some insanely bright insanely saturated input colors to test. (Shown here with a simple gamma 2.2 transform - note the collapse towards the secondary colors: cyan magenta and yellow!)
+
+![HueSwatches24_demo_02](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_demo_02.png)
+
+We'll take the norm using our max(r,g,b) method (note that this image has the intensity compression curve - the Tonescale already applied for display purposes).
+
+![HueSwatches24_demo_03](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_demo_03.png)
+
+From the max(r,g,b) norm, we can calculate the inverse rgb ratios.
+
+![HueSwatches24_demo_04](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_demo_04.png)
+
+And the luminance weights
+
+![HueSwatches24_demo_05](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_demo_05.png)
+
+We can bias our compressed norm with something like a power function. This specifies how much of the highlight region we want to affect with our path to white.
+
+![HueSwatches24_demo_07](/cave/dev/github/opendrt/open-display-transform-master/doc/img/HueSwatches24_demo_07.png)
+
