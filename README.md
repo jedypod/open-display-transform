@@ -4,6 +4,8 @@ An open source, chromaticity preserving, simple neutral and robust display trans
 
 Currently available as a Nuke node. Resolve DCTL is planned once the design is in a less experimental stage.
 
+**ALPHA SOFTWARE** - be warned that this software is highly experimental, and is being actively tested and developed. It is highly recommended that you do not use it for production use in the creation of images.
+
 ## Design Goals
 
 - **Simple** - Simplicity of design 
