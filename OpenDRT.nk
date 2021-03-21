@@ -1,14 +1,14 @@
 set cut_paste_input [stack 0]
 BackdropNode {
  inputs 0
- name BackdropNode62
+ name BackdropNode63
  tile_color 0x2b323801
- label "<font color=#000000><font size=9><b><center>OpenDRT v0.0.61</b></font>\n- Refine luminance control (setup that controls luminance per hue region), to include a bias for what region of norm to remove. Put another way: darken blues and reds below a certain threshold more than values above that threshold.\n- Experiment with s-curve on distance factor, the setup which \"raises\" RGB ratio luminance for more saturated colors. This is a bad idea.\n- Add very rough experimental version of a perceptual hue model using OkLab. Behavior is strange for colors near achromatic. To be solved..."
+ label "<font color=#000000><font size=9><b><center>OpenDRT v0.0.70</b></font>\n- Remove bias on distance control\n- Rework bias on luminance control\n- Switch back to power function on path to white factor because it actually looks about the same with the rgb ratio distance control setup.\n- Still need to figure out the kinks in the perceptual setup, and I'm questioning whether it is a good design decision to have something this brittle and non-reversible in here.\n- Still need to figure out the HDR tonescale..."
  note_font Helvetica
  note_font_size 18
  note_font_color 0xffffffff
  selected true
- xpos -12599
+ xpos -12097
  ypos 378
  bdwidth 434
  bdheight 443
@@ -16,12 +16,12 @@ BackdropNode {
 }
 push $cut_paste_input
 Group {
- name OpenDRT71
- label v0.0.61
+ name OpenDRT72
+ label v0.0.70
  note_font Helvetica
  selected true
- xpos -12409
- ypos 615
+ xpos -11920
+ ypos 675
  mapsize {0 0}
  addUserKnob {20 OpenDRT}
  addUserKnob {41 input_gamut l "input gamut" T InGamut_to_XYZ.gamut}
@@ -48,10 +48,10 @@ Group {
   note_font Helvetica
   note_font_size 10
   note_font_color 0xffffffff
-  xpos 54
-  ypos 149
-  bdwidth 332
-  bdheight 302
+  xpos -16
+  ypos 306
+  bdwidth 526
+  bdheight 383
   z_order -10
  }
  BackdropNode {
@@ -62,10 +62,10 @@ Group {
   note_font Helvetica
   note_font_size 10
   note_font_color 0xffffffff
-  xpos -34
-  ypos 1157
-  bdwidth 834
-  bdheight 528
+  xpos -40
+  ypos 1144
+  bdwidth 961
+  bdheight 592
   z_order -10
  }
  BackdropNode {
@@ -76,10 +76,10 @@ Group {
   note_font Helvetica
   note_font_size 10
   note_font_color 0xffffffff
-  xpos 183
-  ypos 865
-  bdwidth 265
-  bdheight 190
+  xpos 134
+  ypos 874
+  bdwidth 407
+  bdheight 262
   z_order -10
  }
  BackdropNode {
@@ -90,10 +90,10 @@ Group {
   note_font Helvetica
   note_font_size 10
   note_font_color 0xffffffff
-  xpos -979
-  ypos -417
-  bdwidth 419
-  bdheight 414
+  xpos -998
+  ypos -435
+  bdwidth 457
+  bdheight 373
   z_order -10
  }
  BackdropNode {
@@ -104,10 +104,10 @@ Group {
   note_font Helvetica
   note_font_size 10
   note_font_color 0xffffffff
-  xpos -712
-  ypos 82
-  bdwidth 325
-  bdheight 915
+  xpos -741
+  ypos -49
+  bdwidth 382
+  bdheight 1096
   z_order -10
  }
  BackdropNode {
@@ -118,10 +118,10 @@ Group {
   note_font Helvetica
   note_font_size 10
   note_font_color 0xffffffff
-  xpos -348
-  ypos -98
-  bdwidth 257
-  bdheight 357
+  xpos -248
+  ypos -49
+  bdwidth 255
+  bdheight 218
   z_order -10
  }
  BackdropNode {
@@ -132,10 +132,10 @@ Group {
   note_font Helvetica
   note_font_size 10
   note_font_color 0xffffffff
-  xpos -268
-  ypos 295
-  bdwidth 235
-  bdheight 730
+  xpos -337
+  ypos 316
+  bdwidth 298
+  bdheight 732
   z_order -10
  }
  BackdropNode {
@@ -147,7 +147,7 @@ Group {
   note_font_size 10
   note_font_color 0xffffffff
   xpos 156
-  ypos -162
+  ypos -176
   bdwidth 348
   bdheight 232
   z_order -10
@@ -161,7 +161,7 @@ Group {
   note_font_size 10
   note_font_color 0xffffffff
   xpos 167
-  ypos 1736
+  ypos 1796
   bdwidth 327
   bdheight 368
   z_order -10
@@ -174,24 +174,11 @@ Group {
   note_font Helvetica
   note_font_size 10
   note_font_color 0xffffffff
-  xpos 186
-  ypos -571
-  bdwidth 288
-  bdheight 241
+  xpos 191
+  ypos -565
+  bdwidth 279
+  bdheight 229
   z_order -10
- }
- NoOp {
-  inputs 0
-  name display_range
-  label "\[value dmin] to \[value dmax] stops\n\[value lin_dmin] to \[value lin_dmax]"
-  note_font Helvetica
-  xpos -938
-  ypos -321
-  addUserKnob {20 User}
-  addUserKnob {7 lin_dmin l "lin dmin" t "linear dmin value" R 0 0.1}
-  lin_dmin {{0.18*pow(2,dmin)}}
-  addUserKnob {7 lin_dmax l "lin dmax" t "linear dmax value" R 1 50}
-  lin_dmax {{0.18*pow(2,dmax)}}
  }
  Input {
   inputs 0
@@ -224,7 +211,7 @@ Group {
    xpos 324
    ypos -516
   }
-set N40255880 [stack 0]
+set N41a75cf0 [stack 0]
   ColorMatrix {
    matrix {
        {0.7736025453 0.07218572497 0.154211551}
@@ -237,7 +224,7 @@ set N40255880 [stack 0]
    xpos 840
    ypos -465
   }
-push $N40255880
+push $N41a75cf0
   ColorMatrix {
    matrix {
        {0.6712647676 0.225895524 0.1028395444}
@@ -250,7 +237,7 @@ push $N40255880
    xpos 730
    ypos -465
   }
-push $N40255880
+push $N41a75cf0
   ColorMatrix {
    matrix {
        {0.4338874221 0.3762239516 0.1898886263}
@@ -263,7 +250,7 @@ push $N40255880
    xpos 620
    ypos -465
   }
-push $N40255880
+push $N41a75cf0
   ColorMatrix {
    matrix {
        {0.670160532 0.1521552503 0.1776841432}
@@ -276,7 +263,7 @@ push $N40255880
    xpos 510
    ypos -465
   }
-push $N40255880
+push $N41a75cf0
   ColorMatrix {
    matrix {
        {0.6864269972 0.1338092536 0.179763481}
@@ -289,7 +276,7 @@ push $N40255880
    xpos 400
    ypos -465
   }
-push $N40255880
+push $N41a75cf0
   ColorMatrix {
    matrix {
        {0.9875583053 -0.006041352171 0.01848266274}
@@ -328,19 +315,87 @@ push $N40255880
    ypos -459
   }
  end_group
- Dot {
-  name Dot14
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
-  xpos 324
-  ypos -486
+ Group {
+  name CreativeWhitepoint
+  note_font Helvetica
+  xpos 290
+  ypos -459
+  addUserKnob {20 CreativeWhitepoint_tab l CreativeWhitepoint}
+  addUserKnob {4 whitepoint t "Choose the creative whitepoint" M {D65 D60 D55 D50}}
  }
-set N3f3376f0 [stack 0]
+  Input {
+   inputs 0
+   name Input
+   xpos -40
+   ypos -40
+  }
+  Dot {
+   name Dot1
+   note_font "Helvetica Bold"
+   note_font_size 24
+   note_font_color 0xff
+   xpos -6
+   ypos 54
+  }
+set N4c3c4820 [stack 0]
+  ColorMatrix {
+   matrix {
+       {1.042574048 0.03089117631 -0.052812621}
+       {0.02219353616 1.001856685 -0.02107376233}
+       {-0.001164883142 -0.003420527093 0.7617890835}
+     }
+   name ColorMatrix174
+   label "D65 to D50"
+   note_font Helvetica
+   xpos 290
+   ypos 105
+  }
+push $N4c3c4820
+  ColorMatrix {
+   matrix {
+       {1.025850892 0.01794398203 -0.03321377933}
+       {0.01291338541 1.002147794 -0.01324210316}
+       {-0.0007199402899 -0.002181068063 0.8486801386}
+     }
+   name ColorMatrix172
+   label "D65 to D55"
+   note_font Helvetica
+   xpos 180
+   ypos 105
+  }
+push $N4c3c4820
+  ColorMatrix {
+   matrix {
+       {1.011822462 0.007788793184 -0.01577830315}
+       {0.005616828334 1.001506448 -0.006285175681}
+       {-0.0003357357346 -0.001050950028 0.9273666739}
+     }
+   name ColorMatrix173
+   label "D65 to D60"
+   note_font Helvetica
+   xpos 70
+   ypos 105
+  }
+push $N4c3c4820
+  Switch {
+   inputs 4
+   which {{whitepoint}}
+   name SwitchWhitepoint
+   note_font Helvetica
+   xpos -40
+   ypos 179
+  }
+  Output {
+   name Output1
+   xpos -40
+   ypos 290
+  }
+ end_group
+set N5e9af700 [stack 0]
  Group {
   name XYZ_to_RenderGamut
   xpos 290
-  ypos -400
+  ypos -422
   addUserKnob {20 XYZ_to_RenderGamut_tab l XYZ_to_RenderGamut}
   addUserKnob {4 gamut l "render gamut" t "Choose the gamut in which the rendering is performed" M {Rec.2020 P3 Rec.709 ""}}
   addUserKnob {41 matrix T ColorMatrix1.matrix}
@@ -356,7 +411,7 @@ set N3f3376f0 [stack 0]
    xpos 324
    ypos -516
   }
-set N3f23bc80 [stack 0]
+set N43acf660 [stack 0]
   ColorMatrix {
    matrix {
        {3.080398321 -1.537382722 -0.5430157781}
@@ -369,7 +424,7 @@ set N3f23bc80 [stack 0]
    xpos 510
    ypos -465
   }
-push $N3f23bc80
+push $N43acf660
   ColorMatrix {
    matrix {
        {2.369957685 -0.9313831329 -0.4385751188}
@@ -382,7 +437,7 @@ push $N3f23bc80
    xpos 400
    ypos -465
   }
-push $N3f23bc80
+push $N43acf660
   ColorMatrix {
    matrix {
        {1.631600976 -0.3556707203 -0.2759304345}
@@ -421,6 +476,20 @@ push $N3f23bc80
    ypos -459
   }
  end_group
+ Expression {
+  expr0 r>t?r:t+(l-t)*tanh(((r-t)/(l-t)))
+  expr1 g>t?g:t+(l-t)*tanh(((g-t)/(l-t)))
+  expr2 b>t?b:t+(l-t)*tanh(((b-t)/(l-t)))
+  name lift
+  label "fixes issues with shadow grain"
+  xpos 290
+  ypos -390
+  addUserKnob {20 Params_tab l Params}
+  addUserKnob {7 t}
+  t 0.004
+  addUserKnob {7 l R -0.01 0}
+  l -0.0006
+ }
  Dot {
   name Dot1
   note_font "Helvetica Bold"
@@ -429,7 +498,7 @@ push $N3f23bc80
   xpos 324
   ypos -306
  }
-set N4003efe0 [stack 0]
+set N423c8170 [stack 0]
  Expression {
   channel0 rgba
   expr0 max(r,g,b)
@@ -441,20 +510,6 @@ set N4003efe0 [stack 0]
   xpos -810
   ypos -309
  }
- Expression {
-  expr0 r>t?r:t+(l-t)*tanh(((r-t)/(l-t)))
-  expr1 g>t?g:t+(l-t)*tanh(((g-t)/(l-t)))
-  expr2 b>t?b:t+(l-t)*tanh(((b-t)/(l-t)))
-  name lift
-  label "fixes issues with shadow grain"
-  xpos -810
-  ypos -286
-  addUserKnob {20 Params_tab l Params}
-  addUserKnob {7 t}
-  t 0.004
-  addUserKnob {7 l R -0.01 0}
-  l -0.0006
- }
  Dot {
   name Dot22
   note_font "Helvetica Bold"
@@ -463,11 +518,11 @@ set N4003efe0 [stack 0]
   xpos -776
   ypos -216
  }
-set N3fb32a50 [stack 0]
+set N40fd4010 [stack 0]
  Group {
   name Tonemap_HillLangmuir_Log
   xpos -810
-  ypos -100
+  ypos -130
   addUserKnob {20 Tonemap_HillLangmuir_Log_tab l Tonemap_HillLangmuir_Log}
   addUserKnob {7 n R 0 80}
   n 10
@@ -476,7 +531,7 @@ set N3fb32a50 [stack 0]
   addUserKnob {7 offset}
   offset 0.185
   addUserKnob {7 c t "where y=1, x=c" R 0.5 1.5}
-  c 1.05
+  c 1
   addUserKnob {6 log_shaper l "log shaper" t "enable log shaper" +STARTLINE}
   log_shaper true
   addUserKnob {7 dmin t "log shaper min in stops below 0.18" R -12 0}
@@ -505,7 +560,7 @@ set N3fb32a50 [stack 0]
    xpos -6
    ypos 354
   }
-set N3ee39300 [stack 0]
+set N43ac2b50 [stack 0]
   Expression {
    expr0 pow(-r*pow(k,n)/((r-s)),1/n)-k+o
    expr1 pow(-g*pow(k,n)/((g-s)),1/n)-k+o
@@ -523,7 +578,7 @@ set N3ee39300 [stack 0]
    ypos 410
    disable {{!parent.log_shaper}}
   }
-push $N3ee39300
+push $N43ac2b50
   Expression {
    expr0 r<1e-12?0:(log(r/dmid)/log(2)-dmin)/(dmax-dmin)
    expr1 g<1e-12?0:(log(g/dmid)/log(2)-dmin)/(dmax-dmin)
@@ -572,52 +627,80 @@ push $N3ee39300
   note_font_size 24
   note_font_color 0xff
   xpos -776
-  ypos 144
+  ypos 54
  }
-set N40379e70 [stack 0]
+set N4e549490 [stack 0]
  Dot {
   name Dot17
   note_font "Helvetica Bold"
   note_font_size 24
   note_font_color 0xff
   xpos -556
-  ypos 144
+  ypos 54
  }
+set N4d70a640 [stack 0]
+ Dot {
+  name Dot14
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -446
+  ypos 54
+ }
+set N4326fe80 [stack 0]
+ Dot {
+  name Dot21
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -446
+  ypos 264
+ }
+set N41443b00 [stack 0]
  Group {
-  name Exponential4
+  name Power2
+  label "What tonal range gets darkened"
   note_font Helvetica
-  xpos -590
-  ypos 201
-  addUserKnob {20 Exponential_tab l Exponential}
-  addUserKnob {7 s l slope R 5 15}
-  s 5
-  addUserKnob {7 o l offset R -0.5 0.5}
-  o 0.2
+  xpos -480
+  ypos 435
+  addUserKnob {20 Power_tab l Power}
+  addUserKnob {7 p l power R 0 8}
+  p 0.3
+  addUserKnob {7 s l scale t "where the parabola crosses y=1" R 0 2}
+  s 1
  }
   Input {
    inputs 0
    name Input
-   xpos 400
-   ypos 170
+   xpos -40
+   ypos 50
   }
   Expression {
-   expr0 exp(s*r-s-o)
-   expr1 exp(s*g-s-o)
-   expr2 exp(s*b-s-o)
-   name Expression31
+   expr0 sign(r)*pow(fabs(r/s),p)
+   expr1 sign(g)*pow(fabs(g/s),p)
+   expr2 sign(b)*pow(fabs(b/s),p)
+   channel3 none
+   name Expression
    note_font Helvetica
-   xpos 400
-   ypos 231
+   xpos -40
+   ypos 111
   }
   Output {
    name Output
-   xpos 400
-   ypos 290
+   xpos -40
+   ypos 170
   }
  end_group
-set N403849e0 [stack 0]
-push $N3fb32a50
-push $N4003efe0
+ Dot {
+  name Dot19
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -446
+  ypos 534
+ }
+push $N40fd4010
+push $N423c8170
  MergeExpression {
   inputs 2
   temp_name0 m
@@ -659,7 +742,7 @@ push $N4003efe0
    xpos -6
    ypos -126
   }
-set N3eb3a9a0 [stack 0]
+set N5ebd5650 [stack 0]
   Expression {
    channel0 rgb
    expr0 max(r,g,b)
@@ -672,7 +755,7 @@ set N3eb3a9a0 [stack 0]
    ypos -129
    disable {{!parent.chromaticity_linear}}
   }
-set N40261010 [stack 0]
+set N5ebda580 [stack 0]
   Expression {
    expr0 r<t.0?r:t.0+(l.0-t.0)*tanh(((r-t.0)/(l.0-t.0)))
    expr1 g<t.1?g:t.1+(l.1-t.1)*tanh(((g-t.1)/(l.1-t.1)))
@@ -686,7 +769,7 @@ set N40261010 [stack 0]
    addUserKnob {78 l n 3}
    l {{parent.limit.r} {parent.limit.g} {parent.limit.b}}
   }
-push $N40261010
+push $N5ebda580
   Expression {
    temp_name0 s0
    temp_expr0 (l.0-t.0)/pow(pow((1-t.0)/(l.0-t.0),-p)-1,1/p)
@@ -708,9 +791,9 @@ push $N40261010
    addUserKnob {7 p R 1 5}
    p 1
   }
-push $N3eb3a9a0
-push $N40261010
-push $N40261010
+push $N5ebd5650
+push $N5ebda580
+push $N5ebda580
   Expression {
    expr0 r<t.0?r:t.0+(l.0-t.0)*2/pi*atan(pi/2*(r-t.0)/(l.0-t.0))
    expr1 g<t.1?g:t.1+(l.1-t.1)*2/pi*atan(pi/2*(g-t.1)/(l.1-t.1))
@@ -759,13 +842,13 @@ push $N40261010
   xpos 324
   ypos -6
  }
-set N4094a8a0 [stack 0]
+set N286c4690 [stack 0]
  Dot {
   name Dot10
   note_font "Helvetica Bold"
   note_font_size 24
   note_font_color 0xff
-  xpos -226
+  xpos -116
   ypos -6
  }
  Expression {
@@ -779,14 +862,43 @@ set N4094a8a0 [stack 0]
   channel2 none
   channel3 none
   name Luminance_Weights2
-  xpos -260
-  ypos 50
+  xpos -150
+  ypos 20
   addUserKnob {20 Param}
   addUserKnob {35 weight_presets l "" +STARTLINE M {weights/ACEScg "knobs this \{w \{0.26806405 0.67246455 0.05947147\}\}" weights/Rec.2020 "knobs this \{w \{0.26270026 0.67799819 0.05930173\}\}" weights/P3D65 "knobs this \{w \{0.22897467 0.69173867 0.07928693\}\}" weights/Rec.709 "knobs this \{w \{0.21263911 0.71516877 0.07219233\}\}" "weights/Red WideGamut RGB" "knobs this \{w \{0.28669411 0.84297919 -0.12967324\}\}" "weights/Alexa Wide Gamut" "knobs this \{w \{0.2919538 0.82384098 -0.11579483\}\}" "weights/Sony S-Gamut3.Cine" "knobs this \{w \{0.21507585 0.88506854 -0.10014433\}\}" "weights/Filmlight E-Gamut" "knobs this \{w \{0.28013074 0.82020682 -0.10033739\}\}" "weights/DaVinci Wide Gamut" "knobs this \{w \{0.27411851 0.87363189 -0.14775042\}\}"}}
   addUserKnob {78 w l "" t "luminance weighting" -STARTLINE n 3}
   w {0.26270026 0.67799819 0.05930173}
   addUserKnob {6 normalize t "normalize based on max weight" +STARTLINE}
  }
+ Dot {
+  name Dot7
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -116
+  ypos 204
+ }
+set N3e7b6d70 [stack 0]
+ Dot {
+  name Dot25
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -226
+  ypos 204
+ }
+ MergeExpression {
+  inputs 2
+  expr0 (1-Ar)*Br
+  expr1 (1-Ag)*Bg
+  expr2 (1-Ab)*Bb
+  name ComplementMultiply2
+  note_font Helvetica
+  xpos -260
+  ypos 531
+ }
+push $N41443b00
+push $N3e7b6d70
  MergeExpression {
   inputs 2
   expr0 (1-Ar)*Br
@@ -794,77 +906,85 @@ set N4094a8a0 [stack 0]
   expr2 (1-Ab)*Bb
   name ComplementMultiply3
   note_font Helvetica
-  xpos -260
-  ypos 201
+  xpos -150
+  ypos 261
  }
-set N409654e0 [stack 0]
  Dot {
   name Dot4
   note_font "Helvetica Bold"
   note_font_size 24
   note_font_color 0xff
-  xpos -226
-  ypos 474
+  xpos -116
+  ypos 384
  }
-set N40972f70 [stack 0]
-push $N403849e0
+push $N4d70a640
+ Group {
+  name Power
+  note_font Helvetica
+  xpos -590
+  ypos 92
+  addUserKnob {20 Power_tab l Power}
+  addUserKnob {7 p l power R 0 8}
+  p 6
+  addUserKnob {7 s l scale t "where the parabola crosses y=1" R 0 2}
+  s 1.1
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos -40
+   ypos 50
+  }
+  Expression {
+   expr0 sign(r)*pow(fabs(r/s),p)
+   expr1 sign(g)*pow(fabs(g/s),p)
+   expr2 sign(b)*pow(fabs(b/s),p)
+   channel3 none
+   name Expression
+   note_font Helvetica
+   xpos -40
+   ypos 111
+  }
+  Output {
+   name Output
+   xpos -40
+   ypos 170
+  }
+ end_group
+ Clamp {
+  channels rgba
+  name Clamp1
+  note_font Helvetica
+  xpos -590
+  ypos 171
+ }
  Dot {
-  name Dot7
+  name Dot20
   note_font "Helvetica Bold"
   note_font_size 24
   note_font_color 0xff
   xpos -556
-  ypos 384
+  ypos 234
  }
-set N40977ec0 [stack 0]
- Gamma {
-  channels rgba
-  value 2
-  name Gamma1
-  note_font Helvetica
-  xpos -150
-  ypos 381
- }
- Expression {
-  expr0 1-r
-  expr1 1-g
-  expr2 1-b
-  channel3 none
-  name Complement1
-  note_font Helvetica
-  xpos -150
-  ypos 441
- }
- Merge2 {
-  inputs 2
-  operation multiply
-  bbox B
-  output rgb
-  name Merge1
-  note_font Helvetica
-  xpos -150
-  ypos 501
- }
-push $N40972f70
-push $N40977ec0
  MergeExpression {
   inputs 2
   expr0 (1-Ar)*Br
   expr1 (1-Ag)*Bg
   expr2 (1-Ab)*Bb
   name ComplementMultiply
+  label "preserve saturation in brighter more saturated colors"
   note_font Helvetica
   xpos -590
-  ypos 471
+  ypos 375
  }
  Clamp {
   channels rgba
-  name Clamp1
+  name Clamp2
   note_font Helvetica
   xpos -590
-  ypos 681
+  ypos 651
  }
-push $N40379e70
+push $N4e549490
  Dot {
   name Dot6
   note_font "Helvetica Bold"
@@ -887,9 +1007,9 @@ push $N40379e70
   expr0 (1-Ar)*Br
   expr1 (1-Ag)*Bg
   expr2 (1-Ab)*Bb
-  name ComplementMultiply2
+  name ComplementMultiply1
   note_font Helvetica
-  xpos -150
+  xpos -260
   ypos 951
  }
  Dot {
@@ -900,116 +1020,106 @@ push $N40379e70
   xpos 214
   ypos 954
  }
-set N3ec10b70 [stack 0]
+set N4c35fc20 [stack 0]
  Dot {
   name Dot5
   note_font "Helvetica Bold"
   note_font_size 24
   note_font_color 0xff
   xpos 214
-  ypos 1104
+  ypos 1074
  }
-set N3ec15af0 [stack 0]
-push $N3ec10b70
-push $N409654e0
+set N4c364c40 [stack 0]
+push $N4c35fc20
+push $N4326fe80
+ Dot {
+  name Dot23
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -6
+  ypos 54
+ }
+ Dot {
+  name Dot24
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -6
+  ypos 534
+ }
+push $N3e7b6d70
  Dot {
   name Dot11
   note_font "Helvetica Bold"
   note_font_size 24
   note_font_color 0xff
-  xpos 214
+  xpos 104
   ypos 204
  }
  Group {
-  name Tonemap_HillLangmuir
-  xpos 180
-  ypos 320
-  addUserKnob {20 Tonemap_HillLangmuir_Log_tab l Tonemap_HillLangmuir_Log}
-  addUserKnob {7 n R 0 80}
-  n 3
-  addUserKnob {7 k R 0 10}
-  k 0.695
-  addUserKnob {7 o l offset R -1 1}
-  o 0.5
-  addUserKnob {7 c t "where y=1, x=c" R 0.5 1.5}
-  c 0.55
-  addUserKnob {7 s l scale t "scale factor such that x=c where y=1" R 0 2}
-  s {{(pow(k-o+c,n)+pow(k,n))/pow(k-o+c,n)}}
-  addUserKnob {26 ""}
-  addUserKnob {4 direction M {forward inverse}}
+  name Power3
+  label "how much mid saturation range is brightened"
+  note_font Helvetica
+  xpos 70
+  ypos 391
+  disable true
+  addUserKnob {20 Power_tab l Power}
+  addUserKnob {7 p l power R 0 8}
+  p 1
+  addUserKnob {7 s l scale t "where the parabola crosses y=1" R 0 2}
+  s 1
  }
   Input {
    inputs 0
    name Input
    xpos -40
-   ypos 200
+   ypos 50
   }
-  Dot {
-   name Dot1
-   xpos -6
-   ypos 354
-  }
-set N3ec2f430 [stack 0]
   Expression {
-   expr0 pow(-r*pow(k,n)/((r-s)),1/n)-k+o
-   expr1 pow(-g*pow(k,n)/((g-s)),1/n)-k+o
-   expr2 pow(-b*pow(k,n)/((b-s)),1/n)-k+o
-   name Hill_Langmuir_inverse
-   xpos 70
-   ypos 380
-  }
-push $N3ec2f430
-  Expression {
-   expr0 s*(1-pow(k,n)/(pow(k,n)+pow(k+r-o,n)))
-   expr1 s*(1-pow(k,n)/(pow(k,n)+pow(k+g-o,n)))
-   expr2 s*(1-pow(k,n)/(pow(k,n)+pow(k+b-o,n)))
-   name Hill_Langmuir_forward
-   xpos -150
-   ypos 410
-  }
-  Switch {
-   inputs 2
-   which {{parent.direction}}
-   name SwitchDirection
+   expr0 sign(r)*pow(fabs(r/s),p)
+   expr1 sign(g)*pow(fabs(g/s),p)
+   expr2 sign(b)*pow(fabs(b/s),p)
+   channel3 none
+   name Expression
    note_font Helvetica
    xpos -40
-   ypos 471
+   ypos 111
   }
   Output {
    name Output
    xpos -40
-   ypos 530
-  }
-  StickyNote {
-   inputs 0
-   name StickyNote1
-   tile_color 0x272727ff
-   label "<left><b>Hill-Langmuir Equation</b>\nhttps://www.desmos.com/calculator/gkpyvkbizy\nhttps://en.wikipedia.org/wiki/Hill_equation_(biochemistry)"
-   note_font Helvetica
-   note_font_size 14
-   note_font_color 0xa8a8a8ff
-   xpos -173
-   ypos 268
+   ypos 170
   }
  end_group
+ Merge2 {
+  inputs 2
+  operation multiply
+  bbox B
+  output rgb
+  name Merge1
+  note_font Helvetica
+  xpos 70
+  ypos 531
+ }
  Add {
   channels rgb
   value 1
   name Add1
   note_font Helvetica
-  xpos 180
-  ypos 381
+  xpos 70
+  ypos 591
  }
-push $N4094a8a0
+push $N286c4690
  Expression {
   expr0 1-r
   expr1 1-g
   expr2 1-b
   channel3 none
-  name Complement2
+  name RGBRatios
   note_font Helvetica
   xpos 290
-  ypos 81
+  ypos 171
  }
  Merge2 {
   inputs 2
@@ -1019,7 +1129,7 @@ push $N4094a8a0
   name Merge2
   note_font Helvetica
   xpos 290
-  ypos 381
+  ypos 591
  }
  MergeExpression {
   inputs 2
@@ -1028,9 +1138,10 @@ push $N4094a8a0
   expr0 Br*(1-f)+f
   expr1 Bg*(1-f)+f
   expr2 Bb*(1-f)+f
-  name LerpToTarget2
+  name LerpToTarget1
+  label "Lerp to 1.0"
   xpos 290
-  ypos 950
+  ypos 944
  }
  Merge2 {
   inputs 2
@@ -1040,7 +1151,7 @@ push $N4094a8a0
   name Merge5
   note_font Helvetica
   xpos 290
-  ypos 1101
+  ypos 1071
  }
  ColorMatrix {
   matrix {
@@ -1062,15 +1173,33 @@ push $N4094a8a0
   xpos 324
   ypos 1344
  }
-set N403daae0 [stack 0]
-push $N3f3376f0
+set N52917360 [stack 0]
+ Dot {
+  name Dot12
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos 324
+  ypos 1584
+ }
+set N5291c260 [stack 0]
+push $N4c364c40
+push $N5e9af700
  Dot {
   name Dot13
   note_font "Helvetica Bold"
   note_font_size 24
   note_font_color 0xff
   xpos 654
-  ypos -486
+  ypos -456
+ }
+ Dot {
+  name Dot9
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos 654
+  ypos 1224
  }
  Group {
   name Oklab_ExposureInveriant
@@ -1114,7 +1243,7 @@ push $N3f3376f0
    name Normalize
    note_font Helvetica
    xpos -590
-   ypos 561
+   ypos 541
   }
   Group {
    name XYZ_to_Oklab
@@ -1198,10 +1327,18 @@ push $N3f3376f0
   note_font_size 24
   note_font_color 0xff
   xpos 654
-  ypos 1464
+  ypos 1494
  }
-set N3e725230 [stack 0]
-push $N403daae0
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy3
+  note_font Helvetica
+  xpos 180
+  ypos 1485
+ }
+push $N52917360
  Dot {
   name Dot16
   note_font "Helvetica Bold"
@@ -1211,7 +1348,7 @@ push $N403daae0
   ypos 1344
  }
  Group {
-  name Oklab_ExposureInveriant2
+  name Oklab_ExposureInveriant3
   note_font Helvetica
   xpos 70
   ypos 1401
@@ -1252,13 +1389,13 @@ push $N403daae0
    name Normalize
    note_font Helvetica
    xpos -590
-   ypos 561
+   ypos 546
   }
   Group {
    name XYZ_to_Oklab
    note_font Helvetica
    xpos -590
-   ypos 591
+   ypos 576
   }
    Input {
     inputs 0
@@ -1330,55 +1467,29 @@ push $N403daae0
    ypos 920
   }
  end_group
-set N3e72eec0 [stack 0]
- Copy {
-  inputs 2
-  from0 rgba.blue
-  to0 rgba.blue
-  name Copy2
-  note_font Helvetica
-  xpos 180
-  ypos 1504
- }
-push $N3ec15af0
-push $N3e725230
- Copy {
-  inputs 2
-  from0 rgba.alpha
-  to0 rgba.alpha
-  name Copy3
-  note_font Helvetica
-  xpos 180
-  ypos 1455
- }
-push $N3e72eec0
  MergeExpression {
   inputs 2
-  temp_name0 f
-  temp_expr0 Aa
+  temp_name0 d
+  temp_expr0 fabs(Bb-Ab)
+  temp_name1 hc
+  temp_expr1 d<pi?Bb:Bb-2*pi
+  temp_name2 ho
+  temp_expr2 Ab
+  temp_name3 f
+  temp_expr3 Aa
   expr0 r
   expr1 g
-  expr2 Ab*(1-f)+Bb*f
-  name LerpToTarget1
+  expr2 ho*(1-f)+hc*f
+  name LerpToTarget4
   xpos 70
-  ypos 1460
- }
- Switch {
-  inputs 2
-  which 1
-  name SwitchPerceptualMethod
-  note_font Helvetica
-  selected true
-  xpos 70
-  ypos 1541
-  disable true
+  ypos 1490
  }
  Group {
   inputs 2
   name Oklab_ExposureInvariant_Inverse
   note_font Helvetica
   xpos 70
-  ypos 1641
+  ypos 1581
  }
   BackdropNode {
    inputs 0
@@ -1517,7 +1628,7 @@ push $N3e72eec0
    ypos 950
   }
  end_group
-push $N403daae0
+push $N5291c260
  Switch {
   inputs 2
   which {{parent.perceptual}}
@@ -1530,7 +1641,7 @@ push $N403daae0
   name XYZ_to_DisplayGamut
   note_font Helvetica
   xpos 290
-  ypos 1807
+  ypos 1911
   addUserKnob {20 XYZ_to_DisplayGamut_tab l XYZ_to_DisplayGamut}
   addUserKnob {4 gamut l "display gamut" t "Choose the target display device chromaticities." M {Rec.2020 P3 Rec.709}}
   gamut Rec.709
@@ -1551,7 +1662,7 @@ push $N403daae0
    xpos 324
    ypos -516
   }
-set N402ee400 [stack 0]
+set N426c60d0 [stack 0]
   ColorMatrix {
    matrix {
        {3.080398321 -1.537382722 -0.5430157781}
@@ -1564,7 +1675,7 @@ set N402ee400 [stack 0]
    xpos 510
    ypos -465
   }
-push $N402ee400
+push $N426c60d0
   ColorMatrix {
    matrix {
        {2.369957685 -0.9313831329 -0.4385751188}
@@ -1577,7 +1688,7 @@ push $N402ee400
    xpos 400
    ypos -465
   }
-push $N402ee400
+push $N426c60d0
   ColorMatrix {
    matrix {
        {1.631600976 -0.3556707203 -0.2759304345}
@@ -1617,89 +1728,12 @@ push $N402ee400
   }
  end_group
  Group {
-  name CreativeWhitepoint
-  note_font Helvetica
-  xpos 290
-  ypos 1851
-  addUserKnob {20 CreativeWhitepoint_tab l CreativeWhitepoint}
-  addUserKnob {4 whitepoint t "Choose the creative whitepoint" M {D65 D60 D55 D50}}
- }
-  Input {
-   inputs 0
-   name Input
-   xpos -40
-   ypos -40
-  }
-  Dot {
-   name Dot1
-   note_font "Helvetica Bold"
-   note_font_size 24
-   note_font_color 0xff
-   xpos -6
-   ypos 54
-  }
-set N40340c80 [stack 0]
-  ColorMatrix {
-   matrix {
-       {1.042574048 0.03089117631 -0.052812621}
-       {0.02219353616 1.001856685 -0.02107376233}
-       {-0.001164883142 -0.003420527093 0.7617890835}
-     }
-   name ColorMatrix174
-   label "D65 to D50"
-   note_font Helvetica
-   xpos 290
-   ypos 105
-  }
-push $N40340c80
-  ColorMatrix {
-   matrix {
-       {1.025850892 0.01794398203 -0.03321377933}
-       {0.01291338541 1.002147794 -0.01324210316}
-       {-0.0007199402899 -0.002181068063 0.8486801386}
-     }
-   name ColorMatrix172
-   label "D65 to D55"
-   note_font Helvetica
-   xpos 180
-   ypos 105
-  }
-push $N40340c80
-  ColorMatrix {
-   matrix {
-       {1.011822462 0.007788793184 -0.01577830315}
-       {0.005616828334 1.001506448 -0.006285175681}
-       {-0.0003357357346 -0.001050950028 0.9273666739}
-     }
-   name ColorMatrix173
-   label "D65 to D60"
-   note_font Helvetica
-   xpos 70
-   ypos 105
-  }
-push $N40340c80
-  Switch {
-   inputs 4
-   which {{whitepoint}}
-   name SwitchWhitepoint
-   note_font Helvetica
-   xpos -40
-   ypos 179
-  }
-  Output {
-   name Output1
-   xpos -40
-   ypos 290
-  }
- end_group
- Group {
   name InverseEOTF
   note_font Helvetica
   xpos 290
-  ypos 2001
+  ypos 2061
   addUserKnob {20 InverseEOTF_tab l InverseEOTF}
   addUserKnob {4 inverse_eotf l "inverse eotf" t "Choose the inverse EOTF to apply for the target display device." M {"sRGB Display" BT.1886 "Gamma 2.6" DCDM PQ HLG Linear ""}}
-  inverse_eotf Linear
   addUserKnob {7 nits t "display luminance in nits for hdr inverse eotf" -STARTLINE R 100 4000}
   nits 1000
  }
@@ -1714,37 +1748,37 @@ push $N40340c80
    xpos 434
    ypos -156
   }
-set N3ea655e0 [stack 0]
+set N41410f10 [stack 0]
   Dot {
    name Dot6
    xpos 544
    ypos -156
   }
-set N3ea6a430 [stack 0]
+set N41415d80 [stack 0]
   Dot {
    name Dot20
    xpos 654
    ypos -156
   }
-set N3ea6f300 [stack 0]
+set N4141abe0 [stack 0]
   Dot {
    name Dot25
    xpos 764
    ypos -156
   }
-set N3ea74230 [stack 0]
+set N4141fa30 [stack 0]
   Dot {
    name Dot1
    xpos 874
    ypos -156
   }
-set N3ea78fe0 [stack 0]
+set N41424850 [stack 0]
   Dot {
    name Dot2
    xpos 1204
    ypos -156
   }
-push $N3ea78fe0
+push $N41424850
   Expression {
    expr0 "r * (Ymax - Ymin) + Ymin"
    expr1 "g * (Ymax - Ymin) + Ymin"
@@ -1784,7 +1818,7 @@ push $N3ea78fe0
    addUserKnob {7 pq_C +DISABLED R 0 100}
    pq_C 10000
   }
-set N3ea92190 [stack 0]
+set N49968c20 [stack 0]
   Dot {
    name Dot5
    label " "
@@ -1869,7 +1903,7 @@ set N3ea92190 [stack 0]
    xpos 984
    ypos 174
   }
-push $N3ea92190
+push $N49968c20
   Dot {
    name Dot27
    label " PQ"
@@ -1879,7 +1913,7 @@ push $N3ea92190
    xpos 874
    ypos 54
   }
-push $N3ea74230
+push $N4141fa30
   Expression {
    expr0 "pow( (48./52.37) * r, 1./2.6)"
    expr1 "pow( (48./52.37) * g, 1./2.6)"
@@ -1889,7 +1923,7 @@ push $N3ea74230
    xpos 730
    ypos -100
   }
-push $N3ea6f300
+push $N4141abe0
   Expression {
    expr0 pow(r,1/gamma)
    expr1 pow(g,1/gamma)
@@ -1901,7 +1935,7 @@ push $N3ea6f300
    addUserKnob {7 gamma R 0 4}
    gamma 2.6
   }
-push $N3ea6a430
+push $N41415d80
   Expression {
    temp_name0 c_a
    temp_expr0 "pow( pow( Lw, 1./gamma) - pow( Lb, 1./gamma), gamma)"
@@ -1920,7 +1954,7 @@ push $N3ea6a430
    addUserKnob {7 gamma R 1 4}
    gamma 2.4
   }
-push $N3ea655e0
+push $N41410f10
   Expression {
    expr0 pow(r,1/gamma)
    expr1 pow(g,1/gamma)
@@ -1945,7 +1979,7 @@ push $N3ea655e0
    xpos 400
    ypos 470
   }
-push $N3ea78fe0
+push $N41424850
   Viewer {
    frame_range 1-100
    name Viewer1
@@ -1959,12 +1993,96 @@ push $N3ea78fe0
   name Clamp
   note_font Helvetica
   xpos 290
-  ypos 2031
+  ypos 2113
   disable {{!parent.clamp x1 0 1}}
  }
  Output {
   name Output
   xpos 290
-  ypos 2150
+  ypos 2360
  }
+ NoOp {
+  inputs 0
+  name display_range
+  label "\[value dmin] to \[value dmax] stops\n\[value lin_dmin] to \[value lin_dmax]"
+  note_font Helvetica
+  xpos -920
+  ypos -321
+  addUserKnob {20 User}
+  addUserKnob {7 lin_dmin l "lin dmin" t "linear dmin value" R 0 0.1}
+  lin_dmin {{0.18*pow(2,dmin)}}
+  addUserKnob {7 lin_dmax l "lin dmax" t "linear dmax value" R 1 50}
+  lin_dmax {{0.18*pow(2,dmax)}}
+ }
+push $N4d70a640
+ Group {
+  name Exponential4
+  note_font Helvetica
+  xpos -708
+  ypos 88
+  addUserKnob {20 Exponential_tab l Exponential}
+  addUserKnob {7 s l slope R 5 15}
+  s 5
+  addUserKnob {7 o l offset R -0.5 0.5}
+  o 0.5
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 400
+   ypos 170
+  }
+  Expression {
+   expr0 exp(s*r-s-o)
+   expr1 exp(s*g-s-o)
+   expr2 exp(s*b-s-o)
+   name Expression31
+   note_font Helvetica
+   xpos 400
+   ypos 231
+  }
+  Output {
+   name Output
+   xpos 400
+   ypos 290
+  }
+ end_group
+push $N4d70a640
+ Group {
+  name Exponential
+  xpos -714
+  ypos 128
+  addUserKnob {20 Exponential_tab l Exponential}
+  addUserKnob {78 s l slope n 3}
+  s {7 {s.0} {s.0}}
+  addUserKnob {78 l l "y=1 crossing" n 3}
+  l {1.1 {l.0} {l.0}}
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 400
+   ypos 170
+  }
+  Expression {
+   temp_name0 sf0
+   temp_expr0 exp(s.0-s.0*l.0)
+   temp_name1 sf1
+   temp_expr1 exp(s.1-s.1*l.1)
+   temp_name2 sf2
+   temp_expr2 exp(s.2-s.2*l.2)
+   expr0 sf0*exp(s.0*r-s.0)
+   expr1 sf1*exp(s.1*g-s.1)
+   expr2 sf2*exp(s.2*b-s.2)
+   name Expression
+   note_font Helvetica
+   xpos 400
+   ypos 231
+  }
+  Output {
+   name Output
+   xpos 400
+   ypos 290
+  }
+ end_group
 end_group
