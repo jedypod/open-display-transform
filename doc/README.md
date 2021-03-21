@@ -215,7 +215,7 @@ Next with perceptual path to white.
 
 Handling out of gamut color values is a complex multi-dimensional problem that is interwoven through the entire processing chain. Because the sensors of digital cinema cameras are not colorimetric devices, they have a different spectral sensitivity than a human observer. One could say that there is the human observer, and there is the camera observer. This difference in spectral senstivity can result in rgb triplets that are somehow "impossibly" outside of the spectral locus in a CIE 1931 xy chromaticity diagram.
 
-![plot_gamut_comparison](/cave/dev/github/opendrt/open-display-transform-master/doc/img/plot_gamut_comparison.png)
+![plot_gamut_comparison](./img/plot_gamut_comparison.png)
 
 Above is a chromaticity diagram. You can see the familiar horse-shoe shape of the spectral locus for the standard human observer, as calculated by the CIE in 1931. The [planckian locus](https://en.wikipedia.org/wiki/Planckian_locus) is the curved line, and the little plus is the xy chromaticity of [illuminant D65](https://en.wikipedia.org/wiki/Illuminant_D65), a common whitepoint for many colorspaces. Plotted are the triangles for 3 gamuts. The smallest one is Rec.709. The middle one is Arri Alexa WideGamut. The biggest one is [Filmlight E-Gamut](https://www.filmlight.ltd.uk/workflow/truelight.php).
 
@@ -225,23 +225,23 @@ Here is a particularly challenging image we'll use to show what this looks like.
 
 Here is the image rendered through the Open Display Transform node, without perceptual, without gamut compression.
 
-![gamut_compress_01](/cave/dev/github/opendrt/open-display-transform-master/doc/img/gamut_compress_01.png)
+![gamut_compress_01](./img/gamut_compress_01.png)
 
 And here is a plot of the chromaticities of the input image. In this processing, the image was converted from Alexa Wide Gamut linear to ACEScg. Note the chromaticities outside of the spectral locus in the blue corner.
 
-![compress_gamut_chromaticity_plot](/cave/dev/github/opendrt/open-display-transform-master/doc/img/compress_gamut_chromaticity_plot.png)
+![compress_gamut_chromaticity_plot](./img/compress_gamut_chromaticity_plot.png)
 
 If we enable a subtle gamut compression, it helps bring the highly saturated blue colors a bit closer to the achromatic axis, and we get a bit more tonality preserved. Note that the highlights were already pretty well handled by the path to white chroma compression, so it's a small change. Note that in the current implementation this gamut compression is *not* chromaticity linear - it uses the same idea as the GamutCompress tool, so it introduces some hue shifts. For blue hues it actually looks similar to the perceptual model though.
 
-![gamut_compress_02](/cave/dev/github/opendrt/open-display-transform-master/doc/img/gamut_compress_02.png)
+![gamut_compress_02](./img/gamut_compress_02.png)
 
 And if we enable our perceptual path to white processing, it removes some of those subtle purple hues in the highlights.
 
-![gamut_compress_03](/cave/dev/github/opendrt/open-display-transform-master/doc/img/gamut_compress_03.png)
+![gamut_compress_03](./img/gamut_compress_03.png)
 
 Finally, for comparison, here is the ACES Rec.709 Output Transform.
 
-![gamut_compress_04](/cave/dev/github/opendrt/open-display-transform-master/doc/img/gamut_compress_04.png)
+![gamut_compress_04](./img/gamut_compress_04.png)
 
 The artifacts here are are partly due to the lack of gamut mapping in the ACES transform, and partly due to the per-channel nature of the algorithm.
 
