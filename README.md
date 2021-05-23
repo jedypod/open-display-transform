@@ -23,5 +23,5 @@ Currently available as a Nuke node. Resolve DCTL is planned once the design is i
   - Compress wide gamut to smaller display gamut
 - Apply chromaticity conversion and inverse EOTF to prepare image for display device
 
-# [Documentation](./doc)
+# [Documentation](./docs)
 
