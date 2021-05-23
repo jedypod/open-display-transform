@@ -1,0 +1,119 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name Tonemap_ToeLast
+ addUserKnob {20 Tonemap}
+ addUserKnob {35 presets l " " M {"presets/SDR - Dark" "knobs this \{Lp \{Lw\} Lw 100 Lg 11.5 c 1.4 ps 1 t0 0.01\}" "presets/SDR - Dim" "knobs this \{Lp \{Lw\} Lw 100 Lg 11.5 c 1.4 ps .95 t0 0.01\}" "presets/SDR - Average" "knobs this \{Lp \{Lw\} Lw 100 Lg 11.5 c 1.4 ps .9 t0 0.01\}" "presets/Rec.2100 PQ ST-2084 600 nit" "knobs this \{Lp 10000 Lw 600 Lg 14 c 1.2 ps 1 t0 0.002\}" "presets/Rec.2100 PQ ST-2084 1000 nit" "knobs this \{Lp 10000 Lw 1000 Lg 14 c 1.2 ps 1 t0 0.001\}" "presets/Rec.2100 PQ ST-2084 2000 nit" "knobs this \{Lp 10000 Lw 2000 Lg 14 c 1.2 ps 1 t0 0.0005\}" "presets/Rec.2100 PQ ST-2084 4000 nit" "knobs this \{Lp 10000 Lw 4000 Lg 14 c 1.2 ps 1 t0 0.00025\}"}}
+ addUserKnob {7 Lp t "Peak luminance in nits" R 48 10000}
+ Lp {10000}
+ addUserKnob {7 Lw t "Normalized white luminance in nits" R 48 4000}
+ Lw 4000
+ addUserKnob {7 Lg t "Grey luminance in nits." R 4 20}
+ Lg 14
+ addUserKnob {7 c l contrast R 0.8 2}
+ c 1.2
+ addUserKnob {7 ps l surround t "surround compensation: unconstrained power function" R 0.8 1.2}
+ ps 1
+ addUserKnob {7 t0 l toe R 0 0.1}
+ t0 0.00025
+ addUserKnob {26 ""}
+ addUserKnob {7 p t "power (combination of grey-constrained contrast and unconstrained surround compensation)" R 0.5 4}
+ p {{c*ps}}
+ addUserKnob {78 g l grey t "input -> output grey" n 2}
+ g {0.18 {Lg/Lp}}
+ addUserKnob {7 w t "input exposure" R 0 100}
+ w {{-pow(g.1/s.1,1/c)/(g.0*(pow(g.1/s.1,1/c)-1))}}
+ addUserKnob {7 h R 1 2}
+ h {{0.048*Lw/1000+1.037}}
+ addUserKnob {78 s l scale n 2}
+ s {{w*max(1,pow(Lw/1000,0.1))} {Lw/Lp*h}}
+ addUserKnob {4 direction M {forward inverse}}
+ addUserKnob {26 ""}
+ addUserKnob {26 plot_label l " " T "<style>a:link \{color:#ccc\}</style><a href=\"https://www.desmos.com/calculator/7qvuixbzht\">desmos plot</a>"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -40
+  ypos -70
+ }
+ Dot {
+  name Dot1
+  xpos -6
+  ypos -6
+ }
+set N266faae0 [stack 0]
+ Expression {
+  expr0 r/s.1
+  expr1 g/s.1
+  expr2 b/s.1
+  name InvOutputScale
+  xpos 70
+  ypos 21
+ }
+ Expression {
+  temp_name0 rt
+  temp_expr0 pow(0.5*(r+sqrt(r*(4*t0+r))),1/p)
+  temp_name1 gt
+  temp_expr1 pow(0.5*(g+sqrt(g*(4*t0+g))),1/p)
+  temp_name2 bt
+  temp_expr2 pow(0.5*(b+sqrt(b*(4*t0+b))),1/p)
+  expr0 rt/(1-rt)
+  expr1 gt/(1-gt)
+  expr2 bt/(1-bt)
+  name InvCompress
+  xpos 70
+  ypos 51
+ }
+ Expression {
+  expr0 r/s.0
+  expr1 g/s.0
+  expr2 b/s.0
+  name InputScale1
+  xpos 70
+  ypos 81
+ }
+push $N266faae0
+ Expression {
+  expr0 r*s.0
+  expr1 g*s.0
+  expr2 b*s.0
+  name InputScale
+  xpos -150
+  ypos 21
+ }
+ Expression {
+  temp_name0 rt
+  temp_expr0 pow(r/(r+1),p)
+  temp_name1 gt
+  temp_expr1 pow(g/(g+1),p)
+  temp_name2 bt
+  temp_expr2 pow(b/(b+1),p)
+  expr0 (rt*rt)/(rt+t0)
+  expr1 (gt*gt)/(gt+t0)
+  expr2 (bt*bt)/(bt+t0)
+  name Compression
+  xpos -150
+  ypos 51
+ }
+ Expression {
+  expr0 r*s.1
+  expr1 g*s.1
+  expr2 b*s.1
+  name OutputScale
+  xpos -150
+  ypos 81
+ }
+ Switch {
+  inputs 2
+  which {{parent.direction}}
+  name SwitchDirection
+  xpos -40
+  ypos 141
+ }
+ Output {
+  name Output
+  xpos -40
+  ypos 200
+ }
+end_group
