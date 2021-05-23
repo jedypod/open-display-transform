@@ -1,10 +1,8 @@
 # Open Display Transform
+![OpenDRT v0.0.80](/docs/img/OpenDRT_Nuke_v0.0.80.png)
+A simple, robust, and open source display transform for rendering wide gamut  high dynamic range scene-linear images on a display device. 
 
-An open source, chromaticity preserving, simple neutral and robust display transform for preparing wide gamut scene-linear high dynamic range images for being presented on a display device. 
-
-Currently available as a Nuke node. Resolve DCTL is planned once the design is in a less experimental stage.
-
-**ALPHA SOFTWARE** - be warned that this software is highly experimental, and is being actively tested and developed. It is highly recommended that you do not use it for production use in the creation of images.
+Currently available as a Nuke node. Resolve DCTL is coming.
 
 ## Design Goals
 
@@ -23,5 +21,4 @@ Currently available as a Nuke node. Resolve DCTL is planned once the design is i
   - Compress wide gamut to smaller display gamut
 - Apply chromaticity conversion and inverse EOTF to prepare image for display device
 
-# [Documentation](./docs)
-
+# Read the [Documentation](./docs)
