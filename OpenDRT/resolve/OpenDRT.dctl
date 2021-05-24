@@ -1,0 +1,323 @@
+// DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 1, {A, B, C, D, E, F, G, H}, {A, B, C, D, E, F, G, H});
+DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Filmlight E-Gamut, DaVinci Wide Gamut});
+DEFINE_UI_PARAMS(_Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 10000.0, 100.0);
+DEFINE_UI_PARAMS(_Lw, Lw, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 4000.0, 10.0);
+DEFINE_UI_PARAMS(_Lg, Lg, DCTLUI_SLIDER_FLOAT, 10.0, 1.0, 20.0, 1.0);
+DEFINE_UI_PARAMS(_c, contrast, DCTLUI_SLIDER_FLOAT, 1.4, 0.5, 2.0, 0.0);
+DEFINE_UI_PARAMS(_ps, surround, DCTLUI_SLIDER_FLOAT, 1.0, 0.8, 1.2, 0.0);
+DEFINE_UI_PARAMS(_t0, toe, DCTLUI_SLIDER_FLOAT, 0.004, 0.0, 0.01, 0.0);
+DEFINE_UI_PARAMS(chroma_compress, chroma compress, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.01);
+DEFINE_UI_PARAMS(saturation, saturation, DCTLUI_SLIDER_FLOAT, 1.05, 0.8, 1.2, 0.01);
+DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93});
+DEFINE_UI_PARAMS(wr, red weight, DCTLUI_SLIDER_FLOAT, 0.24, 0.0, 0.5, 0.0);
+DEFINE_UI_PARAMS(wg, green weight, DCTLUI_SLIDER_FLOAT, 0.14, 0.0, 0.5, 0.0);
+DEFINE_UI_PARAMS(wb, blue weight, DCTLUI_SLIDER_FLOAT, 0.09, 0.0, 0.5, 0.0);
+DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 1, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec.1886, 2.6 Power DCI, ST-2084 PQ, HLG});
+DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 2, {Rec2020, P3D65, Rec709}, {Rec2020, P3D65, Rec709});
+DEFINE_UI_PARAMS(clamp, clamp, DCTLUI_CHECK_BOX, 1);
+DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
+
+#define identity_mtx make_float3x3(make_float3(1.0f, 0.0f, 0.0f), make_float3(0.0f, 1.0f, 0.0f), make_float3(0.0f, 0.0f, 1.0f))
+#define matrix_ap0_to_xyz make_float3x3(make_float3(0.950362384319, 0.000000000000, 0.000093463248), make_float3(0.343966454268, 0.728166162968, -0.072132542729), make_float3(0.000000000000, 0.000000000000, 1.089057803154))
+#define matrix_ap1_to_xyz make_float3x3(make_float3(0.660931229591, 0.133696138859, 0.155828580260), make_float3(0.272228747606, 0.674081742764, 0.053689509630), make_float3(-0.006018006243, 0.004383686464, 1.090692043304))
+#define matrix_p3d65_to_xyz make_float3x3(make_float3(0.486571133137, 0.265667706728, 0.198217317462), make_float3(0.228974640369, 0.691738605499, 0.079286918044), make_float3(-0.000000000000, 0.045113388449, 1.043944478035))
+#define matrix_rec2020_to_xyz make_float3x3(make_float3(0.636958122253, 0.144616916776, 0.168880969286), make_float3(0.262700229883, 0.677998125553, 0.059301715344), make_float3(0.000000000000, 0.028072696179, 1.060985088348))
+#define matrix_rec709_to_xyz make_float3x3(make_float3(0.412390917540, 0.357584357262, 0.180480793118), make_float3(0.212639078498, 0.715168714523, 0.072192311287), make_float3(0.019330825657, 0.119194783270, 0.950532138348))
+#define matrix_arriwg_to_xyz make_float3x3(make_float3(0.638007640839, 0.214703813195, 0.097744457424), make_float3(0.291953772306, 0.823840856552, -0.115794822574), make_float3(0.002798279049, -0.067034222186, 1.153293848038))
+#define matrix_redwg_to_xyz make_float3x3(make_float3(0.735275208950, 0.068609409034, 0.146571278572), make_float3(0.286694079638, 0.842979073524, -0.129673242569), make_float3(-0.079680845141, -0.347343206406, 1.516081929207))
+#define matrix_egamut_to_xyz make_float3x3(make_float3(0.705396831036, 0.164041340351, 0.081017754972), make_float3(0.280130714178, 0.820206701756, -0.100337378681), make_float3(-0.103781513870, -0.072907261550, 1.265746593475))
+#define matrix_davinciwg_to_xyz make_float3x3(make_float3(0.700622320175, 0.148774802685, 0.101058728993), make_float3(0.274118483067, 0.873631775379, -0.147750422359), make_float3(-0.098962903023, -0.137895315886, 1.325916051865))
+#define matrix_xyz_to_truelightlms make_float3x3(make_float3(0.18295, 0.859943, -0.031061), make_float3(-0.394427, 1.258988, 0.106423), make_float3(0.064856, -0.07625, 0.93164))
+
+#define catd50 make_float3(0.171823f, 1.292538f, 1.228587f)
+#define catd55 make_float3(0.176293f, 1.279333f, 1.100720f)
+#define catd60 make_float3(0.179970f, 1.268278f, 1.005850f)
+#define catd65 make_float3(0.182950f, 1.258988f, 0.931640f)
+#define catd75 make_float3(0.187590f, 1.244085f, 0.827517f)
+#define catd93 make_float3(0.193087f, 1.225341f, 0.717363f)
+
+#define wnd50 make_float3(1.09063f, 1.1408f, 1.17646f)
+#define wnd55 make_float3(1.05337f, 1.08334f, 1.10416f)
+#define wnd60 make_float3(1.02355f, 1.037f, 1.0461f)
+#define wnd65 make_float3(1.0f, 1.0f, 1.0f)
+#define wnd75 make_float3(1.12915f, 1.13116f, 1.14486f)
+#define wnd93 make_float3(1.30631f, 1.31116f, 1.34374f)
+
+
+typedef struct {
+  float3 x, y, z;
+} float3x3;
+
+__DEVICE__ float3x3 make_float3x3(float3 a, float3 b, float3 c) {
+  float3x3 d; d.x = a; d.y = b; d.z = c;
+  return d;
+}
+
+__DEVICE__ float3 mult_f3_f33(float3 a, float3x3 m) {
+  return make_float3(
+    m.x.x * a.x + m.x.y * a.y + m.x.z * a.z, 
+    m.y.x * a.x + m.y.y * a.y + m.y.z * a.z, 
+    m.z.x * a.x + m.z.y * a.y + m.z.z * a.z);
+}
+
+__DEVICE__ float3x3 inv_f33(float3x3 m) {
+  // https://stackoverflow.com/questions/983999/simple-3x3-matrix-inverse-code-c
+  double d = m.x.x * (m.y.y * m.z.z - m.z.y * m.y.z) - 
+    m.x.y * (m.y.x * m.z.z - m.y.z * m.z.x) + 
+    m.x.z * (m.y.x * m.z.y - m.y.y * m.z.x);
+  double id = 1.0f / d;
+  float3x3 c = identity_mtx;
+  c.x.x = id * (m.y.y * m.z.z - m.z.y * m.y.z);
+  c.x.y = id * (m.x.z * m.z.y - m.x.y * m.z.z);
+  c.x.z = id * (m.x.y * m.y.z - m.x.z * m.y.y);
+  c.y.x = id * (m.y.z * m.z.x - m.y.x * m.z.z);
+  c.y.y = id * (m.x.x * m.z.z - m.x.z * m.z.x);
+  c.y.z = id * (m.y.x * m.x.z - m.x.x * m.y.z);
+  c.z.x = id * (m.y.x * m.z.y - m.z.x * m.y.y);
+  c.z.y = id * (m.z.x * m.x.y - m.x.x * m.z.y);
+  c.z.z = id * (m.x.x * m.y.y - m.y.x * m.x.y);
+  return c;
+}
+
+__DEVICE__ float3 powv(float3 a, float b) { return make_float3(_powf(a.x, b), _powf(a.y, b), _powf(a.z, b)); }
+__DEVICE__ float3 sqrtv(float3 a) { return make_float3(_sqrtf(a.x), _sqrtf(a.y), _sqrtf(a.z)); }
+__DEVICE__ float3 maxv(float3 a, float b) { return make_float3(_fmaxf(a.x, b), _fmaxf(a.y, b), _fmaxf(a.z, b)); }
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
+{
+ 
+  /* Presets and setup */
+
+  // Input gamut
+  float3x3 in_to_xyz;
+  if (in_gamut == ap0) in_to_xyz = matrix_ap0_to_xyz; 
+  else if (in_gamut == ap1) in_to_xyz = matrix_ap1_to_xyz;
+  else if (in_gamut == p3d65) in_to_xyz = matrix_p3d65_to_xyz; 
+  else if (in_gamut == rec2020) in_to_xyz = matrix_rec2020_to_xyz;
+  else if (in_gamut == rec709) in_to_xyz = matrix_rec709_to_xyz; 
+  else if (in_gamut == awg) in_to_xyz = matrix_arriwg_to_xyz;
+  else if (in_gamut == rwg) in_to_xyz = matrix_redwg_to_xyz; 
+  else if (in_gamut == egamut) in_to_xyz = matrix_egamut_to_xyz;
+  else if (in_gamut == davinciwg) in_to_xyz = matrix_davinciwg_to_xyz;
+
+  // CAT scaling
+  float3 cats;
+  // cat normalization (float3: rec2020, p3d65, rec709)
+  float3 wn;
+  if (wp == D50) {
+    cats = catd50;
+    wn = wnd50;
+  } else if (wp == D55) {
+    cats = catd55;
+    wn = wnd55;
+  } else if (wp == D60) {
+    cats = catd60;
+    wn = wnd60;
+  } else if (wp == D65) {
+    cats = catd65;
+    wn = wnd65; 
+  } else if (wp == D75) {
+    cats = catd75;
+    wn = wnd75;
+  } else if (wp == D93) {
+    cats = catd93;
+    wn = wnd93;
+  }
+
+  // Display gamut
+  // Rec2020, P3D65, Rec709
+  float3x3 xyz_to_display;
+  float w_n;
+  if (display_gamut == Rec2020) {
+    xyz_to_display = inv_f33(matrix_rec2020_to_xyz);
+    w_n = wn.x;
+  } else if (display_gamut == P3D65) { 
+    xyz_to_display = inv_f33(matrix_p3d65_to_xyz);
+    w_n = wn.y;
+  } else if (display_gamut == Rec709) {
+    xyz_to_display = inv_f33(matrix_rec709_to_xyz);
+    w_n = wn.z;
+  }
+
+  
+  // Tonemap
+  float Lp, Lw, Lg, c, ps, t0;
+  Lp = _Lp; Lw = _Lw; Lg = _Lg; c = _c; ps = _ps; t0 = _t0;
+  const float th = Lg / Lw;
+  const float p = c * ps;
+  const float2 g = make_float2(0.18f, Lg / Lp);
+  const float h = 0.048 * Lw / 1000 + 1.033;
+  const float sy = ((Lw / Lp) * h) / w_n;
+  const float gi = _powf(g.y / sy, 1.0f / c);
+  const float w = th > gi ? gi / g.x : (2.0f * th * gi - gi - th * th) / (g.x * (gi - 1.0f));
+  const float sx = w * _fmaxf(1.0f, _powf(Lw / 1000.0f, 0.1f));
+
+  /* EOTF
+     ----------------------- */
+  
+  // ST2084 Constants
+  const float m1 = 2610.0f / 4096.0f * (1.0f / 4.0f);
+  const float m2 = 2523.0f / 4096.0f * 128.0f;
+  const float c1 = 107.0f / 128.0f;
+  const float c2 = 2413.0f / 128.0f;
+  const float c3 = 2392.0f / 128.0f;
+  const float PQ_Lw = 10000.0f;
+
+  // HLG Constants
+  const float HLG_Lw = 1000.0f;
+  const float HLG_Lb = 0.0f;
+  const float HLG_Ls = 5.0f;
+  const float h_a = 0.17883277f;
+  const float h_b = 1.0f - 4.0f * 0.17883277f;
+  const float h_c = 0.5f - h_a * _logf(4.0f * h_a);
+  const float h_g = 1.2f * _powf(1.111f, _log2f(HLG_Lw / 1000.0f)) * _powf(0.98f, _log2f(_fmaxf(1e-6f, HLG_Ls) / 5.0f));
+
+  int eotf;
+  if (EOTF == lin) eotf = 0; 
+  else if (EOTF == srgb) eotf = 1; 
+  else if (EOTF == rec1886) eotf = 2; 
+  else if (EOTF == dci) eotf = 3; 
+  else if (EOTF == pq) eotf = 4; 
+  else if (EOTF == hlg) eotf = 5;
+
+    
+  // Forward and inverse LMS matrix
+  float3x3 xyz_to_tlms = matrix_xyz_to_truelightlms;
+  float3x3 tlms_to_xyz = matrix_xyz_to_truelightlms;
+  tlms_to_xyz.x.x = cats.x;
+  tlms_to_xyz.y.y = cats.y;
+  tlms_to_xyz.z.z = cats.z;
+  tlms_to_xyz = inv_f33(tlms_to_xyz);
+
+  // Normalization for weighted vector length norm so that achromatic values are not shifted
+  const float wsum = _sqrtf(wr*wr + wg*wg + wb*wb);
+  
+
+  /* Display Rendering 
+     -----------------------------------------------  */
+  
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  if (invert == 0) {
+    // input gamut to xyz d65 cat: xyz scaling
+    rgb = mult_f3_f33(rgb, in_to_xyz);
+
+    // XYZ to Truelight LMS D65 aligned
+    rgb = mult_f3_f33(rgb, xyz_to_tlms);
+
+    // Weighted vector length norm
+    rgb = maxv(rgb, 1e-12f);
+    float n = _sqrtf(_powf(wr * rgb.x, 2.0f) + _powf(wg * rgb.y, 2.0f) + _powf(wb * rgb.z, 2.0f))/wsum;
+    
+    // RGB Ratios
+    rgb /= n;
+
+    // Tonemap: input scale -> shoulder compression -> contrast -> toe -> output scale
+    n = n * sx;
+    float ns = n; // Store scaled n for chroma compression factor
+    n = n > th ? th + 1.0f / (1.0f / (n - th) + 1.0f / (1.0f - th)) : n;
+    float ccf = n / ns; // chroma compression factor
+    n = _powf(n, p);
+    n = (n * n) / (n + t0);
+    
+    // chroma compression
+    ccf = _powf(ccf, chroma_compress) * saturation;
+    // Lerp rgb ratios to 1.0 by chroma compress factor
+    rgb = (1.0f - ccf) + rgb * ccf;
+
+    rgb *= n;
+
+    // LMS to XYZ + Whitepoint chromatic adaptation
+    rgb = mult_f3_f33(rgb, tlms_to_xyz);
+    rgb = mult_f3_f33(rgb, xyz_to_display);
+
+    // Output scale
+    rgb *= sy;
+
+    // Clamp
+    rgb = make_float3(_saturatef(rgb.x), _saturatef(rgb.y), _saturatef(rgb.z));
+
+    
+    /* Inverse EOTF
+       -----------------------  */
+
+    float eotf_p = 2.0f + eotf * 0.2f;
+    if ((eotf > 0) && (eotf < 4)) { // Power Function
+      rgb = powv(rgb, 1.0f / eotf_p);
+    } else if (eotf == 4) { // ST2084 PQ
+      rgb = powv((c1 + c2 * powv(rgb * PQ_Lw / 10000.0f, m1))/(1.0f + c3 * powv(rgb * PQ_Lw / 10000.0f, m1)), m2);
+    }  else if (eotf == 5) { // HLG
+      float Ys = 0.2627f * rgb.x + 0.6780f * rgb.y + 0.0593f * rgb.z;
+      // HLG Inverse OOTF
+      rgb = rgb * _powf(Ys, (1.0f - h_g) / h_g);
+      // HLG OETF
+      rgb.x = rgb.x <= 1.0f / 12.0f ? _sqrtf(3.0f * rgb.x) : h_a * _logf(12.0f * rgb.x - h_b) + h_c;
+      rgb.y = rgb.y <= 1.0f / 12.0f ? _sqrtf(3.0f * rgb.y) : h_a * _logf(12.0f * rgb.y - h_b) + h_c;
+      rgb.z = rgb.z <= 1.0f / 12.0f ? _sqrtf(3.0f * rgb.z) : h_a * _logf(12.0f * rgb.z - h_b) + h_c;
+    }
+
+
+  } else {
+
+    /* Inverse Display Rendering
+       ------------------------------- */
+    
+    // Forward EOTF
+    float eotf_p = 2.0f + eotf * 0.2f;
+    if ((eotf > 0) && (eotf < 4)) {
+      // Power Function
+      rgb = powv(rgb, eotf_p);
+    } else if (eotf == 4) {
+      // ST2084 PQ
+      rgb = powv((powv(rgb, 1.0f / m2) - c1) / (c2 - c3 * powv(rgb, 1.0f / m2)),  1.0f / m1) * 10000.0f / PQ_Lw;
+    } else if (eotf == 5) { 
+      float Ys = 0.2627f * rgb.x + 0.6780f * rgb.y + 0.0593f * rgb.z;
+      // HLG Inverse OETF
+      rgb.x = rgb.x <= 0.5f ? (rgb.x * rgb.x) / 3.0f : (_expf((rgb.x - h_c) / h_a) + h_b) / 12.0f;
+      rgb.y = rgb.y <= 0.5f ? (rgb.y * rgb.y) / 3.0f : (_expf((rgb.y - h_c) / h_a) + h_b) / 12.0f;
+      rgb.z = rgb.z <= 0.5f ? (rgb.z * rgb.z) / 3.0f : (_expf((rgb.z - h_c) / h_a) + h_b) / 12.0f;
+      // HLG OOTF
+      rgb = rgb * _powf(Ys, h_g - 1.0f);
+    }
+
+    // Inverse output scale
+    rgb /= sy;
+
+    // display gamut to XYZ
+    rgb = mult_f3_f33(rgb, inv_f33(xyz_to_display));
+
+    // XYZ to LMS
+    rgb = mult_f3_f33(rgb, inv_f33(tlms_to_xyz));
+
+    // Weighted vector length norm
+    float n = _sqrtf(_powf(wr * rgb.x, 2.0f) + _powf(wg * rgb.y, 2.0f) + _powf(wb * rgb.z, 2.0f)) / wsum;
+    n = _fmaxf(1e-12f, _fminf(0.999f, n));
+
+    // RGB Ratios
+    rgb /= n;
+
+    // inverse output scale -> inverse toe -> inverse contrast -> inverse shoulder -> inverse input scale
+    n = (n + _sqrtf(n * (4.0f * t0 + n)))/2.0f;
+    n = _powf(n, 1.0f/p);
+    float ns = n;
+    n = n > th ? th + 1.0f / (1.0f / (n - th) - 1.0f / (1.0f - th)) : n;
+    float ccf = ns / n; 
+    n /= sx;
+
+    // Chroma compression
+    ccf = _powf(ccf, chroma_compress) * saturation;
+    // Inverse Lerp rgb ratios
+    rgb = (rgb - 1.0f) / ccf + 1.0f;
+
+    rgb *= n;
+
+    // LMS to XYZ
+    rgb = mult_f3_f33(rgb, inv_f33(xyz_to_tlms));
+
+    // XYZ to input gamut
+    rgb = mult_f3_f33(rgb, inv_f33(in_to_xyz));
+
+  }
+
+  return rgb;
+}
