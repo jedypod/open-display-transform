@@ -3,35 +3,37 @@ push $cut_paste_input
 Group {
  name OpenDRT
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.0.80 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.0.81b1 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
  addUserKnob {41 gamut l "input gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer l " " T ""}
- addUserKnob {35 presets l " " M {"presets/Rec.1886: 2.4 Power EOTF | Rec.709" "knobs this \{Lp \{Lw\} Lw 100 Lg 10.5 c 1.4 surround 1 t0 0.005 th \{Lg/Lw\} wp 3 eotf 2 display_gamut 2\}" "presets/sRGB Display: 2.2 Power EOTF | Rec.709" "knobs this \{Lp \{Lw\} Lw 100 Lg 10.5 c 1.4 surround 0 t0 0.006 th \{Lg/Lw\} wp 3 eotf 1 display_gamut 2\}" "presets/Apple Display P3: 2.2 Power EOTF | P3D65" "knobs this \{Lp \{Lw\} Lw 100 Lg 10.5 c 1.4 surround 0 t0 0.006 th \{Lg/Lw\} wp 3 eotf 1 display_gamut 1\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 108 nit" "knobs this \{Lp 10000 Lw 108 Lg 4.8 c 1.3 surround 2 t0 0.003 th \{Lg/Lw\} wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 600 nit" "knobs this \{Lp 10000 Lw 600 Lg 15 c 1.2 surround 2 t0 0.002 th \{Lg/Lw\} wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 1000 nit" "knobs this \{Lp 10000 Lw 1000 Lg 15 c 1.2 surround 2 t0 0.001 th \{Lg/Lw\} wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: HLG EOTF | Rec.2020 | 1000 nit" "knobs this \{Lp 1000 Lw 1000 Lg 15 c 1.2 surround 2 t0 0.001 th \{Lg/Lw\} wp 3 eotf 5 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 2000 nit" "knobs this \{Lp 10000 Lw 2000 Lg 15 c 1.2 surround 2 t0 0.0006 th \{Lg/Lw\} wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 4000 nit" "knobs this \{Lp 10000 Lw 4000 Lg 15 c 1.2 surround 2 t0 0.0002 th \{Lg/Lw\} wp 3 eotf 4 display_gamut 0\}"}}
+ addUserKnob {35 presets l " " M {"presets/Rec.1886: 2.4 Power EOTF | Rec.709" "knobs this \{Lw 100 Lg 10 c 1.4 surround 1 wp 3 eotf 2 display_gamut 2\}" "presets/sRGB Display: 2.2 Power EOTF | Rec.709" "knobs this \{Lw 100 Lg 10 c 1.4 surround 0 wp 3 eotf 1 display_gamut 2\}" "presets/Apple Display P3: 2.2 Power EOTF | P3D65" "knobs this \{Lw 100 Lg 10 c 1.4 surround 0 wp 3 eotf 1 display_gamut 1\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 108 nit" "knobs this \{Lw 108 Lg 4.8 c 1.3 surround 2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 600 nit" "knobs this \{Lw 600 Lg 15 c 1.2 surround 2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 1000 nit" "knobs this \{Lw 1000 Lg 15 c 1.2 surround 2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: HLG EOTF | Rec.2020 | 1000 nit" "knobs this \{Lw 1000 Lg 15 c 1.2 surround 2 wp 3 eotf 5 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 2000 nit" "knobs this \{Lw 2000 Lg 15 c 1.2 surround 2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 4000 nit" "knobs this \{Lw 4000 Lg 15 c 1.2 surround 2 wp 3 eotf 4 display_gamut 0\}" ""}}
  addUserKnob {26 ""}
  addUserKnob {26 luminance_label l " " T <b>luminance</b>}
- addUserKnob {7 Lp t "Peak luminance in nits" R 48 10000}
- Lp {{Lw}}
  addUserKnob {7 Lw t "Normalized white luminance in nits" R 48 4000}
  Lw 100
  addUserKnob {7 Lg t "Grey luminance in nits." R 4 20}
- Lg 10.5
+ Lg 10
  addUserKnob {7 c l contrast R 0.8 2}
  c 1.4
- addUserKnob {7 t0 l toe R 0 0.1}
- t0 0.006
  addUserKnob {4 surround M {average dim dark ""}}
+ surround dim
+ addUserKnob {6 pwh l "piecewise hyperbolic" t "Piecewise hyperbolic compression function with linear section below middle grey" +STARTLINE}
  addUserKnob {20 calc_grp l "" +STARTLINE n 1}
  calc_grp 0
+ addUserKnob {7 Lp t "Peak luminance in nits" R 48 10000}
+ Lp {{eotf==4?10000:eotf==5?1000:Lw}}
+ addUserKnob {7 t0 l toe R 0 0.01}
+ t0 {{1/Lw}}
  addUserKnob {7 ps t "surround compensation: unconstrained power function" R 0.9 1}
  ps {{0.9+0.05*surround}}
- addUserKnob {7 th t "hyperbolic compression threshold. " R 0 0.5}
- th {{Lg/Lw}}
  addUserKnob {7 p t "power (combination of grey-constrained contrast and unconstrained surround compensation)" R 0.5 4}
  p {{c*ps}}
+ addUserKnob {7 th}
+ th {{Lg/Lw}}
  addUserKnob {78 g l grey t "input -> output grey" n 2}
  g {0.18 {Lg/Lp}}
  addUserKnob {7 w t "input exposure" R 0 100}
- w {{th>pow(g.1/s.1,1/c)?pow(g.1/s.1,1/c)/g.0:(2*th*pow(g.1/s.1,1/c)-pow(g.1/s.1,1/c)-th*th)/(g.0*(pow(g.1/s.1,1/c)-1))}}
+ w {{pwh?th>pow(g.1/s.1,1/c)?pow(g.1/s.1,1/c)/g.0:(2*th*pow(g.1/s.1,1/c)-pow(g.1/s.1,1/c)-th*th)/(g.0*(pow(g.1/s.1,1/c)-1)):-pow(g.1/s.1,1/c)/(g.0*(pow(g.1/s.1,1/c)-1))}}
  addUserKnob {7 h R 1 2}
  h {{0.048*Lw/1000+1.037}}
  addUserKnob {78 s l scale n 2}
@@ -40,9 +42,9 @@ Group {
  addUserKnob {26 ""}
  addUserKnob {26 chroma_label l " " T <b>chroma</b>}
  addUserKnob {7 chroma_compress l compress t "amount to compress chrominance as luminance approaches display maximum"}
- chroma_compress 0.5
+ chroma_compress 0.35
  addUserKnob {7 saturation R 1 1.2}
- saturation 1.05
+ saturation 1.1
  addUserKnob {41 wp l whitepoint T TruelightLMS_to_XYZ.wp}
  addUserKnob {20 chroma_grp l " " t "preset chroma params - adjust if you wish" n 1}
  chroma_grp 0
@@ -75,12 +77,11 @@ Group {
   xpos 324
   ypos -876
  }
-set N16749780 [stack 0]
+set N2d8cf5b0 [stack 0]
  Group {
   name EOTF
-  selected true
   xpos 730
-  ypos -879
+  ypos -880
   addUserKnob {20 EOTF_tab l EOTF}
   addUserKnob {4 eotf l EOTF t "Choose the inverse EOTF to apply for the target display device." M {None "sRGB Display" BT.1886 "Gamma 2.6" PQ HLG ""}}
   eotf {{parent.InverseEOTF.eotf}}
@@ -96,13 +97,13 @@ set N16749780 [stack 0]
    xpos 434
    ypos -96
   }
-set Naf3ab50 [stack 0]
+set N2d8e23d0 [stack 0]
   Dot {
    name Dot8
    xpos 544
    ypos -96
   }
-set Nb59ebcb0 [stack 0]
+set N2d8e7240 [stack 0]
   Dot {
    name Dot1
    xpos 654
@@ -141,7 +142,7 @@ set Nb59ebcb0 [stack 0]
    addUserKnob {7 Lamb t "ambient luminance level in nits" R 0 200}
    Lamb 5
   }
-push $Nb59ebcb0
+push $N2d8e7240
   Expression {
    expr0 pow((pow(r,1/m_2)-c_1)/(c_2-c_3*pow(r,1/m_2)),1/m_1)*10000/Lw
    expr1 pow((pow(g,1/m_2)-c_1)/(c_2-c_3*pow(g,1/m_2)),1/m_1)*10000/Lw
@@ -163,7 +164,7 @@ push $Nb59ebcb0
    addUserKnob {7 Lw t "Display peak luminance in nits" R 600 4000}
    Lw 10000
   }
-push $Naf3ab50
+push $N2d8e23d0
   Expression {
    expr0 sign(r)*pow(fabs(r),p)
    expr1 sign(g)*pow(fabs(g),p)
@@ -194,7 +195,7 @@ push $Naf3ab50
   expr2 b/s.1
   name InvOutputScale
   xpos 730
-  ypos -819
+  ypos -820
  }
  ColorMatrix {
   matrix {
@@ -205,7 +206,7 @@ push $Naf3ab50
   invert true
   name Inv_XYZ_to_DisplayGamut
   xpos 730
-  ypos -759
+  ypos -760
  }
  ColorMatrix {
   matrix {
@@ -215,14 +216,14 @@ push $Naf3ab50
     }
   name Inv_TruelightLMS_to_XYZ
   xpos 730
-  ypos -699
+  ypos -700
  }
  Dot {
   name Dot1
   xpos 764
   ypos -636
  }
-set N347ee0c0 [stack 0]
+set N2d9654c0 [stack 0]
  Dot {
   name Dot2
   xpos 544
@@ -236,7 +237,7 @@ set N347ee0c0 [stack 0]
   channel3 none
   name WeightedSmoothMax1
   xpos 510
-  ypos -612
+  ypos -610
   addUserKnob {20 Param}
   addUserKnob {78 w n 3}
   w {{wr} {wg} {wb}}
@@ -253,14 +254,14 @@ set N347ee0c0 [stack 0]
   expr2 max(mn,min(mx,b))
   name Clamp1
   xpos 510
-  ypos -579
+  ypos -580
  }
  Dot {
   name Dot3
   xpos 544
   ypos -546
  }
-set Nef5f7ed0 [stack 0]
+set N2d98cd30 [stack 0]
  Expression {
   expr0 (r+sqrt(r*(4*t0+r)))/2
   channel1 {-rgba.red rgba.green -rgba.blue none}
@@ -268,7 +269,7 @@ set Nef5f7ed0 [stack 0]
   expr2 (b+sqrt(b*(4*t0+b)))/2
   name InvToe
   xpos 510
-  ypos -519
+  ypos -520
  }
  Expression {
   expr0 pow(r,1/p)
@@ -276,33 +277,51 @@ set Nef5f7ed0 [stack 0]
   expr2 pow(b,1/p)
   name InvPower
   xpos 510
-  ypos -489
+  ypos -490
  }
-set N1ceb9960 [stack 0]
+set N2d99fe20 [stack 0]
  Expression {
   expr0 r>th?th+1/(1/(r-th)-1/(1-th)):r
   expr1 g>th?th+1/(1/(g-th)-1/(1-th)):g
   expr2 b>th?th+1/(1/(b-th)-1/(1-th)):b
+  name InvShoulder_pwh
+  xpos 400
+  ypos -460
+ }
+push $N2d99fe20
+ Expression {
+  expr0 r/(1-r)
+  expr1 g/(1-g)
+  expr2 b/(1-b)
   name InvShoulder
+  note_font Helvetica
   xpos 510
   ypos -459
  }
-set N8f60c20 [stack 0]
+ Switch {
+  inputs 2
+  which {{parent.pwh}}
+  name Switch2
+  note_font Helvetica
+  xpos 510
+  ypos -429
+ }
+set N8431930 [stack 0]
  Expression {
   expr0 r/s.0
   expr1 g/s.0
   expr2 b/s.0
   name InvInputScale
   xpos 510
-  ypos -429
+  ypos -370
  }
  Dot {
   name Dot4
   xpos 544
-  ypos -336
+  ypos -306
  }
-push $N1ceb9960
-push $N8f60c20
+push $N2d99fe20
+push $N8431930
  MergeExpression {
   inputs 2
   expr0 Ar==0?0:Ar/Br
@@ -310,7 +329,7 @@ push $N8f60c20
   expr2 Ab==0?0:Ab/Bb
   name MergeDivide1
   xpos 620
-  ypos -460
+  ypos -430
  }
  Expression {
   expr0 pow(r,p)
@@ -318,7 +337,7 @@ push $N8f60c20
   expr2 pow(b,p)
   name Power
   xpos 620
-  ypos -429
+  ypos -400
   addUserKnob {20 Params_tab l Params}
   addUserKnob {7 p l power R 0.01 2}
   p {{chroma_compress}}
@@ -329,7 +348,7 @@ push $N8f60c20
   expr2 b*s
   name ScaleSaturation1
   xpos 620
-  ypos -399
+  ypos -370
   addUserKnob {20 Params_tab l Params}
   addUserKnob {7 s l scale R 0 2}
   s {{saturation}}
@@ -337,10 +356,10 @@ push $N8f60c20
  Dot {
   name Dot8
   xpos 654
-  ypos -366
+  ypos -336
  }
-push $Nef5f7ed0
-push $N347ee0c0
+push $N2d98cd30
+push $N2d9654c0
  MergeExpression {
   inputs 2
   expr0 Ar==0?0:Br/Ar
@@ -357,7 +376,7 @@ push $N347ee0c0
   expr2 (Bb-1)/Ab+1
   name InvLerp
   xpos 730
-  ypos -369
+  ypos -340
  }
  MergeExpression {
   inputs 2
@@ -366,7 +385,7 @@ push $N347ee0c0
   expr2 Ar*Bb
   name Multiply2
   xpos 730
-  ypos -339
+  ypos -310
  }
  ColorMatrix {
   matrix {
@@ -377,7 +396,7 @@ push $N347ee0c0
   invert true
   name Inv_XYZ_to_TruelightLMS
   xpos 730
-  ypos -249
+  ypos -250
  }
  ColorMatrix {
   matrix {
@@ -388,21 +407,22 @@ push $N347ee0c0
   invert true
   name Inv_InGamut_to_XYZ
   xpos 730
-  ypos -189
+  ypos -190
  }
  Dot {
   name Dot9
   xpos 764
   ypos 84
  }
-push $N16749780
+push $N2d8cf5b0
  Group {
   name InGamut_to_XYZ
   tile_color 0x429940ff
+  selected true
   xpos 290
-  ypos -819
+  ypos -820
   addUserKnob {20 InputGamut_to_XYZ_tab l InputGamut_to_XYZ}
-  addUserKnob {4 gamut l "input gamut" M {ACES ACEScg P3D65 Rec.2020 Rec.709 AlexaWideGamut RedWideGamutRGB "" "" ""}}
+  addUserKnob {4 gamut l "input gamut" M {ACES ACEScg P3D65 Rec.2020 Rec.709 AlexaWideGamut RedWideGamutRGB "Filmlight E-Gamut" "DaVinci Wide Gamut" ""}}
   gamut ACEScg
   addUserKnob {41 matrix T ColorMatrix.matrix}
   addUserKnob {41 invert -STARTLINE T ColorMatrix.invert}
@@ -418,7 +438,7 @@ push $N16749780
    xpos 324
    ypos -546
   }
-set N83df0100 [stack 0]
+set N2da56210 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -434,14 +454,40 @@ set N83df0100 [stack 0]
    xpos 290
    ypos -250
   }
-push $N83df0100
+push $N2da56210
   Dot {
    name Dot391
    label " *RGB to XYZ D65 CAT: XYZ Scaling"
    xpos 434
    ypos -546
   }
-set Na64fc350 [stack 0]
+set N2da6d710 [stack 0]
+  ColorMatrix {
+   matrix {
+       {0.7006223202 0.1487748027 0.101058729}
+       {0.2741184831 0.8736317754 -0.1477504224}
+       {-0.09896290302 -0.1378953159 1.325916052}
+     }
+   name ColorMatrix30
+   label "DaVinci WG to XYZ D65"
+   note_font Helvetica
+   xpos 1280
+   ypos -465
+  }
+push $N2da6d710
+  ColorMatrix {
+   matrix {
+       {0.705396831 0.1640413404 0.08101775497}
+       {0.2801307142 0.8202067018 -0.1003373787}
+       {-0.1037815139 -0.07290726155 1.265746593}
+     }
+   name ColorMatrix29
+   label "Filmlight E-Gamut to XYZ D65"
+   note_font Helvetica
+   xpos 1170
+   ypos -465
+  }
+push $N2da6d710
   ColorMatrix {
    matrix {
        {0.735275209 0.06860940903 0.1465712786}
@@ -453,7 +499,7 @@ set Na64fc350 [stack 0]
    xpos 1060
    ypos -465
   }
-push $Na64fc350
+push $N2da6d710
   ColorMatrix {
    matrix {
        {0.6380076408 0.2147038132 0.09774445742}
@@ -465,7 +511,7 @@ push $Na64fc350
    xpos 950
    ypos -465
   }
-push $Na64fc350
+push $N2da6d710
   ColorMatrix {
    matrix {
        {0.4123909175 0.3575843573 0.1804807931}
@@ -477,7 +523,7 @@ push $Na64fc350
    xpos 840
    ypos -465
   }
-push $Na64fc350
+push $N2da6d710
   ColorMatrix {
    matrix {
        {0.6369581223 0.1446169168 0.1688809693}
@@ -489,7 +535,7 @@ push $Na64fc350
    xpos 730
    ypos -465
   }
-push $Na64fc350
+push $N2da6d710
   ColorMatrix {
    matrix {
        {0.4865711331 0.2656677067 0.1982173175}
@@ -501,7 +547,7 @@ push $Na64fc350
    xpos 620
    ypos -465
   }
-push $Na64fc350
+push $N2da6d710
   ColorMatrix {
    matrix {
        {0.6609312296 0.1336961389 0.1558285803}
@@ -513,7 +559,7 @@ push $Na64fc350
    xpos 510
    ypos -465
   }
-push $Na64fc350
+push $N2da6d710
   ColorMatrix {
    matrix {
        {0.9503623843 0 9.346324805e-05}
@@ -526,11 +572,12 @@ push $Na64fc350
    ypos -465
   }
   Switch {
-   inputs 7
+   inputs 9
    which {{gamut}}
    name SwitchGamut
+   selected true
    xpos 400
-   ypos -369
+   ypos -370
   }
  end_group
  ColorMatrix {
@@ -542,14 +589,14 @@ push $Na64fc350
   name XYZ_to_TruelightLMS
   label "XYZ D65 to TruelightRGB D65 Scaled"
   xpos 290
-  ypos -705
+  ypos -706
  }
  Dot {
   name Dot453
   xpos 324
   ypos -636
  }
-set Na65fac70 [stack 0]
+set N2dadb840 [stack 0]
  Dot {
   name Dot454
   xpos 104
@@ -575,32 +622,49 @@ set Na65fac70 [stack 0]
   xpos 104
   ypos -546
  }
-set Nef5f10a0 [stack 0]
+set N2daf5030 [stack 0]
  Expression {
   expr0 r*s.0
   expr1 g*s.0
   expr2 b*s.0
   name InputScale
   xpos 70
-  ypos -519
+  ypos -520
  }
-set Nef3efb10 [stack 0]
+set N2daf9f60 [stack 0]
  Expression {
   expr0 r>th?th+1/(1/(r-th)+1/(1-th)):r
   expr1 g>th?th+1/(1/(g-th)+1/(1-th)):g
   expr2 b>th?th+1/(1/(b-th)+1/(1-th)):b
+  name Shoulder_pwh
+  xpos -40
+  ypos -490
+ }
+push $N2daf9f60
+ Expression {
+  expr0 r/(r+1)
+  expr1 g/(g+1)
+  expr2 b/(b+1)
   name Shoulder
   xpos 70
-  ypos -489
+  ypos -490
  }
-set Na5bf8130 [stack 0]
+ Switch {
+  inputs 2
+  which {{parent.pwh}}
+  name Switch1
+  note_font Helvetica
+  xpos 70
+  ypos -459
+ }
+set N32441530 [stack 0]
  Expression {
   expr0 pow(r,p)
   expr1 pow(g,p)
   expr2 pow(b,p)
   name Power1
   xpos 70
-  ypos -459
+  ypos -400
  }
  Expression {
   expr0 (r*r)/(r+t0)
@@ -609,15 +673,15 @@ set Na5bf8130 [stack 0]
   expr2 (b*b)/(b+t0)
   name Toe
   xpos 70
-  ypos -429
+  ypos -370
  }
  Dot {
   name Dot6
   xpos 104
-  ypos -336
+  ypos -306
  }
-push $Na5bf8130
-push $Nef3efb10
+push $N32441530
+push $N2daf9f60
  Dot {
   name Dot5
   xpos 214
@@ -630,7 +694,7 @@ push $Nef3efb10
   expr2 Ab==0?0:Ab/Bb
   name MergeDivide2
   xpos 180
-  ypos -490
+  ypos -460
  }
  Expression {
   expr0 pow(r,p)
@@ -638,7 +702,7 @@ push $Nef3efb10
   expr2 pow(b,p)
   name Power8
   xpos 180
-  ypos -459
+  ypos -430
   addUserKnob {20 Params_tab l Params}
   addUserKnob {7 p l power R 0.01 2}
   p {{chroma_compress}}
@@ -649,7 +713,7 @@ push $Nef3efb10
   expr2 b*s
   name ScaleSaturation
   xpos 180
-  ypos -429
+  ypos -400
   addUserKnob {20 Params_tab l Params}
   addUserKnob {7 s l scale R 0 2}
   s {{saturation}}
@@ -657,10 +721,10 @@ push $Nef3efb10
  Dot {
   name Dot13
   xpos 214
-  ypos -366
+  ypos -336
  }
-push $Nef5f10a0
-push $Na65fac70
+push $N2daf5030
+push $N2dadb840
  MergeExpression {
   inputs 2
   expr0 Ar==0?0:Br/Ar
@@ -677,7 +741,7 @@ push $Na65fac70
   expr2 (1-Ab)+Bb*Ab
   name LerpToTarget1
   xpos 290
-  ypos -369
+  ypos -340
  }
  MergeExpression {
   inputs 2
@@ -686,7 +750,7 @@ push $Na65fac70
   expr2 Ar*Bb
   name Multiply14
   xpos 290
-  ypos -339
+  ypos -310
  }
  ColorMatrix {
   matrix {
@@ -698,7 +762,7 @@ push $Na65fac70
   name TruelightLMS_to_XYZ
   label "Scaled for Chromatic Adaptation"
   xpos 290
-  ypos -255
+  ypos -256
   addUserKnob {20 User}
   addUserKnob {4 wp l whitepoint t "Choose the creative whitepoint that determines the color of the neutral axis when rendered on the display." M {D50 D55 D60 D65 D75 D93}}
   wp D65
@@ -711,7 +775,7 @@ push $Na65fac70
   name XYZ_to_DisplayGamut
   tile_color 0x429940ff
   xpos 290
-  ypos -189
+  ypos -190
   addUserKnob {20 XYZ_to_DisplayGamut_tab l XYZ_to_DisplayGamut}
   addUserKnob {4 gamut l "display gamut" t "Choose the target display device chromaticities." M {Rec.2020 P3 Rec.709 "" ""}}
   gamut Rec.709
@@ -730,14 +794,14 @@ push $Na65fac70
    xpos 324
    ypos -516
   }
-set N9478a220 [stack 0]
+set N2dbb4540 [stack 0]
   Dot {
    name Dot1
    label " XYZ D65 to *RGB CAT: XYZ Scaling"
    xpos 434
    ypos -516
   }
-set N94783190 [stack 0]
+set N2dbb9340 [stack 0]
   ColorMatrix {
    matrix {
        {3.240968943 -1.537382722 -0.4986106157}
@@ -749,7 +813,7 @@ set N94783190 [stack 0]
    xpos 620
    ypos -465
   }
-push $N94783190
+push $N2dbb9340
   ColorMatrix {
    matrix {
        {2.493495464 -0.9313831329 -0.4027105868}
@@ -761,7 +825,7 @@ push $N94783190
    xpos 510
    ypos -465
   }
-push $N94783190
+push $N2dbb9340
   ColorMatrix {
    matrix {
        {1.716650844 -0.3556707203 -0.2533662021}
@@ -780,7 +844,7 @@ push $N94783190
    xpos 400
    ypos -399
   }
-push $N9478a220
+push $N2dbb4540
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -803,7 +867,7 @@ push $N9478a220
   expr2 b*s.1
   name OutputScale
   xpos 290
-  ypos -129
+  ypos -130
  }
  Expression {
   temp_name0 mn
@@ -815,16 +879,16 @@ push $N9478a220
   expr2 max(mn,min(mx,b))
   name Clamp
   xpos 290
-  ypos -99
+  ypos -100
   disable {{!parent.clamp}}
  }
  Group {
   name InverseEOTF
   xpos 290
-  ypos -9
+  ypos -10
   addUserKnob {20 EOTF_tab l EOTF}
   addUserKnob {4 eotf t "Choose the inverse EOTF to apply for the target display device." M {None "sRGB Display" BT.1886 "Gamma 2.6" PQ HLG "" "" ""}}
-  eotf "sRGB Display"
+  eotf BT.1886
  }
   Input {
    inputs 0
@@ -837,13 +901,13 @@ push $N9478a220
    xpos 434
    ypos -96
   }
-set Nb5d1f230 [stack 0]
+set N2dc27d00 [stack 0]
   Dot {
    name Dot3
    xpos 544
    ypos -96
   }
-set N18627320 [stack 0]
+set N2dc2cb70 [stack 0]
   Dot {
    name Dot4
    xpos 654
@@ -862,7 +926,7 @@ set N18627320 [stack 0]
    addUserKnob {7 _g t "Gamma: Extended model for gamma variation according to peak display luminance and surround luminance: BT.2390-8 p32" R 0 2}
    _g {{1.2*pow(1.111,log(Lw/1000)/log(2))*pow(0.98,log(max(1e-6,Lamb)/5)/log(2))}}
    addUserKnob {7 Lw R 600 4000}
-   Lw 1000
+   Lw {{parent.parent.Lw}}
    addUserKnob {7 Lamb t "ambient luminance level in nits" R 0 200}
    Lamb 5
   }
@@ -872,7 +936,7 @@ set N18627320 [stack 0]
    expr2 b<=1/12?sqrt(3*b):_a*log(12*b-_b)+_c
    name HLG_OETF
    xpos 620
-   ypos -40
+   ypos -38
    addUserKnob {20 CONSTANTS_tab l CONSTANTS}
    addUserKnob {7 _a t alpha}
    _a 0.17883277
@@ -881,7 +945,7 @@ set N18627320 [stack 0]
    addUserKnob {7 _c}
    _c {{0.5-_a*log(4*_a)}}
   }
-push $N18627320
+push $N2dc2cb70
   Expression {
    expr0 pow((c_1+c_2*pow(r*Lw/10000,m_1))/(1+c_3*pow(r*Lw/10000,m_1)),m_2)
    expr1 pow((c_1+c_2*pow(g*Lw/10000,m_1))/(1+c_3*pow(g*Lw/10000,m_1)),m_2)
@@ -903,7 +967,7 @@ push $N18627320
    addUserKnob {7 Lw t "Display peak luminance in nits" R 600 4000}
    Lw 10000
   }
-push $Nb5d1f230
+push $N2dc27d00
   Expression {
    expr0 sign(r)*pow(fabs(r),1/p)
    expr1 sign(g)*pow(fabs(g),1/p)
@@ -925,7 +989,7 @@ push $Nb5d1f230
   Output {
    name Output
    xpos 400
-   ypos 80
+   ypos 50
   }
  end_group
  Switch {
@@ -933,7 +997,7 @@ push $Nb5d1f230
   which {{parent.direction}}
   name SwitchDirection
   xpos 290
-  ypos 81
+  ypos 80
  }
  Output {
   name Output
