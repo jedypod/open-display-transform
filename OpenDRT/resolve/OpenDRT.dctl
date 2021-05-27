@@ -61,10 +61,10 @@ __DEVICE__ float3 mult_f3_f33(float3 a, float3x3 m) {
 
 __DEVICE__ float3x3 inv_f33(float3x3 m) {
   // https://stackoverflow.com/questions/983999/simple-3x3-matrix-inverse-code-c
-  double d = m.x.x * (m.y.y * m.z.z - m.z.y * m.y.z) - 
+  float d = m.x.x * (m.y.y * m.z.z - m.z.y * m.y.z) - 
     m.x.y * (m.y.x * m.z.z - m.y.z * m.z.x) + 
     m.x.z * (m.y.x * m.z.y - m.y.y * m.z.x);
-  double id = 1.0f / d;
+  float id = 1.0f / d;
   float3x3 c = identity_mtx;
   c.x.x = id * (m.y.y * m.z.z - m.z.y * m.y.z);
   c.x.y = id * (m.x.z * m.z.y - m.x.y * m.z.z);
