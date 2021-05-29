@@ -1055,7 +1055,7 @@ push $N105c6140
   temp_name0 mn
   temp_expr0 0
   temp_name1 mx
-  temp_expr1 1
+  temp_expr1 Lw/Lp
   expr0 max(mn,min(mx,r))
   expr1 max(mn,min(mx,g))
   expr2 max(mn,min(mx,b))
