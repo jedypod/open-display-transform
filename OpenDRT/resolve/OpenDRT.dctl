@@ -327,7 +327,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb *= sy;
 
     // Clamp
-    rgb = maxf3(minf3(rgb, 1.0f), 0.0f);
+    rgb = maxf3(minf3(rgb, Lw / Lp), 0.0f);
 
     /* Inverse EOTF
        -----------------------  */
