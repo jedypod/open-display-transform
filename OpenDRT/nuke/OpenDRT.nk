@@ -36,7 +36,7 @@ Group {
  addUserKnob {20 endGroup n -1}
  addUserKnob {26 ""}
  addUserKnob {26 chroma_label l " " T <b>chroma</b>}
- addUserKnob {7 hldc l "highlight dechroma" t "amount to compress chrominance as luminance approaches display maximum"}
+ addUserKnob {7 hldc l "hl dechroma" t "amount to compress chrominance as luminance approaches display maximum"}
  hldc 0.5
  addUserKnob {6 pdch l "perceptual dechroma" +STARTLINE}
  pdch true
