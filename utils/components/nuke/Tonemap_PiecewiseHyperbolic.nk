@@ -3,37 +3,35 @@ push $cut_paste_input
 Group {
  name Tonemap_PiecewiseHyperbolic
  addUserKnob {20 Tonemap}
- addUserKnob {35 presets l " " M {"presets/SDR - Dark" "knobs this \{Lp \{Lw\} Lw 100 Lg 10.5 c 1.4 ps 1 t0 0.004 th \{Lg/Lw\}\}" "presets/SDR - Dim" "knobs this \{Lp \{Lw\} Lw 100 Lg 10.5 c 1.4 ps .95 t0 0.005 th \{Lg/Lw\}\}" "presets/SDR - Average" "knobs this \{Lp \{Lw\} Lw 100 Lg 10.5 c 1.4 ps .9 t0 0.006 th \{Lg/Lw\}\}" "presets/Rec.2100 PQ ST-2084 600 nit" "knobs this \{Lp 10000 Lw 600 Lg 15 c 1.2 ps 1 t0 0.002 th \{Lg/Lw\}\}" "presets/Rec.2100 PQ ST-2084 1000 nit" "knobs this \{Lp 10000 Lw 1000 Lg 15 c 1.2 ps 1 t0 0.001 th \{Lg/Lw\}\}" "presets/Rec.2100 PQ ST-2084 2000 nit" "knobs this \{Lp 10000 Lw 2000 Lg 15 c 1.2 ps 1 t0 0.0006 th \{Lg/Lw\}\}" "presets/Rec.2100 PQ ST-2084 4000 nit" "knobs this \{Lp 10000 Lw 4000 Lg 15 c 1.2 ps 1 t0 0.0002 th \{Lg/Lw\}\}"}}
- addUserKnob {7 Lp t "Peak luminance in nits" R 48 10000}
- Lp {10000}
- addUserKnob {7 Lw t "Normalized white luminance in nits" R 48 4000}
- Lw 4000
- addUserKnob {7 Lg t "Grey luminance in nits." R 4 20}
- Lg 15
+ addUserKnob {35 presets l " " M {"presets/SDR - Dark" "knobs this \{Lp \{Lw\} Lw 100 c 1.4 surround 0\}" "presets/SDR - Dim" "knobs this \{Lp \{Lw\} Lw 100 c 1.4 surround 1\}" "presets/SDR - Average" "knobs this \{Lp \{Lw\} Lw 100 c 1.4 surround 2\}" "presets/Rec.2100 PQ ST-2084 600 nit" "knobs this \{Lp 10000 Lw 600 c 1.2 surround 2\}" "presets/Rec.2100 PQ ST-2084 1000 nit" "knobs this \{Lp 10000 Lw 1000 c 1.2 surround 2\}" "presets/Rec.2100 PQ ST-2084 2000 nit" "knobs this \{Lp 10000 Lw 2000 c 1.2 surround 2\}" "presets/Rec.2100 PQ ST-2084 4000 nit" "knobs this \{Lp 10000 Lw 4000 c 1.2 surround 2\}"}}
+ addUserKnob {7 Lw t "Normalized white luminance in nits" R 100 4000}
+ Lw 100
  addUserKnob {7 c l contrast R 0.8 2}
- c 1.2
- addUserKnob {7 ps l surround t "surround compensation: unconstrained power function" R 0.8 1.2}
- ps 1
- addUserKnob {7 t0 l toe R 0 0.1}
- t0 0.0002
+ c 1.4
+ addUserKnob {4 surround M {average dim dark}}
  addUserKnob {20 calcs_grp l "" +STARTLINE n 1}
- calcs_grp 0
- addUserKnob {7 th t "hyperbolic compression threshold. " R 0 0.5}
- th {{Lg/Lw}}
+ addUserKnob {7 Lp t "Peak luminance in nits" R 48 10000}
+ Lp {{Lw}}
+ addUserKnob {7 Lg t "Grey luminance in nits." R 4 20}
+ Lg {{14.4+1.436*log(Lw/1000)}}
+ addUserKnob {7 t0 l toe R 0 0.1}
+ t0 {{1/Lw}}
+ addUserKnob {7 ps t "surround compensation: unconstrained power function" R 0.8 1.2}
+ ps {{0.9+0.05*surround}}
  addUserKnob {7 p t "power (combination of grey-constrained contrast and unconstrained surround compensation)" R 0.5 4}
  p {{c*ps}}
+ addUserKnob {7 th t "hyperbolic compression threshold. " R 0 0.5}
+ th {{Lg/Lw}}
  addUserKnob {78 g l grey t "input -> output grey" n 2}
  g {0.18 {Lg/Lp}}
- addUserKnob {7 w t "input exposure" R 0 100}
- w {{th>pow(g.1/s.1,1/c)?pow(g.1/s.1,1/c)/g.0:(2*th*pow(g.1/s.1,1/c)-pow(g.1/s.1,1/c)-th*th)/(g.0*(pow(g.1/s.1,1/c)-1))}}
  addUserKnob {7 h R 1 2}
  h {{0.048*Lw/1000+1.037}}
  addUserKnob {78 s l scale n 2}
- s {{w*max(1,pow(Lw/1000,0.1))} {Lw/Lp*h}}
- addUserKnob {4 direction M {forward inverse}}
+ s {{th>pow(g.1/s.1,1/c)?pow(g.1/s.1,1/c)/g.0:(2*th*pow(g.1/s.1,1/c)-pow(g.1/s.1,1/c)-th*th)/(g.0*(pow(g.1/s.1,1/c)-1))} {Lw/Lp*h}}
  addUserKnob {20 endGroup n -1}
  addUserKnob {26 ""}
- addUserKnob {26 plot_label l " " T "<style>a:link \{color:#ccc\}</style><a href=\"https://www.desmos.com/calculator/n2pkbijupz\">desmos plot</a>"}
+ addUserKnob {4 direction M {forward inverse}}
+ addUserKnob {26 plot_label l " " T "<style>a:link \{color:#ccc\}</style><a href=\"https://www.desmos.com/calculator/cuernu7azcz\">desmos plot</a>"}
 }
  Input {
   inputs 0
@@ -46,7 +44,7 @@ Group {
   xpos -6
   ypos -6
  }
-set Nefaf21c0 [stack 0]
+set N43a0da60 [stack 0]
  Expression {
   expr0 r/s.1
   expr1 g/s.1
@@ -88,7 +86,7 @@ set Nefaf21c0 [stack 0]
   xpos 70
   ypos 141
  }
-push $Nefaf21c0
+push $N43a0da60
  Expression {
   expr0 r*s.0
   expr1 g*s.0
