@@ -418,7 +418,7 @@ push $N7d82c120
   addUserKnob {6 cl l clamp t "clamp lerp factor channel to 0-1 range" -STARTLINE}
   cl true
   addUserKnob {18 p l power R 0.2 4}
-  p {1 1.05 1.5}
+  p {1 1.1 1.5}
   addUserKnob {6 p_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
  }
  Expression {
@@ -875,7 +875,7 @@ push $N6ebf22a0
   addUserKnob {6 cl l clamp t "clamp lerp factor channel to 0-1 range" -STARTLINE}
   cl true
   addUserKnob {18 p l power R 0.2 4}
-  p {1 1.05 1.5}
+  p {1 1.1 1.5}
   addUserKnob {6 p_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
  }
  Expression {

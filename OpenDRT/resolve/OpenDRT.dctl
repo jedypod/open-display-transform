@@ -302,7 +302,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       // bias reds toward orange
       ccf3 = power_lerp(ccf3, make_float3(1.0f, 1.5f, 1.1f), hue_rotate(hch, 1.5f).z);
       // bias blues towards cyan
-      ccf3 = power_lerp(ccf3, make_float3(1.0f, 1.06f, 1.5f), hch.x);
+      ccf3 = power_lerp(ccf3, make_float3(1.0f, 1.1f, 1.5f), hch.x);
 
       // chroma compression
       ccf3 = powf3(ccf3, hldc) * sat;
@@ -400,12 +400,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // Highlight Re-Chroma
     if (pdch == 1) {
-      // Qperceptual-pdch hue-path bias
+      // Quasi-perceptual hue-path bias
       float3 ccf3 = make_float3(ccf, ccf, ccf);
       // bias reds toward orange
       ccf3 = power_lerp(ccf3, make_float3(1.0f, 1.5f, 1.1f), hue_rotate(hch, 1.5f).z);
       // bias blues towards cyan
-      ccf3 = power_lerp(ccf3, make_float3(1.0f, 1.06f, 1.5f), hch.x);
+      ccf3 = power_lerp(ccf3, make_float3(1.0f, 1.1f, 1.5f), hch.x);
 
       // chroma compression
       ccf3 = powf3(ccf3, hldc) * sat;
