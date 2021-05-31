@@ -6,7 +6,7 @@ Group {
  addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.0.81b3 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
  addUserKnob {41 gamut l "input gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer l " " T ""}
- addUserKnob {35 presets l " " M {"presets/Rec.1886: 2.4 Power EOTF | Rec.709" "knobs this \{Lw 100 c 1.4 surround 1 wp 3 eotf 2 display_gamut 2\}" "presets/sRGB Display: 2.2 Power EOTF | Rec.709" "knobs this \{Lw 100 c 1.4 surround 0 wp 3 eotf 1 display_gamut 2\}" "presets/Apple Display P3: 2.2 Power EOTF | P3D65" "knobs this \{Lw 100 c 1.4 surround 0 wp 3 eotf 1 display_gamut 1\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 600 nit" "knobs this \{Lw 600 c 1.2 surround 2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 1000 nit" "knobs this \{Lw 1000 c 1.2 surround 2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: HF | Rec.2020 | 1000 nit" "knobs this \{Lw 1000 c 1.2 surround 2 wp 3 eotf 5 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 2000 nit" "knobs this \{Lw 2000 c 1.2 surround 2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 4000 nit" "knobs this \{Lw 4000 c 1.2 surround 2 wp 3 eotf 4 display_gamut 0\}"}}
+ addUserKnob {35 presets l " " M {"presets/Rec.1886: 2.4 Power EOTF | Rec.709" "knobs this \{Lw 100 c 1.4 surround 1 saturation 1.2 wp 3 eotf 2 display_gamut 2\}" "presets/sRGB Display: 2.2 Power EOTF | Rec.709" "knobs this \{Lw 100 c 1.4 surround 0 saturation 1.2 wp 3 eotf 1 display_gamut 2\}" "presets/Apple Display P3: 2.2 Power EOTF | P3D65" "knobs this \{Lw 100 c 1.4 surround 0 saturation 1.2 wp 3 eotf 1 display_gamut 1\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 600 nit" "knobs this \{Lw 600 c 1.2 surround 2 saturation 1 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 1000 nit" "knobs this \{Lw 1000 c 1.2 surround 2 saturation 1 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: HF | Rec.2020 | 1000 nit" "knobs this \{Lw 1000 c 1.2 surround 2 saturation 1 wp 3 eotf 5 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 2000 nit" "knobs this \{Lw 2000 c 1.2 surround 2 saturation 1 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST-2084 PQ EOTF | Rec.2020 | 4000 nit" "knobs this \{Lw 4000 c 1.2 surround 2 saturation 1 wp 3 eotf 4 display_gamut 0\}"}}
  addUserKnob {26 ""}
  addUserKnob {26 luminance_label l " " T <b>luminance</b>}
  addUserKnob {7 Lw t "Normalized white luminance in nits" R 100 4000}
@@ -41,7 +41,7 @@ Group {
  addUserKnob {6 pdch l "perceptual dechroma" +STARTLINE}
  pdch true
  addUserKnob {7 saturation R 0.5 1.5}
- saturation 1.1
+ saturation 1.2
  addUserKnob {41 wp l whitepoint T TruelightLMS_to_XYZ.wp}
  addUserKnob {20 chroma_grp l " " t "preset chroma params - adjust if you wish" n 1}
  chroma_grp 0
