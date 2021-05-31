@@ -14,7 +14,7 @@ DEFINE_UI_PARAMS(c, contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1, 1.5, 0.0);
 DEFINE_UI_PARAMS(toe, toe, DCTLUI_SLIDER_FLOAT, 0.01, 0.0, 0.02, 0.001);
 DEFINE_UI_PARAMS(surround, surround, DCTLUI_COMBO_BOX, 1, {average, dim, dark}, {average, dim, dark});
 DEFINE_UI_PARAMS(hldc, hl dechroma, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0);
-DEFINE_UI_PARAMS(sat, saturation, DCTLUI_SLIDER_FLOAT, 1.1, 0.5, 1.5, 0.0);
+DEFINE_UI_PARAMS(sat, saturation, DCTLUI_SLIDER_FLOAT, 1.2, 0.5, 1.5, 0.0);
 DEFINE_UI_PARAMS(wr, red weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.5, 0.0);
 DEFINE_UI_PARAMS(wg, green weight, DCTLUI_SLIDER_FLOAT, 0.1, 0.0, 0.5, 0.0);
 DEFINE_UI_PARAMS(wb, blue weight, DCTLUI_SLIDER_FLOAT, 0.09, 0.0, 0.5, 0.0);
