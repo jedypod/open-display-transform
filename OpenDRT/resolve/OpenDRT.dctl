@@ -60,9 +60,9 @@ __DEVICE__ float3x3 make_float3x3(float3 a, float3 b, float3 c) {
 // Multiply float3 vector a and 3x3 matrix m
 __DEVICE__ float3 mult_f3_f33(float3 a, float3x3 m) {
   return make_float3(
-      m.x.x * a.x + m.x.y * a.y + m.x.z * a.z,
-      m.y.x * a.x + m.y.y * a.y + m.y.z * a.z,
-      m.z.x * a.x + m.z.y * a.y + m.z.z * a.z);
+    m.x.x * a.x + m.x.y * a.y + m.x.z * a.z,
+    m.y.x * a.x + m.y.y * a.y + m.y.z * a.z,
+    m.z.x * a.x + m.z.y * a.y + m.z.z * a.z);
 }
 
 // Calculate inverse of 3x3 matrix: https://stackoverflow.com/questions/983999/simple-3x3-matrix-inverse-code-c
@@ -117,9 +117,9 @@ __DEVICE__ float3 hue_rotate(float3 rgb, float rot) {
 // float3 power function with mix / lerp to input
 __DEVICE__ float3 power_lerp(float3 rgb, float3 p, float f) {
   return make_float3(
-    _powf(rgb.x, p.x) * f + rgb.x * (1.0f - f),
-    _powf(rgb.y, p.y) * f + rgb.y * (1.0f - f),
-    _powf(rgb.z, p.z) * f + rgb.z * (1.0f - f));
+    _fmaxf(0.0f, _powf(rgb.x, p.x) * f + rgb.x * (1.0f - f)),
+    _fmaxf(0.0f, _powf(rgb.y, p.y) * f + rgb.y * (1.0f - f)),
+    _fmaxf(0.0f, _powf(rgb.z, p.z) * f + rgb.z * (1.0f - f)));
 }
 
 // Helper functions to perform math operations on a float3 vector
@@ -127,7 +127,7 @@ __DEVICE__ float3 powf3(float3 a, float b) { return make_float3(_powf(a.x, b), _
 __DEVICE__ float3 sqrtf3(float3 a) { return make_float3(_sqrtf(a.x), _sqrtf(a.y), _sqrtf(a.z)); }
 __DEVICE__ float3 maxf3(float3 a, float b) { return make_float3(_fmaxf(a.x, b), _fmaxf(a.y, b), _fmaxf(a.z, b)); }
 __DEVICE__ float3 minf3(float3 a, float b) { return make_float3(_fminf(a.x, b), _fminf(a.y, b), _fminf(a.z, b)); }
-
+__DEVICE__ float _sign(float x) { if (x > 0.0f) return 1.0f; if (x < 0.0f) return -1.0f; return 0.0f; }
 
 
 
