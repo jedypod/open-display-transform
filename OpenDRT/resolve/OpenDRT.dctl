@@ -345,9 +345,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     } else if (eotf == 4) { // ST2084 PQ
       rgb = powf3((c1 + c2 * powf3(rgb * PQ_Lw / 10000.0f, m1)) / (1.0f + c3 * powf3(rgb * PQ_Lw / 10000.0f, m1)), m2);
     } else if (eotf == 5) { // HLG
-      float Ys = 0.2627f * rgb.x + 0.6780f * rgb.y + 0.0593f * rgb.z;
+      float Yd = 0.2627f * rgb.x + 0.6780f * rgb.y + 0.0593f * rgb.z;
       // HLG Inverse OOTF
-      rgb = rgb * _powf(Ys, (1.0f - h_g) / h_g);
+      rgb = rgb * _powf(Yd, (1.0f - h_g) / h_g);
       // HLG OETF
       rgb.x = rgb.x <= 1.0f / 12.0f ? _sqrtf(3.0f * rgb.x) : h_a * _logf(12.0f * rgb.x - h_b) + h_c;
       rgb.y = rgb.y <= 1.0f / 12.0f ? _sqrtf(3.0f * rgb.y) : h_a * _logf(12.0f * rgb.y - h_b) + h_c;
@@ -367,12 +367,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       // ST2084 PQ
       rgb = powf3((powf3(rgb, 1.0f / m2) - c1) / (c2 - c3 * powf3(rgb, 1.0f / m2)), 1.0f / m1) * 10000.0f / PQ_Lw;
     } else if (eotf == 5) {
-      float Ys = 0.2627f * rgb.x + 0.6780f * rgb.y + 0.0593f * rgb.z;
       // HLG Inverse OETF
-      rgb.x = rgb.x <= 0.5f ? (rgb.x * rgb.x) / 3.0f : (_expf((rgb.x - h_c) / h_a) + h_b) / 12.0f;
-      rgb.y = rgb.y <= 0.5f ? (rgb.y * rgb.y) / 3.0f : (_expf((rgb.y - h_c) / h_a) + h_b) / 12.0f;
-      rgb.z = rgb.z <= 0.5f ? (rgb.z * rgb.z) / 3.0f : (_expf((rgb.z - h_c) / h_a) + h_b) / 12.0f;
+      rgb.x = rgb.x <= 0.5f ? rgb.x * rgb.x / 3.0f : (_expf((rgb.x - h_c) / h_a) + h_b) / 12.0f;
+      rgb.y = rgb.y <= 0.5f ? rgb.y * rgb.y / 3.0f : (_expf((rgb.y - h_c) / h_a) + h_b) / 12.0f;
+      rgb.z = rgb.z <= 0.5f ? rgb.z * rgb.z / 3.0f : (_expf((rgb.z - h_c) / h_a) + h_b) / 12.0f;
       // HLG OOTF
+      float Ys = 0.2627f * rgb.x + 0.6780f * rgb.y + 0.0593f * rgb.z;
       rgb = rgb * _powf(Ys, h_g - 1.0f);
     }
 
