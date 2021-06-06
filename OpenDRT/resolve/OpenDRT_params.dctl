@@ -9,7 +9,7 @@
 
     Preset Values
     -------------
-    Here's a rough sketch of what the parameters are for SDR and HDR
+    Here's a rough sketch of what the parameters would be for SDR and HDR
     SDR: Lw = Lp, Lg = 10.0, c = 1.4, toe = 0.01, sat = 1.2
     HDR: Lp = 10,000, Lw = nits, Lg = 15, maybe boosted a bit as Lw increases, c = 1.2, toe = 0.001 @ 1000 nits, toe = 0.00025 @ 4000 nits, sat = 1.0
     -------------------------------------------------
@@ -29,15 +29,28 @@ DEFINE_UI_PARAMS(wg, green weight, DCTLUI_SLIDER_FLOAT, 0.1, 0.0, 0.33, 0.0);
 DEFINE_UI_PARAMS(wb, blue weight, DCTLUI_SLIDER_FLOAT, 0.09, 0.0, 0.33, 0.0);
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93});
 DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG});
-DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 2, {Rec2020, P3D65, Rec709}, {Rec2020, P3D65, Rec709});
+DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 4, {Rec2020, P3D65, P3D60, P3DCI, Rec709, DCDM}, {Rec.2020, P3 D65, P3 D60, P3 DCI, Rec.709, DCDM XYZ});
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
 DEFINE_UI_PARAMS(pdch, perceptual dechroma, DCTLUI_CHECK_BOX, 1);
 
 
+// Custom 3x3 matrix struct float3x3
+typedef struct {
+  float3 x, y, z;
+} float3x3;
+
+// Struct to hold whitepoint normalization
+typedef struct {
+  float rec2020, p3d65, p3d60, p3dci, rec709, dcdm;
+} wpnorm;
+
+// Gamut conversion matrices: All with XYZ Scaling as whitepoint chromatic adaptation method, because we do chromatic adaptation in LMS space during display rendering.
 #define identity_mtx make_float3x3(make_float3(1.0f, 0.0f, 0.0f), make_float3(0.0f, 1.0f, 0.0f), make_float3(0.0f, 0.0f, 1.0f))
 #define matrix_ap0_to_xyz make_float3x3(make_float3(0.950362384319, 0.000000000000, 0.000093463248), make_float3(0.343966454268, 0.728166162968, -0.072132542729), make_float3(0.000000000000, 0.000000000000, 1.089057803154))
 #define matrix_ap1_to_xyz make_float3x3(make_float3(0.660931229591, 0.133696138859, 0.155828580260), make_float3(0.272228747606, 0.674081742764, 0.053689509630), make_float3(-0.006018006243, 0.004383686464, 1.090692043304))
 #define matrix_p3d65_to_xyz make_float3x3(make_float3(0.486571133137, 0.265667706728, 0.198217317462), make_float3(0.228974640369, 0.691738605499, 0.079286918044), make_float3(-0.000000000000, 0.045113388449, 1.043944478035))
+#define matrix_p3d60_to_xyz make_float3x3(make_float3(0.504949748516, 0.264681518078, 0.183015048504), make_float3(0.237623393536, 0.689170777798, 0.073206014931), make_float3(-0.000000000000, 0.044945921749, 0.963879227638))
+#define matrix_p3dci_to_xyz make_float3x3(make_float3(0.445170015097, 0.277134418488, 0.172282665968), make_float3(0.209491759539, 0.721595287323, 0.068913064897), make_float3(-0.000000000000, 0.047060567886, 0.907355427742))
 #define matrix_rec2020_to_xyz make_float3x3(make_float3(0.636958122253, 0.144616916776, 0.168880969286), make_float3(0.262700229883, 0.677998125553, 0.059301715344), make_float3(0.000000000000, 0.028072696179, 1.060985088348))
 #define matrix_rec709_to_xyz make_float3x3(make_float3(0.412390917540, 0.357584357262, 0.180480793118), make_float3(0.212639078498, 0.715168714523, 0.072192311287), make_float3(0.019330825657, 0.119194783270, 0.950532138348))
 #define matrix_arriwg_to_xyz make_float3x3(make_float3(0.638007640839, 0.214703813195, 0.097744457424), make_float3(0.291953772306, 0.823840856552, -0.115794822574), make_float3(0.002798279049, -0.067034222186, 1.153293848038))
@@ -53,24 +66,19 @@ DEFINE_UI_PARAMS(pdch, perceptual dechroma, DCTLUI_CHECK_BOX, 1);
 #define catd75 make_float3(0.187590f, 1.244085f, 0.827517f)
 #define catd93 make_float3(0.193087f, 1.225341f, 0.717363f)
 
-#define wnd50 make_float3(1.09063f, 1.1408f, 1.17646f)
-#define wnd55 make_float3(1.05337f, 1.08334f, 1.10416f)
-#define wnd60 make_float3(1.02355f, 1.037f, 1.0461f)
-#define wnd65 make_float3(1.0f, 1.0f, 1.0f)
-#define wnd75 make_float3(1.12915f, 1.13116f, 1.14486f)
-#define wnd93 make_float3(1.30631f, 1.31116f, 1.34374f)
+__CONSTANT__ wpnorm wnd50 = {1.09063f, 1.1408f, 1.09928f, 1.2469f, 1.17646f, 1.0f};
+__CONSTANT__ wpnorm wnd55 = {1.05337f, 1.08334f, 1.04391f, 1.18409f, 1.10416f, 1.0f};
+__CONSTANT__ wpnorm wnd60 = {1.02355f, 1.037f, 1.00028f, 1.13345f, 1.0461f, 1.0f};
+__CONSTANT__ wpnorm wnd65 = {1.0f, 1.0f, 1.08307f, 1.15054f, 1.0f, 1.0f};
+__CONSTANT__ wpnorm wnd75 = {1.12915f, 1.13116f, 1.22512f, 1.30144f, 1.14486f, 1.0f};
+__CONSTANT__ wpnorm wnd93 = {1.30631f, 1.31116f, 1.42007f, 1.50853f, 1.34374f, 1.0f};
 
-// Custom 3x3 matrix struct float3x3
-typedef struct {
-  float3 x, y, z;
-} float3x3;
+
 
 // Helper function to create a float3x3
 __DEVICE__ float3x3 make_float3x3(float3 a, float3 b, float3 c) {
   float3x3 d;
-  d.x = a;
-  d.y = b;
-  d.z = c;
+  d.x = a, d.y = b, d.z = c;
   return d;
 }
 
@@ -173,11 +181,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // illuminant in Truelight LMS colorspace on exit from rendering through inverse
   float3 cats;
 
-  // Normalization factor for scaling output to compensate for peak white shift
-  // due to chromatic adaptation to target whitepoint.
-  // TODO: float3 for conveniance: x = rec2020, y = p3d65, z = rec709 : will need to support more for DCI
-  float3 wn;
-
+  // Normalization factor to scale display light, compensating for peak white shift
+  // due to chromatic adaptation to target creative whitepoint.
+  wpnorm wn;
+  
   // Set up whitepoint based on user parameters
   if (wp == D50)         cats = catd50, wn = wnd50;
   else if (wp == D55)    cats = catd55, wn = wnd55;
@@ -197,9 +204,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Set up display gamut conversion matrices: Rec2020, P3D65, Rec709
   float3x3 xyz_to_display;
   float w_n;
-  if (display_gamut == Rec2020)       xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.x;
-  else if (display_gamut == P3D65)    xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.y;
-  else if (display_gamut == Rec709)   xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.z;
+  if (display_gamut == Rec2020)       xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020;
+  else if (display_gamut == P3D65)    xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65;
+  else if (display_gamut == P3D60)    xyz_to_display = inv_f33(matrix_p3d60_to_xyz), w_n = wn.p3d60;
+  else if (display_gamut == P3DCI)    xyz_to_display = inv_f33(matrix_p3dci_to_xyz), w_n = wn.p3dci;
+  else if (display_gamut == Rec709)   xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709;
+  else if (display_gamut == DCDM)     xyz_to_display = identity_mtx, w_n = wn.dcdm;
 
 
   // Surround illumination compensation. Super simple power model for SDR mainly.
@@ -328,7 +338,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb *= sy;
 
     // Clamp
-    rgb = maxf3(minf3(rgb, Lw / Lp), 0.0f);
+    rgb = maxf3(minf3(rgb, display_gamut == DCDM ? 1.0f : Lw / Lp), 0.0f);
 
     /* Inverse EOTF
        -----------------------  */
