@@ -6,15 +6,28 @@
 */
 
 DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec .2020, Rec .709, Alexa Wide Gamut, Red Wide Gamut RGB, Filmlight E - Gamut, DaVinci Wide Gamut});
-DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 0, {sdr_rec1886, sdr_srgb, sdr_applep3, sdr_rec2020, sdr_p3dci, hdr_rec2020_pq_100nit, hdr_rec2020_pq_600nit, hdr_rec2020_pq_1000nit, hdr_rec2020_hlg_1000nit, hdr_rec2020_pq_2000nit, hdr_rec2020_pq_4000nit, hdr_p3d65_pq_100nit, hdr_p3d65_pq_600nit, hdr_p3d65_pq_1000nit, hdr_p3d65_pq_2000nit, hdr_p3d65_pq_4000nit}, {Rec.1886: 2.4 Power | Rec.709, sRGB Display: 2.2 Power | Rec.709, Apple Display P3: 2.2 Power | P3D65, Rec.2020: 2.4 Power | Rec.2020, DCI: 2.6 Power | P3 DCI, Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit, Rec.2100: HLG | Rec.2020 | 1000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit, Dolby: ST 2084 PQ | P3D65 | 100 nit, Dolby: ST 2084 PQ | P3D65 | 600 nit, Dolby: ST 2084 PQ | P3D65 | 1000 nit, Dolby: ST 2084 PQ | P3D65 | 2000 nit, Dolby: ST 2084 PQ | P3D65 | 4000 nit});
+DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 0, {sdr_rec1886, sdr_srgb, sdr_applep3, sdr_rec2020, hdr_rec2020_pq_100nit, hdr_rec2020_pq_600nit, hdr_rec2020_pq_1000nit, hdr_rec2020_hlg_1000nit, hdr_rec2020_pq_2000nit, hdr_rec2020_pq_4000nit, hdr_p3d65_pq_100nit, hdr_p3d65_pq_600nit, hdr_p3d65_pq_1000nit, hdr_p3d65_pq_2000nit, hdr_p3d65_pq_4000nit, dci_p3d60, dci_p3d65, dci_p3dci, dci_dcdm}, {Rec.1886: 2.4 Power | Rec.709, sRGB Display: 2.2 Power | Rec.709, Apple Display P3: 2.2 Power | P3D65, Rec.2020: 2.4 Power | Rec.2020, Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit, Rec.2100: HLG | Rec.2020 | 1000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit, Dolby: ST 2084 PQ | P3D65 | 100 nit, Dolby: ST 2084 PQ | P3D65 | 600 nit, Dolby: ST 2084 PQ | P3D65 | 1000 nit, Dolby: ST 2084 PQ | P3D65 | 2000 nit, Dolby: ST 2084 PQ | P3D65 | 4000 nit, DCI: 2.6 Power | P3 D60, DCI: 2.6 Power | P3 D65, DCI: 2.6 Power | P3 DCI, DCI: 2.6 Power | DCDM XYZ});
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93});
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
 
 
+// Custom 3x3 matrix struct float3x3
+typedef struct {
+  float3 x, y, z;
+} float3x3;
+
+// Struct to hold whitepoint normalization
+typedef struct {
+  float rec2020, p3d65, p3d60, p3dci, rec709, dcdm;
+} wpnorm;
+
+// Gamut conversion matrices: All with XYZ Scaling as whitepoint chromatic adaptation method, because we do chromatic adaptation in LMS space during display rendering.
 #define identity_mtx make_float3x3(make_float3(1.0f, 0.0f, 0.0f), make_float3(0.0f, 1.0f, 0.0f), make_float3(0.0f, 0.0f, 1.0f))
 #define matrix_ap0_to_xyz make_float3x3(make_float3(0.950362384319, 0.000000000000, 0.000093463248), make_float3(0.343966454268, 0.728166162968, -0.072132542729), make_float3(0.000000000000, 0.000000000000, 1.089057803154))
 #define matrix_ap1_to_xyz make_float3x3(make_float3(0.660931229591, 0.133696138859, 0.155828580260), make_float3(0.272228747606, 0.674081742764, 0.053689509630), make_float3(-0.006018006243, 0.004383686464, 1.090692043304))
 #define matrix_p3d65_to_xyz make_float3x3(make_float3(0.486571133137, 0.265667706728, 0.198217317462), make_float3(0.228974640369, 0.691738605499, 0.079286918044), make_float3(-0.000000000000, 0.045113388449, 1.043944478035))
+#define matrix_p3d60_to_xyz make_float3x3(make_float3(0.504949748516, 0.264681518078, 0.183015048504), make_float3(0.237623393536, 0.689170777798, 0.073206014931), make_float3(-0.000000000000, 0.044945921749, 0.963879227638))
+#define matrix_p3dci_to_xyz make_float3x3(make_float3(0.445170015097, 0.277134418488, 0.172282665968), make_float3(0.209491759539, 0.721595287323, 0.068913064897), make_float3(-0.000000000000, 0.047060567886, 0.907355427742))
 #define matrix_rec2020_to_xyz make_float3x3(make_float3(0.636958122253, 0.144616916776, 0.168880969286), make_float3(0.262700229883, 0.677998125553, 0.059301715344), make_float3(0.000000000000, 0.028072696179, 1.060985088348))
 #define matrix_rec709_to_xyz make_float3x3(make_float3(0.412390917540, 0.357584357262, 0.180480793118), make_float3(0.212639078498, 0.715168714523, 0.072192311287), make_float3(0.019330825657, 0.119194783270, 0.950532138348))
 #define matrix_arriwg_to_xyz make_float3x3(make_float3(0.638007640839, 0.214703813195, 0.097744457424), make_float3(0.291953772306, 0.823840856552, -0.115794822574), make_float3(0.002798279049, -0.067034222186, 1.153293848038))
@@ -30,24 +43,17 @@ DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
 #define catd75 make_float3(0.187590f, 1.244085f, 0.827517f)
 #define catd93 make_float3(0.193087f, 1.225341f, 0.717363f)
 
-#define wnd50 make_float3(1.09063f, 1.1408f, 1.17646f)
-#define wnd55 make_float3(1.05337f, 1.08334f, 1.10416f)
-#define wnd60 make_float3(1.02355f, 1.037f, 1.0461f)
-#define wnd65 make_float3(1.0f, 1.0f, 1.0f)
-#define wnd75 make_float3(1.12915f, 1.13116f, 1.14486f)
-#define wnd93 make_float3(1.30631f, 1.31116f, 1.34374f)
-
-// Custom 3x3 matrix struct float3x3
-typedef struct {
-  float3 x, y, z;
-} float3x3;
+__CONSTANT__ wpnorm wnd50 = {1.09063f, 1.1408f, 1.09928f, 1.2469f, 1.17646f, 1.0f};
+__CONSTANT__ wpnorm wnd55 = {1.05337f, 1.08334f, 1.04391f, 1.18409f, 1.10416f, 1.0f};
+__CONSTANT__ wpnorm wnd60 = {1.02355f, 1.037f, 1.00028f, 1.13345f, 1.0461f, 1.0f};
+__CONSTANT__ wpnorm wnd65 = {1.0f, 1.0f, 1.08307f, 1.15054f, 1.0f, 1.0f};
+__CONSTANT__ wpnorm wnd75 = {1.12915f, 1.13116f, 1.22512f, 1.30144f, 1.14486f, 1.0f};
+__CONSTANT__ wpnorm wnd93 = {1.30631f, 1.31116f, 1.42007f, 1.50853f, 1.34374f, 1.0f};
 
 // Helper function to create a float3x3
 __DEVICE__ float3x3 make_float3x3(float3 a, float3 b, float3 c) {
   float3x3 d;
-  d.x = a;
-  d.y = b;
-  d.z = c;
+  d.x = a, d.y = b, d.z = c;
   return d;
 }
 
@@ -150,11 +156,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // illuminant in Truelight LMS colorspace on exit from rendering through inverse
   float3 cats;
 
-  // Normalization factor for scaling output to compensate for peak white shift
-  // due to chromatic adaptation to target whitepoint.
-  // TODO: float3 for conveniance: x = rec2020, y = p3d65, z = rec709 : will need to support more for DCI white
-  float3 wn;
-
+  // Normalization factor to scale display light, compensating for peak white shift
+  // due to chromatic adaptation to target creative whitepoint.
+  wpnorm wn;
+  
   // Set up whitepoint based on user parameters
   if (wp == D50)         cats = catd50, wn = wnd50;
   else if (wp == D55)    cats = catd55, wn = wnd55;
@@ -175,40 +180,34 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // highlight dechroma 
   float hldc = 0.5f;
 
-  // Enable quasi-perceptual dechroma
+  // Enable quasi-perceptual highlight dechroma
   int pdch = 1;
-
   
   /* Set up presets
      ----------------------- */
   int eotf;
   float Lw, Lp, c, ps, sat, w_n;
   float3x3 xyz_to_display;
-  // else if (EOTF == srgb)    eotf = 1;
-  // else if (EOTF == rec1886) eotf = 2;
-  // else if (EOTF == dci)     eotf = 3;
-  // else if (EOTF == pq)      eotf = 4;
-  // else if (EOTF == hlg)     eotf = 5;
-  // if (surround == average)    ps = 0.9f;
-  // else if (surround == dim)   ps = 0.95f;
-  // else if (surround == dark)  ps = 1.0f;
 
-  if (preset == sdr_rec1886) Lw = 100.0f, Lp = 100.0f, c = 1.4f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.z, eotf = 2;
-  else if (preset == sdr_srgb) Lw = 100.0f, Lp = 100.0f, c = 1.4f, ps = 0.9f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.z, eotf = 1;
-  else if (preset == sdr_applep3) Lw = 100.0f, Lp = 100.0f, c = 1.4f, ps = 0.9f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.z, eotf = 1;
-  else if (preset == sdr_rec2020) Lw = 100.0f, Lp = 100.0f, c = 1.4f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.z, eotf = 2;
-  else if (preset == sdr_p3dci) Lw = 100.0f, Lp = 100.0f, c = 1.4f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.z, eotf = 3; // TODO! set up DCI display matrix
-  else if (preset == hdr_rec2020_pq_100nit) Lw = 100.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.z, eotf = 4;
-  else if (preset == hdr_rec2020_pq_600nit) Lw = 600.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.z, eotf = 4;
-  else if (preset == hdr_rec2020_pq_1000nit) Lw = 1000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.z, eotf = 4;
-  else if (preset == hdr_rec2020_hlg_1000nit) Lw = 1000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.z, eotf = 5;
-  else if (preset == hdr_rec2020_pq_2000nit) Lw = 2000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.z, eotf = 4;
-  else if (preset == hdr_rec2020_pq_4000nit) Lw = 4000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.z, eotf = 4;
-  else if (preset == hdr_p3d65_pq_100nit) Lw = 100.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.z, eotf = 4;
-  else if (preset == hdr_p3d65_pq_600nit) Lw = 600.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.z, eotf = 4;
-  else if (preset == hdr_p3d65_pq_1000nit) Lw = 1000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.z, eotf = 4;
-  else if (preset == hdr_p3d65_pq_2000nit) Lw = 2000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.z, eotf = 4;
-  else if (preset == hdr_p3d65_pq_4000nit) Lw = 4000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.z, eotf = 4;
+  if (preset == sdr_rec1886) Lw = 100.0f, Lp = Lw, c = 1.4f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 2;
+  else if (preset == sdr_srgb) Lw = 100.0f, Lp = Lw, c = 1.4f, ps = 0.9f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 1;
+  else if (preset == sdr_applep3) Lw = 100.0f, Lp = Lw, c = 1.4f, ps = 0.9f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 1;
+  else if (preset == sdr_rec2020) Lw = 100.0f, Lp = Lw, c = 1.4f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 2;
+  else if (preset == dci_p3d60) Lw = 100.0f, Lp = Lw, c = 1.4f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d60_to_xyz), w_n = wn.p3d60, eotf = 3;
+  else if (preset == dci_p3d65) Lw = 100.0f, Lp = Lw, c = 1.4f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d60_to_xyz), w_n = wn.p3d60, eotf = 3;
+  else if (preset == dci_p3dci) Lw = 100.0f, Lp = Lw, c = 1.4f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3dci_to_xyz), w_n = wn.p3dci, eotf = 3;
+  else if (preset == dci_dcdm) Lw = 100.0f, Lp = Lw * 52.37f / 48.0f, c = 1.4f, ps = 1.0f, sat = 1.2f, xyz_to_display = identity_mtx, w_n = wn.dcdm, eotf = 3;
+  else if (preset == hdr_rec2020_pq_100nit) Lw = 100.0f, Lp = 10000.0f, c = 1.4f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_pq_600nit) Lw = 600.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_pq_1000nit) Lw = 1000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_hlg_1000nit) Lw = 1000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 5;
+  else if (preset == hdr_rec2020_pq_2000nit) Lw = 2000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_pq_4000nit) Lw = 4000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_p3d65_pq_100nit) Lw = 100.0f, Lp = 10000.0f, c = 1.4f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_600nit) Lw = 600.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_1000nit) Lw = 1000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_2000nit) Lw = 2000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_4000nit) Lw = 4000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
 
 
 
@@ -335,7 +334,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb *= sy;
 
     // Clamp
-    rgb = maxf3(minf3(rgb, Lw / Lp), 0.0f);
+    rgb = maxf3(minf3(rgb, preset == dci_dcdm ? 1.0f : Lw / Lp), 0.0f);
 
     /* Inverse EOTF
        -----------------------  */
