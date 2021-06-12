@@ -5,7 +5,8 @@
       https://github.com/jedypod/open-display-transform
 */
 
-DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec .2020, Rec .709, Alexa Wide Gamut, Red Wide Gamut RGB, Filmlight E - Gamut, DaVinci Wide Gamut});
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, egamut, davinciwg}, {AP0, AP1, P3D65, Rec .2020, Rec .709, Alexa Wide Gamut, Red Wide Gamut RGB, Filmlight E - Gamut, DaVinci Wide Gamut});
+DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, ACEScct, ACEScc, LogC, Log3G10, SLog3}, {linear, ACEScct, ACEScc, LogC, Log3G10, S-Log3})
 DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 0, {sdr_rec1886, sdr_srgb, sdr_applep3, sdr_rec2020, hdr_rec2020_pq_100nit, hdr_rec2020_pq_600nit, hdr_rec2020_pq_1000nit, hdr_rec2020_hlg_1000nit, hdr_rec2020_pq_2000nit, hdr_rec2020_pq_4000nit, hdr_p3d65_pq_100nit, hdr_p3d65_pq_600nit, hdr_p3d65_pq_1000nit, hdr_p3d65_pq_2000nit, hdr_p3d65_pq_4000nit, dci_p3d60, dci_p3d65, dci_p3dci, dci_dcdm}, {Rec.1886: 2.4 Power | Rec.709, sRGB Display: 2.2 Power | Rec.709, Apple Display P3: 2.2 Power | P3D65, Rec.2020: 2.4 Power | Rec.2020, Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit, Rec.2100: HLG | Rec.2020 | 1000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit, Dolby: ST 2084 PQ | P3D65 | 100 nit, Dolby: ST 2084 PQ | P3D65 | 600 nit, Dolby: ST 2084 PQ | P3D65 | 1000 nit, Dolby: ST 2084 PQ | P3D65 | 2000 nit, Dolby: ST 2084 PQ | P3D65 | 4000 nit, DCI: 2.6 Power | P3 D60, DCI: 2.6 Power | P3 D65, DCI: 2.6 Power | P3 DCI, DCI: 2.6 Power | DCDM XYZ});
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93});
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
@@ -128,6 +129,114 @@ __DEVICE__ float3 sqrtf3(float3 a) { return make_float3(_sqrtf(a.x), _sqrtf(a.y)
 __DEVICE__ float3 maxf3(float3 a, float b) { return make_float3(_fmaxf(a.x, b), _fmaxf(a.y, b), _fmaxf(a.z, b)); }
 __DEVICE__ float3 minf3(float3 a, float b) { return make_float3(_fminf(a.x, b), _fminf(a.y, b), _fminf(a.z, b)); }
 __DEVICE__ float _sign(float x) { if (x > 0.0f) return 1.0f; if (x < 0.0f) return -1.0f; return 0.0f; }
+
+__DEVICE__ float lin_to_ACEScct(float in)
+{
+    if (in <= 0.0078125f)
+    {
+        return 10.5402377416545f * in + 0.0729055341958355f;
+    }
+    else
+    {
+        return (_log2f(in) + 9.72f) / 17.52f;
+    }   
+}
+
+__DEVICE__ float ACEScct_to_lin(float in)
+{
+    if (in > 0.155251141552511f)
+    {
+        return _powf( 2.0f, in*17.52f - 9.72f);
+    }
+    else
+    {
+        return (in - 0.0729055341958355f) / 10.5402377416545f;
+    }
+}
+
+__DEVICE__ float lin_to_ACEScc(float in)
+{
+    if (in < 0.0f)
+    {
+        return -0.3584474886f; // =(_log2f( pow(2.,-16.))+9.72)/17.52
+    }
+    if (in < _powf(2.0f,-15.0f))
+    {
+        return (_log2f( _powf(2.0f,-16.0f) + in * 0.5f) + 9.72f) / 17.52f;
+    }
+    return (_log2f(in) + 9.72f) / 17.52f;
+}
+
+__DEVICE__ float ACEScc_to_lin(float in)
+{
+    if (in < -0.3013698630f) // (9.72-15)/17.52
+    {
+        return (_powf( 2.0f, in*17.52f-9.72f) - _powf( 2.0f,-16.0f))*2.0f;
+    }
+    if ( in < (_log2f(65504.0f)+9.72f)/17.52f)
+    {
+        return _powf( 2.0f, in*17.52f-9.72f);
+    }
+    return 65504.0f;
+}
+
+__DEVICE__ float lin_to_LogC(float in)
+{
+    if  (in >= 0.01059106816664f)
+    {
+        return 0.385537f + 0.247190f * _log10f(in * 5.555556f + 0.052272f);
+    }
+    return in * 5.367655f + 0.092809f;
+}
+
+__DEVICE__ float LogC_to_lin(float in)
+{
+    if (in > 0.149659f)
+    {
+        return (_powf(10.0f,(in - 0.385537f) / 0.247190f) - 0.052272f) / 5.555556f;
+    }
+    return (in - 0.092809f) / 5.367655f;
+}
+
+
+
+__DEVICE__ float lin_to_Log3G10(float in)
+{
+    if (in < -0.01f)
+    {
+        return (in + 0.01f) * 15.1927f;
+    }
+    return (0.224282f * _log10f(((in + 0.01f) * 155.975327f) + 1.0f));
+}
+
+
+__DEVICE__ float Log3G10_to_lin(float in)
+{
+    if (in < 0.0f)
+    {
+        return (in / 15.1927f) - 0.01f;
+    }
+    return ((_powf(10.0f, in / 0.224282f) - 1.0f) / 155.975327f) - 0.01f;
+}
+
+
+__DEVICE__ float lin_to_SLog3(float in)
+{
+    if (in < 0.01125f)
+    {
+        return in * 6.621943712f + 0.0928641251f;
+    }
+    return (420.0f + _log10f((in + 0.01f) / (0.18f + 0.01f)) * 261.5f) / 1023.0f;
+}
+
+__DEVICE__ float SLog3_to_lin(float in)
+{
+    if (in < 171.2102946929f / 1023.0f)
+    {
+        return (in - 0.09286412512219f) / 6.62194371177582f;
+    }
+    return _powf(10.0f, ((in * 1023.0f - 420.0f) / 261.5f)) * (0.18f + 0.01f) - 0.01f;
+}
 
 
 
@@ -278,6 +387,33 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float3 rgb = make_float3(p_R, p_G, p_B);
 
   if (invert == 0) {
+    // linearise input
+    if (in_curve == ACEScct) {
+      rgb.x = ACEScct_to_lin(rgb.x);
+      rgb.y = ACEScct_to_lin(rgb.y);
+      rgb.z = ACEScct_to_lin(rgb.z);
+    }
+    if (in_curve == ACEScc) {
+      rgb.x = ACEScc_to_lin(rgb.x);
+      rgb.y = ACEScc_to_lin(rgb.y);
+      rgb.z = ACEScc_to_lin(rgb.z);
+    }
+    if (in_curve == LogC) {
+      rgb.x = LogC_to_lin(rgb.x);
+      rgb.y = LogC_to_lin(rgb.y);
+      rgb.z = LogC_to_lin(rgb.z);
+    }
+    if (in_curve == Log3G10) {
+      rgb.x = Log3G10_to_lin(rgb.x);
+      rgb.y = Log3G10_to_lin(rgb.y);
+      rgb.z = Log3G10_to_lin(rgb.z);
+    }
+    if (in_curve == SLog3) {
+      rgb.x = SLog3_to_lin(rgb.x);
+      rgb.y = SLog3_to_lin(rgb.y);
+      rgb.z = SLog3_to_lin(rgb.z);
+    }
+
     // input gamut to xyz d65 cat: xyz scaling
     rgb = mult_f3_f33(rgb, in_to_xyz);
 
@@ -435,6 +571,33 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // XYZ to input gamut
     rgb = mult_f3_f33(rgb, inv_f33(in_to_xyz));
+    
+    // inverse input OETF
+    if (in_curve == ACEScct) {
+      rgb.x = lin_to_ACEScct(rgb.x);
+      rgb.y = lin_to_ACEScct(rgb.y);
+      rgb.z = lin_to_ACEScct(rgb.z);
+    }
+    if (in_curve == ACEScc) {
+      rgb.x = lin_to_ACEScc(rgb.x);
+      rgb.y = lin_to_ACEScc(rgb.y);
+      rgb.z = lin_to_ACEScc(rgb.z);
+    }
+    if (in_curve == LogC) {
+      rgb.x = lin_to_LogC(rgb.x);
+      rgb.y = lin_to_LogC(rgb.y);
+      rgb.z = lin_to_LogC(rgb.z);
+    }
+    if (in_curve == Log3G10) {
+      rgb.x = lin_to_Log3G10(rgb.x);
+      rgb.y = lin_to_Log3G10(rgb.y);
+      rgb.z = lin_to_Log3G10(rgb.z);
+    }
+    if (in_curve == SLog3) {
+      rgb.x = lin_to_SLog3(rgb.x);
+      rgb.y = lin_to_SLog3(rgb.y);
+      rgb.z = lin_to_SLog3(rgb.z);
+    }
   }
 
   return rgb;
