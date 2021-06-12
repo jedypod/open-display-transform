@@ -499,7 +499,7 @@ push $N2bfc9a10
   ypos -790
   addUserKnob {20 InputGamut_to_XYZ_tab l InputGamut_to_XYZ}
   addUserKnob {4 gamut l "input gamut" M {ACES ACEScg P3D65 Rec.2020 Rec.709 "Alexa WideGamut" "Red WideGamutRGB" "Sony SGamut3" "Filmlight E-Gamut" "DaVinci Wide Gamut" "" ""}}
-  gamut "DaVinci Wide Gamut"
+  gamut "ACEScg"
   addUserKnob {41 matrix T ColorMatrix.matrix}
   addUserKnob {41 invert -STARTLINE T ColorMatrix.invert}
  }
