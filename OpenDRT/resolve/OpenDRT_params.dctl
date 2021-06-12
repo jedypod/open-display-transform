@@ -1,6 +1,6 @@
 /*  OpenDRT Params
     -------------------------------------------------
-      v0.0.81
+      v0.0.82b1
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
     
@@ -15,7 +15,8 @@
     -------------------------------------------------
 */
 
-DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec .2020, Rec .709, Alexa Wide Gamut, Red Wide Gamut RGB, Filmlight E - Gamut, DaVinci Wide Gamut});
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Filmlight E - Gamut, DaVinci Wide Gamut});
+DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Filmlight TLog, DaVinci Intermediate});
 DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 10000.0, 100.0);
 DEFINE_UI_PARAMS(Lw, Lw, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 4000.0, 10.0);
 DEFINE_UI_PARAMS(Lg, Lg, DCTLUI_SLIDER_FLOAT, 10.0, 1.0, 100.0, 1.0);
@@ -147,6 +148,68 @@ __DEVICE__ float3 power_lerp(float3 rgb, float3 p, float f) {
     _fmaxf(0.0f, _powf(rgb.z, p.z) * f + rgb.z * (1.0f - f)));
 }
 
+
+__DEVICE__ float3 lin2log(float3 rgb, int tf) {
+  if (tf == 0) return rgb;
+  else if (tf == 1) { // ACEScct
+    rgb.x = rgb.x > 0.0078125f ? (_log2f(rgb.x) + 9.72f) / 17.52f : 10.5402377416545f * rgb.x + 0.0729055341958355f;
+    rgb.y = rgb.y > 0.0078125f ? (_log2f(rgb.y) + 9.72f) / 17.52f : 10.5402377416545f * rgb.y + 0.0729055341958355f;
+    rgb.z = rgb.z > 0.0078125f ? (_log2f(rgb.z) + 9.72f) / 17.52f : 10.5402377416545f * rgb.z + 0.0729055341958355f;
+  } else if (tf == 2) { // Arri V3 LogC EI 800
+    rgb.x = rgb.x > 0.010591f ? 0.24719f * _log10f(5.555556f * rgb.x + 0.052272f) + 0.385537f : 5.367655f * rgb.x + 0.092809f;
+    rgb.y = rgb.y > 0.010591f ? 0.24719f * _log10f(5.555556f * rgb.y + 0.052272f) + 0.385537f : 5.367655f * rgb.y + 0.092809f;
+    rgb.z = rgb.z > 0.010591f ? 0.24719f * _log10f(5.555556f * rgb.z + 0.052272f) + 0.385537f : 5.367655f * rgb.z + 0.092809f;
+  } else if (tf == 3) { // Red Log3G10
+    rgb.x = rgb.x > -0.01f ? 0.224282f * _log10f(((rgb.x + 0.01f) * 155.975327f) + 1.0f) : (rgb.x + 0.01f) * 15.1927f;
+    rgb.y = rgb.y > -0.01f ? 0.224282f * _log10f(((rgb.y + 0.01f) * 155.975327f) + 1.0f) : (rgb.y + 0.01f) * 15.1927f;
+    rgb.z = rgb.z > -0.01f ? 0.224282f * _log10f(((rgb.z + 0.01f) * 155.975327f) + 1.0f) : (rgb.z + 0.01f) * 15.1927f;
+  } else if (tf == 4) { // Sony SLog3
+    rgb.x = rgb.x >= 0.01125f ? (420.0f + _log10f((rgb.x + 0.01f) / (0.18f + 0.01f)) * 261.5f) / 1023.0f : (rgb.x * (171.2102946929f - 95.0f) / 0.01125000f + 95.0f) / 1023.0f;
+    rgb.y = rgb.y >= 0.01125f ? (420.0f + _log10f((rgb.y + 0.01f) / (0.18f + 0.01f)) * 261.5f) / 1023.0f : (rgb.y * (171.2102946929f - 95.0f) / 0.01125000f + 95.0f) / 1023.0f;
+    rgb.z = rgb.z >= 0.01125f ? (420.0f + _log10f((rgb.z + 0.01f) / (0.18f + 0.01f)) * 261.5f) / 1023.0f : (rgb.z * (171.2102946929f - 95.0f) / 0.01125000f + 95.0f) / 1023.0f;
+  } else if (tf == 5) { // Filmlight T-Log
+    rgb.x = rgb.x < 0.0f ? 16.18437649f * rgb.x + 0.075f : _logf(rgb.x + 0.00570482f) * 0.09232903f + 0.55201266f;
+    rgb.y = rgb.y < 0.0f ? 16.18437649f * rgb.y + 0.075f : _logf(rgb.y + 0.00570482f) * 0.09232903f + 0.55201266f;
+    rgb.z = rgb.z < 0.0f ? 16.18437649f * rgb.z + 0.075f : _logf(rgb.z + 0.00570482f) * 0.09232903f + 0.55201266f;
+  } else if (tf == 6) { // DaVinci Intermediate
+    rgb.x = rgb.x <= 0.00262409f ? rgb.x * 10.44426855f : (_log2f(rgb.x + 0.0075f) + 7.0f) * 0.07329248f;
+    rgb.y = rgb.y <= 0.00262409f ? rgb.y * 10.44426855f : (_log2f(rgb.y + 0.0075f) + 7.0f) * 0.07329248f;
+    rgb.z = rgb.z <= 0.00262409f ? rgb.z * 10.44426855f : (_log2f(rgb.z + 0.0075f) + 7.0f) * 0.07329248f;
+  }
+  return rgb;
+}
+
+__DEVICE__ float3 log2lin(float3 rgb, int tf) {
+  if (tf == 0) return rgb;
+  else if (tf == 1) { // ACEScct
+    rgb.x = rgb.x > 0.155251141552511f ? _powf(2.0f, rgb.x * 17.52f - 9.72f) : (rgb.x - 0.0729055341958355f) / 10.5402377416545f;
+    rgb.y = rgb.y > 0.155251141552511f ? _powf(2.0f, rgb.y * 17.52f - 9.72f) : (rgb.y - 0.0729055341958355f) / 10.5402377416545f;
+    rgb.z = rgb.z > 0.155251141552511f ? _powf(2.0f, rgb.z * 17.52f - 9.72f) : (rgb.z - 0.0729055341958355f) / 10.5402377416545f;
+  } else if (tf == 2) { // Arri V3 LogC EI 800
+    rgb.x = rgb.x > 0.149658f ? (_powf(10.0f, (rgb.x - 0.385537f) / 0.24719f) - 0.052272f) / 5.555556f : (rgb.x - 0.092809f) / 5.367655f;
+    rgb.y = rgb.y > 0.149658f ? (_powf(10.0f, (rgb.y - 0.385537f) / 0.24719f) - 0.052272f) / 5.555556f : (rgb.y - 0.092809f) / 5.367655f;
+    rgb.z = rgb.z > 0.149658f ? (_powf(10.0f, (rgb.z - 0.385537f) / 0.24719f) - 0.052272f) / 5.555556f : (rgb.z - 0.092809f) / 5.367655f;
+  } else if (tf == 3) { // Red Log3G10
+    rgb.x = rgb.x > 0.0f ? (_powf(10.0f, rgb.x / 0.224282f) - 1.0f) / 155.975327f - 0.01f : (rgb.x / 15.1927f) - 0.01f;
+    rgb.y = rgb.y > 0.0f ? (_powf(10.0f, rgb.y / 0.224282f) - 1.0f) / 155.975327f - 0.01f : (rgb.y / 15.1927f) - 0.01f;
+    rgb.z = rgb.z > 0.0f ? (_powf(10.0f, rgb.z / 0.224282f) - 1.0f) / 155.975327f - 0.01f : (rgb.z / 15.1927f) - 0.01f;
+  } else if (tf == 4) { // Sony SLog3
+    rgb.x = rgb.x >= 171.2102946929f / 1023.0f ? _powf(10.0f, ((rgb.x * 1023.0f - 420.0f) / 261.5f)) * (0.18f + 0.01f) - 0.01f : (rgb.x * 1023.0f - 95.0f) * 0.01125000f / (171.2102946929f - 95.0f);
+    rgb.y = rgb.y >= 171.2102946929f / 1023.0f ? _powf(10.0f, ((rgb.y * 1023.0f - 420.0f) / 261.5f)) * (0.18f + 0.01f) - 0.01f : (rgb.y * 1023.0f - 95.0f) * 0.01125000f / (171.2102946929f - 95.0f);
+    rgb.z = rgb.z >= 171.2102946929f / 1023.0f ? _powf(10.0f, ((rgb.z * 1023.0f - 420.0f) / 261.5f)) * (0.18f + 0.01f) - 0.01f : (rgb.z * 1023.0f - 95.0f) * 0.01125000f / (171.2102946929f - 95.0f);
+  } else if (tf == 5) { // Filmlight T-Log
+    rgb.x = rgb.x < 0.075f ? (rgb.x - 0.075f) / 16.18437649f : _expf((rgb.x - 0.55201266f) / 0.09232903f) - 0.00570482f;
+    rgb.y = rgb.y < 0.075f ? (rgb.y - 0.075f) / 16.18437649f : _expf((rgb.y - 0.55201266f) / 0.09232903f) - 0.00570482f;
+    rgb.z = rgb.z < 0.075f ? (rgb.z - 0.075f) / 16.18437649f : _expf((rgb.z - 0.55201266f) / 0.09232903f) - 0.00570482f;
+  } else if (tf == 6) { // DaVinci Intermediate
+    rgb.x = rgb.x <= 0.02740668f ? rgb.x / 10.44426855f : _powf(2.0f, (rgb.x / 0.07329248f) - 7.0f) - 0.0075f;
+    rgb.y = rgb.y <= 0.02740668f ? rgb.y / 10.44426855f : _powf(2.0f, (rgb.y / 0.07329248f) - 7.0f) - 0.0075f;
+    rgb.z = rgb.z <= 0.02740668f ? rgb.z / 10.44426855f : _powf(2.0f, (rgb.z / 0.07329248f) - 7.0f) - 0.0075f;
+  }
+  return rgb;
+}
+
+
 // Helper functions to perform math operations on a float3 vector
 __DEVICE__ float3 powf3(float3 a, float b) { return make_float3(_powf(a.x, b), _powf(a.y, b), _powf(a.z, b)); }
 __DEVICE__ float3 sqrtf3(float3 a) { return make_float3(_sqrtf(a.x), _sqrtf(a.y), _sqrtf(a.z)); }
@@ -174,6 +237,16 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (in_gamut == rwg)        in_to_xyz = matrix_redwg_to_xyz;
   else if (in_gamut == egamut)     in_to_xyz = matrix_egamut_to_xyz;
   else if (in_gamut == davinciwg)  in_to_xyz = matrix_davinciwg_to_xyz;
+
+  // Transfer function for linearizing input
+  int tf;
+  if (in_curve == linear)                     tf = 0;
+  else if (in_curve == acescct)               tf = 1;
+  else if (in_curve == arri_logc)             tf = 2;
+  else if (in_curve == red_log3g10)           tf = 3;
+  else if (in_curve == sony_slog3)            tf = 4;
+  else if (in_curve == filmlight_tlog)        tf = 5;
+  else if (in_curve == davinci_intermediate)  tf = 6;
 
   /* Whitepoint handling */
 
@@ -235,7 +308,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   const float c1 = 107.0f / 128.0f;
   const float c2 = 2413.0f / 128.0f;
   const float c3 = 2392.0f / 128.0f;
-  const float PQ_Lw = 10000.0f;
 
   // HLG Constants
   const float HLG_Lw = 1000.0f;
@@ -282,6 +354,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float3 rgb = make_float3(p_R, p_G, p_B);
 
   if (invert == 0) {
+    // Linearize input
+    rgb = lin2log(rgb, tf);
+
     // input gamut to xyz d65 cat: xyz scaling
     rgb = mult_f3_f33(rgb, in_to_xyz);
 
@@ -346,7 +421,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     if ((eotf > 0) && (eotf < 4)) { // Power Function
       rgb = powf3(rgb, 1.0f / eotf_p);
     } else if (eotf == 4) { // ST2084 PQ
-      rgb = powf3((c1 + c2 * powf3(rgb * PQ_Lw / 10000.0f, m1)) / (1.0f + c3 * powf3(rgb * PQ_Lw / 10000.0f, m1)), m2);
+      rgb = powf3((c1 + c2 * powf3(rgb, m1)) / (1.0f + c3 * powf3(rgb, m1)), m2);
     } else if (eotf == 5) { // HLG
       float Yd = 0.2627f * rgb.x + 0.6780f * rgb.y + 0.0593f * rgb.z;
       // HLG Inverse OOTF
@@ -368,7 +443,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       rgb = powf3(rgb, eotf_p);
     } else if (eotf == 4) {
       // ST2084 PQ
-      rgb = powf3((powf3(rgb, 1.0f / m2) - c1) / (c2 - c3 * powf3(rgb, 1.0f / m2)), 1.0f / m1) * 10000.0f / PQ_Lw;
+      rgb = powf3((powf3(rgb, 1.0f / m2) - c1) / (c2 - c3 * powf3(rgb, 1.0f / m2)), 1.0f / m1);
     } else if (eotf == 5) {
       // HLG Inverse OETF
       rgb.x = rgb.x <= 0.5f ? rgb.x * rgb.x / 3.0f : (_expf((rgb.x - h_c) / h_a) + h_b) / 12.0f;
@@ -439,6 +514,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // XYZ to input gamut
     rgb = mult_f3_f33(rgb, inv_f33(in_to_xyz));
+
+    // Return to working space
+    rgb = log2lin(rgb, tf);
   }
 
   return rgb;
