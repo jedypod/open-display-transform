@@ -33,6 +33,7 @@ DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, d
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 4, {Rec2020, P3D65, P3D60, P3DCI, Rec709, DCDM}, {Rec.2020, P3 D65, P3 D60, P3 DCI, Rec.709, DCDM XYZ});
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
 DEFINE_UI_PARAMS(pdch, perceptual dechroma, DCTLUI_CHECK_BOX, 1);
+DEFINE_UI_PARAMS(clamp, clamp, DCTLUI_CHECK_BOX, 1);
 
 
 // Custom 3x3 matrix struct float3x3
@@ -413,7 +414,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb *= sy;
 
     // Clamp
-    rgb = maxf3(minf3(rgb, display_gamut == DCDM ? 1.0f : Lw / Lp), 0.0f);
+    if (clamp == 1) {
+      rgb = maxf3(minf3(rgb, display_gamut == DCDM ? 1.0f : Lw / Lp), 0.0f);
+    }
 
     /* Inverse EOTF
        -----------------------  */
