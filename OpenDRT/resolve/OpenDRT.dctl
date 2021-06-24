@@ -5,8 +5,8 @@
       https://github.com/jedypod/open-display-transform
 */
 
-DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Filmlight E - Gamut, DaVinci Wide Gamut});
-DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Filmlight TLog, DaVinci Intermediate});
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut});
+DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate});
 DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 0, {sdr_rec1886, sdr_srgb, sdr_applep3, sdr_rec2020, hdr_rec2020_pq_100nit, hdr_rec2020_pq_600nit, hdr_rec2020_pq_1000nit, hdr_rec2020_hlg_1000nit, hdr_rec2020_pq_2000nit, hdr_rec2020_pq_4000nit, hdr_p3d65_pq_100nit, hdr_p3d65_pq_600nit, hdr_p3d65_pq_1000nit, hdr_p3d65_pq_2000nit, hdr_p3d65_pq_4000nit, dci_p3d60, dci_p3d65, dci_p3dci, dci_dcdm}, {Rec.1886: 2.4 Power | Rec.709, sRGB Display: 2.2 Power | Rec.709, Apple Display P3: 2.2 Power | P3D65, Rec.2020: 2.4 Power | Rec.2020, Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit, Rec.2100: HLG | Rec.2020 | 1000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit, Dolby: ST 2084 PQ | P3D65 | 100 nit, Dolby: ST 2084 PQ | P3D65 | 600 nit, Dolby: ST 2084 PQ | P3D65 | 1000 nit, Dolby: ST 2084 PQ | P3D65 | 2000 nit, Dolby: ST 2084 PQ | P3D65 | 4000 nit, DCI: 2.6 Power | P3 D60, DCI: 2.6 Power | P3 D65, DCI: 2.6 Power | P3 DCI, DCI: 2.6 Power | DCDM XYZ});
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93});
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
@@ -36,6 +36,7 @@ typedef struct {
 #define matrix_sonysgamut3 make_float3x3(make_float3(0.599083900452, 0.248925492167, 0.102446496487), make_float3(0.215075820684, 0.885068416595, -0.100144319236), make_float3(-0.032065849751, -0.027658388019, 1.148782014847))
 #define matrix_egamut_to_xyz make_float3x3(make_float3(0.705396831036, 0.164041340351, 0.081017754972), make_float3(0.280130714178, 0.820206701756, -0.100337378681), make_float3(-0.103781513870, -0.072907261550, 1.265746593475))
 #define matrix_davinciwg_to_xyz make_float3x3(make_float3(0.700622320175, 0.148774802685, 0.101058728993), make_float3(0.274118483067, 0.873631775379, -0.147750422359), make_float3(-0.098962903023, -0.137895315886, 1.325916051865))
+#define matrix_blackmagicwg_to_xyz make_float3x3(make_float3(0.606538414955, 0.220412746072, 0.123504832387), make_float3(0.267992943525, 0.832748472691, -0.100741356611), make_float3(-0.029442556202, -0.086612440646, 1.205112814903))
 #define matrix_xyz_to_truelightlms make_float3x3(make_float3(0.18295, 0.859943, -0.031061), make_float3(-0.394427, 1.258988, 0.106423), make_float3(0.064856, -0.07625, 0.93164))
 
 #define catd50 make_float3(0.171823f, 1.292538f, 1.228587f)
@@ -150,6 +151,10 @@ __DEVICE__ float3 lin2log(float3 rgb, int tf) {
     rgb.x = rgb.x <= 0.00262409f ? rgb.x * 10.44426855f : (_log2f(rgb.x + 0.0075f) + 7.0f) * 0.07329248f;
     rgb.y = rgb.y <= 0.00262409f ? rgb.y * 10.44426855f : (_log2f(rgb.y + 0.0075f) + 7.0f) * 0.07329248f;
     rgb.z = rgb.z <= 0.00262409f ? rgb.z * 10.44426855f : (_log2f(rgb.z + 0.0075f) + 7.0f) * 0.07329248f;
+  } else if (tf == 7) { // Blackmagic Film Gen5
+    rgb.x = rgb.x < 0.005f ? rgb.x * 8.283605932402494f : 0.08692876065491224f * _log2f(rgb.x + 0.005494072432257808f) + 0.5300133392291939f;
+    rgb.y = rgb.y < 0.005f ? rgb.y * 8.283605932402494f : 0.08692876065491224f * _log2f(rgb.y + 0.005494072432257808f) + 0.5300133392291939f;
+    rgb.z = rgb.z < 0.005f ? rgb.z * 8.283605932402494f : 0.08692876065491224f * _log2f(rgb.z + 0.005494072432257808f) + 0.5300133392291939f;
   }
   return rgb;
 }
@@ -180,6 +185,10 @@ __DEVICE__ float3 log2lin(float3 rgb, int tf) {
     rgb.x = rgb.x <= 0.02740668f ? rgb.x / 10.44426855f : _powf(2.0f, (rgb.x / 0.07329248f) - 7.0f) - 0.0075f;
     rgb.y = rgb.y <= 0.02740668f ? rgb.y / 10.44426855f : _powf(2.0f, (rgb.y / 0.07329248f) - 7.0f) - 0.0075f;
     rgb.z = rgb.z <= 0.02740668f ? rgb.z / 10.44426855f : _powf(2.0f, (rgb.z / 0.07329248f) - 7.0f) - 0.0075f;
+  } else if (tf == 7) { // Blackmagic Film Gen5
+    rgb.x = rgb.x < 0.13388378f ? (rgb.x - 0.09246575342465753f) / 8.283605932402494f : _expf((rgb.x - 0.5300133392291939f) / 0.08692876065491224f) - 0.005494072432257808f;
+    rgb.y = rgb.y < 0.13388378f ? (rgb.y - 0.09246575342465753f) / 8.283605932402494f : _expf((rgb.y - 0.5300133392291939f) / 0.08692876065491224f) - 0.005494072432257808f;
+    rgb.z = rgb.z < 0.13388378f ? (rgb.z - 0.09246575342465753f) / 8.283605932402494f : _expf((rgb.z - 0.5300133392291939f) / 0.08692876065491224f) - 0.005494072432257808f;
   }
   return rgb;
 }
@@ -203,16 +212,17 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Input gamut conversion to D65 aligned XYZ (CAT: xyz scaling)
   float3x3 in_to_xyz;
-  if (in_gamut == ap0)             in_to_xyz = matrix_ap0_to_xyz;
-  else if (in_gamut == ap1)        in_to_xyz = matrix_ap1_to_xyz;
-  else if (in_gamut == p3d65)      in_to_xyz = matrix_p3d65_to_xyz;
-  else if (in_gamut == rec2020)    in_to_xyz = matrix_rec2020_to_xyz;
-  else if (in_gamut == rec709)     in_to_xyz = matrix_rec709_to_xyz;
-  else if (in_gamut == awg)        in_to_xyz = matrix_arriwg_to_xyz;
-  else if (in_gamut == rwg)        in_to_xyz = matrix_redwg_to_xyz;
-  else if (in_gamut == egamut)     in_to_xyz = matrix_egamut_to_xyz;
-  else if (in_gamut == sgamut3)    in_to_xyz = matrix_sonysgamut3;
-  else if (in_gamut == davinciwg)  in_to_xyz = matrix_davinciwg_to_xyz;
+  if (in_gamut == ap0)                in_to_xyz = matrix_ap0_to_xyz;
+  else if (in_gamut == ap1)           in_to_xyz = matrix_ap1_to_xyz;
+  else if (in_gamut == p3d65)         in_to_xyz = matrix_p3d65_to_xyz;
+  else if (in_gamut == rec2020)       in_to_xyz = matrix_rec2020_to_xyz;
+  else if (in_gamut == rec709)        in_to_xyz = matrix_rec709_to_xyz;
+  else if (in_gamut == awg)           in_to_xyz = matrix_arriwg_to_xyz;
+  else if (in_gamut == rwg)           in_to_xyz = matrix_redwg_to_xyz;
+  else if (in_gamut == egamut)        in_to_xyz = matrix_egamut_to_xyz;
+  else if (in_gamut == sgamut3)       in_to_xyz = matrix_sonysgamut3;
+  else if (in_gamut == davinciwg)     in_to_xyz = matrix_davinciwg_to_xyz;
+  else if (in_gamut == blackmagicwg)  in_to_xyz = matrix_blackmagicwg_to_xyz;
 
   // Transfer function for linearizing input
   int tf;
@@ -223,6 +233,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (in_curve == sony_slog3)            tf = 4;
   else if (in_curve == filmlight_tlog)        tf = 5;
   else if (in_curve == davinci_intermediate)  tf = 6;
+  else if (in_curve == blackmagic_film_gen5)  tf = 7;
 
   /* Whitepoint handling */
 
