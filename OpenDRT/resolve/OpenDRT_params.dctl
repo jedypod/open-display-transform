@@ -15,25 +15,25 @@
     -------------------------------------------------
 */
 
-DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut});
-DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate});
-DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 10000.0, 100.0);
-DEFINE_UI_PARAMS(Lw, Lw, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 4000.0, 10.0);
-DEFINE_UI_PARAMS(Lg, Lg, DCTLUI_SLIDER_FLOAT, 10.0, 1.0, 100.0, 1.0);
-DEFINE_UI_PARAMS(c, contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1, 1.5, 0.0);
-DEFINE_UI_PARAMS(toe, toe, DCTLUI_SLIDER_FLOAT, 0.01, 0.0, 0.02, 0.001);
-DEFINE_UI_PARAMS(surround, surround, DCTLUI_COMBO_BOX, 1, {average, dim, dark}, {average, dim, dark});
-DEFINE_UI_PARAMS(hldc, hl dechroma, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0);
-DEFINE_UI_PARAMS(sat, saturation, DCTLUI_SLIDER_FLOAT, 1.2, 0.5, 1.5, 0.0);
-DEFINE_UI_PARAMS(wr, red weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.33, 0.0);
-DEFINE_UI_PARAMS(wg, green weight, DCTLUI_SLIDER_FLOAT, 0.1, 0.0, 0.33, 0.0);
-DEFINE_UI_PARAMS(wb, blue weight, DCTLUI_SLIDER_FLOAT, 0.09, 0.0, 0.33, 0.0);
-DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93});
-DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG});
-DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 4, {Rec2020, P3D65, P3D60, P3DCI, Rec709, DCDM}, {Rec.2020, P3 D65, P3 D60, P3 DCI, Rec.709, DCDM XYZ});
-DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
-DEFINE_UI_PARAMS(pdch, perceptual dechroma, DCTLUI_CHECK_BOX, 1);
-DEFINE_UI_PARAMS(clamp, clamp, DCTLUI_CHECK_BOX, 1);
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
+DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 10000.0, 100.0)
+DEFINE_UI_PARAMS(Lw, Lw, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 4000.0, 10.0)
+DEFINE_UI_PARAMS(Lg, Lg, DCTLUI_SLIDER_FLOAT, 10.0, 1.0, 100.0, 1.0)
+DEFINE_UI_PARAMS(c, contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1, 1.5, 0.0)
+DEFINE_UI_PARAMS(toe, toe, DCTLUI_SLIDER_FLOAT, 0.01, 0.0, 0.02, 0.001)
+DEFINE_UI_PARAMS(surround, surround, DCTLUI_COMBO_BOX, 1, {average, dim, dark}, {average, dim, dark})
+DEFINE_UI_PARAMS(hldc, hl dechroma, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(sat, saturation, DCTLUI_SLIDER_FLOAT, 1.2, 0.5, 1.5, 0.0)
+DEFINE_UI_PARAMS(wr, red weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.33, 0.0)
+DEFINE_UI_PARAMS(wg, green weight, DCTLUI_SLIDER_FLOAT, 0.1, 0.0, 0.33, 0.0)
+DEFINE_UI_PARAMS(wb, blue weight, DCTLUI_SLIDER_FLOAT, 0.09, 0.0, 0.33, 0.0)
+DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93})
+DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
+DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 4, {Rec2020, P3D65, P3D60, P3DCI, Rec709, DCDM}, {Rec.2020, P3 D65, P3 D60, P3 DCI, Rec.709, DCDM XYZ})
+DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(pdch, perceptual dechroma, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(clamp, clamp, DCTLUI_CHECK_BOX, 1)
 
 
 // Custom 3x3 matrix struct float3x3
