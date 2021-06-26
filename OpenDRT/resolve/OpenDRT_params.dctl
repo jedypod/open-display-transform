@@ -367,7 +367,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   if (invert == 0) {
     // Linearize input
-    rgb = lin2log(rgb, tf);
+    rgb = log2lin(rgb, tf);
 
     // input gamut to xyz d65 cat: xyz scaling
     rgb = mult_f3_f33(rgb, in_to_xyz);
@@ -530,7 +530,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb = mult_f3_f33(rgb, inv_f33(in_to_xyz));
 
     // Return to working space
-    rgb = log2lin(rgb, tf);
+    rgb = lin2log(rgb, tf);
   }
 
   return rgb;
