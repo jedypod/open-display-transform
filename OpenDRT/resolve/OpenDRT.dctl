@@ -331,7 +331,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // highlight dechroma 
   float dch = 0.5f;
 
-  // Enable quasi-perceptual highlight dechroma
+  // Enable perceptual highlight dechroma
   int pdch = 1;
   
   /* Set up presets
@@ -474,7 +474,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       rgb = make_float3(rgb.x, rgb.y, rgb_ndc.z);
 
       // Copy Intensity from source, masked by ccf. This helps preserve tonality a lot but need to do more testing to see if it's a bad idea...
-      // rgb = make_float3(rgb_ndc.x * ccf + rgb.x * (1.0f - ccf), rgb.y, rgb_ndc.z);
+      rgb = make_float3(rgb_ndc.x * ccf + rgb.x * (1.0f - ccf), rgb.y, rgb_ndc.z);
       
       // Convert back to XYZ
       rgb = ictcp_to_xyz(rgb, Lw, 1);

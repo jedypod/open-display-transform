@@ -1220,7 +1220,6 @@ set Nf5423900 [stack 0]
   selected true
   xpos 180
   ypos -129
-  disable true
  }
  Group {
   name ICtCp_to_Rec2020_
