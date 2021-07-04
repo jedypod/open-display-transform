@@ -239,8 +239,8 @@ __DEVICE__ float3 gamut_compress(float3 rgb, float th, float x0) {
   float c = 1.0f - _fminf(rgb.x, _fminf(rgb.y, rgb.z)); // Traditional chroma
   // Scale factor for compression function to enforce (x0, y0) intersection constraint. y0 = 1 (gamut boundary)
   float s = (1.0f - th) / _sqrtf(x0 - 1.0f);
-  // Parabolic compression function, then normalize by chroma to get mult factor
-  c = (c < th ? c : s * _sqrtf(c - th + s * s / 4.0f) - s * _sqrtf(s * s / 4.0f) + th) / c;
+  // Parabolic compression function: https://www.desmos.com/calculator/fm062gzpfn - then normalize by chroma to get mult factor
+  c = c == 0.0f ? 0.0f : (c < th ? c : s * _sqrtf(c - th + s * s / 4.0f) - s * _sqrtf(s * s / 4.0f) + th) / c;
   rgb = (1.0f + c * (rgb - 1.0f));
   rgb *= mx;
   rgb = mult_f3_f33(rgb, matrix_rec2020_to_xyz);
@@ -248,7 +248,7 @@ __DEVICE__ float3 gamut_compress(float3 rgb, float th, float x0) {
 }
 
 __DEVICE__ float3 xyz_to_ictcp(float3 rgb, float Lw, int cyl) {
-  // Convert from XYZ to ICtCp colorspace, with optional gamut compression and cylindrical conversion
+  // Convert from XYZ to ICtCp colorspace, with optional cylindrical output conversion
   rgb = mult_f3_f33(rgb, inv_f33(matrix_rec2020_to_xyz));
   rgb = mult_f3_f33(rgb, matrix_ictcp_rec2020_to_lms);
   rgb = eotf_pq(rgb / Lw, 1);
