@@ -856,7 +856,7 @@ set Nf5487900 [stack 0]
    temp_name0 c
    temp_expr0 1-min(r,g,b)
    channel0 {rgba.red rgba.green rgba.blue none}
-   expr0 (c<th?c:s*sqrt(c-th+s*s/4)-s*sqrt(s*s/4)+th)/c
+   expr0 c==0?0:(c<th?c:s*sqrt(c-th+s*s/4)-s*sqrt(s*s/4)+th)/c
    expr3 c
    name compress3
    xpos 510
@@ -1081,7 +1081,7 @@ set Nf5421600 [stack 0]
    temp_name0 c
    temp_expr0 1-min(r,g,b)
    channel0 {rgba.red rgba.green rgba.blue none}
-   expr0 (c<th?c:s*sqrt(c-th+s*s/4)-s*sqrt(s*s/4)+th)/c
+   expr0 c==0?0:(c<th?c:s*sqrt(c-th+s*s/4)-s*sqrt(s*s/4)+th)/c
    expr3 c
    name compress3
    xpos 510
