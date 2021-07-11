@@ -1,0 +1,281 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name Nayatani_HK
+ addUserKnob {20 Nayatani_HK_tab l "Nayatani HK"}
+ addUserKnob {41 gamut l "input gamut" T InGamut_to_XYZ.gamut}
+ addUserKnob {41 illum T Nayatani1997_.illum}
+ addUserKnob {41 meth l method T Nayatani1997_.meth}
+ addUserKnob {41 La T Nayatani1997_.La}
+}
+ StickyNote {
+  inputs 0
+  name StickyNote1
+  tile_color 0x272727ff
+  label "<left><pre>\n<b>References</b>\nSimple estimation methods for the Helmholtz—Kohlrausch effect\nYoshinobu Nayatani\nhttps://doi.org/10.1002/(SICI)1520-6378(199712)22:6<385::AID-COL6>3.0.CO;2-R\n\nClarification of differences between variable achromatic color and variable chromatic color methods in the Helmholtz–Kohlrausch effect\nYoshinobu Nayatani, Hideki Sakai\nhttps://doi.org/10.1002/col.20194\n\nPrediction of the Helmholtz-Kohlrausch effect using the CIELUV formula\nYoshinobu Nayatani, Motohiro Nakajima\nhttps://doi.org/10.1002/(SICI)1520-6378(199608)21:4<252::AID-COL1>3.0.CO;2-P"
+  note_font_size 14
+  note_font_color 0xa8a8a8ff
+  xpos 137
+  ypos -81
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos -40
+  ypos -130
+ }
+ Dot {
+  name Dot1
+  xpos -6
+  ypos -78
+ }
+set Nd42e5600 [stack 0]
+ Group {
+  name InGamut_to_XYZ
+  tile_color 0x429940ff
+  xpos -150
+  ypos -82
+  addUserKnob {20 InputGamut_to_XYZ_tab l InputGamut_to_XYZ}
+  addUserKnob {4 gamut l "input gamut" M {ACES ACEScg P3D65 Rec.2020 Rec.709 "Alexa WideGamut" "Red WideGamutRGB" "Sony SGamut3" "Filmlight E-Gamut" "DaVinci Wide Gamut" "" ""}}
+  gamut ACEScg
+  addUserKnob {41 matrix T ColorMatrix.matrix}
+  addUserKnob {41 invert -STARTLINE T ColorMatrix.invert}
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 290
+   ypos -610
+  }
+  Dot {
+   name Dot1
+   xpos 324
+   ypos -546
+  }
+set Nd42e4100 [stack 0]
+  ColorMatrix {
+   matrix {
+       {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
+       {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
+       {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
+     }
+   name ColorMatrix
+   xpos 290
+   ypos -370
+  }
+  Output {
+   name Output
+   xpos 290
+   ypos -250
+  }
+push $Nd42e4100
+  Dot {
+   name Dot391
+   label " *RGB to XYZ D65 CAT: XYZ Scaling"
+   xpos 434
+   ypos -546
+  }
+set Nd35f2b00 [stack 0]
+  ColorMatrix {
+   matrix {
+       {0.7006223202 0.1487748027 0.101058729}
+       {0.2741184831 0.8736317754 -0.1477504224}
+       {-0.09896290302 -0.1378953159 1.325916052}
+     }
+   name ColorMatrix30
+   label "DaVinci WG to XYZ D65"
+   xpos 1390
+   ypos -466
+  }
+push $Nd35f2b00
+  ColorMatrix {
+   matrix {
+       {0.705396831 0.1640413404 0.08101775497}
+       {0.2801307142 0.8202067018 -0.1003373787}
+       {-0.1037815139 -0.07290726155 1.265746593}
+     }
+   name ColorMatrix29
+   label "Filmlight E-Gamut to XYZ D65"
+   xpos 1280
+   ypos -466
+  }
+push $Nd35f2b00
+  ColorMatrix {
+   matrix {
+       {0.5990839005 0.2489254922 0.1024464965}
+       {0.2150758207 0.8850684166 -0.1001443192}
+       {-0.03206584975 -0.02765838802 1.148782015}
+     }
+   name ColorMatrix31
+   label "SonySGamut3 to XYZ D65"
+   xpos 1170
+   ypos -465
+  }
+push $Nd35f2b00
+  ColorMatrix {
+   matrix {
+       {0.735275209 0.06860940903 0.1465712786}
+       {0.2866940796 0.8429790735 -0.1296732426}
+       {-0.07968084514 -0.3473432064 1.516081929}
+     }
+   name ColorMatrix22
+   label "REDWideGamutRGB to XYZ D65"
+   xpos 1060
+   ypos -466
+  }
+push $Nd35f2b00
+  ColorMatrix {
+   matrix {
+       {0.6380076408 0.2147038132 0.09774445742}
+       {0.2919537723 0.8238408566 -0.1157948226}
+       {0.002798279049 -0.06703422219 1.153293848}
+     }
+   name ColorMatrix21
+   label "Arri AlexaWideGamut to XYZ D65"
+   xpos 950
+   ypos -466
+  }
+push $Nd35f2b00
+  ColorMatrix {
+   matrix {
+       {0.4123909175 0.3575843573 0.1804807931}
+       {0.2126390785 0.7151687145 0.07219231129}
+       {0.01933082566 0.1191947833 0.9505321383}
+     }
+   name ColorMatrix18
+   label "Rec709 to XYZ D65"
+   xpos 840
+   ypos -466
+  }
+push $Nd35f2b00
+  ColorMatrix {
+   matrix {
+       {0.6369581223 0.1446169168 0.1688809693}
+       {0.2627002299 0.6779981256 0.05930171534}
+       {4.99410725e-17 0.02807269618 1.060985088}
+     }
+   name ColorMatrix17
+   label "Rec2020 to XYZ D65"
+   xpos 730
+   ypos -466
+  }
+push $Nd35f2b00
+  ColorMatrix {
+   matrix {
+       {0.4865711331 0.2656677067 0.1982173175}
+       {0.2289746404 0.6917386055 0.07928691804}
+       {-3.972076965e-17 0.04511338845 1.043944478}
+     }
+   name ColorMatrix16
+   label "P3D65 to XYZ D65"
+   xpos 620
+   ypos -466
+  }
+push $Nd35f2b00
+  ColorMatrix {
+   matrix {
+       {0.6609312296 0.1336961389 0.1558285803}
+       {0.2722287476 0.6740817428 0.05368950963}
+       {-0.006018006243 0.004383686464 1.090692043}
+     }
+   name ColorMatrix1
+   label "ACEScg to XYZ D65"
+   xpos 510
+   ypos -466
+  }
+push $Nd35f2b00
+  ColorMatrix {
+   matrix {
+       {0.9503623843 0 9.346324805e-05}
+       {0.3439664543 0.728166163 -0.07213254273}
+       {0 0 1.089057803}
+     }
+   name ColorMatrix2
+   label "ACES to XYZ D65"
+   xpos 400
+   ypos -466
+  }
+  Switch {
+   inputs 10
+   which {{gamut}}
+   name SwitchGamut
+   xpos 400
+   ypos -370
+  }
+ end_group
+ Expression {
+  temp_name0 f
+  temp_expr0 0.005
+  expr0 max(0,r+f)
+  expr1 max(0,g+f)
+  expr2 max(0,b+f)
+  name Clamp
+  xpos -150
+  ypos -57
+ }
+ Expression {
+  temp_name0 d
+  temp_expr0 (r+15*g+3*b)
+  temp_name1 L
+  temp_expr1 g>_e?116*pow(g,1/3)-16:g*_k
+  expr0 L/(n?100:1)
+  expr1 d==0?0:4*r/d
+  expr2 d==0?0:9*g/d
+  name XYZ_to_Luv
+  label "XYZ to L*u'v'"
+  xpos -150
+  ypos -15
+  addUserKnob {20 Params}
+  addUserKnob {7 _e}
+  _e {{216/24389}}
+  addUserKnob {7 _k}
+  _k {{24389/27}}
+  addUserKnob {6 n l normalize +STARTLINE}
+  n true
+ }
+ Expression {
+  temp_name0 h
+  temp_expr0 atan2(b-w_uv.1,g-w_uv.0)
+  temp_name1 th
+  temp_expr1 h<0?h+radians(360):h
+  temp_name2 q
+  temp_expr2 -0.01585-0.03017*cos(th)-0.04556*cos(2*th)-0.02667*cos(3*th)-0.00295*cos(4*th)+0.14592*sin(th)+0.05084*sin(2*th)-0.01900*sin(3*th)-0.00764*sin(4*th)
+  temp_name3 S_uv
+  temp_expr3 13*hypot(g-w_uv.0,b-w_uv.1)
+  channel0 {rgba.red rgba.green rgba.blue none}
+  expr0 1/(1+(m*q+0.0872*K_Br)*S_uv)
+  name Nayatani1997_
+  label "object colors"
+  xpos -150
+  ypos 33
+  addUserKnob {20 Params_tab l Params}
+  addUserKnob {4 illum M {D50 D55 D60 D65}}
+  illum D65
+  addUserKnob {78 w_xy n 2}
+  w_xy {{curve(illum) 0.3457 0.33243 0.321626 0.3127} {curve(illum) 0.3585 0.34744 0.337737 0.329}}
+  addUserKnob {78 w_uv n 2}
+  w_uv {{4*w_xy.0/(-2*w_xy.0+12*w_xy.1+3)} {9*w_xy.1/(-2*w_xy.0+12*w_xy.1+3)}}
+  addUserKnob {7 La t "adapting luminance" R 0 200}
+  La 63.61
+  addUserKnob {4 meth l method M {VAC VCC}}
+  addUserKnob {7 m R -4 4}
+  m {{meth?-0.134:-0.866}}
+  addUserKnob {7 K_Br R 0 10}
+  K_Br {{0.2717*(6.469+6.362*pow(La,0.4495))/(6.469+pow(La,0.4495))}}
+ }
+push $Nd42e5600
+ Merge2 {
+  inputs 2
+  operation multiply
+  bbox B
+  output rgb
+  name Merge5
+  xpos -40
+  ypos 39
+ }
+ Output {
+  name Output
+  xpos -40
+  ypos 86
+ }
+end_group
