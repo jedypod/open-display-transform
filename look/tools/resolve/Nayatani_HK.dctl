@@ -1,0 +1,125 @@
+/* Implements the Nayatani 1997 model for Helmholtz-Kohlrausch Effect Compensation
+    References
+    ---
+    Simple estimation methods for the Helmholtz—Kohlrausch effect
+    Yoshinobu Nayatani
+    https://doi.org/10.1002/(SICI)1520-6378(199712)22:6<385::AID-COL6>3.0.CO;2-R
+    
+    Clarification of differences between variable achromatic color and variable chromatic color methods in the Helmholtz–Kohlrausch effect
+    Yoshinobu Nayatani, Hideki Sakai
+    https://doi.org/10.1002/col.20194
+    
+    Prediction of the Helmholtz-Kohlrausch effect using the CIELUV formula
+    Yoshinobu Nayatani, Motohiro Nakajima
+    https://doi.org/10.1002/(SICI)1520-6378(199608)21:4<252::AID-COL1>3.0.CO;2-P
+*/
+
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65}, {D50, D55, D60, D65})
+DEFINE_UI_PARAMS(La, L adapt, DCTLUI_SLIDER_FLOAT, 63.61, 0, 200, 1)
+DEFINE_UI_PARAMS(meth, method, DCTLUI_COMBO_BOX, 0, {VAC, VCC}, {VAC, VCC})
+
+__CONSTANT__ float pi = 3.14159265359f;
+
+// Custom 3x3 matrix struct float3x3
+typedef struct {
+  float3 x, y, z;
+} float3x3;
+
+// Helper function to create a float3x3
+__DEVICE__ float3x3 make_float3x3(float3 a, float3 b, float3 c) {
+  float3x3 d;
+  d.x = a, d.y = b, d.z = c;
+  return d;
+}
+
+// Multiply float3 vector a and 3x3 matrix m
+__DEVICE__ float3 mult_f3_f33(float3 a, float3x3 m) {
+  return make_float3(
+    m.x.x * a.x + m.x.y * a.y + m.x.z * a.z,
+    m.y.x * a.x + m.y.y * a.y + m.y.z * a.z,
+    m.z.x * a.x + m.z.y * a.y + m.z.z * a.z);
+}
+
+#define identity_mtx make_float3x3(make_float3(1.0f, 0.0f, 0.0f), make_float3(0.0f, 1.0f, 0.0f), make_float3(0.0f, 0.0f, 1.0f))
+#define matrix_ap0_to_xyz make_float3x3(make_float3(0.950362384319f, 0.000000000000f, 0.000093463248f), make_float3(0.343966454268f, 0.728166162968f, -0.072132542729f), make_float3(0.000000000000f, 0.000000000000, 1.089057803154f))
+#define matrix_ap1_to_xyz make_float3x3(make_float3(0.660931229591f, 0.133696138859f, 0.155828580260f), make_float3(0.272228747606f, 0.674081742764f, 0.053689509630f), make_float3(-0.006018006243f, 0.004383686464, 1.090692043304f))
+#define matrix_p3d65_to_xyz make_float3x3(make_float3(0.486571133137f, 0.265667706728f, 0.198217317462f), make_float3(0.228974640369f, 0.691738605499f, 0.079286918044f), make_float3(-0.000000000000f, 0.045113388449, 1.043944478035f))
+#define matrix_p3d60_to_xyz make_float3x3(make_float3(0.504949748516f, 0.264681518078f, 0.183015048504f), make_float3(0.237623393536f, 0.689170777798f, 0.073206014931f), make_float3(-0.000000000000f, 0.044945921749f, 0.963879227638f))
+#define matrix_p3dci_to_xyz make_float3x3(make_float3(0.445170015097f, 0.277134418488f, 0.172282665968f), make_float3(0.209491759539f, 0.721595287323f, 0.068913064897f), make_float3(-0.000000000000f, 0.047060567886f, 0.907355427742f))
+#define matrix_rec2020_to_xyz make_float3x3(make_float3(0.636958122253f, 0.144616916776f, 0.168880969286f), make_float3(0.262700229883f, 0.677998125553f, 0.059301715344f), make_float3(0.000000000000f, 0.028072696179, 1.060985088348f))
+#define matrix_rec709_to_xyz make_float3x3(make_float3(0.412390917540f, 0.357584357262f, 0.180480793118f), make_float3(0.212639078498f, 0.715168714523f, 0.072192311287f), make_float3(0.019330825657f, 0.119194783270f, 0.950532138348f))
+#define matrix_arriwg_to_xyz make_float3x3(make_float3(0.638007640839f, 0.214703813195f, 0.097744457424f), make_float3(0.291953772306f, 0.823840856552f, -0.115794822574f), make_float3(0.002798279049f, -0.067034222186, 1.153293848038f))
+#define matrix_redwg_to_xyz make_float3x3(make_float3(0.735275208950f, 0.068609409034f, 0.146571278572f), make_float3(0.286694079638f, 0.842979073524f, -0.129673242569f), make_float3(-0.079680845141f, -0.347343206406, 1.516081929207f))
+#define matrix_sonysgamut3 make_float3x3(make_float3(0.599083900452f, 0.248925492167f, 0.102446496487f), make_float3(0.215075820684f, 0.885068416595f, -0.100144319236f), make_float3(-0.032065849751f, -0.027658388019, 1.148782014847f))
+#define matrix_blackmagicwg_to_xyz make_float3x3(make_float3(0.606538414955f, 0.220412746072f, 0.123504832387f), make_float3(0.267992943525f, 0.832748472691f, -0.100741356611f), make_float3(-0.029442556202f, -0.086612440646, 1.205112814903f))
+#define matrix_egamut_to_xyz make_float3x3(make_float3(0.705396831036f, 0.164041340351f, 0.081017754972f), make_float3(0.280130714178f, 0.820206701756f, -0.100337378681f), make_float3(-0.103781513870f, -0.072907261550, 1.265746593475f))
+#define matrix_davinciwg_to_xyz make_float3x3(make_float3(0.700622320175f, 0.148774802685f, 0.101058728993f), make_float3(0.274118483067f, 0.873631775379f, -0.147750422359f), make_float3(-0.098962903023f, -0.137895315886, 1.325916051865f))
+
+__DEVICE__ float radians(float d) {return d * (pi / 180.0f);}
+__DEVICE__ float degrees(float r) {return r * (180.0f / pi);}
+__DEVICE__ float3 maxf3(float3 a, float b) { return make_float3(_fmaxf(a.x, b), _fmaxf(a.y, b), _fmaxf(a.z, b)); }
+
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
+{
+
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  // Input gamut conversion to D65 aligned XYZ (CAT: xyz scaling)
+  float3x3 in_to_xyz;
+  if (in_gamut == ap0)                in_to_xyz = matrix_ap0_to_xyz;
+  else if (in_gamut == ap1)           in_to_xyz = matrix_ap1_to_xyz;
+  else if (in_gamut == p3d65)         in_to_xyz = matrix_p3d65_to_xyz;
+  else if (in_gamut == rec2020)       in_to_xyz = matrix_rec2020_to_xyz;
+  else if (in_gamut == rec709)        in_to_xyz = matrix_rec709_to_xyz;
+  else if (in_gamut == awg)           in_to_xyz = matrix_arriwg_to_xyz;
+  else if (in_gamut == rwg)           in_to_xyz = matrix_redwg_to_xyz;
+  else if (in_gamut == sgamut3)       in_to_xyz = matrix_sonysgamut3;
+  else if (in_gamut == blackmagicwg)  in_to_xyz = matrix_blackmagicwg_to_xyz;
+  else if (in_gamut == egamut)        in_to_xyz = matrix_egamut_to_xyz;
+  else if (in_gamut == davinciwg)     in_to_xyz = matrix_davinciwg_to_xyz;
+
+  // Reference white illuminant
+  float2 w_xy;
+  if (wp == D50)        w_xy = make_float2(0.3457f, 0.3585f);
+  else if (wp == D55)   w_xy = make_float2(0.33243f, 0.34744f);
+  else if (wp == D60)   w_xy = make_float2(0.321626f, 0.337737f);
+  else if (wp == D65)   w_xy = make_float2(0.3127f, 0.329f);
+  
+  const float w_uv_d = (-2.0f * w_xy.x + 12.0f * w_xy.y + 3.0f);
+  const float2 w_uv = make_float2(4.0f * w_xy.x / w_uv_d, 9.0f * w_xy.y / w_uv_d);
+  
+  // Convert RGB to XYZ
+  float3 xyz = mult_f3_f33(rgb, in_to_xyz);
+
+  xyz += 0.005f;
+  xyz = maxf3(xyz, 0.0f);
+
+  // Convert XYZ to L*u'v'
+  float d = xyz.x + 15.0f * xyz.y + 3.0f * xyz.z;
+  const float _e = 216.0f / 24389.0f;
+  const float _k = 24389.0f / 27.0f;
+  float3 Luv = make_float3((xyz.y > _e ? 116.0f * _powf(xyz.y, 1.0f / 3.0f) - 16.0f : xyz.y * _k) / 100.0f,
+    d == 0.0f ? 0.0f : 4.0f * xyz.x / d,
+    d == 0.0f ? 0.0f : 9.0f * xyz.y / d);
+
+  // Calculate Nayatani 1997 Helmholtz-Kohlrausch compensation factor
+  float m = meth == VAC ? -0.866f : -0.134f;
+  const float K_Br = 0.2717f * (6.469f + 6.362f * _powf(La, 0.4495f)) / (6.469f + _powf(La, 0.4495f));
+
+  // Hue angle in radians
+  float h = _atan2f(Luv.z - w_uv.y, Luv.y - w_uv.x);
+  h = h < 0.0f ? h + radians(360.0f) : h;
+
+  float q = -0.01585f - 0.03017f * _cosf(h) - 0.04556f * _cosf(2.0f * h) - 0.02667f * _cosf(3.0f * h) - 0.00295f * _cosf(4.0f * h) + 0.14592f * _sinf(h) + 0.05084f * _sinf(2.0f * h) - 0.01900f * _sinf(3.0f * h) - 0.00764f * _sinf(4.0f * h);
+  float S_uv = 13.0f * _hypotf(Luv.y - w_uv.x, Luv.z - w_uv.y);
+
+  float s = (1.0f + (m * q + 0.0872f * K_Br) * S_uv);
+  s = s == 0.0f ? 1.0f : 1.0f / s;
+
+  rgb *= s;
+
+  return rgb;
+
+};
