@@ -16,6 +16,7 @@ The available parameters are as follows:
   Choose the transfer function of the input. For example if you are working on Red footage, this might be Red Log3G10.
 - **preset**
   Choose the preset that best defines the viewing condition of your intended output. The viewing condition describes the display device and surround conditions. For example if you are targeting standard SDR video, this might be set to Rec.1886, which renders the image for a 100 nit peak brightness monitor in a 5 nit ambient surround, as specified by [ITU-R Rec.709](https://www.itu.int/rec/R-REC-BT.709). If you're rendering for HDR output, this might be Rec.2100 ST 2084 PQ, which renders the image for HDR10 output according to [ITU-R Rec.2100](https://www.itu.int/rec/R-REC-BT.2100).
+  
   ![Resolve OpenDRT Presets](img/ui/Resolve_OpenDRT_presets.png)
 - **whitepoint**
   Sets the [creative whitepoint](tech_creative_whitepoint.md). This allows you to creatively set the whitepoint of your display rendering if you want it to be different than the technical whitepoint of your display device. For example if you set this to D55, neutral colors will be rendered as a warmer hue compared to the default D65.
