@@ -7,6 +7,7 @@ Group {
  addUserKnob {41 illum T Nayatani1997_.illum}
  addUserKnob {41 meth l method T Nayatani1997_.meth}
  addUserKnob {41 La T Nayatani1997_.La}
+ addUserKnob {6 invert +STARTLINE}
 }
  StickyNote {
   inputs 0
@@ -15,21 +16,21 @@ Group {
   label "<left><pre>\n<b>References</b>\nSimple estimation methods for the Helmholtz—Kohlrausch effect\nYoshinobu Nayatani\nhttps://doi.org/10.1002/(SICI)1520-6378(199712)22:6<385::AID-COL6>3.0.CO;2-R\n\nClarification of differences between variable achromatic color and variable chromatic color methods in the Helmholtz–Kohlrausch effect\nYoshinobu Nayatani, Hideki Sakai\nhttps://doi.org/10.1002/col.20194\n\nPrediction of the Helmholtz-Kohlrausch effect using the CIELUV formula\nYoshinobu Nayatani, Motohiro Nakajima\nhttps://doi.org/10.1002/(SICI)1520-6378(199608)21:4<252::AID-COL1>3.0.CO;2-P"
   note_font_size 14
   note_font_color 0xa8a8a8ff
-  xpos 137
-  ypos -81
+  xpos 115
+  ypos -119
  }
  Input {
   inputs 0
   name Input
   xpos -40
-  ypos -130
+  ypos -154
  }
  Dot {
   name Dot1
   xpos -6
   ypos -78
  }
-set Nd42e5600 [stack 0]
+set N9a8c2b00 [stack 0]
  Group {
   name InGamut_to_XYZ
   tile_color 0x429940ff
@@ -52,7 +53,7 @@ set Nd42e5600 [stack 0]
    xpos 324
    ypos -546
   }
-set Nd42e4100 [stack 0]
+set N9a8c1600 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -68,14 +69,14 @@ set Nd42e4100 [stack 0]
    xpos 290
    ypos -250
   }
-push $Nd42e4100
+push $N9a8c1600
   Dot {
    name Dot391
    label " *RGB to XYZ D65 CAT: XYZ Scaling"
    xpos 434
    ypos -546
   }
-set Nd35f2b00 [stack 0]
+set N9a8c0100 [stack 0]
   ColorMatrix {
    matrix {
        {0.7006223202 0.1487748027 0.101058729}
@@ -87,7 +88,7 @@ set Nd35f2b00 [stack 0]
    xpos 1390
    ypos -466
   }
-push $Nd35f2b00
+push $N9a8c0100
   ColorMatrix {
    matrix {
        {0.705396831 0.1640413404 0.08101775497}
@@ -99,7 +100,7 @@ push $Nd35f2b00
    xpos 1280
    ypos -466
   }
-push $Nd35f2b00
+push $N9a8c0100
   ColorMatrix {
    matrix {
        {0.5990839005 0.2489254922 0.1024464965}
@@ -111,7 +112,7 @@ push $Nd35f2b00
    xpos 1170
    ypos -465
   }
-push $Nd35f2b00
+push $N9a8c0100
   ColorMatrix {
    matrix {
        {0.735275209 0.06860940903 0.1465712786}
@@ -123,7 +124,7 @@ push $Nd35f2b00
    xpos 1060
    ypos -466
   }
-push $Nd35f2b00
+push $N9a8c0100
   ColorMatrix {
    matrix {
        {0.6380076408 0.2147038132 0.09774445742}
@@ -135,7 +136,7 @@ push $Nd35f2b00
    xpos 950
    ypos -466
   }
-push $Nd35f2b00
+push $N9a8c0100
   ColorMatrix {
    matrix {
        {0.4123909175 0.3575843573 0.1804807931}
@@ -147,7 +148,7 @@ push $Nd35f2b00
    xpos 840
    ypos -466
   }
-push $Nd35f2b00
+push $N9a8c0100
   ColorMatrix {
    matrix {
        {0.6369581223 0.1446169168 0.1688809693}
@@ -159,7 +160,7 @@ push $Nd35f2b00
    xpos 730
    ypos -466
   }
-push $Nd35f2b00
+push $N9a8c0100
   ColorMatrix {
    matrix {
        {0.4865711331 0.2656677067 0.1982173175}
@@ -171,7 +172,7 @@ push $Nd35f2b00
    xpos 620
    ypos -466
   }
-push $Nd35f2b00
+push $N9a8c0100
   ColorMatrix {
    matrix {
        {0.6609312296 0.1336961389 0.1558285803}
@@ -183,7 +184,7 @@ push $Nd35f2b00
    xpos 510
    ypos -466
   }
-push $Nd35f2b00
+push $N9a8c0100
   ColorMatrix {
    matrix {
        {0.9503623843 0 9.346324805e-05}
@@ -205,7 +206,7 @@ push $Nd35f2b00
  end_group
  Expression {
   temp_name0 f
-  temp_expr0 0.005
+  temp_expr0 0
   expr0 max(0,r+f)
   expr1 max(0,g+f)
   expr2 max(0,b+f)
@@ -258,24 +259,25 @@ push $Nd35f2b00
   addUserKnob {7 La t "adapting luminance" R 0 200}
   La 63.61
   addUserKnob {4 meth l method M {VAC VCC}}
+  meth VCC
   addUserKnob {7 m R -4 4}
   m {{meth?-0.134:-0.866}}
   addUserKnob {7 K_Br R 0 10}
   K_Br {{0.2717*(6.469+6.362*pow(La,0.4495))/(6.469+pow(La,0.4495))}}
  }
-push $Nd42e5600
- Merge2 {
+push $N9a8c2b00
+ MergeExpression {
   inputs 2
-  operation multiply
-  bbox B
-  output rgb
-  name Merge5
+  expr0 invert?Br/Ar:Ar*Br
+  expr1 invert?Bg/Ag:Ag*Bg
+  expr2 invert?Bb/Ab:Ab*Bb
+  name MergeExpression1
   xpos -40
   ypos 39
  }
  Output {
   name Output
   xpos -40
-  ypos 86
+  ypos 110
  }
 end_group
