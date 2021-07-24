@@ -2,11 +2,11 @@
 
 Here I will define a glossary of terms which I will use in this documentation.
 
-- **Display Transform** - A transform which applies aesthetic and colorimetric transformations to an image in order to prepare it for being properly displayed on a device such as a monitor or television. Also sometimes called a Display Rendering Transform or DRT (from Filmlight), an Output Transform (ACES) or more generally a View Transform.
+- **Display Transform** - A transform which applies aesthetic and colorimetric transformations to an image in order to prepare it for being properly displayed in a specific viewing condition, for example on an television in a dark room, or in a DCI calibrated projector in a theater. Also sometimes called a Display Rendering Transform or DRT (from Filmlight), an Output Transform (ACES) or more generally a View Transform.
 - **Scene-Referred** - Image data having a precisely known mathematical relationship between light in a scene and image pixel values. See [this tweet](https://twitter.com/momaku/status/812025645626703874) from [Charles Poynton](https://www.poynton.ca) for more precision!
 - **Display-Referred** - Image data having a precisely known mathematical relationship between image code values and light emitted from a display device.
 - **Scene-Linear** - A specific form of scene-referred imagery in which pixel values have an intensity that is [proportional](https://en.wikipedia.org/wiki/Proportionality_(mathematics)) to scene light intensity.
-- **Chromaticity** - A specific color coordinate usually defined as a cartesian x,y coordinate in some chromaticity space such as CIE 1931 xy, or CIE 1976 u'v'. 
+- **Chromaticity** - A specific color coordinate usually defined as a cartesian x,y coordinate in some chromaticity space such as CIE 1931 xy, or CIE 1976 u'v'.
 - **Achromatic Axis** - In a 3-dimensional RGB coordinate system, the achromatic axis is formed along the line where the individual color components are equal to each other. That is, where R=G=B. In a scene-referred colorspace, the achromatic axis can be of infinite length. In a display-referred colorspace, the achromatic axis is the diagonal line between the origin and the white corner of the display gamut cube.
 - **Display Device** - A device which displays an image such as a CRT monitor, an OLED Television, an LCD computer monitor, or an LED wall.
 - **Nit** - A unit of measure for light intensity. Equal to 1 Candela per Meter Squared. 
