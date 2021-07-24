@@ -3,6 +3,7 @@
 ## Resolve
 
 Here is the default DCTL node loaded in Resolve Studio:
+
 ![Resolve OpenDRT Minimal](img/ui/Resolve_OpenDRT_minimal.png)
 
 By default OpenDRT has very few parameters exposed. This is intentional. OpenDRT is **not** a grading tool. It is a display transform. Its purpose is to render a scene-referred input to a display referred output, in a consistent and predictable way.
