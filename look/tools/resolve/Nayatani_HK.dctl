@@ -17,7 +17,8 @@
 DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65}, {D50, D55, D60, D65})
 DEFINE_UI_PARAMS(La, L adapt, DCTLUI_SLIDER_FLOAT, 63.61, 0, 200, 1)
-DEFINE_UI_PARAMS(meth, method, DCTLUI_COMBO_BOX, 0, {VAC, VCC}, {VAC, VCC})
+DEFINE_UI_PARAMS(meth, method, DCTLUI_COMBO_BOX, 1, {VAC, VCC}, {VAC, VCC})
+DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
 
 __CONSTANT__ float pi = 3.14159265359f;
 
@@ -93,7 +94,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Convert RGB to XYZ
   float3 xyz = mult_f3_f33(rgb, in_to_xyz);
 
-  xyz += 0.005f;
   xyz = maxf3(xyz, 0.0f);
 
   // Convert XYZ to L*u'v'
@@ -118,7 +118,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float s = (1.0f + (m * q + 0.0872f * K_Br) * S_uv);
   s = s == 0.0f ? 1.0f : 1.0f / s;
 
-  rgb *= s;
+  if (invert == 1)
+    rgb /= s;
+  else
+    rgb *= s;
 
   return rgb;
 
