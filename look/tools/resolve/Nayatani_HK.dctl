@@ -57,8 +57,8 @@ __DEVICE__ float3 mult_f3_f33(float3 a, float3x3 m) {
 #define matrix_egamut_to_xyz make_float3x3(make_float3(0.705396831036f, 0.164041340351f, 0.081017754972f), make_float3(0.280130714178f, 0.820206701756f, -0.100337378681f), make_float3(-0.103781513870f, -0.072907261550, 1.265746593475f))
 #define matrix_davinciwg_to_xyz make_float3x3(make_float3(0.700622320175f, 0.148774802685f, 0.101058728993f), make_float3(0.274118483067f, 0.873631775379f, -0.147750422359f), make_float3(-0.098962903023f, -0.137895315886, 1.325916051865f))
 
-__DEVICE__ float radians(float d) {return d * (pi / 180.0f);}
-__DEVICE__ float degrees(float r) {return r * (180.0f / pi);}
+__DEVICE__ float _radians(float d) {return d * (pi / 180.0f);}
+__DEVICE__ float _degrees(float r) {return r * (180.0f / pi);}
 __DEVICE__ float3 maxf3(float3 a, float b) { return make_float3(_fmaxf(a.x, b), _fmaxf(a.y, b), _fmaxf(a.z, b)); }
 
 
@@ -110,7 +110,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Hue angle in radians
   float h = _atan2f(Luv.z - w_uv.y, Luv.y - w_uv.x);
-  h = h < 0.0f ? h + radians(360.0f) : h;
+  h = h < 0.0f ? h + _radians(360.0f) : h;
 
   float q = -0.01585f - 0.03017f * _cosf(h) - 0.04556f * _cosf(2.0f * h) - 0.02667f * _cosf(3.0f * h) - 0.00295f * _cosf(4.0f * h) + 0.14592f * _sinf(h) + 0.05084f * _sinf(2.0f * h) - 0.01900f * _sinf(3.0f * h) - 0.00764f * _sinf(4.0f * h);
   float S_uv = 13.0f * _hypotf(Luv.y - w_uv.x, Luv.z - w_uv.y);
