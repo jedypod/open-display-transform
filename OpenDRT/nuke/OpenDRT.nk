@@ -319,7 +319,7 @@ push $Nf55f4100
   temp_name1 ns
   temp_expr1 Br
   channel0 rgba
-  expr0 nt==0?0:n/ns
+  expr0 ns==0?0:n/ns
   channel1 none
   channel2 none
   channel3 none
@@ -691,7 +691,7 @@ push $Nf5528100
   temp_name1 ns
   temp_expr1 Br
   channel0 rgba
-  expr0 nt==0?0:n/ns
+  expr0 ns==0?0:n/ns
   channel1 none
   channel2 none
   channel3 none
