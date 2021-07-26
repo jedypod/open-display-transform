@@ -421,11 +421,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   float3 rgb = make_float3(p_R, p_G, p_B);
 
+
   if (invert == 0) {
     // Linearize input
     rgb = log2lin(rgb, tf);
 
-    // input gamut to xyz d65 cat: xyz scaling
+    // Input gamut to xyz d65 cat: xyz scaling
     rgb = mult_f3_f33(rgb, in_to_xyz);
 
     // XYZ to Truelight LMS D65 aligned
@@ -447,7 +448,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Store scaled n for chroma compression factor
     float ns = n;
     n = n / (n + 1.0f);
-    float ccf = ((n * n) / (n + t0))/ ns; // include toe compression in ccf
+    float ccf = n / ns;
     n = _powf(n, p);
     n = (n * n) / (n + t0);
 

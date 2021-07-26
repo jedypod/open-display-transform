@@ -1,6 +1,6 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.0.82
+      v0.0.83
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 */
@@ -438,7 +438,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Store scaled n for chroma compression factor
     float ns = n; 
     n = n / (n + 1.0f);
-    float ccf = ((n * n) / (n + t0))/ ns; // include toe compression in ccf
+    float ccf = n / ns;
     n = _powf(n, p);
     n = (n * n) / (n + t0);
 
@@ -450,7 +450,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Dechroma rgb
     rgb = (1.0f - ccf) + rgb * ccf;
 
-    // Multiply rgb ratios by compressed norm
+    // RGB with dechroma
     rgb *= n;
 
     // Convert from Truelight LMS to XYZ
