@@ -1,6 +1,6 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.0.83
+      v0.0.83b2
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 */
@@ -9,7 +9,6 @@ DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, r
 DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
 DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 0, {sdr_rec1886, sdr_srgb, sdr_applep3, sdr_rec2020, hdr_rec2020_pq_100nit, hdr_rec2020_pq_600nit, hdr_rec2020_pq_1000nit, hdr_rec2020_hlg_1000nit, hdr_rec2020_pq_2000nit, hdr_rec2020_pq_4000nit, hdr_p3d65_pq_100nit, hdr_p3d65_pq_600nit, hdr_p3d65_pq_1000nit, hdr_p3d65_pq_2000nit, hdr_p3d65_pq_4000nit, dci_p3d60, dci_p3d65, dci_p3dci, dci_dcdm}, {Rec.1886: 2.4 Power | Rec.709, sRGB Display: 2.2 Power | Rec.709, Apple Display P3: 2.2 Power | P3D65, Rec.2020: 2.4 Power | Rec.2020, Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit, Rec.2100: HLG | Rec.2020 | 1000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit, Dolby: ST 2084 PQ | P3D65 | 100 nit, Dolby: ST 2084 PQ | P3D65 | 600 nit, Dolby: ST 2084 PQ | P3D65 | 1000 nit, Dolby: ST 2084 PQ | P3D65 | 2000 nit, Dolby: ST 2084 PQ | P3D65 | 4000 nit, DCI: 2.6 Power | P3 D60, DCI: 2.6 Power | P3 D65, DCI: 2.6 Power | P3 DCI, DCI: 2.6 Power | DCDM XYZ})
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93})
-DEFINE_UI_PARAMS(lcb, lenscap black, DCTLUI_CHECK_BOX, 1)
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
 
 
@@ -23,9 +22,13 @@ typedef struct {
   float rec2020, p3d65, p3d60, p3dci, rec709, dcdm;
 } wpnorm;
 
-/* Gamut conversion matrices: CIE 1931 XYZ with D65 whitepoint, using 
-   XYZ Scaling as the chromatic adaptation method. We do chromatic adaptation
-   in Truelight LMS colorspace during display rendering. */
+/* Gamut conversion matrices
+   Convert input colorspace into CIE 1931 XYZ with D65 whitepoint, 
+   using XYZ Scaling as the chromatic adaptation method.
+   We convert XYZ into Truelight LMS colorspace, then normalize 
+   so that D65 white is equal energy. This is our reference point.
+   After display rendering we scale to output whitepoint in LMS.
+*/
 #define identity_mtx make_float3x3(make_float3(1.0f, 0.0f, 0.0f), make_float3(0.0f, 1.0f, 0.0f), make_float3(0.0f, 0.0f, 1.0f))
 #define matrix_ap0_to_xyz make_float3x3(make_float3(0.950362384319f, 0.000000000000f, 0.000093463248f), make_float3(0.343966454268f, 0.728166162968f, -0.072132542729f), make_float3(0.000000000000f, 0.000000000000, 1.089057803154f))
 #define matrix_ap1_to_xyz make_float3x3(make_float3(0.660931229591f, 0.133696138859f, 0.155828580260f), make_float3(0.272228747606f, 0.674081742764f, 0.053689509630f), make_float3(-0.006018006243f, 0.004383686464, 1.090692043304f))
@@ -43,7 +46,7 @@ typedef struct {
 
 // "Truelight LMS" or "Truelight RGB" colorspace, described in "Chromaticity coordinates for graphic arts based on CIE 2006 LMS with even spacing of Munsell colours" by Richard Kirk
 // https://doi.org/10.2352/issn.2169-2629.2019.27.38
-#define matrix_xyz_to_truelightlms make_float3x3(make_float3(0.18295f, 0.859943f, -0.031061f), make_float3(-0.394427, 1.258988f, 0.106423f), make_float3(0.064856f, -0.07625f, 0.93164f))
+#define matrix_xyz_to_truelightlms make_float3x3(make_float3(0.257085f, 0.859943f, -0.031061f), make_float3(-0.394427, 1.175800f, 0.106423f), make_float3(0.064856f, -0.07625f, 0.559067f))
 
 // ICtCp perceptual colorspace.
 // ITU-R Rec BT.2100-2: https://www.itu.int/rec/R-REC-BT.2100
@@ -51,12 +54,14 @@ typedef struct {
 #define matrix_ictcp_rec2020_to_lms make_float3x3(make_float3(1688.0f, 2146.0f, 262.0f) / 4096.0f, make_float3(683.0f, 2951.0f, 462.0f) / 4096.0f, make_float3(99.0f, 309.0f, 3688.0f) / 4096.0f)
 #define matrix_ictcp_lms_to_ictcp make_float3x3(make_float3(0.5f, 0.5f, 0.0f), make_float3(6610.0f, -13613.0f, 7003.0f) / 4096.0f, make_float3(17933.0f, -17390.0f, -543.0f) / 4096.0f)
 
-#define catd50 make_float3(0.171823f, 1.292538f, 1.228587f)
-#define catd55 make_float3(0.176293f, 1.279333f, 1.100720f)
-#define catd60 make_float3(0.179970f, 1.268278f, 1.005850f)
-#define catd65 make_float3(0.182950f, 1.258988f, 0.931640f)
-#define catd75 make_float3(0.187590f, 1.244085f, 0.827517f)
-#define catd93 make_float3(0.193087f, 1.225341f, 0.717363f)
+// Whitepoint scaling factors for Truelight LMS
+// eg: (1, 1, 1) in RGB (D65 whitepoint) -> XYZ -> TLMS /= catd65 *= catd55 -> XYZ -> Yxy == D65 white
+#define catd50 make_float3(1.08221f, 0.883260f, 0.447579f)
+#define catd55 make_float3(1.07730f, 0.896467f, 0.500927f)
+#define catd60 make_float3(1.07344f, 0.907523f, 0.549381f)
+#define catd65 make_float3(1.07046f, 0.916817f, 0.594251f)
+#define catd75 make_float3(1.06600f, 0.931715f, 0.670839f)
+#define catd93 make_float3(1.06098f, 0.950462f, 0.776150f)
 
 __CONSTANT__ wpnorm wnd50 = {1.09063f, 1.1408f, 1.09928f, 1.2469f, 1.17646f, 1.0f};
 __CONSTANT__ wpnorm wnd55 = {1.05337f, 1.08334f, 1.04391f, 1.18409f, 1.10416f, 1.0f};
@@ -290,6 +295,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (in_gamut == egamut)        in_to_xyz = matrix_egamut_to_xyz;
   else if (in_gamut == davinciwg)     in_to_xyz = matrix_davinciwg_to_xyz;
 
+  const float3x3 xyz_to_in = inv_f33(in_to_xyz);
+
   // Transfer function for linearizing input
   int tf;
   if (in_curve == linear)                     tf = 0;
@@ -303,8 +310,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   /* Whitepoint handling */
 
-  // CAT scale: float3 storing diagonal matrix entries for scaling to target
-  // illuminant in Truelight LMS colorspace on exit from rendering through inverse
+  // CAT scale factor for creative output whitepoint
   float3 cats;
 
   // Normalization factor to scale display light, compensating for peak white shift
@@ -319,20 +325,15 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (wp == D75)    cats = catd75, wn = wnd75;
   else if (wp == D93)    cats = catd93, wn = wnd93;
 
-  // Set up forward and inverse Truelight LMS matrix with whitepoint values
-  float3x3 xyz_to_tlms = matrix_xyz_to_truelightlms;
-  float3x3 tlms_to_xyz = matrix_xyz_to_truelightlms;
-  tlms_to_xyz.x.x = cats.x;
-  tlms_to_xyz.y.y = cats.y;
-  tlms_to_xyz.z.z = cats.z;
-  tlms_to_xyz = inv_f33(tlms_to_xyz);
-
+  // forward and inverse Truelight LMS matrix
+  const float3x3 xyz_to_tlms = matrix_xyz_to_truelightlms;
+  const float3x3 tlms_to_xyz = inv_f33(matrix_xyz_to_truelightlms);
 
   // highlight dechroma 
-  float dch = 0.5f;
+  const float dch = 0.5f;
 
   // Enable perceptual highlight dechroma
-  int pdch = 1;
+  const int pdch = 1;
   
   /* Set up presets
      ----------------------- */
@@ -360,6 +361,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (preset == hdr_p3d65_pq_2000nit) Lw = 2000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
   else if (preset == hdr_p3d65_pq_4000nit) Lw = 4000.0f, Lp = 10000.0f, c = 1.2f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
 
+  const float3x3 display_to_xyz = inv_f33(xyz_to_display);
 
   /* Set up tonemap parameters
       Here we set up the parameter space for the tonemap function.
@@ -367,12 +369,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   */
 
   // Display-referred toe adjustment for flare or glare compensation
-  float toe = 1.0f / Lw;
-
-  // Lenscap Black compensation
-  // Todo: some more testing to confirm this idea works.
-  float lcbc = lcb == 1 ? 0.002f * 100.0f / Lw : 0.0f;
-  float t0 = toe + lcbc * 100.0f / Lw;
+  const float t0 = 1.0f / Lw;
 
   // Output grey level in nits
   const float Lg = 14.4f + 1.436f * _logf(Lw / 1000.0f);
@@ -419,11 +416,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Input gamut to xyz d65 cat: xyz scaling
     rgb = mult_f3_f33(rgb, in_to_xyz);
 
-    // XYZ to Truelight LMS D65 aligned
+    // XYZ to Truelight LMS
     rgb = mult_f3_f33(rgb, xyz_to_tlms);
 
-    // Lenscap black compensation
-    rgb += lcbc;
+    // Normalize D65 white to equal energy
+    rgb /= catd65;
 
     // Weighted vector length norm
     rgb = maxf3(rgb, 1e-12f);
@@ -452,39 +449,40 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // RGB with dechroma
     rgb *= n;
+    
+    // Apply output creative output whitepoint scale
+    // TODO: determine if it is a mistake to do gamut compression _after_ creative whitepoint adjustment
+    rgb *= cats;
+    rgb_ndc *= cats;
 
     // Convert from Truelight LMS to XYZ
-    rgb = mult_f3_f33(rgb, inv_f33(xyz_to_tlms));
+    rgb = mult_f3_f33(rgb, tlms_to_xyz);
 
     // Gamut compress rgb
     rgb = gamut_compress(rgb, 0.9f, 1.2f);
 
     // Perceptual dechroma in ICtCp colorspace
     if (pdch == 1) {
-      rgb_ndc = mult_f3_f33(rgb_ndc, inv_f33(xyz_to_tlms));
+      rgb_ndc = mult_f3_f33(rgb_ndc, tlms_to_xyz);
 
       // Gamut compress rgb_ndc to avoid issues in perceptual colorspace with chromaticities outside the spectral locus
-      rgb_ndc = gamut_compress(rgb_ndc, 0.98f, 1.02f);
+      // Effectively this uses the behavior of the perceptual colorspace _near_ the spectral locus for values outside
+      rgb_ndc = gamut_compress(rgb_ndc, 0.95f, 1.05f);
 
       // Convert to ICtCp perceptual colorspace. Normalize by Lw for proper luminance range.
-      rgb_ndc = xyz_to_ictcp(rgb_ndc, Lw, 1);
-      rgb = xyz_to_ictcp(rgb, Lw, 1);
+      rgb_ndc = xyz_to_ictcp(rgb_ndc, Lw, 0);
+      rgb = xyz_to_ictcp(rgb, Lw, 0);
 
-      // Copy hue from source
-      rgb = make_float3(rgb.x, rgb.y, rgb_ndc.z);
+      // Copy hue from no dechroma source triplet. Effectively warps the hue from chromaticity-linear to perceptual.
+      // Calculate scale factor to avoid conversion to cylindrical and back. Optimization thanks to Jean-Michel Gilbert
+      float s = _hypotf(rgb.y, rgb.z) / _hypotf(rgb_ndc.y, rgb_ndc.z);
+      rgb = make_float3(rgb.x, rgb_ndc.y * s, rgb_ndc.z * s);
 
-      // Copy Intensity from source, masked by ccf. This helps preserve tonality a lot but need to do more testing to see if it's a bad idea...
-      rgb = make_float3(rgb_ndc.x * ccf + rgb.x * (1.0f - ccf), rgb.y, rgb_ndc.z);
-      
       // Convert back to XYZ
-      rgb = ictcp_to_xyz(rgb, Lw, 1);
+      rgb = ictcp_to_xyz(rgb, Lw, 0);
     }
 
-    // Convert back to Truelight LMS
-    rgb = mult_f3_f33(rgb, xyz_to_tlms);
-
-    // LMS to XYZ + Whitepoint chromatic adaptation
-    rgb = mult_f3_f33(rgb, tlms_to_xyz);
+    // Convert XYZ to display gamut
     rgb = mult_f3_f33(rgb, xyz_to_display);
 
     // Output scale
@@ -503,14 +501,15 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       rgb = eotf_hlg(rgb, 1);
     }
   } else {
-
+    
     /* Inverse Display Rendering
        -------------------------
         Inverse will not be an exact match, due to multiple factors:
         - Limitations of display gamut volume
         - Mis-matches in more saturated colors due to weighted vector length norm
         - Gamut compression not included in inverse
-        - Perceptual dechroma not included in inverse    */
+        - Perceptual dechroma not included in inverse    
+    */
 
 
     // Forward EOTF
@@ -527,10 +526,13 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb /= sy;
 
     // display gamut to XYZ
-    rgb = mult_f3_f33(rgb, inv_f33(xyz_to_display));
+    rgb = mult_f3_f33(rgb, display_to_xyz);
 
     // XYZ to LMS
-    rgb = mult_f3_f33(rgb, inv_f33(tlms_to_xyz));
+    rgb = mult_f3_f33(rgb, xyz_to_tlms);
+
+    // Inverse output creative output whitepoint scale
+    rgb /= cats;
 
     // Weighted vector length norm
     float n = _sqrtf(_powf(wr * rgb.x, 2.0f) + _powf(wg * rgb.y, 2.0f) + _powf(wb * rgb.z, 2.0f)) / wsum;
@@ -545,7 +547,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     n = _powf(n, 1.0f / p);
     float ns = n;
     n = n / (1.0f - n);
-    float ccf = ((n * n) / (n + t0))/ ns;
+    float ccf = ns / n;
     n /= sx;
 
     // Chroma compression factor
@@ -556,14 +558,14 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Multiply rgb ratios by uncompressed norm
     rgb *= n;
 
-    // Inverse lenscap black compensation
-    rgb -= lcbc;
+    // Inverse D65 Normalization
+    rgb *= catd65;
 
     // LMS to XYZ
-    rgb = mult_f3_f33(rgb, inv_f33(xyz_to_tlms));
+    rgb = mult_f3_f33(rgb, tlms_to_xyz);
 
-    // XYZ to input gamut
-    rgb = mult_f3_f33(rgb, inv_f33(in_to_xyz));
+    // XYZ to input gamut.
+    rgb = mult_f3_f33(rgb, xyz_to_in);
 
     // Return to working space
     rgb = lin2log(rgb, tf);
