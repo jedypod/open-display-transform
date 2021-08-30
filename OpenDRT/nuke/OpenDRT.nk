@@ -1194,8 +1194,10 @@ ypos -82
 end_group
 MergeExpression {
 inputs 2
-temp_name0 s
-temp_expr0 hypot(Bg,Bb)/hypot(Ag,Ab)
+temp_name0 h_ndc
+temp_expr0 hypot(Ag,Ab)
+temp_name1 s
+temp_expr1 h_ndc==0?0:hypot(Bg,Bb)/h_ndc
 expr0 Br
 expr1 Ag*s
 expr2 Ab*s
