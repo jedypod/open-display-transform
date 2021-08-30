@@ -473,6 +473,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       rgb_ndc = mult_f3_f33(rgb_ndc, tlms_to_xyz);
 
       // Gamut compress rgb_ndc to avoid issues in perceptual colorspace with chromaticities outside the spectral locus
+      // Effectively this uses the behavior of the perceptual colorspace _near_ the spectral locus for values outside
       rgb_ndc = gamut_compress(rgb_ndc, 0.95f, 1.05f);
 
       // Convert to ICtCp perceptual colorspace. Normalize by Lw for proper luminance range.
@@ -481,7 +482,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
       // Copy hue from no dechroma source triplet. Effectively warps the hue from chromaticity-linear to perceptual.
       // Calculate scale factor to avoid conversion to cylindrical and back. Optimization thanks to Jean-Michel Gilbert
-      float s = _hypotf(rgb.y, rgb.z) / _hypotf(rgb_ndc.y, rgb_ndc.z);
+      float h_ndc = _hypotf(rgb_ndc.y, rgb_ndc.z);
+      float s = h_ndc == 0.0f ? 0.0f : _hypotf(rgb.y, rgb.z) / h_ndc;
       rgb = make_float3(rgb.x, rgb_ndc.y * s, rgb_ndc.z * s);
 
       // Convert back to XYZ

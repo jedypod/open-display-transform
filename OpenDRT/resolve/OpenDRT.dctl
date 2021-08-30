@@ -475,7 +475,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
       // Copy hue from no dechroma source triplet. Effectively warps the hue from chromaticity-linear to perceptual.
       // Calculate scale factor to avoid conversion to cylindrical and back. Optimization thanks to Jean-Michel Gilbert
-      float s = _hypotf(rgb.y, rgb.z) / _hypotf(rgb_ndc.y, rgb_ndc.z);
+      float h_ndc = _hypotf(rgb_ndc.y, rgb_ndc.z);
+      float s = h_ndc == 0.0f ? 0.0f : _hypotf(rgb.y, rgb.z) / h_ndc;
       rgb = make_float3(rgb.x, rgb_ndc.y * s, rgb_ndc.z * s);
 
       // Convert back to XYZ
