@@ -1,6 +1,6 @@
 # Open Display Transform
-![OpenDRT v0.0.81b3 Nuke](/docs/img/OpenDRT_Nuke_v0.0.81b3.png)
-![OpenDRT v0.0.81 Resolve](/docs/img/OpenDRT_Resolve_v0.0.81.png)
+![OpenDRT v0.0.82 Nuke](/docs/img/ui/OpenDRT_Nuke_v0.0.81b3.png)
+![OpenDRT v0.0.81b3 Resolve](/docs/img/ui/OpenDRT_Resolve_v0.0.81b3.png)
 
 A simple and robust open source display transform for rendering wide gamut high dynamic range scene-linear images on an SDR or HDR display device.
 
@@ -16,4 +16,5 @@ Available as a node for Nuke or Nuke Non-Commercial, and a DCTL for Resolve Stud
 - **Invertible** - Can operate in the forward and inverse directions within the limitations of display-referred imagery
 - **Look Not Included** - Intended to be used in conjunction with a look transform upstream
 
-# Read the [Documentation](./docs)
+# Documentation
+Get started with [installation instructions](/docs/doc_installation.md), or read through the [Documentation](/docs)
