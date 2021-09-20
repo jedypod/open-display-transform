@@ -387,7 +387,6 @@ __DEVICE__ float3 jzazbz(float3 input, int inverse, int cyl) {
     float3 lms = input;
     if (cyl == 1) // Convert to cartesian
       lms = make_float3(lms.x, lms.y * _cosf(lms.z), lms.y * _sinf(lms.z));
-    return lms;
     lms.x = (lms.x + d_0) / (1.0f + d - d * (lms.x + d_0));
     lms = mult_f3_f33(lms, mtx_izazbz_to_lmsp);
     lms = eotf_pq(lms, 0, 1);
