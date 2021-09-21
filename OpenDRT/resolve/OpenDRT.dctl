@@ -129,10 +129,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       toe compression function is used for flare compensation. 
       The behavior of the tonescale function is controlled using a simple
       model, driven by a single variable (Lw) describing display peak luminance.
-      https://www.desmos.com/calculator/uddzlyvpdv
+      https://www.desmos.com/calculator/ssx2a1bpsz
 
       And another plot which does not include the parameter model:
-      https://www.desmos.com/calculator/24lgkj24ah
+      https://www.desmos.com/calculator/85ctrzzt4y
       
       The Michaelis-Menten equation has been shown to describe the response of photoreceptor
       cells in the retina:
