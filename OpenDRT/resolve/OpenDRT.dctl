@@ -1,6 +1,6 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.0.90b1
+      v0.0.90b2
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 */
@@ -93,7 +93,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   /* Set up presets
      ----------------------- */
   int eotf;
-  float Lw, ps, sat, w_n, ds;
+  float Lw, ps, sat, w_n;
   float3x3 xyz_to_display;
 
   if (preset == sdr_rec1886) Lw = 100.0f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 2;
@@ -117,27 +117,29 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (preset == hdr_p3d65_pq_4000nit) Lw = 4000.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
 
   // Display output normalization
-  ds = eotf == 4 ? Lw / 10000.0f : eotf == 5 ? Lw / 1000.0f : preset == dci_dcdm ? 48.0f / 52.37f : 1.0f;
+  const float ds = eotf == 4 ? Lw / 10000.0f : eotf == 5 ? Lw / 1000.0f : preset == dci_dcdm ? 48.0f / 52.37f : 1.0f;
+  // Display maximum for display-linear clamp.
+  const float clamp_max = preset == dci_dcdm ? 1.0f : ds;
   
   const float3x3 display_to_xyz = inv_f33(xyz_to_display);
 
   /* Tone Scale
-      OpenDRT uses a very simple Naka-Rushton style tone scale. 
-      https://www.desmos.com/calculator/r494egbrtw
-      
-      And here's another plot that does not include the parameter model,
-      so you can get a feel for what the different parameters adjust:
-      https://www.desmos.com/calculator/tdi3yfqyrg
-      
-      Tonemap sigmoid based on the Naka-Rushton formula of 
-      photoreceptor pigment bleaching in primate cone cells:
-      https://pubmed.ncbi.nlm.nih.gov/6666056/2
-      http://retina.anatomy.upenn.edu/~rob/lance/michaelis.html
+      OpenDRT uses a simple tonescale based on the Michaelis-Menten equation
+      to map scene-referred to display-referred. Then a parabolic 
+      toe compression function is used for flare compensation. 
+      The behavior of the tonescale function is controlled using a simple
+      model, driven by a single variable (Lw) describing display peak luminance.
+      https://www.desmos.com/calculator/uddzlyvpdv
 
-      Naka-Rushton is similar to the Michaelis-Menten model of enzyme kinetics,
-      but includes a power function which we use to control image contrast.
+      And another plot which does not include the parameter model:
+      https://www.desmos.com/calculator/24lgkj24ah
       
-      Inspired by the function posted here by Daniele Siragusano
+      The Michaelis-Menten equation has been shown to describe the response of photoreceptor
+      cells in the retina:
+      http://retina.anatomy.upenn.edu/~rob/lance/michaelis.html
+      https://pubmed.ncbi.nlm.nih.gov/6666056/2
+
+      This implementation is inspired by Daniele Siragusano's post:
       https://community.acescentral.com/t/output-transform-tone-scale/3498/14
 
       First we set up the parameter space which controls the function.
@@ -210,6 +212,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // _mixf3(nt, dlms, ccf);
     dlms = nt * (1.0f - ccf) + dlms * ccf;
 
+    dlms = clamp_min_f3(dlms, 0.0f);
+    float3 yrg = lms_to_yrg(dlms, 1);
+    yrg.y = compress_parabolic(yrg.y, 0.3f, 0.5f, 0.45f);
+    dlms = yrg_to_lms(yrg, 1);
+
+
     // Apply output creative output whitepoint scale to both scene lms and display lms
     // Also normalize by w_n so that channels are not pushed above display peak luminance. 
     // For example if using a D55 whitepoint, without normalization the R channel would be > 1
@@ -219,23 +227,22 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     
     // Convert from Truelight LMS to XYZ
     float3 xyz = mult_f3_f33(dlms, tlms_to_xyz);
-        
-    xyz = gamut_compress_rgb(xyz, 0.85f, 1.4f, 1);
 
     // Distort chromaticity-linear chroma compression along perceptual hue paths using JzAzBz
     if (pdch == 1) {
-      float3 jz = jzazbz(xyz, 0, 1);
-
+      float3 jz = xyz_to_jzazbz(xyz, 1);
+    
       // Apply gamut compression to C in JCh. Values tuned to protect CC24 values.
-      jz.y = compress_parabolic(jz.y, 0.018f, 0.048f, 0.022f);
+      jz.y = compress_parabolic(jz.y, 0.015f, 0.05f, 0.02f);
 
       // Scene-linear XYZ tristimulus without any chroma compression. To use as our source hue.
       float3 xyz_ndc = mult_f3_f33(lms, tlms_to_xyz);
-      float3 jz_ndc = jzazbz(xyz_ndc, 0, 1);
+      float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
       
       // Copy hue from jz_ndc: Effectively warps the hue from chromaticity-linear to perceptual.
       jz.z = jz_ndc.z;
-      xyz = jzazbz(jz, 1, 1);
+    
+      xyz = jzazbz_to_xyz(jz, 1);
     }
 
     // Convert XYZ to display gamut
@@ -245,7 +252,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb *= ds;
 
     // Clamp
-    rgb = clamp_f3(rgb, 0.0f, preset == dci_dcdm ? 1.0f : ds);
+    rgb = clamp_max_f3(clamp_min_f3(rgb, 0.0f), clamp_max);
 
     // Inverse EOTF
     float eotf_p = 2.0f + eotf * 0.2f; 
