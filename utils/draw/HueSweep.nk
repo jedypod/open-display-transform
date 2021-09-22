@@ -1,102 +1,762 @@
 set cut_paste_input [stack 0]
 Group {
- inputs 0
  name HueSweep
  postage_stamp true
- addUserKnob {20 HueSweep_tab l HueSweep}
- addUserKnob {41 format T Constant8.format}
- addUserKnob {7 e l exposure t "exposure, in stops, to brighten above pivot, and to darken below pivot.\n\ntotal exposure range is 2 * exposure" R 0 8}
- e 5
- addUserKnob {7 pivot}
- pivot 1
- addUserKnob {7 saturation t "adjust saturation of overall hue sweep"}
- saturation 1
+ addUserKnob {20 HueSweep}
+ addUserKnob {26 swatch_label l " " T <b>swatch</b>}
+ addUserKnob {3 size}
+ size 512
+ addUserKnob {7 ar l aspect R 1 2}
+ ar 1
  addUserKnob {26 ""}
- addUserKnob {6 posterize +STARTLINE}
- addUserKnob {3 samples}
- samples 4
- addUserKnob {7 sample_sat l "sample sat" t "adjust saturation of each sample"}
- sample_sat 0.9
+ addUserKnob {4 colorspace t "color model to create the hue sweep in" M {RGB Yxy L*u'v' Yrg ""}}
+ addUserKnob {41 rgb_gamut l "rgb gamut" t "define the gamut for RGB colorspace.\n\nFor example if you want to output a sRGB hue sweep in ACEScg, chose rgb gamut = Rec.709, out gamut = ACEScg" -STARTLINE T XYZ_to_Gamut1.gamut}
+ addUserKnob {41 out_gamut l "out gamut" T XYZ_to_Gamut.gamut}
+ addUserKnob {41 quantize l "quantize into discrete samples" T ValueChromaHue.quantize}
+ addUserKnob {41 s l samples T ValueChromaHue.s}
+ addUserKnob {41 hueshift l "hue shift" T ValueChromaHue.hueshift}
+ addUserKnob {41 ch l chroma T ValueChromaHue.ch}
+ addUserKnob {41 sa l "chroma ramp" T ValueChromaHue.sa}
+ addUserKnob {41 ex l exposure T ValueChromaHue.ex}
+ addUserKnob {41 p l contrast T ValueChromaHue.p}
+ addUserKnob {6 achromatic_row l "achromatic row" +STARTLINE}
+ achromatic_row true
 }
  Constant {
   inputs 0
-  format "2048 1024 0 0 2048 1024 1 latlong_2k"
-  name Constant8
-  note_font Helvetica
-  xpos 1160
-  ypos 591
+  format "512 512 0 0 512 512 1 square_512"
+  name Constant13
+  xpos 1060
+  ypos 494
   postage_stamp false
  }
- Expression {
-  expr0 x<width/3?x/(width/3):x<width/3*2?1-(x-width/3)/(width/3):0
-  expr1 x<width/3?1-x/(width/3):x>width/3*2?(x-width/3*2)/(width/3):0
-  expr2 x>width/3&&x<width/3*2?(x-width/3)/(width/3):x>width/3*2?1-(x-width/3*2)/(width/3):0
-  expr3 1
-  name Expression10
-  label "hue sweep"
-  note_font Helvetica
-  xpos 1160
-  ypos 645
- }
- Posterize {
-  channels rgb
-  Colors {{parent.samples}}
-  name Posterize1
-  note_font Helvetica
-  xpos 1160
-  ypos 711
-  disable {{!parent.posterize}}
- }
- Dot {
-  name Dot1
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
-  xpos 1194
-  ypos 774
- }
-set Nb6f4be0 [stack 0]
- Expression {
-  temp_name0 w
-  temp_expr0 width/(samples*3)
-  expr3 (x%w)/w
-  name Expression2
-  note_font Helvetica
-  xpos 1040
-  ypos 771
- }
-push $Nb6f4be0
- Saturation {
-  inputs 1+1
-  saturation {{parent.sample_sat}}
-  mode Maximum
-  name Saturation1
-  note_font Helvetica
-  xpos 1160
-  ypos 810
-  disable {{!parent.posterize}}
+ Reformat {
+  type "to box"
+  box_width {{ar>1?parent.size:parent.size*ar}}
+  box_height {{ar<1?parent.size:box_width/parent.ar}}
+  box_fixed true
+  name Reformat1
+  xpos 1060
+  ypos 542
  }
  Expression {
-  expr0 r*pow(2,(y/height-pivot)*2*e)
-  expr1 g*pow(2,(y/height-pivot)*2*e)
-  expr2 b*pow(2,(y/height-pivot)*2*e)
+  temp_name0 _r
+  temp_expr0 y/height
+  temp_name1 rs
+  temp_expr1 _r*s
+  temp_name2 ri
+  temp_expr2 rint(rs+0.5001)/s
+  expr0 exp(p*x/width-p)*pow(2,ex)
+  expr1 (1-rs%1*sa)*ch
+  expr2 ((quantize?ri:_r)+sh)%1
+  name ValueChromaHue
+  note_font Helvetica
+  xpos 1060
+  ypos 615
+  addUserKnob {20 Params}
+  addUserKnob {6 quantize l "quantize into discrete samples" +STARTLINE}
+  quantize true
+  addUserKnob {3 s l samples t "number of discrete hue samples"}
+  s 24
+  addUserKnob {7 ch l chroma t "set the max chroma"}
+  ch 1
+  addUserKnob {7 sa l "chroma ramp" t "create a chroma ramp from max chroma value to 1-this value for each hue"}
+  addUserKnob {7 ex l exposure t "exposure up or down" R -4 6}
+  addUserKnob {7 p l contrast R 0 10}
+  addUserKnob {7 sh l shift t "shift the resulting hue: a value of 1 is 360 degrees"}
+  sh {{hueshift/360}}
+  addUserKnob {7 hueshift l "hue shift" t "shift the resulting hue in degrees" R 0 360}
+ }
+set Na02f9600 [stack 0]
+ Expression {
+  temp_name0 h
+  temp_expr0 b*2*pi
+  expr0 r
+  expr1 g*cos(h)
+  expr2 g*sin(h)
+  name polar_to_cartesian
+  xpos 730
+  ypos 686
+ }
+set Na02f8f00 [stack 0]
+ Expression {
+  temp_name0 d
+  temp_expr0 invert?-1:1
+  expr1 g+d*0.14722
+  expr2 b+d*0.50911666
+  name offset_white1
+  note_font Helvetica
+  xpos 730
+  ypos 783
+  addUserKnob {20 User}
+  addUserKnob {6 invert +STARTLINE}
+ }
+ Expression {
+  temp_name0 l
+  temp_expr0 0.95*g+0.38*b
+  temp_name1 m
+  temp_expr1 0.02*g+0.59*b+0.03
+  temp_name2 _a
+  temp_expr2 r/(0.68990272*l+0.34832189*m)
+  expr0 l*_a
+  expr1 m*_a
+  expr2 (1-l-m)*_a
+  name Yrg_to_tRGB2
+  note_font Helvetica
+  xpos 730
+  ypos 831
+ }
+ Expression {
+  expr0 r*w.0
+  expr1 g*w.1
+  expr2 b*w.2
+  name Normalize1
+  label D65
+  xpos 730
+  ypos 872
+  addUserKnob {20 Params}
+  addUserKnob {35 presets l "" +STARTLINE M {presets/D50 "knobs this \{w \{1.08221 0.883260 0.447579\} label D50\}" presets/D55 "knobs this \{w \{1.07730 0.896467 0.500927\} label D55\}" presets/D60 "knobs this \{w \{1.07344 0.907523 0.549381\} label D60\}" presets/D65 "knobs this \{w \{1.07046 0.916817 0.594251\} label D65\}" presets/D75 "knobs this \{w \{1.06600 0.931715 0.670839\} label D75\}" presets/D93 "knobs this \{w \{1.06098 0.950462 0.776150\} label D93\}"}}
+  addUserKnob {78 w n 3}
+  w {1.07046 0.916817 0.594251}
+ }
+ ColorMatrix {
+  matrix {
+      {0.257085 0.859943 -0.031061}
+      {-0.394427 1.1758 0.106423}
+      {0.064856 -0.07625 0.559067}
+    }
+  invert true
+  name tlms_to_XYZ
+  xpos 730
+  ypos 910
+ }
+ Group {
+  name XYZ_to_Gamut
+  tile_color 0x429940ff
+  xpos 730
+  ypos 950
+  addUserKnob {20 InputGamut_to_XYZ_tab l InputGamut_to_XYZ}
+  addUserKnob {4 gamut l "input gamut" M {ACES ACEScg P3D65 Rec.2020 Rec.709 "Alexa WideGamut" "Red WideGamutRGB" "Sony SGamut3" "Filmlight E-Gamut" "DaVinci Wide Gamut" "" ""}}
+  gamut ACEScg
+  addUserKnob {41 matrix T ColorMatrix.matrix}
+  addUserKnob {41 invert -STARTLINE T ColorMatrix.invert}
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 290
+   ypos -610
+  }
+  Dot {
+   name Dot1
+   xpos 324
+   ypos -546
+  }
+set N86d2dd00 [stack 0]
+  ColorMatrix {
+   matrix {
+       {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
+       {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
+       {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
+     }
+   invert true
+   name ColorMatrix
+   xpos 290
+   ypos -370
+  }
+  Output {
+   name Output
+   xpos 290
+   ypos -250
+  }
+push $N86d2dd00
+  Dot {
+   name Dot391
+   label " *RGB to XYZ D65 CAT: XYZ Scaling"
+   xpos 434
+   ypos -546
+  }
+set N86d2c800 [stack 0]
+  ColorMatrix {
+   matrix {
+       {0.7006223202 0.1487748027 0.101058729}
+       {0.2741184831 0.8736317754 -0.1477504224}
+       {-0.09896290302 -0.1378953159 1.325916052}
+     }
+   name ColorMatrix30
+   label "DaVinci WG to XYZ D65"
+   xpos 1390
+   ypos -466
+  }
+push $N86d2c800
+  ColorMatrix {
+   matrix {
+       {0.705396831 0.1640413404 0.08101775497}
+       {0.2801307142 0.8202067018 -0.1003373787}
+       {-0.1037815139 -0.07290726155 1.265746593}
+     }
+   name ColorMatrix29
+   label "Filmlight E-Gamut to XYZ D65"
+   xpos 1280
+   ypos -466
+  }
+push $N86d2c800
+  ColorMatrix {
+   matrix {
+       {0.5990839005 0.2489254922 0.1024464965}
+       {0.2150758207 0.8850684166 -0.1001443192}
+       {-0.03206584975 -0.02765838802 1.148782015}
+     }
+   name ColorMatrix31
+   label "SonySGamut3 to XYZ D65"
+   xpos 1170
+   ypos -465
+  }
+push $N86d2c800
+  ColorMatrix {
+   matrix {
+       {0.735275209 0.06860940903 0.1465712786}
+       {0.2866940796 0.8429790735 -0.1296732426}
+       {-0.07968084514 -0.3473432064 1.516081929}
+     }
+   name ColorMatrix22
+   label "REDWideGamutRGB to XYZ D65"
+   xpos 1060
+   ypos -466
+  }
+push $N86d2c800
+  ColorMatrix {
+   matrix {
+       {0.6380076408 0.2147038132 0.09774445742}
+       {0.2919537723 0.8238408566 -0.1157948226}
+       {0.002798279049 -0.06703422219 1.153293848}
+     }
+   name ColorMatrix21
+   label "Arri AlexaWideGamut to XYZ D65"
+   xpos 950
+   ypos -466
+  }
+push $N86d2c800
+  ColorMatrix {
+   matrix {
+       {0.4123909175 0.3575843573 0.1804807931}
+       {0.2126390785 0.7151687145 0.07219231129}
+       {0.01933082566 0.1191947833 0.9505321383}
+     }
+   name ColorMatrix18
+   label "Rec709 to XYZ D65"
+   xpos 840
+   ypos -466
+  }
+push $N86d2c800
+  ColorMatrix {
+   matrix {
+       {0.6369581223 0.1446169168 0.1688809693}
+       {0.2627002299 0.6779981256 0.05930171534}
+       {4.99410725e-17 0.02807269618 1.060985088}
+     }
+   name ColorMatrix17
+   label "Rec2020 to XYZ D65"
+   xpos 730
+   ypos -466
+  }
+push $N86d2c800
+  ColorMatrix {
+   matrix {
+       {0.4865711331 0.2656677067 0.1982173175}
+       {0.2289746404 0.6917386055 0.07928691804}
+       {-3.972076965e-17 0.04511338845 1.043944478}
+     }
+   name ColorMatrix16
+   label "P3D65 to XYZ D65"
+   xpos 620
+   ypos -466
+  }
+push $N86d2c800
+  ColorMatrix {
+   matrix {
+       {0.6609312296 0.1336961389 0.1558285803}
+       {0.2722287476 0.6740817428 0.05368950963}
+       {-0.006018006243 0.004383686464 1.090692043}
+     }
+   name ColorMatrix1
+   label "ACEScg to XYZ D65"
+   xpos 510
+   ypos -466
+  }
+push $N86d2c800
+  ColorMatrix {
+   matrix {
+       {0.9503623843 0 9.346324805e-05}
+       {0.3439664543 0.728166163 -0.07213254273}
+       {0 0 1.089057803}
+     }
+   name ColorMatrix2
+   label "ACES to XYZ D65"
+   xpos 400
+   ypos -466
+  }
+  Switch {
+   inputs 10
+   which {{gamut}}
+   name SwitchGamut
+   xpos 400
+   ypos -370
+  }
+ end_group
+push $Na02f8f00
+ Group {
+  name Colorspace_CIELuv
+  xpos 840
+  ypos 878
+  addUserKnob {20 CIELuv_tab l CIELuv}
+  addUserKnob {41 gamut T InGamut_to_XYZ.gamut}
+  addUserKnob {4 opp l mode t "Output traditional opponent model L*u*v*, \nor output euclidean L*u'v', with optional whitepoint offset" M {L*u'v' L*u*v*}}
+  addUserKnob {6 LCh l LCh(uv) t "Polar coordinate transform of cartesian L*u'v': \nLuminance, Chroma, Hue angle. \n\nNote: Must output L*u*v* for this to work.\nNote: h is output in radians: 0 to 2*pi" -STARTLINE}
+  addUserKnob {41 illum t "whitepoint illuminant" T XYZ_to_Luv.illum}
+  addUserKnob {6 wo l "wp offset" t "in cartesian L*u'v', offset such that whitepoint illuminant is at origin." -STARTLINE}
+  wo true
+  addUserKnob {4 direction M {forward inverse}}
+  direction inverse
+  addUserKnob {6 n l normalize t "normalize to 0-1 range" +STARTLINE}
+  n true
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 83
+   ypos -428
+  }
+set N15a5eb00 [stack 0]
+  Expression {
+   temp_name0 n
+   expr0 r
+   expr1 g*cos(b)
+   expr2 g*sin(b)
+   name LCh_to_Luv
+   xpos 180
+   ypos -370
+   disable {{!LCh}}
+  }
+  Expression {
+   temp_name0 m
+   temp_expr0 n?100:1
+   expr0 r*m
+   expr1 opp?g*m:g
+   expr2 opp?b*m:b
+   name Scale
+   xpos 180
+   ypos -324
+  }
+  Expression {
+   expr1 g+o.0
+   expr2 b+o.1
+   name inv_offset_white
+   xpos 180
+   ypos -298
+   disable {{parent.offset_white.disable x21 1}}
+   addUserKnob {20 Params}
+   addUserKnob {78 o n 2}
+   o {{parent.XYZ_to_Luv.uw} {parent.XYZ_to_Luv.vw}}
+  }
+  Expression {
+   temp_name0 _a
+   temp_expr0 (52*r/(opp?g+13*r*uw:13*g*r)-1)/3
+   temp_name1 Y
+   temp_expr1 r>_k*_e?pow((r+16)/116,3):r/_k
+   temp_name2 _d
+   temp_expr2 Y*(39*r/(opp?b+13*r*vw:13*b*r)-5)
+   temp_name3 X
+   temp_expr3 (_d+5*Y)/(_a+1/3)
+   expr0 X
+   expr1 Y
+   expr2 X*_a-5*Y
+   name Luv_to_XYZ1
+   xpos 180
+   ypos -274
+   addUserKnob {20 Params}
+   addUserKnob {18 ixyz l illum_XYZ}
+   ixyz {{parent.XYZ_to_Luv.ixyz} {parent.XYZ_to_Luv.ixyz} {parent.XYZ_to_Luv.ixyz}}
+   addUserKnob {6 ixyz_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+   addUserKnob {6 illum_XYZ_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+   addUserKnob {7 uw}
+   uw {{4*ixyz.r/(ixyz.r+15*ixyz.g+3*ixyz.b)}}
+   addUserKnob {7 vw}
+   vw {{9*ixyz.g/(ixyz.r+15*ixyz.g+3*ixyz.b)}}
+   addUserKnob {7 _e}
+   _e {{216/24389}}
+   addUserKnob {7 _k}
+   _k {{24389/27}}
+  }
+push $N15a5eb00
+  Expression {
+   temp_name0 d
+   temp_expr0 (r+15*g+3*b)
+   temp_name1 u
+   temp_expr1 4*r/d
+   temp_name2 v
+   temp_expr2 9*g/d
+   temp_name3 L
+   temp_expr3 g>_e?116*pow(g,1/3)-16:g*_k
+   expr0 L/(n?100:1)
+   expr1 opp?13*L*(u-uw)/(n?100:1):u
+   expr2 opp?13*L*(v-vw)/(n?100:1):v
+   name XYZ_to_Luv
+   xpos -40
+   ypos -322
+   addUserKnob {20 Params}
+   addUserKnob {4 illum M {D50 D55 D60 D65}}
+   illum D65
+   addUserKnob {18 ixyz l illum_XYZ}
+   ixyz {{curve(illum) 0.9642945528 0.9567937851 0.9526392221 0.9504492879} {curve(illum) 1 1 1 1} {curve(illum) 0.825103879 0.9213933349 1.008833051 1.089060545}}
+   addUserKnob {6 ixyz_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+   addUserKnob {6 illum_XYZ_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+   addUserKnob {7 uw}
+   uw {{4*ixyz.r/(ixyz.r+15*ixyz.g+3*ixyz.b)}}
+   addUserKnob {7 vw}
+   vw {{9*ixyz.g/(ixyz.r+15*ixyz.g+3*ixyz.b)}}
+   addUserKnob {7 _e}
+   _e {{216/24389}}
+   addUserKnob {7 _k}
+   _k {{24389/27}}
+  }
+  Expression {
+   expr1 g-o.0
+   expr2 b-o.1
+   name offset_white
+   xpos -40
+   ypos -296
+   disable {{!(!opp&&wo)}}
+   addUserKnob {20 Params}
+   addUserKnob {78 o n 2}
+   o {{parent.XYZ_to_Luv.uw} {parent.XYZ_to_Luv.vw}}
+  }
+  Expression {
+   temp_name0 h
+   temp_expr0 atan2(b,g)
+   expr0 r
+   expr1 hypot(g,b)
+   expr2 h<0?h+radians(360):h
+   name Luv_to_LCh
+   xpos -40
+   ypos -250
+   disable {{!LCh}}
+  }
+  Switch {
+   inputs 2
+   which {{parent.direction}}
+   name SwitchDirection
+   xpos 83
+   ypos -188
+  }
+  Output {
+   name Output
+   xpos 70
+   ypos -58
+  }
+  StickyNote {
+   inputs 0
+   name StickyNote1
+   tile_color 0x272727ff
+   label "<left><b>CIE L*u*v*</b>\nhttps://github.com/colour-science/colour/blob/HEAD/colour/models/cie_luv.py\nhttps://en.wikipedia.org/wiki/CIELUV\nhttp://www.brucelindbloom.com/Eqn_XYZ_to_Luv.html"
+   note_font_size 14
+   note_font_color 0xa8a8a8ff
+   xpos -110
+   ypos -154
+  }
+ end_group
+ ColorMatrix {
+  matrix {
+      {{parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix}}
+      {{parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix}}
+      {{parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix}}
+    }
+  invert true
+  name ColorMatrix1
+  note_font Helvetica
+  xpos 840
+  ypos 951
+ }
+push $Na02f8f00
+ Expression {
+  temp_name0 aY
+  temp_expr0 r
+  temp_name1 ax
+  temp_expr1 g+w.0
+  temp_name2 ay
+  temp_expr2 b+w.1
+  expr0 b==0?b:(ax*aY/ay)
+  expr1 b==0?0:r
+  expr2 b==0?b:(1-ax-ay)*aY/ay
+  name Yxy_to_XYZ3
+  xpos 950
+  ypos 878
+  addUserKnob {20 Params}
+  addUserKnob {4 illum M {D50 D55 D60 D65}}
+  illum D65
+  addUserKnob {78 wxyz n 3}
+  wxyz {{curve(illum) 0.9642945528 0.9567937851 0.9526392221 0.9504492879} {curve(illum) 1 1 1 1} {curve(illum) 0.825103879 0.9213933349 1.008833051 1.089060545}}
+  addUserKnob {78 w n 2}
+  w {{wxyz.0/(wxyz.0+wxyz.1+wxyz.2)} {wxyz.1/(wxyz.0+wxyz.1+wxyz.2)}}
+ }
+ ColorMatrix {
+  matrix {
+      {{parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix}}
+      {{parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix}}
+      {{parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix}}
+    }
+  invert true
+  name ColorMatrix3
+  note_font Helvetica
+  xpos 950
+  ypos 951
+ }
+push $Na02f9600
+ Expression {
+  temp_name0 C
+  temp_expr0 r*g
+  temp_name1 X
+  temp_expr1 C*(1-abs((b*6)%2-1))
+  temp_name2 m
+  temp_expr2 r-C
+  expr0 (b<1/6?C:b<2/6?X:b<3/6?0:b<4/6?0:b<5/6?X:C)+m
+  expr1 (b<1/6?X:b<2/6?C:b<3/6?C:b<4/6?X:b<5/6?0:0)+m
+  expr2 (b<1/6?0:b<2/6?0:b<3/6?X:b<4/6?C:b<5/6?C:X)+m
+  name VSH_to_RGB1
+  xpos 1060
+  ypos 838
+ }
+ Group {
+  name XYZ_to_Gamut1
+  tile_color 0x429940ff
+  xpos 1060
+  ypos 902
+  addUserKnob {20 InputGamut_to_XYZ_tab l InputGamut_to_XYZ}
+  addUserKnob {4 gamut l "input gamut" M {ACES ACEScg P3D65 Rec.2020 Rec.709 "Alexa WideGamut" "Red WideGamutRGB" "Sony SGamut3" "Filmlight E-Gamut" "DaVinci Wide Gamut" "" ""}}
+  gamut Rec.709
+  addUserKnob {41 matrix T ColorMatrix.matrix}
+  addUserKnob {41 invert -STARTLINE T ColorMatrix.invert}
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 290
+   ypos -610
+  }
+  Dot {
+   name Dot1
+   xpos 324
+   ypos -546
+  }
+set N19f3a400 [stack 0]
+  ColorMatrix {
+   matrix {
+       {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
+       {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
+       {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
+     }
+   name ColorMatrix
+   xpos 290
+   ypos -370
+  }
+  Output {
+   name Output
+   xpos 290
+   ypos -250
+  }
+push $N19f3a400
+  Dot {
+   name Dot391
+   label " *RGB to XYZ D65 CAT: XYZ Scaling"
+   xpos 434
+   ypos -546
+  }
+set N19f38f00 [stack 0]
+  ColorMatrix {
+   matrix {
+       {0.7006223202 0.1487748027 0.101058729}
+       {0.2741184831 0.8736317754 -0.1477504224}
+       {-0.09896290302 -0.1378953159 1.325916052}
+     }
+   name ColorMatrix30
+   label "DaVinci WG to XYZ D65"
+   xpos 1390
+   ypos -466
+  }
+push $N19f38f00
+  ColorMatrix {
+   matrix {
+       {0.705396831 0.1640413404 0.08101775497}
+       {0.2801307142 0.8202067018 -0.1003373787}
+       {-0.1037815139 -0.07290726155 1.265746593}
+     }
+   name ColorMatrix29
+   label "Filmlight E-Gamut to XYZ D65"
+   xpos 1280
+   ypos -466
+  }
+push $N19f38f00
+  ColorMatrix {
+   matrix {
+       {0.5990839005 0.2489254922 0.1024464965}
+       {0.2150758207 0.8850684166 -0.1001443192}
+       {-0.03206584975 -0.02765838802 1.148782015}
+     }
+   name ColorMatrix31
+   label "SonySGamut3 to XYZ D65"
+   xpos 1170
+   ypos -465
+  }
+push $N19f38f00
+  ColorMatrix {
+   matrix {
+       {0.735275209 0.06860940903 0.1465712786}
+       {0.2866940796 0.8429790735 -0.1296732426}
+       {-0.07968084514 -0.3473432064 1.516081929}
+     }
+   name ColorMatrix22
+   label "REDWideGamutRGB to XYZ D65"
+   xpos 1060
+   ypos -466
+  }
+push $N19f38f00
+  ColorMatrix {
+   matrix {
+       {0.6380076408 0.2147038132 0.09774445742}
+       {0.2919537723 0.8238408566 -0.1157948226}
+       {0.002798279049 -0.06703422219 1.153293848}
+     }
+   name ColorMatrix21
+   label "Arri AlexaWideGamut to XYZ D65"
+   xpos 950
+   ypos -466
+  }
+push $N19f38f00
+  ColorMatrix {
+   matrix {
+       {0.4123909175 0.3575843573 0.1804807931}
+       {0.2126390785 0.7151687145 0.07219231129}
+       {0.01933082566 0.1191947833 0.9505321383}
+     }
+   name ColorMatrix18
+   label "Rec709 to XYZ D65"
+   xpos 840
+   ypos -466
+  }
+push $N19f38f00
+  ColorMatrix {
+   matrix {
+       {0.6369581223 0.1446169168 0.1688809693}
+       {0.2627002299 0.6779981256 0.05930171534}
+       {4.99410725e-17 0.02807269618 1.060985088}
+     }
+   name ColorMatrix17
+   label "Rec2020 to XYZ D65"
+   xpos 730
+   ypos -466
+  }
+push $N19f38f00
+  ColorMatrix {
+   matrix {
+       {0.4865711331 0.2656677067 0.1982173175}
+       {0.2289746404 0.6917386055 0.07928691804}
+       {-3.972076965e-17 0.04511338845 1.043944478}
+     }
+   name ColorMatrix16
+   label "P3D65 to XYZ D65"
+   xpos 620
+   ypos -466
+  }
+push $N19f38f00
+  ColorMatrix {
+   matrix {
+       {0.6609312296 0.1336961389 0.1558285803}
+       {0.2722287476 0.6740817428 0.05368950963}
+       {-0.006018006243 0.004383686464 1.090692043}
+     }
+   name ColorMatrix1
+   label "ACEScg to XYZ D65"
+   xpos 510
+   ypos -466
+  }
+push $N19f38f00
+  ColorMatrix {
+   matrix {
+       {0.9503623843 0 9.346324805e-05}
+       {0.3439664543 0.728166163 -0.07213254273}
+       {0 0 1.089057803}
+     }
+   name ColorMatrix2
+   label "ACES to XYZ D65"
+   xpos 400
+   ypos -466
+  }
+  Switch {
+   inputs 10
+   which {{gamut}}
+   name SwitchGamut
+   xpos 400
+   ypos -370
+  }
+ end_group
+ ColorMatrix {
+  matrix {
+      {{parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix}}
+      {{parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix}}
+      {{parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix} {parent.XYZ_to_Gamut.ColorMatrix.matrix}}
+    }
+  invert true
+  name ColorMatrix2
+  note_font Helvetica
+  xpos 1060
+  ypos 951
+ }
+ Switch {
+  inputs 4
+  which {{colorspace}}
+  name Switch1
+  note_font Helvetica
+  xpos 840
+  ypos 1023
+ }
+ Crop {
+  box {0 -1 {width} {height}}
+  crop false
+  name Crop2
+  xpos 840
+  ypos 1118
+  disable {{!parent.achromatic_row}}
+ }
+ Expression {
+  expr0 y==-1?x/width:r
+  expr1 y==-1?x/width:g
+  expr2 y==-1?x/width:b
   name Expression1
-  label exposure
-  note_font Helvetica
-  xpos 1160
-  ypos 855
+  label "achromatic row"
+  xpos 840
+  ypos 1160
+  disable {{!parent.achromatic_row}}
  }
- Saturation {
-  saturation {{parent.saturation}}
-  mode Maximum
-  name Saturation2
+ Crop {
+  box {0 {-height/s} {width} {height}}
+  reformat true
+  crop false
+  name Crop1
+  xpos 840
+  ypos 1214
+  disable {{!parent.achromatic_row}}
+ }
+ Shuffle {
+  alpha white
+  name Shuffle1
+  label "\[value in]"
   note_font Helvetica
-  xpos 1160
-  ypos 911
+  xpos 840
+  ypos 1257
  }
  Output {
   name Output
-  xpos 1160
-  ypos 994
+  xpos 840
+  ypos 1334
  }
 end_group
