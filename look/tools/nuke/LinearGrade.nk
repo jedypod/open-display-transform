@@ -1,0 +1,55 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name LinearGrade
+ addUserKnob {20 LinearGrade_tab l LinearGrade}
+ addUserKnob {41 exposure T Expression.exposure}
+ addUserKnob {41 c l contrast T Expression.c}
+ addUserKnob {41 pivot T Expression.pivot}
+ addUserKnob {41 off l offset T Expression.off}
+}
+ Input {
+  inputs 0
+  name Inputmask
+  xpos -40
+  ypos -201
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos -150
+  ypos -250
+ }
+ Expression {
+  inputs 1+1
+  temp_name0 m
+  temp_expr0 (max(r,g,b))/p
+  temp_name1 s
+  temp_expr1 c==1?ex:m>0?pow(m,c-1)*ex:1
+  expr0 (r+o)*s
+  expr1 (g+o)*s
+  expr2 (b+o)*s
+  name Expression
+  selected true
+  xpos -150
+  ypos -202
+  addUserKnob {20 Params}
+  addUserKnob {7 exposure R -6 6}
+  addUserKnob {7 c l contrast R 0.1 2}
+  c 1
+  addUserKnob {7 pivot R -4 4}
+  addUserKnob {7 off l offset R -0.1 0.1}
+  addUserKnob {7 ex R 0 10}
+  ex {{pow(2,exposure)}}
+  addUserKnob {7 p R 0 4}
+  p {{0.18*pow(2,pivot)}}
+  addUserKnob {7 o R -0.1 0.1}
+  o {{this.off}}
+ }
+ Output {
+  name Output
+  xpos -150
+  ypos -154
+ }
+end_group
