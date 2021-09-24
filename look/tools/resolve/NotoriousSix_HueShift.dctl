@@ -1,0 +1,79 @@
+/* Notorious Six Hue Shift
+    v0.0.1
+    Written by Jed Smith
+    github.com/jedypod/open-display-transform
+*/
+
+#include "libDTColorMath.h"
+
+DEFINE_UI_PARAMS(sy, yellow, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(sr, red, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(sm, magenta, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(sb, blue, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(sc, cyan, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(sg, green, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(sc_h, custom hue, DCTLUI_SLIDER_FLOAT, 100, 0, 360, 0)
+DEFINE_UI_PARAMS(sc_w, custom width, DCTLUI_SLIDER_FLOAT, 0.3, 0, 2, 0)
+DEFINE_UI_PARAMS(sc0, shift 0, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(sc1, shift 1, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(sc2, shift 2, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+
+
+__DEVICE__ float extract_hue_angle(float h, float o, float ch, float w) {
+  // Given hue, offset, width, and chroma, extract hue angle
+  float hc = linwinf(2.0f - w, 2.0f, 2.0f, 2.0f + w, _fmod(h + o, 6.0f));
+  hc = _smoothstepf(0.0f, 1.0f, hc);
+  hc *= ch;
+  return hc;
+}
+
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
+{
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  // max(r,g,b) norm
+  float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  
+  // RGB Ratios
+  float3 rats;
+  if (n == 0.0f) rats = make_float3(0.0f, 0.0f, 0.0f);
+  else rats = rgb / n;
+  // rats = clamp_min_f3(rats, -1.0f);
+
+  // chroma simplifies to 1 - min(r,g,b) in rgb ratios
+  float ch = 1.0f - _fminf(rats.x, _fminf(rats.y, rats.z));
+  float h = hue(rats);
+
+  // hue extraction for primaries (RGB)
+  float3 hep = make_float3(
+    extract_hue_angle(h, 2.0f, ch, 1.0f),
+    extract_hue_angle(h, 6.0f, ch, 1.0f),
+    extract_hue_angle(h, 4.0f, ch, 1.0f));
+
+  // hue extraction for secondaries (CMY)
+  float3 hes = make_float3(
+    extract_hue_angle(h, 5.0f, ch, 1.0f),
+    extract_hue_angle(h, 3.0f, ch, 1.0f),
+    extract_hue_angle(h, 1.0f, ch, 1.0f));
+
+  rats.x = (rats.x - sb) * hep.z + (rats.x + sg) * hep.y + rats.x * (1.0f - (hep.z + hep.y));
+  rats.y = (rats.y + sr) * hep.x + (rats.y + sb) * hep.z + rats.y * (1.0f - (hep.x + hep.z));
+  rats.z = (rats.z - sr) * hep.x + (rats.z - sg) * hep.y + rats.z * (1.0f - (hep.x + hep.y));
+  
+  float bm = 1.5f; // boost max
+  rats.x = _fminf(bm, rats.x + sy) * hes.z + _fminf(bm, rats.x - sm) * hes.y + rats.x * (1.0f - (hes.z + hes.y));
+  rats.y = _fminf(bm, rats.y + sc) * hes.x + _fminf(bm, rats.y - sy) * hes.z + rats.y * (1.0f - (hes.x + hes.z));
+  rats.z = _fminf(bm, rats.z - sc) * hes.x + _fminf(bm, rats.z + sm) * hes.y + rats.z * (1.0f - (hes.x + hes.y));
+
+  float hc = extract_hue_angle(h, sc_h / 60.0f, ch, sc_w);
+
+  // HueShift Custom
+  rats.x = _fminf(bm, rats.x + sc2) * hc + _fminf(bm, rats.x - sc1) * hc + rats.x * (1.0f - (hc + hc));
+  rats.y = _fminf(bm, rats.y + sc0) * hc + _fminf(bm, rats.y - sc2) * hc + rats.y * (1.0f - (hc + hc));
+  rats.z = _fminf(bm, rats.z - sc0) * hc + _fminf(bm, rats.z + sc1) * hc + rats.z * (1.0f - (hc + hc));
+  
+
+  rgb = rats * n;
+  return rgb;
+}

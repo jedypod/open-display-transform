@@ -1,0 +1,375 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name NotoriousSix_HueShift
+ tile_color 0x53617700
+ addUserKnob {20 NotoriousSix_HueShift_tab l NotoriousSix_HueShift}
+ addUserKnob {7 sy l yellow R -1 1}
+ addUserKnob {7 sr l red R -1 1}
+ addUserKnob {7 sm l magenta R -1 1}
+ addUserKnob {7 sb l blue R -1 1}
+ addUserKnob {7 sc l cyan R -1 1}
+ addUserKnob {7 sg l green R -1 1}
+ addUserKnob {20 custom_grp l "custom hue angle shift" n 1}
+ custom_grp 0
+ addUserKnob {7 sc_h l "custom hue" t "center for custom hue extraction" R 0 360}
+ sc_h 100
+ addUserKnob {7 sc_w l "custom width" t "width for custom hue extraction"}
+ sc_w 0.3
+ addUserKnob {41 sc0 l "shift 0" T Shift_Custom1.sc0}
+ addUserKnob {41 sc1 l "shift 1" T Shift_Custom1.sc1}
+ addUserKnob {41 sc2 l "shift 2" T Shift_Custom1.sc2}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {41 maskChannelMask l mask -STARTLINE T NodeWrapper1.maskChannelMask}
+ addUserKnob {41 invert_mask l invert -STARTLINE T NodeWrapper1.invert_mask}
+ addUserKnob {41 mix T NodeWrapper1.mix}
+}
+ Input {
+  inputs 0
+  name Inputmask
+  xpos -150
+  ypos 375
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos -260
+  ypos -442
+ }
+ Dot {
+  name Dot104
+  xpos -226
+  ypos -342
+ }
+set N71bf8100 [stack 0]
+ Dot {
+  name Dot105
+  xpos -446
+  ypos -342
+ }
+ Expression {
+  channel0 rgba
+  expr0 max(r,g,b)
+  channel3 none
+  name Norm
+  xpos -480
+  ypos -298
+ }
+ Dot {
+  name Dot2
+  xpos -446
+  ypos -222
+ }
+set N73bf6b00 [stack 0]
+ Dot {
+  name Dot106
+  xpos -446
+  ypos 282
+ }
+push $N73bf6b00
+push $N71bf8100
+ MergeExpression {
+  inputs 2
+  temp_name0 n
+  temp_expr0 Ar
+  expr0 n==0?0:r/n
+  expr1 n==0?0:g/n
+  expr2 n==0?0:b/n
+  name RGBRatios
+  xpos -260
+  ypos -226
+ }
+ Expression {
+  temp_name0 th
+  temp_expr0 -1
+  expr0 max(th,r)
+  expr1 max(th,g)
+  expr2 max(th,b)
+  name ClampMin
+  xpos -260
+  ypos -200
+ }
+ Dot {
+  name Dot7
+  xpos -226
+  ypos -174
+ }
+set N73bf4f00 [stack 0]
+ Dot {
+  name Dot9
+  xpos -116
+  ypos -174
+ }
+set N73bf4800 [stack 0]
+ Expression {
+  channel0 rgba
+  expr0 1-min(r,g,b)
+  channel1 none
+  channel2 none
+  channel3 none
+  name ch3
+  xpos -150
+  ypos -130
+ }
+ Dot {
+  name Dot3
+  note_font "Helvetica Bold"
+  note_font_size 24
+  note_font_color 0xff
+  xpos -116
+  ypos -78
+ }
+set N793f7900 [stack 0]
+push $N73bf4800
+ Expression {
+  temp_name0 M
+  temp_expr0 max(r,g,b)
+  temp_name1 C
+  temp_expr1 M-min(r,g,b)
+  channel0 rgba
+  expr0 (C==0?0:r==M?((g-b)/C+6)%6:g==M?(b-r)/C+2:b==M?(r-g)/C+4:0)
+  name Hue2
+  xpos 290
+  ypos -178
+ }
+ Dot {
+  name Dot8
+  xpos 324
+  ypos -54
+ }
+set N793f6b00 [stack 0]
+ Expression {
+  temp_name0 h
+  temp_expr0 (r+o)%6
+  temp_name1 wl
+  temp_expr1 h<e1?clamp((h-e0)/(e1-e0)):clamp((h-e3)/(e2-e3))
+  temp_name2 ws
+  temp_expr2 wl*wl*(3-2*wl)
+  channel0 rgba
+  expr0 sm?ws:wl
+  name LinearWindow1
+  label Custom
+  xpos 290
+  ypos 176
+  addUserKnob {20 Param}
+  addUserKnob {7 o l offset R 0 6}
+  o {{sc_h/60}}
+  addUserKnob {7 e0 R 0 4}
+  e0 {{2-sc_w}}
+  addUserKnob {7 e1 R 0 4}
+  e1 2
+  addUserKnob {7 e2 R 0 4}
+  e2 2
+  addUserKnob {7 e3 R 0 4}
+  e3 {{2+sc_w}}
+  addUserKnob {6 sm l smoothstep +STARTLINE}
+  sm true
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 Ar
+  expr0 r*m*(1-f)+r*f
+  expr1 g*m*(1-f)+g*f
+  expr2 b*m*(1-f)+b*f
+  name MultiplyLerp3
+  xpos -40
+  ypos 182
+  addUserKnob {20 Params}
+  addUserKnob {7 m R 0 4}
+ }
+push $N793f7900
+push $N793f6b00
+ Expression {
+  temp_name0 h0
+  temp_expr0 (r+o0)%6
+  temp_name1 h1
+  temp_expr1 (r+o1)%6
+  temp_name2 h2
+  temp_expr2 (r+o2)%6
+  expr0 clamp(h0>c0?(h0-c0-f0)/(c0-(c0+f0)):(h0-(c0-f0))/(c0-(c0-f0)))
+  expr1 clamp(h1>c1?(h1-c1-f1)/(c1-(c1+f1)):(h1-(c1-f1))/(c1-(c1-f1)))
+  expr2 clamp(h2>c2?(h2-c2-f2)/(c2-(c2+f2)):(h2-(c2-f2))/(c2-(c2-f2)))
+  channel3 none
+  name LerpWindow1
+  label CMY
+  xpos 180
+  ypos 32
+  addUserKnob {20 Param}
+  addUserKnob {7 o0 R 0 6}
+  o0 5
+  addUserKnob {7 o1 R 0 6}
+  o1 3
+  addUserKnob {7 o2 R 0 6}
+  o2 1
+  addUserKnob {26 ""}
+  addUserKnob {7 c0 R 1 3}
+  c0 2
+  addUserKnob {7 f0 R 0.2 1.2}
+  f0 1
+  addUserKnob {7 c1 R 1 3}
+  c1 2
+  addUserKnob {7 f1 R 0.2 1.2}
+  f1 1
+  addUserKnob {7 c2 R 1 3}
+  c2 2
+  addUserKnob {7 f2 R 0.2 1.2}
+  f2 1
+ }
+ Expression {
+  expr0 r*r*(3-2*r)
+  expr1 g*g*(3-2*g)
+  expr2 b*b*(3-2*b)
+  name SmoothStepInput4
+  xpos 180
+  ypos 86
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 Ar
+  expr0 r*m*(1-f)+r*f
+  expr1 g*m*(1-f)+g*f
+  expr2 b*m*(1-f)+b*f
+  name MultiplyLerp2
+  xpos -40
+  ypos 86
+  addUserKnob {20 Params}
+  addUserKnob {7 m R 0 4}
+ }
+push $N793f7900
+push $N793f6b00
+ Expression {
+  temp_name0 h0
+  temp_expr0 (r+o0)%6
+  temp_name1 h1
+  temp_expr1 (r+o1)%6
+  temp_name2 h2
+  temp_expr2 (r+o2)%6
+  expr0 clamp(h0>c0?(h0-c0-f0)/(c0-(c0+f0)):(h0-(c0-f0))/(c0-(c0-f0)))
+  expr1 clamp(h1>c1?(h1-c1-f1)/(c1-(c1+f1)):(h1-(c1-f1))/(c1-(c1-f1)))
+  expr2 clamp(h2>c2?(h2-c2-f2)/(c2-(c2+f2)):(h2-(c2-f2))/(c2-(c2-f2)))
+  channel3 none
+  name LerpWindow8
+  label RGB
+  xpos 180
+  ypos -64
+  addUserKnob {20 Param}
+  addUserKnob {7 o0 R 0 6}
+  o0 2
+  addUserKnob {7 o1 R 0 6}
+  o1 6
+  addUserKnob {7 o2 R 0 6}
+  o2 4
+  addUserKnob {26 ""}
+  addUserKnob {7 c0 R 1 3}
+  c0 2
+  addUserKnob {7 f0 R 0.2 1.2}
+  f0 1
+  addUserKnob {7 c1 R 1 3}
+  c1 2
+  addUserKnob {7 f1 R 0.2 1.2}
+  f1 1
+  addUserKnob {7 c2 R 1 3}
+  c2 2
+  addUserKnob {7 f2 R 0.2 1.2}
+  f2 1
+ }
+ Expression {
+  expr0 r*r*(3-2*r)
+  expr1 g*g*(3-2*g)
+  expr2 b*b*(3-2*b)
+  name SmoothStepInput3
+  xpos 180
+  ypos -10
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 Ar
+  expr0 r*m*(1-f)+r*f
+  expr1 g*m*(1-f)+g*f
+  expr2 b*m*(1-f)+b*f
+  name MultiplyLerp1
+  xpos -40
+  ypos -10
+  addUserKnob {20 Params}
+  addUserKnob {7 m R 0 4}
+ }
+push $N73bf4f00
+ MergeExpression {
+  inputs 2
+  expr0 (r-sb)*Ab+(r+sg)*Ag+r*(1-(Ab+Ag))
+  expr1 (g+sr)*Ar+(g+sb)*Ab+g*(1-(Ar+Ab))
+  expr2 (b-sr)*Ar+(b-sg)*Ag+b*(1-(Ar+Ag))
+  name Shift_RGB
+  xpos -260
+  ypos -10
+  addUserKnob {20 Params}
+  addUserKnob {7 sr R -1 1}
+  sr {{parent.sr}}
+  addUserKnob {7 sg R -1 1}
+  sg {{parent.sg}}
+  addUserKnob {7 sb R -1 1}
+  sb {{parent.sb}}
+ }
+ MergeExpression {
+  inputs 2
+  expr0 min(mx.0,r+sy)*Ab+min(mx.0,r-sm)*Ag+r*(1-(Ab+Ag))
+  expr1 min(mx.1,g+sc)*Ar+min(mx.1,g-sy)*Ab+g*(1-(Ar+Ab))
+  expr2 min(mx.2,b-sc)*Ar+min(mx.2,b+sm)*Ag+b*(1-(Ar+Ag))
+  name Shift_CMY1
+  xpos -260
+  ypos 86
+  addUserKnob {20 Params}
+  addUserKnob {7 sc R -1 1}
+  sc {{parent.sc}}
+  addUserKnob {7 sm R -1 1}
+  sm {{parent.sm}}
+  addUserKnob {7 sy R -1 1}
+  sy {{parent.sy}}
+  addUserKnob {78 mx n 3}
+  mx {1.5 1.5 1.5}
+ }
+ MergeExpression {
+  inputs 2
+  expr0 min(mx.0,r+sc2)*Ab+min(mx.0,r-sc1)*Ag+r*(1-(Ab+Ag))
+  expr1 min(mx.1,g+sc0)*Ar+min(mx.1,g-sc2)*Ab+g*(1-(Ar+Ab))
+  expr2 min(mx.2,b-sc0)*Ar+min(mx.2,b+sc1)*Ag+b*(1-(Ar+Ag))
+  name Shift_Custom1
+  xpos -260
+  ypos 182
+  addUserKnob {20 Params}
+  addUserKnob {7 sc0 R -1 1}
+  addUserKnob {7 sc1 R -1 1}
+  addUserKnob {7 sc2 R -1 1}
+  addUserKnob {78 mx n 3}
+  mx {1.5 1.5 1.5}
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 n
+  temp_expr0 Ar
+  expr0 n*r
+  expr1 n*g
+  expr2 n*b
+  name Recombine
+  xpos -260
+  ypos 278
+ }
+push $N71bf8100
+ NodeWrapper {
+  inputs 2+1
+  channels rgb
+  name NodeWrapper1
+  xpos -260
+  ypos 375
+ }
+ Output {
+  name Output
+  xpos -260
+  ypos 481
+ }
+end_group
