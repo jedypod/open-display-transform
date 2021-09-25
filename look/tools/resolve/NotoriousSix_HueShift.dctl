@@ -1,10 +1,9 @@
 /* Notorious Six Hue Shift
-    v0.0.1
+    v0.0.2
     Written by Jed Smith
     github.com/jedypod/open-display-transform
 */
 
-#include "libDTColorMath.h"
 
 DEFINE_UI_PARAMS(sy, yellow, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(sr, red, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
@@ -17,20 +16,48 @@ DEFINE_UI_PARAMS(sc_w, custom width, DCTLUI_SLIDER_FLOAT, 0.3, 0, 2, 0)
 DEFINE_UI_PARAMS(sc0, shift 0, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(sc1, shift 1, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(sc2, shift 2, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(zs, zone range, DCTLUI_SLIDER_FLOAT, 0, -6, 6, 0)
+DEFINE_UI_PARAMS(ze, zoned, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(zi, invert zone, DCTLUI_CHECK_BOX, 0)
 
+
+__DEVICE__ float extract(float e0, float e1, float x) {
+  // Extract a range from e0 to e1 from f, clamping values above or below.
+  return _clampf((x - e0) / (e1 - e0), 0.0f, 1.0f);
+}
+
+__DEVICE__ float extract_window(float e0, float e1, float e2, float e3, float x) {
+  // Linear window function to extract a range from float x
+  // https://www.desmos.com/calculator/uzsk5ta5v7
+  return x < e1 ? extract(e0, e1, x) : extract(e3, e2, x);
+}
 
 __DEVICE__ float extract_hue_angle(float h, float o, float ch, float w) {
   // Given hue, offset, width, and chroma, extract hue angle
-  float hc = linwinf(2.0f - w, 2.0f, 2.0f, 2.0f + w, _fmod(h + o, 6.0f));
-  hc = _smoothstepf(0.0f, 1.0f, hc);
+  float hc = extract_window(2.0f - w, 2.0f, 2.0f, 2.0f + w, _fmod(h + o, 6.0f));
+  hc = hc * hc * (3.0f - 2.0f * hc); // smoothstep
   hc *= ch;
   return hc;
+}
+
+__DEVICE__ float hue(float3 rgb) {
+  // Calculate and return hue in degrees between 0 and 6
+  float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  float mn = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
+  float ch = mx - mn;
+  float h;
+  if (ch == 0.0f) h = 0.0f;
+  else if (mx == rgb.x) h = _fmod((rgb.y - rgb.z) / ch + 6.0f, 6.0f);
+  else if (mx == rgb.y) h = (rgb.z - rgb.x) / ch + 2.0f;
+  else if (mx == rgb.z) h = (rgb.x - rgb.y) / ch + 4.0f;
+  return h;
 }
 
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
 {
   float3 rgb = make_float3(p_R, p_G, p_B);
+  float3 in = rgb;
 
   // max(r,g,b) norm
   float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
@@ -75,5 +102,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   
 
   rgb = rats * n;
+
+  if (ze == 1) {
+    float f = _powf(n / (n + 1.0f), _powf(2.0f, zs));
+    if (zi == 1) f = 1.0f - f;
+    rgb = in * (1.0f - f) + rgb * f;
+  }
+
   return rgb;
 }
