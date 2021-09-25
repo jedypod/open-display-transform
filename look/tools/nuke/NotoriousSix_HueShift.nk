@@ -3,7 +3,8 @@ push $cut_paste_input
 Group {
  name NotoriousSix_HueShift
  tile_color 0x53617700
- addUserKnob {20 NotoriousSix_HueShift_tab l NotoriousSix_HueShift}
+ addUserKnob {20 HueShift_tab l HueShift}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Notorious Six HueShift</b> created by Jed Smith\n<br>v0.0.2 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look>documentation</a><br>"}
  addUserKnob {7 sy l yellow R -1 1}
  addUserKnob {7 sr l red R -1 1}
  addUserKnob {7 sm l magenta R -1 1}
@@ -20,7 +21,10 @@ Group {
  addUserKnob {41 sc1 l "shift 1" T Shift_Custom1.sc1}
  addUserKnob {41 sc2 l "shift 2" T Shift_Custom1.sc2}
  addUserKnob {20 endGroup n -1}
- addUserKnob {26 "" +STARTLINE}
+ addUserKnob {6 ze l zoned t "enable zone limiting." +STARTLINE}
+ addUserKnob {6 zi l "invert zone" t "effect range in midtones and shadows instead of highlights" -STARTLINE}
+ addUserKnob {7 zs l "zone range" t "set range affected by hue shift. lower values affect more midtones and shadows, higher values affect less." R -4 4}
+ addUserKnob {26 ""}
  addUserKnob {41 maskChannelMask l mask -STARTLINE T NodeWrapper1.maskChannelMask}
  addUserKnob {41 invert_mask l invert -STARTLINE T NodeWrapper1.invert_mask}
  addUserKnob {41 mix T NodeWrapper1.mix}
@@ -29,7 +33,7 @@ Group {
   inputs 0
   name Inputmask
   xpos -150
-  ypos 375
+  ypos 398
   number 1
  }
  Input {
@@ -43,7 +47,13 @@ Group {
   xpos -226
   ypos -342
  }
-set N71bf8100 [stack 0]
+set Ne56a400 [stack 0]
+ Dot {
+  name Dot1
+  xpos -336
+  ypos -342
+ }
+set Ne569d00 [stack 0]
  Dot {
   name Dot105
   xpos -446
@@ -60,16 +70,36 @@ set N71bf8100 [stack 0]
  Dot {
   name Dot2
   xpos -446
-  ypos -222
+  ypos -246
  }
-set N73bf6b00 [stack 0]
+set Ne568800 [stack 0]
  Dot {
   name Dot106
   xpos -446
   ypos 282
  }
-push $N73bf6b00
-push $N71bf8100
+set Ne568100 [stack 0]
+push $Ne569d00
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 pow(Ar/(Ar+1),p)
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 r
+  expr1 g
+  expr2 b
+  expr3 zi?1-f:f
+  name Extract
+  selected true
+  xpos -370
+  ypos 326
+  addUserKnob {20 Params}
+  addUserKnob {7 p R 0 64}
+  p {{pow(2,zs)}}
+ }
+push $Ne568100
+push $Ne568800
+push $Ne56a400
  MergeExpression {
   inputs 2
   temp_name0 n
@@ -79,7 +109,7 @@ push $N71bf8100
   expr2 n==0?0:b/n
   name RGBRatios
   xpos -260
-  ypos -226
+  ypos -250
  }
  Expression {
   temp_name0 th
@@ -96,13 +126,13 @@ push $N71bf8100
   xpos -226
   ypos -174
  }
-set N73bf4f00 [stack 0]
+set Na4422400 [stack 0]
  Dot {
   name Dot9
   xpos -116
   ypos -174
  }
-set N73bf4800 [stack 0]
+set Na4421d00 [stack 0]
  Expression {
   channel0 rgba
   expr0 1-min(r,g,b)
@@ -115,14 +145,11 @@ set N73bf4800 [stack 0]
  }
  Dot {
   name Dot3
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
   xpos -116
   ypos -78
  }
-set N793f7900 [stack 0]
-push $N73bf4800
+set Na4420f00 [stack 0]
+push $Na4421d00
  Expression {
   temp_name0 M
   temp_expr0 max(r,g,b)
@@ -139,7 +166,7 @@ push $N73bf4800
   xpos 324
   ypos -54
  }
-set N793f6b00 [stack 0]
+set Na4420100 [stack 0]
  Expression {
   temp_name0 h
   temp_expr0 (r+o)%6
@@ -180,8 +207,8 @@ set N793f6b00 [stack 0]
   addUserKnob {20 Params}
   addUserKnob {7 m R 0 4}
  }
-push $N793f7900
-push $N793f6b00
+push $Na4420f00
+push $Na4420100
  Expression {
   temp_name0 h0
   temp_expr0 (r+o0)%6
@@ -239,8 +266,8 @@ push $N793f6b00
   addUserKnob {20 Params}
   addUserKnob {7 m R 0 4}
  }
-push $N793f7900
-push $N793f6b00
+push $Na4420f00
+push $Na4420100
  Expression {
   temp_name0 h0
   temp_expr0 (r+o0)%6
@@ -298,7 +325,7 @@ push $N793f6b00
   addUserKnob {20 Params}
   addUserKnob {7 m R 0 4}
  }
-push $N73bf4f00
+push $Na4422400
  MergeExpression {
   inputs 2
   expr0 (r-sb)*Ab+(r+sg)*Ag+r*(1-(Ab+Ag))
@@ -359,17 +386,28 @@ push $N73bf4f00
   xpos -260
   ypos 278
  }
-push $N71bf8100
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 ze?Aa:1
+  expr0 Ar*(1-f)+Br*f
+  expr1 Ag*(1-f)+Bg*f
+  expr2 Ab*(1-f)+Bb*f
+  name Mix
+  xpos -260
+  ypos 327
+ }
+push $Ne56a400
  NodeWrapper {
   inputs 2+1
   channels rgb
   name NodeWrapper1
   xpos -260
-  ypos 375
+  ypos 398
  }
  Output {
   name Output
   xpos -260
-  ypos 481
+  ypos 470
  }
 end_group
