@@ -20,7 +20,7 @@ DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, r
 DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
 DEFINE_UI_PARAMS(sx, sx, DCTLUI_SLIDER_FLOAT, 0.7, 0.7, 20, 0.0)
 DEFINE_UI_PARAMS(sy, sy, DCTLUI_SLIDER_FLOAT, 1.04, 1.0, 1.24, 0.0)
-DEFINE_UI_PARAMS(p, contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1, 1.6, 0.0)
+DEFINE_UI_PARAMS(p, contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1, 2.0, 0.0)
 DEFINE_UI_PARAMS(fl, flare, DCTLUI_SLIDER_FLOAT, 0.01, 0.0, 0.02, 0.001)
 DEFINE_UI_PARAMS(dch, dechroma, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(sat, saturation, DCTLUI_SLIDER_FLOAT, 1.2, 0.5, 1.5, 0.0)
@@ -167,7 +167,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     float np = _powf(nt / sy, 1.0f / p);
     float ns = (np/(1.0f - np)) * sx;
     float ccf = ns == 0.0f ? 0.0f : _powf(_powf(nt, 1.0f / p) / ns, dch) * sat;
-    lms = (n * (ccf - 1.0f) + lms) / ccf * ns / n;
+    lms = (n * (ccf - 1.0f) + lms) / ccf * (ns / sx) / n;
     lms *= catd65;
     xyz = mult_f3_f33(lms, tlms_to_xyz);
     rgb = mult_f3_f33(xyz, xyz_to_in);

@@ -5,14 +5,13 @@
       https://github.com/jedypod/open-display-transform
 */
 
-#include "libDTColorMath.h"
-
 DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
 DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 0, {sdr_rec1886, sdr_srgb, sdr_applep3, sdr_rec2020, hdr_rec2020_pq_100nit, hdr_rec2020_pq_600nit, hdr_rec2020_pq_1000nit, hdr_rec2020_hlg_1000nit, hdr_rec2020_pq_2000nit, hdr_rec2020_pq_4000nit, hdr_p3d65_pq_100nit, hdr_p3d65_pq_600nit, hdr_p3d65_pq_1000nit, hdr_p3d65_pq_2000nit, hdr_p3d65_pq_4000nit, dci_p3d60, dci_p3d65, dci_p3dci, dci_dcdm}, {Rec.1886: 2.4 Power | Rec.709, sRGB Display: 2.2 Power | Rec.709, Apple Display P3: 2.2 Power | P3D65, Rec.2020: 2.4 Power | Rec.2020, Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit, Rec.2100: HLG | Rec.2020 | 1000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit, Dolby: ST 2084 PQ | P3D65 | 100 nit, Dolby: ST 2084 PQ | P3D65 | 600 nit, Dolby: ST 2084 PQ | P3D65 | 1000 nit, Dolby: ST 2084 PQ | P3D65 | 2000 nit, Dolby: ST 2084 PQ | P3D65 | 4000 nit, DCI: 2.6 Power | P3 D60, DCI: 2.6 Power | P3 D65, DCI: 2.6 Power | P3 DCI, DCI: 2.6 Power | DCDM XYZ})
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93})
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
 
+#include "libDTColorMath.h"
 
 __CONSTANT__ wpnorm wnd50 = {1.09063f, 1.1408f, 1.09928f, 1.2469f, 1.17646f, 1.0f};
 __CONSTANT__ wpnorm wnd55 = {1.05337f, 1.08334f, 1.04391f, 1.18409f, 1.10416f, 1.0f};
@@ -116,10 +115,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (preset == hdr_p3d65_pq_2000nit) Lw = 2000.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
   else if (preset == hdr_p3d65_pq_4000nit) Lw = 4000.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
 
-  // Display output normalization
-  const float ds = eotf == 4 ? Lw / 10000.0f : eotf == 5 ? Lw / 1000.0f : preset == dci_dcdm ? 48.0f / 52.37f : 1.0f;
-  // Display maximum for display-linear clamp.
-  const float clamp_max = preset == dci_dcdm ? 1.0f : ds;
   
   const float3x3 display_to_xyz = inv_f33(xyz_to_display);
 
@@ -166,6 +161,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   const float sx = 0.016f * _powf(Lw, 0.87f) - 0.17f;
   const float sy = 1.036f + 0.00005f * Lw;
 
+  // Display output normalization
+  const float ds = eotf == 4 ? Lw / 10000.0f : eotf == 5 ? Lw / 1000.0f : preset == dci_dcdm ? 48.0f / 52.37f : 1.0f;
+  // Display maximum for display-linear clamp.
+  const float clamp_max = preset == dci_dcdm ? 1.0f : ds;
+  
 
   // R G B weights for vector length norm. Affects luminance and chroma of output color.
   const float3 vw = make_float3(0.25f, 0.1f, 0.09f);
@@ -307,7 +307,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     float ccf = ns == 0.0f ? 0.0f : _powf(_powf(nt, 1.0f / p) / ns, dch) * sat;
 
     // chroma expand
-    lms = (n * (ccf - 1.0f) + lms) / ccf * ns / n;
+    lms = (n * (ccf - 1.0f) + lms) / ccf * (ns / sx) / n;
 
     // Inverse D65 Normalization
     lms *= catd65;

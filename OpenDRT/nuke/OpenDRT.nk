@@ -194,7 +194,7 @@ push $N2932dd00
   temp_name2 ns
   temp_expr2 (pow(nt/sy,1/p)/(1-pow(nt/sy,1/p)))*sx
   temp_name3 ccf
-  temp_expr3 pow(ns==0?0:pow(nt,1/p)/ns,dch)*sat
+  temp_expr3 pow(ns==0?0:pow(nt,1/p)/(ns/sx),dch)*sat
   expr0 n==0?0:(n*(ccf-1)+r)/ccf*ns/n
   expr1 n==0?0:(n*(ccf-1)+g)/ccf*ns/n
   expr2 n==0?0:(n*(ccf-1)+b)/ccf*ns/n
