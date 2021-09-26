@@ -8,7 +8,7 @@ Here you will find some tools to create look modification transforms, as well as
   Very simple chromaticity-preserving scene-linear grade operator: `offset -> pivoted contrast -> exposure`  
   ![LinearGrade UI](docs/img/ui/LinearGrade_ResolveUI.png)
 - **NotoriousSix_HueShift** : [Nuke](tools/nuke/NotoriousSix_HueShift.nk) | [Resolve](tools/resolve/NotoriousSix_HueShift.dctl)  
-  Hue shift tool. Allows smooth shifts of hue per hue angle, for each of the primary and secondary colors: RGB, CMY. With an additional hue shift for a custom angle and width. Preset is for orange. You can also enable a zoned range selection, which will limit the hue shift to a range of input luminance, depending on how you set the zone range slider. Lower values include more midtones and shadows, higher less.
+  Hue shift tool. Allows smooth shifts of hue per hue angle, for each of the primary and secondary colors: RGB, CMY. With an additional hue shift for a custom angle and width. Preset is for orange. You can also enable a zoned range selection, which will limit the hue shift to a range of input luminance, depending on how you set the zone range slider. Lower values include more midtones and shadows, higher less.  
   ![HueShift UI](docs/img/ui/NotoriousSix_HueShift_ResolveUI.png)
 
 ## Look Presets
