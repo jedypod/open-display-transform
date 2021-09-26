@@ -1,0 +1,54 @@
+/* 
+*/
+
+DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(out_gamut, out gamut, DCTLUI_COMBO_BOX, 1, {o_ap0, o_ap1, o_p3d65, o_rec2020, o_rec709, o_awg, o_rwg, o_sgamut3, o_blackmagicwg, o_egamut, o_davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
+
+
+#include "libDTColorMath.h"
+
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
+{
+
+  float3 rgb = make_float3(p_R, p_G, p_B);
+  
+  float3x3 in_to_xyz;
+  if (in_gamut == ap0)                in_to_xyz = matrix_ap0_to_xyz;
+  else if (in_gamut == ap1)           in_to_xyz = matrix_ap1_to_xyz;
+  else if (in_gamut == p3d65)         in_to_xyz = matrix_p3d65_to_xyz;
+  else if (in_gamut == rec2020)       in_to_xyz = matrix_rec2020_to_xyz;
+  else if (in_gamut == rec709)        in_to_xyz = matrix_rec709_to_xyz;
+  else if (in_gamut == awg)           in_to_xyz = matrix_arriwg_to_xyz;
+  else if (in_gamut == rwg)           in_to_xyz = matrix_redwg_to_xyz;
+  else if (in_gamut == sgamut3)       in_to_xyz = matrix_sonysgamut3;
+  else if (in_gamut == blackmagicwg)  in_to_xyz = matrix_blackmagicwg_to_xyz;
+  else if (in_gamut == egamut)        in_to_xyz = matrix_egamut_to_xyz;
+  else if (in_gamut == davinciwg)     in_to_xyz = matrix_davinciwg_to_xyz;
+
+  float3x3 xyz_to_out;
+  if (out_gamut == ap0)                xyz_to_out = inv_f33(matrix_ap0_to_xyz);
+  else if (out_gamut == ap1)           xyz_to_out = inv_f33(matrix_ap1_to_xyz);
+  else if (out_gamut == p3d65)         xyz_to_out = inv_f33(matrix_p3d65_to_xyz);
+  else if (out_gamut == rec2020)       xyz_to_out = inv_f33(matrix_rec2020_to_xyz);
+  else if (out_gamut == rec709)        xyz_to_out = inv_f33(matrix_rec709_to_xyz);
+  else if (out_gamut == awg)           xyz_to_out = inv_f33(matrix_arriwg_to_xyz);
+  else if (out_gamut == rwg)           xyz_to_out = inv_f33(matrix_redwg_to_xyz);
+  else if (out_gamut == sgamut3)       xyz_to_out = inv_f33(matrix_sonysgamut3);
+  else if (out_gamut == blackmagicwg)  xyz_to_out = inv_f33(matrix_blackmagicwg_to_xyz);
+  else if (out_gamut == egamut)        xyz_to_out = inv_f33(matrix_egamut_to_xyz);
+  else if (out_gamut == davinciwg)     xyz_to_out = inv_f33(matrix_davinciwg_to_xyz);
+
+
+  if (invert == 1) {
+    rgb = mult_f3_f33(rgb, inv_f33(xyz_to_out));
+    rgb = mult_f3_f33(rgb, inv_f33(in_to_xyz));
+  } else {
+    rgb = mult_f3_f33(rgb, in_to_xyz);
+    rgb = mult_f3_f33(rgb, xyz_to_out);
+  }
+
+  return rgb;
+  
+}

@@ -1,0 +1,47 @@
+/* 
+*/
+
+DEFINE_UI_PARAMS(in_curve, in curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
+DEFINE_UI_PARAMS(out_curve, out curve, DCTLUI_COMBO_BOX, 0, {o_linear, o_acescct, o_arri_logc, o_red_log3g10, o_sony_slog3, o_blackmagic_film_gen5, o_filmlight_tlog, o_davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
+DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
+
+
+#include "libDTColorMath.h"
+
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
+{
+
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  int itf;
+  if (in_curve == linear)                     itf = 0;
+  else if (in_curve == acescct)               itf = 1;
+  else if (in_curve == arri_logc)             itf = 2;
+  else if (in_curve == red_log3g10)           itf = 3;
+  else if (in_curve == sony_slog3)            itf = 4;
+  else if (in_curve == filmlight_tlog)        itf = 5;
+  else if (in_curve == davinci_intermediate)  itf = 6;
+  else if (in_curve == blackmagic_film_gen5)  itf = 7;
+
+  int otf;
+  if (out_curve == linear)                     otf = 0;
+  else if (out_curve == o_acescct)               otf = 1;
+  else if (out_curve == o_arri_logc)             otf = 2;
+  else if (out_curve == o_red_log3g10)           otf = 3;
+  else if (out_curve == o_sony_slog3)            otf = 4;
+  else if (out_curve == o_filmlight_tlog)        otf = 5;
+  else if (out_curve == o_davinci_intermediate)  otf = 6;
+  else if (out_curve == o_blackmagic_film_gen5)  otf = 7;
+
+  if (invert == 1) {
+    rgb = log2lin(rgb, otf);
+    rgb = lin2log(rgb, itf);
+  } else {
+    rgb = log2lin(rgb, itf);
+    rgb = lin2log(rgb, otf);
+  }
+
+  return rgb;
+  
+}
