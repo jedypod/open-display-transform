@@ -209,14 +209,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     float3 dlms = lms * nt / n;
 
     // Compress chroma: chromaticity-linear desaturation by ccf
-    // _mixf3(nt, dlms, ccf);
     dlms = nt * (1.0f - ccf) + dlms * ccf;
 
     dlms = clamp_min_f3(dlms, 0.0f);
     float3 yrg = lms_to_yrg(dlms, 1);
     yrg.y = compress_parabolic(yrg.y, 0.3f, 0.5f, 0.45f);
     dlms = yrg_to_lms(yrg, 1);
-
 
     // Apply output creative output whitepoint scale to both scene lms and display lms
     // Also normalize by w_n so that channels are not pushed above display peak luminance. 
@@ -273,6 +271,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
         - Gamut compression not included in inverse
         - Perceptual dechroma not included in inverse    
     */
+    
+    rgb = clamp_max_f3(clamp_min_f3(rgb, 0.0f), 1.0f);
 
     // Forward EOTF
     float eotf_p = 2.0f + eotf * 0.2f;
@@ -304,16 +304,31 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     float nt = (n + _sqrtf(n * (4.0f * fl + n))) / 2.0f;
     float np = _powf(nt / sy, 1.0f / p);
     float ns = (np/(1.0f - np)) * sx;
-    float ccf = ns == 0.0f ? 0.0f : _powf(_powf(nt, 1.0f / p) / ns, dch) * sat;
+    float ccf = ns == 0.0f ? 0.0f : _powf(_powf(nt, 1.0f / p) / (ns / sx), dch) * sat;
 
     // chroma expand
-    lms = (n * (ccf - 1.0f) + lms) / ccf * (ns / sx) / n;
+    float3 dlms = (n * (ccf - 1.0f) + lms) / ccf * ns / n;
 
     // Inverse D65 Normalization
+    dlms *= catd65;
     lms *= catd65;
 
     // LMS to XYZ
-    xyz = mult_f3_f33(lms, tlms_to_xyz);
+    xyz = mult_f3_f33(dlms, tlms_to_xyz);
+
+    // Un-Distort chromaticity-linear chroma compression along perceptual hue paths using JzAzBz
+    if (pdch == 1) {
+      float3 jz = xyz_to_jzazbz(xyz, 1);
+    
+      // Scene-linear XYZ tristimulus without any chroma compression. To use as our source hue.
+      float3 xyz_ndc = mult_f3_f33(lms, tlms_to_xyz);
+      float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
+      
+      // Copy hue from jz_ndc: Effectively warps the hue from perceptual to chromaticity-linear.
+      jz.z = jz_ndc.z;
+    
+      xyz = jzazbz_to_xyz(jz, 1);
+    }
 
     // XYZ to input gamut.
     rgb = mult_f3_f33(xyz, xyz_to_in);
