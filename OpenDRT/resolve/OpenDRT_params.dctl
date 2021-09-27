@@ -122,15 +122,17 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     float ccf = _powf(sx / (n + sx), dch) * sat;
     float3 dlms = lms * nt / n;
     dlms = nt * (1.0f - ccf) + dlms * ccf;
-    float3 yrg = lms_to_yrg(dlms, 1);
-    yrg.y = compress_parabolic(yrg.y, 0.3f, 0.5f, 0.45f);
-    dlms = yrg_to_lms(yrg, 1);
+    if (gcmp == 1) {
+      float3 yrg = lms_to_yrg(dlms, 1);
+      yrg.y = compress_parabolic(yrg.y, 0.3f, 0.5f, 0.45f);
+      dlms = yrg_to_lms(yrg, 1);
+    }
     dlms *= cats / w_n;
     lms *= cats / w_n;
     float3 xyz = mult_f3_f33(dlms, tlms_to_xyz);
     if (pdch == 1) {
       float3 jz = xyz_to_jzazbz(xyz, 1);
-      jz.y = compress_parabolic(jz.y, 0.018f, 0.048f, 0.022f);
+      if (gcmp == 1) jz.y = compress_parabolic(jz.y, 0.018f, 0.048f, 0.022f);
       float3 xyz_ndc = mult_f3_f33(lms, tlms_to_xyz);
       float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
       jz.z = jz_ndc.z;
