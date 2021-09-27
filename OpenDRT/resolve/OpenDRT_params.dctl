@@ -149,6 +149,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     }
 
   } else {
+    rgb = clamp_max_f3(clamp_min_f3(rgb, 0.0f), 1.0f);
     float eotf_p = 2.0f + eotf * 0.2f;
     if ((eotf > 0) && (eotf < 4)) {
       rgb = powf3(rgb, eotf_p);
@@ -165,11 +166,19 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     n = _fmaxf(1e-12f, _fminf(0.999f, n));
     float nt = (n + _sqrtf(n * (4.0f * fl + n))) / 2.0f;
     float np = _powf(nt / sy, 1.0f / p);
-    float ns = (np/(1.0f - np)) * sx;
-    float ccf = ns == 0.0f ? 0.0f : _powf(_powf(nt, 1.0f / p) / ns, dch) * sat;
-    lms = (n * (ccf - 1.0f) + lms) / ccf * (ns / sx) / n;
+    float ns = (np / (1.0f - np)) * sx;
+    float ccf = ns == 0.0f ? 0.0f : _powf(_powf(nt, 1.0f / p) / (ns / sx), dch) * sat;
+    float3 dlms = (n * (ccf - 1.0f) + lms) / ccf * ns / n;
+    dlms *= catd65;
     lms *= catd65;
-    xyz = mult_f3_f33(lms, tlms_to_xyz);
+    xyz = mult_f3_f33(dlms, tlms_to_xyz);
+    if (pdch == 1) {
+      float3 jz = xyz_to_jzazbz(xyz, 1);
+      float3 xyz_ndc = mult_f3_f33(lms, tlms_to_xyz);
+      float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
+      jz.z = jz_ndc.z;
+      xyz = jzazbz_to_xyz(jz, 1);
+    }
     rgb = mult_f3_f33(xyz, xyz_to_in);
     rgb = lin2log(rgb, tf);
   }
