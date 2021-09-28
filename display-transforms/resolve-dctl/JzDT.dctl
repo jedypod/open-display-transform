@@ -1,0 +1,173 @@
+/*  JzDT 
+      A simple display transform based on JzAzBz LMS.
+      Uses a chromaticity-linear rendering, with perceptual chroma compression
+      hue-path compensation using the JzAzBz perceptual color model.
+      Uses a max(r,g,b) norm, and a simple tonescale based on the 
+      Michaelis-Menten model of enzyme kinetics, which has been shown to 
+      describe the response of photoreceptor cells to stimulus.
+    ---------------------------------------------------------------------------
+      v0.0.1
+      Written by Jed Smith
+      https://github.com/jedypod/open-display-transform
+
+      Requires ./libDTColorMath.h
+    -------------------------------------------------
+*/
+
+
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
+DEFINE_UI_PARAMS(Lw, Lw, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 4000.0, 10.0)
+DEFINE_UI_PARAMS(dch, dechroma, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(sat, saturation, DCTLUI_SLIDER_FLOAT, 1.2, 0.5, 1.5, 0.0)
+DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
+DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 4, {Rec2020, P3D65, P3D60, P3DCI, Rec709, DCDM}, {Rec.2020, P3 D65, P3 D60, P3 DCI, Rec.709, DCDM XYZ})
+DEFINE_UI_PARAMS(surround, surround, DCTLUI_COMBO_BOX, 1, {average, dim, dark}, {average, dim, dark})
+DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+// DEFINE_UI_PARAMS(euc, euclidean, DCTLUI_CHECK_BOX, 0) // euclidean distance norm
+DEFINE_UI_PARAMS(pdch, perceptual dechroma, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(gcmp, gamut compress, DCTLUI_CHECK_BOX, 1)
+
+#include "libDTColorMath.h"
+
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
+{
+
+  float3x3 in_to_xyz;
+  if (in_gamut == ap0)                in_to_xyz = matrix_ap0_to_xyz;
+  else if (in_gamut == ap1)           in_to_xyz = matrix_ap1_to_xyz;
+  else if (in_gamut == p3d65)         in_to_xyz = matrix_p3d65_to_xyz;
+  else if (in_gamut == rec2020)       in_to_xyz = matrix_rec2020_to_xyz;
+  else if (in_gamut == rec709)        in_to_xyz = matrix_rec709_to_xyz;
+  else if (in_gamut == awg)           in_to_xyz = matrix_arriwg_to_xyz;
+  else if (in_gamut == rwg)           in_to_xyz = matrix_redwg_to_xyz;
+  else if (in_gamut == sgamut3)       in_to_xyz = matrix_sonysgamut3;
+  else if (in_gamut == blackmagicwg)  in_to_xyz = matrix_blackmagicwg_to_xyz;
+  else if (in_gamut == egamut)        in_to_xyz = matrix_egamut_to_xyz;
+  else if (in_gamut == davinciwg)     in_to_xyz = matrix_davinciwg_to_xyz;
+
+  const float3x3 xyz_to_in = inv_f33(in_to_xyz);
+
+  int tf;
+  if (in_curve == linear)                     tf = 0;
+  else if (in_curve == acescct)               tf = 1;
+  else if (in_curve == arri_logc)             tf = 2;
+  else if (in_curve == red_log3g10)           tf = 3;
+  else if (in_curve == sony_slog3)            tf = 4;
+  else if (in_curve == filmlight_tlog)        tf = 5;
+  else if (in_curve == davinci_intermediate)  tf = 6;
+  else if (in_curve == blackmagic_film_gen5)  tf = 7;
+
+  float3x3 xyz_to_display;
+  if (display_gamut == Rec2020)       xyz_to_display = inv_f33(matrix_rec2020_to_xyz);
+  else if (display_gamut == P3D65)    xyz_to_display = inv_f33(matrix_p3d65_to_xyz);
+  else if (display_gamut == P3D60)    xyz_to_display = inv_f33(matrix_p3d60_to_xyz);
+  else if (display_gamut == P3DCI)    xyz_to_display = inv_f33(matrix_p3dci_to_xyz);
+  else if (display_gamut == Rec709)   xyz_to_display = inv_f33(matrix_rec709_to_xyz);
+  else if (display_gamut == DCDM)     xyz_to_display = identity_mtx;
+
+  const float3x3 display_to_xyz = inv_f33(xyz_to_display);
+
+  // Surround compensation
+  float ps;
+  if (surround == average)    ps = 0.9f;
+  else if (surround == dim)   ps = 0.95f;
+  else if (surround == dark)  ps = 1.0f;
+
+  int eotf;
+  if (EOTF == lin)          eotf = 0;
+  else if (EOTF == srgb)    eotf = 1;
+  else if (EOTF == rec1886) eotf = 2;
+  else if (EOTF == dci)     eotf = 3;
+  else if (EOTF == pq)      eotf = 4;
+  else if (EOTF == hlg)     eotf = 5;
+
+  const float ds = eotf == 4 ? Lw / 10000.0f : eotf == 5 ? Lw / 1000.0f : 1.0f;
+  
+  // Calculate tonescale parameters
+  const float c = 12.0f * _powf(Lw, -0.86f) + 1.17f;
+  const float p = c * ps;
+  const float fl = 1.0f / Lw;
+  const float sx = 0.016f * _powf(Lw, 0.87f) - 0.17f;
+  const float sy = 1.036f + 0.00005f * Lw;
+
+
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+
+  /* Forward Display Rendering 
+     ----------------------------------------------------------- */
+
+  if (invert == 0) {
+    rgb = log2lin(rgb, tf);
+    float3 xyz = mult_f3_f33(rgb, in_to_xyz);
+    float3 lms = xyz_to_jzlms(xyz);
+
+    // Tonescale: https://www.desmos.com/calculator/ssx2a1bpsz
+    float n = _fmaxf(lms.x, _fmaxf(lms.y, lms.z));
+    // if (euc == 1) n = _sqrtf(lms.x * lms.x + lms.y*lms.y+lms.z*lms.z)/_sqrtf(3.0f);
+    float ns = sy * _powf(n / (n + sx), p);
+    float nt = ns * ns / (ns + fl);
+    float ccf = _powf(sx / (n + sx), dch) * sat;
+    float3 dlms = lms * nt / n;
+    dlms = nt * (1.0f - ccf) + dlms * ccf;
+    xyz = jzlms_to_xyz(dlms);
+    
+    if (pdch == 1) {
+      float3 jz = xyz_to_jzazbz(xyz, 1);
+      if (gcmp == 1) jz.y = compress_parabolic(jz.y, 0.015f, 0.05f, 0.03f);
+      float3 xyz_ndc = jzlms_to_xyz(lms);
+      float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
+      jz.z = jz_ndc.z;
+      xyz = jzazbz_to_xyz(jz, 1);
+    }
+    
+    rgb = mult_f3_f33(xyz, xyz_to_display);
+    rgb *= ds;
+
+    rgb = clamp_f3(rgb, 0.0f, 1.0f);
+    float eotf_p = 2.0f + eotf * 0.2f;
+    if ((eotf > 0) && (eotf < 4)) {
+      rgb = powf3(rgb, 1.0f / eotf_p);
+    } else if (eotf == 4) {
+      rgb = eotf_pq(rgb, 1, 0);
+    } else if (eotf == 5) {
+      rgb = eotf_hlg(rgb, 1);
+    }
+  } else {
+    rgb = clamp_max_f3(clamp_min_f3(rgb, 0.0f), 1.0f);
+    float eotf_p = 2.0f + eotf * 0.2f;
+    if ((eotf > 0) && (eotf < 4)) {
+      rgb = powf3(rgb, eotf_p);
+    } else if (eotf == 4) {
+      rgb = eotf_pq(rgb, 0, 0);
+    } else if (eotf == 5) {
+      rgb = eotf_hlg(rgb, 0);
+    }
+    rgb /= ds;
+    float3 xyz = mult_f3_f33(rgb, display_to_xyz);
+    float3 lms = xyz_to_jzlms(xyz);
+
+    // Inverse Tonescale
+    float n = _fmaxf(lms.x, _fmaxf(lms.y, lms.z));
+    n = _fmaxf(1e-12f, _fminf(0.999f, n));
+    float nt = (n + _sqrtf(n * (4.0f * fl + n))) / 2.0f;
+    float np = _powf(nt / sy, 1.0f / p);
+    float ns = (np / (1.0f - np)) * sx;
+    float ccf = ns == 0.0f ? 0.0f : _powf(_powf(nt, 1.0f / p) / (ns / sx), dch) * sat;
+    float3 dlms = (n * (ccf - 1.0f) + lms) / ccf * ns / n;
+    
+    xyz = jzlms_to_xyz(dlms);
+    if (pdch == 1) {
+      float3 jz = xyz_to_jzazbz(xyz, 1);
+      float3 xyz_ndc = jzlms_to_xyz(lms);
+      float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
+      jz.z = jz_ndc.z;
+      xyz = jzazbz_to_xyz(jz, 1);
+    }
+    rgb = mult_f3_f33(xyz, xyz_to_in);
+    rgb = lin2log(rgb, tf);
+  }
+  return rgb;
+}
