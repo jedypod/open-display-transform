@@ -8,6 +8,18 @@
 */
 
 
+
+/* ##########################################################################
+    Constants
+    ---------------------------
+*/
+
+__CONSTANT__ float pi = 3.14159265358979323846f;
+__CONSTANT__ float pi2 = 1.57079632679489661923f;
+__CONSTANT__ float pi4 = 0.785398163397448309616f;
+
+
+
 /* ##########################################################################
     Custom Structs
     ---------------------------
@@ -48,12 +60,23 @@ typedef struct {
 #define matrix_davinciwg_to_xyz make_float3x3(make_float3(0.700622320175f, 0.148774802685f, 0.101058728993f), make_float3(0.274118483067f, 0.873631775379f, -0.147750422359f), make_float3(-0.098962903023f, -0.137895315886, 1.325916051865f))
 #define matrix_blackmagicwg_to_xyz make_float3x3(make_float3(0.606538414955f, 0.220412746072f, 0.123504832387f), make_float3(0.267992943525f, 0.832748472691f, -0.100741356611f), make_float3(-0.029442556202f, -0.086612440646, 1.205112814903f))
 
+
 /* Matrix for conversion from CIE 1931 XYZ tristumulus to CIE 2006 LMS or "Truelight LMS", described in:
     "Chromaticity Coordinates for Graphic Arts Based on CIE 2006 LMS with Even Spacing of Munsell Colours" by Richard Kirk
     https://doi.org/10.2352/issn.2169-2629.2019.27.38
 */
 #define matrix_xyz_to_truelightlms make_float3x3(make_float3(0.257085f, 0.859943f, -0.031061f), make_float3(-0.394427, 1.175800f, 0.106423f), make_float3(0.064856f, -0.07625f, 0.559067f))
 
+
+/* Custom rendering gamut for "rgbDT" display transform
+    rxy 0.859 0.264
+    gxy 0.137 1.12
+    bxy 0.085 -0.096
+    wxy 0.3127 0.329
+*/
+#define matrix_rgbdt_to_xyz make_float3x3(make_float3(0.72113842f, 0.11148937f, 0.11782813f), make_float3(0.22163042f, 0.91144598f, -0.13307647f), make_float3(-0.10325963f, -0.20914429f, 1.40146172f))
+// 10% Rec.709 weighted desaturation
+#define matrix_rgbdt_desat make_float3x3(make_float3(0.921264f, 0.0715169f, 0.00721923f), make_float3(0.0212639f, 0.971517f, 0.00721923f), make_float3(0.0212639f, 0.0715169f, 0.907219f))
 
 // Whitepoint scaling factors for Truelight LMS
 // eg: (1, 1, 1) in RGB (D65 whitepoint) -> XYZ -> TLMS /= catd65 *= catd55 -> XYZ -> Yxy == D65 white
@@ -76,6 +99,8 @@ typedef struct {
     ---------------------------------
 */
 
+__DEVICE__ float _radians(float d) {return d * (pi / 180.0f);}
+__DEVICE__ float _degrees(float r) {return r * (180.0f / pi);}
 
 __DEVICE__ float3 sqrtf3(float3 a) {
   // For each component of float3 a, compute the square-root
@@ -120,9 +145,67 @@ __DEVICE__ float3 spowf3(float3 a, float b) {
     _sign(a.z)*_powf(_fabs(a.z), b));
 }
 
-// __DEVICE__ float __mix(float a float b float f) {
-    // Linear interpolation between a and b by factor f. Extrapolates.
-// }
+__DEVICE__ float _mixf(float a, float b, float f) {
+  // Linear interpolation between float a and float b by factor f. Extrapolates.
+  return a * (1.0f - f) + b * f;
+}
+
+__DEVICE__ float3 _mixf3(float3 a, float3 b, float f) {
+  // Linear interpolation between float3 a and float3 b by factor f. Extrapolates.
+  return make_float3(_mixf(a.x, b.x, f), _mixf(a.y, b.y, f), _mixf(a.z, b.z, f));
+}
+
+__DEVICE__ float _smoothstepf(float e0, float e1, float x) {
+  // return smoothstep of float x between e0 and e1
+  x = _clampf((x - e0) / (e1 - e0), 0.0f, 1.0f);
+  return x * x * (3.0f - 2.0f * x);
+}
+
+__DEVICE__ float3 _smoothstepf3(float e0, float e1, float3 x) {
+  // return smoothstep of float3 x between e0 and e1
+  return make_float3(_smoothstepf(e0, e1, x.x), _smoothstepf(e0, e1, x.y), _smoothstepf(e0, e1, x.z));
+}
+
+__DEVICE__ float extract(float e0, float e1, float x) {
+  // Extract a range from e0 to e1 from f, clamping values above or below.
+  return _clampf((x - e0) / (e1 - e0), 0.0f, 1.0f);
+}
+
+__DEVICE__ float extract_window(float e0, float e1, float e2, float e3, float x) {
+  // Linear window function to extract a range from float x
+  // https://www.desmos.com/calculator/uzsk5ta5v7
+  return x < e1 ? extract(e0, e1, x) : extract(e3, e2, x);
+}
+
+__DEVICE__ float3 extract_window_f3(float e0, float e1, float e2, float e3, float3 x) {
+  // Linear window function to extract a range from float3 x
+  return make_float3(extract_window(e0, e1, e2, e3, x.x), extract_window(e0, e1, e2, e3, x.y), extract_window(e0, e1, e2, e3, x.z));
+}
+
+
+__DEVICE__ float chroma(float3 rgb, int norm) {
+  // Calculate and return classical chroma. If norm, normalize by mx
+  float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  float mn = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
+  float ch = mx - mn;
+  if (norm == 1) ch = mx == 0.0f ? 0.0f : ch / mx;
+  return ch;
+}
+
+
+__DEVICE__ float hue(float3 rgb) {
+  // Calculate and return hue in degrees between 0 and 6
+  float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  float mn = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
+  float ch = mx - mn;
+  float h;
+  if (ch == 0.0f) h = 0.0f;
+  else if (mx == rgb.x) h = _fmod((rgb.y - rgb.z) / ch + 6.0f, 6.0f);
+  else if (mx == rgb.y) h = (rgb.z - rgb.x) / ch + 2.0f;
+  else if (mx == rgb.z) h = (rgb.x - rgb.y) / ch + 4.0f;
+  return h;
+}
+
 
 // Helper function to create a float3x3
 __DEVICE__ float3x3 make_float3x3(float3 a, float3 b, float3 c) {
@@ -293,17 +376,21 @@ __DEVICE__ float3 eotf_pq(float3 rgb, int inverse, int jz) {
     m2 *= 1.7f;
     Lp = 10000.0f;
   }
-  
+
   if (inverse == 1) {
     rgb /= Lp;
-    rgb = powf3(rgb, m1);
-    rgb = powf3((c1 + c2 * rgb) / (1.0f + c3 * rgb), m2);
-    return rgb;
+    rgb = spowf3(rgb, m1);
+    // Prevent shitting of the bed when there are negatives, for JzAzBz conversion
+    rgb.x = _sign(rgb.x) * _powf((c1 + c2 * _fabs(rgb.x)) / (1.0f + c3 * _fabs(rgb.x)), m2);
+    rgb.y = _sign(rgb.y) * _powf((c1 + c2 * _fabs(rgb.y)) / (1.0f + c3 * _fabs(rgb.y)), m2);
+    rgb.z = _sign(rgb.z) * _powf((c1 + c2 * _fabs(rgb.z)) / (1.0f + c3 * _fabs(rgb.z)), m2);
   } else {
-    rgb = powf3(rgb, 1.0f / m2);
-    rgb = powf3((rgb - c1) / (c2 - c3 * rgb), 1.0f / m1) * Lp;
-    return rgb;
+    rgb = spowf3(rgb, 1.0f / m2);
+    rgb.x = _sign(rgb.x) * _powf((_fabs(rgb.x) - c1) / (c2 - c3 * _fabs(rgb.x)), 1.0f / m1) * Lp;
+    rgb.y = _sign(rgb.y) * _powf((_fabs(rgb.y) - c1) / (c2 - c3 * _fabs(rgb.y)), 1.0f / m1) * Lp;
+    rgb.z = _sign(rgb.z) * _powf((_fabs(rgb.z) - c1) / (c2 - c3 * _fabs(rgb.z)), 1.0f / m1) * Lp;
   }
+  return rgb;
 }
 
 
@@ -367,47 +454,56 @@ __DEVICE__ float3 ictcp_to_xyz(float3 xyz, float Lw, int cyl) {
 # define matrix_jzazbz_xyz_to_lms make_float3x3(make_float3(0.41479f, 0.579999f, 0.014648f), make_float3(-0.20151f, 1.12065f, 0.0531008f), make_float3(-0.0166008f, 0.2648f, 0.66848f))
 # define matrix_jzazbz_lms_p_to_izazbz make_float3x3(make_float3(0.5f, 0.5f, 0.0f), make_float3(3.524f, -4.06671f, 0.542708f), make_float3(0.199076f, 1.0968f, -1.29588f))
 
+
+__DEVICE__ float3 xyz_to_jzlms(float3 xyz) {
+  float3 lms;
+  lms = make_float3(1.15f * xyz.x - (1.15f - 1.0f) * xyz.z,
+        0.66f * xyz.y - (0.66f - 1.0f) * xyz.x,
+        xyz.z);
+  lms = mult_f3_f33(lms, matrix_jzazbz_xyz_to_lms);
+  return lms;
+}
+
+__DEVICE__ float3 jzlms_to_xyz(float3 lms) {
+  float3 xyz;
+  xyz = mult_f3_f33(lms, inv_f33(matrix_jzazbz_xyz_to_lms));
+  xyz = make_float3(
+    (xyz.x + (1.15f - 1.0f) * xyz.z) / 1.15f,
+    (xyz.y + (0.66f - 1.0f) * ((xyz.x + (1.15f - 1.0f) * xyz.z) / 1.15f)) / 0.66f, 
+    xyz.z);
+  return xyz;
+}
+
+
+
 __DEVICE__ float3 xyz_to_jzazbz(float3 xyz, int cyl) {
   // Convert input XYZ D65 aligned tristimulus values into JzAzBz perceptual colorspace, 
   // if cyl==1: output cylindrical JCh : J = luma, C = chroma, h = hue in radians
-  const float b = 1.15f;
-  const float g = 0.66f;
   const float d = -0.56f;
   const float d_0 = 1.6295499532821565e-11f;
-
-  xyz = make_float3(
-    b * xyz.x - (b - 1.0f) * xyz.z,
-    g * xyz.y - (g-1.0f) * xyz.x,
-    xyz.z);
-  float3 lms = mult_f3_f33(xyz, matrix_jzazbz_xyz_to_lms);
+  float3 lms;
+  lms = xyz_to_jzlms(xyz);
   lms = eotf_pq(lms, 1, 1);
   lms = mult_f3_f33(lms, matrix_jzazbz_lms_p_to_izazbz);
   lms.x = lms.x * (1.0f + d) / (1.0f + d * lms.x) - d_0;
   
   // Convert to cylindrical
   if (cyl == 1) lms = cartesian_to_polar(lms);
-  
+
   return lms;
 }
 
 
 __DEVICE__ float3 jzazbz_to_xyz(float3 jz, int cyl) {
-  const float _b = 1.15f;
-  const float _g = 0.66f;
-  const float _d = -0.56f;
-  const float _d_0 = 1.6295499532821565e-11f;
-
+  const float d = -0.56f;
+  const float d_0 = 1.6295499532821565e-11f;
   // Convert to cartesian
   if (cyl == 1) jz = polar_to_cartesian(jz);
 
-  jz.x = (jz.x + _d_0) / (1.0f + _d - _d * (jz.x + _d_0));
+  jz.x = (jz.x + d_0) / (1.0f + d - d * (jz.x + d_0));
   jz = mult_f3_f33(jz, inv_f33(matrix_jzazbz_lms_p_to_izazbz));
   jz = eotf_pq(jz, 0, 1);
-  jz = mult_f3_f33(jz, inv_f33(matrix_jzazbz_xyz_to_lms));
-  jz = make_float3(
-    (jz.x + (_b-1.0f) * jz.z) / _b,
-    (jz.y + (_g - 1.0f) * ((jz.x + (_b - 1.0f) * jz.z) / _b)) / _g,
-    jz.z);
+  jz = jzlms_to_xyz(jz);
   return jz;
 }
 
