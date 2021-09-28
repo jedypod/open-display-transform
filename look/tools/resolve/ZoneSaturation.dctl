@@ -1,0 +1,118 @@
+/* ZoneSaturation
+    A zoned saturation control with per-hue angle controls.
+    The zones are defined by a hyperbolic extraction of input
+
+    Input should be scene-linear.
+    Requires ./libDTColorMath.h
+  ---------------------------------------------------
+    v0.0.1
+    Written by Jed Smith
+    github.com/jedypod/open-display-transform
+*/
+
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(sat, sat, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(sal, sat low, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(zrl, range low, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(sah, sat high, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(zrh, range high, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(sy, sat yellow, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(sr, sat red, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(sm, sat magenta, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(sb, sat blue, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(sc, sat cyan, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(sg, sat green, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(pch, perceptual, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(zha, zone hue angle, DCTLUI_COMBO_BOX, 1, {none, low, high}, {none, low, high})
+
+#include "libDTColorMath.h"
+
+__DEVICE__ float extract_hue_angle(float h, float o, float w) {
+  // Given hue, offset, width, and chroma, extract hue angle
+  float hc = extract_window(2.0f - w, 2.0f, 2.0f, 2.0f + w, _fmod(h + o, 6.0f));
+  hc = hc * hc * (3.0f - 2.0f * hc); // smoothstep
+  return hc;
+}
+
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
+{
+  float3 rgb, lms, xyz;
+  const float3x3 xyz_to_lms = matrix_xyz_to_truelightlms;
+  const float3x3 lms_to_xyz = inv_f33(matrix_xyz_to_truelightlms);
+
+  // Input gamut conversion to D65 aligned XYZ (CAT: xyz scaling)
+  float3x3 in_to_xyz;
+  if (in_gamut == ap0)                in_to_xyz = matrix_ap0_to_xyz;
+  else if (in_gamut == ap1)           in_to_xyz = matrix_ap1_to_xyz;
+  else if (in_gamut == p3d65)         in_to_xyz = matrix_p3d65_to_xyz;
+  else if (in_gamut == rec2020)       in_to_xyz = matrix_rec2020_to_xyz;
+  else if (in_gamut == rec709)        in_to_xyz = matrix_rec709_to_xyz;
+  else if (in_gamut == awg)           in_to_xyz = matrix_arriwg_to_xyz;
+  else if (in_gamut == rwg)           in_to_xyz = matrix_redwg_to_xyz;
+  else if (in_gamut == sgamut3)       in_to_xyz = matrix_sonysgamut3;
+  else if (in_gamut == blackmagicwg)  in_to_xyz = matrix_blackmagicwg_to_xyz;
+  else if (in_gamut == egamut)        in_to_xyz = matrix_egamut_to_xyz;
+  else if (in_gamut == davinciwg)     in_to_xyz = matrix_davinciwg_to_xyz;
+  const float3x3 xyz_to_in = inv_f33(in_to_xyz);
+  
+
+  rgb = make_float3(p_R, p_G, p_B);
+  
+  xyz = mult_f3_f33(rgb, in_to_xyz);
+  lms = mult_f3_f33(xyz, xyz_to_lms);
+  lms /= catd65;
+  
+  float n = (lms.x + lms.y + lms.z) / 3.0f;
+  float fh = _powf(n / (n + 1.0f), 1.0f / _powf(2.0f, zrh));
+  float fl = _powf(1.0f / (n + 1.0f), 1.0f / _powf(2.0f, zrl));
+  
+  float fha; // factor for hue angle
+  if (zha == none) fha = 1.0f;
+  else if (zha == low) fha = fl;
+  else if (zha == high) fha = fh;
+
+  // Global saturation
+  lms = n * (1.0f - sat) + lms * sat;
+
+  // Zoned saturation low
+  lms = lms * (1.0f - fh) + (n * (1.0f - sah) + lms * sah) * fh;
+
+  // Zoned saturation high
+  lms = lms * (1.0f - fl) + (n * (1.0f - sal) + lms * sal) * fl;
+  
+  // Hue Angle Controls
+  float h = hue(rgb);
+  // hue extraction for primaries (RGB)
+  float3 hep = make_float3(
+    extract_hue_angle(h, 2.0f, 1.0f),
+    extract_hue_angle(h, 6.0f, 1.0f),
+    extract_hue_angle(h, 4.0f, 1.0f));
+  // hue extraction for secondaries (CMY)
+  float3 hes = make_float3(
+    extract_hue_angle(h, 5.0f, 1.0f),
+    extract_hue_angle(h, 3.0f, 1.0f),
+    extract_hue_angle(h, 1.0f, 1.0f));
+  // Per hue angle saturation, mixed by factor hue angle fha  
+  lms.x = lms.x*(1.0f-fha)+((n*(1.0f-sr)+lms.x*sr)*hep.x+(n*(1.0f-sg)+lms.x*sg)*hep.y+(n*(1.0f-sb)+lms.x*sb)*hep.z+lms.x*(1.0f-(hep.x+hep.y+hep.z)))*fha;
+  lms.y = lms.y*(1.0f-fha)+((n*(1.0f-sr)+lms.y*sr)*hep.x+(n*(1.0f-sg)+lms.y*sg)*hep.y+(n*(1.0f-sb)+lms.y*sb)*hep.z+lms.y*(1.0f-(hep.x+hep.y+hep.z)))*fha;
+  lms.z = lms.z*(1.0f-fha)+((n*(1.0f-sr)+lms.z*sr)*hep.x+(n*(1.0f-sg)+lms.z*sg)*hep.y+(n*(1.0f-sb)+lms.z*sb)*hep.z+lms.z*(1.0f-(hep.x+hep.y+hep.z)))*fha;
+
+  lms.x = lms.x*(1.0f-fha)+((n*(1.0f-sc)+lms.x*sc)*hes.x+(n*(1.0f-sm)+lms.x*sm)*hes.y+(n*(1.0f-sy)+lms.x*sy)*hes.z+lms.x*(1.0f-(hes.x+hes.y+hes.z)))*fha;
+  lms.y = lms.y*(1.0f-fha)+((n*(1.0f-sc)+lms.y*sc)*hes.x+(n*(1.0f-sm)+lms.y*sm)*hes.y+(n*(1.0f-sy)+lms.y*sy)*hes.z+lms.y*(1.0f-(hes.x+hes.y+hes.z)))*fha;
+  lms.z = lms.z*(1.0f-fha)+((n*(1.0f-sc)+lms.z*sc)*hes.x+(n*(1.0f-sm)+lms.z*sm)*hes.y+(n*(1.0f-sy)+lms.z*sy)*hes.z+lms.z*(1.0f-(hes.x+hes.y+hes.z)))*fha;
+
+  lms *= catd65;
+  float3 out_xyz = mult_f3_f33(lms, lms_to_xyz);
+
+  if (pch == 1) {
+    float3 jz = xyz_to_jzazbz(out_xyz, 1);
+    float3 jz_nch = xyz_to_jzazbz(xyz, 1);
+    jz.z = jz_nch.z;
+    out_xyz = jzazbz_to_xyz(jz, 1);
+  }
+
+  rgb = mult_f3_f33(out_xyz, xyz_to_in);
+
+  return rgb;
+}
