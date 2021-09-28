@@ -963,11 +963,11 @@ push $Nfdafab00
   ypos 128
   addUserKnob {20 Params_tab l Params}
   addUserKnob {7 t0 t "threshold to start compression\n" R 0 0.1}
-  t0 0.018
+  t0 0.015
   addUserKnob {7 x0 t "x coordinate to compress to" R 0 0.2}
-  x0 0.048
+  x0 0.05
   addUserKnob {7 y0 t "y coordinate to compress to" R 0 0.1}
-  y0 0.022
+  y0 0.025
   addUserKnob {7 s}
   s {{(y0-t0)/sqrt(x0-y0)}}
   addUserKnob {7 ox R -2 2}
