@@ -13,6 +13,7 @@ DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
 
 #include "libDTColorMath.h"
 
+// Whitepoint normalization factors for each possible output display gamut
 __CONSTANT__ wpnorm wnd50 = {1.09063f, 1.1408f, 1.09928f, 1.2469f, 1.17646f, 1.0f};
 __CONSTANT__ wpnorm wnd55 = {1.05337f, 1.08334f, 1.04391f, 1.18409f, 1.10416f, 1.0f};
 __CONSTANT__ wpnorm wnd60 = {1.02355f, 1.037f, 1.00028f, 1.13345f, 1.0461f, 1.0f};
@@ -100,7 +101,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (preset == sdr_applep3) Lw = 100.0f, ps = 0.9f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 1;
   else if (preset == sdr_rec2020) Lw = 100.0f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 2;
   else if (preset == dci_p3d60) Lw = 100.0f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d60_to_xyz), w_n = wn.p3d60, eotf = 3;
-  else if (preset == dci_p3d65) Lw = 100.0f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d60_to_xyz), w_n = wn.p3d60, eotf = 3;
+  else if (preset == dci_p3d65) Lw = 100.0f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 3;
   else if (preset == dci_p3dci) Lw = 100.0f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3dci_to_xyz), w_n = wn.p3dci, eotf = 3;
   else if (preset == dci_dcdm) Lw = 100.0f,  52.37f / 48.0f, ps = 1.0f, sat = 1.2f, xyz_to_display = identity_mtx, w_n = wn.dcdm, eotf = 3;
   else if (preset == hdr_rec2020_pq_100nit) Lw = 100.0f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
