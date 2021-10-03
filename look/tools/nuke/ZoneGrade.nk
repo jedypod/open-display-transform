@@ -1,0 +1,234 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name ZoneGrade
+ addUserKnob {20 ZoneGrade_tab l ZoneGrade}
+ addUserKnob {26 global_label l " @b;global" T " \n"}
+ addUserKnob {7 ge l exposure R -4 4}
+ addUserKnob {7 go l offset R -0.02 0.02}
+ addUserKnob {7 gc l contrast R 0.1 2}
+ gc 1
+ addUserKnob {7 gcp l pivot R -4 4}
+ addUserKnob {26 zones_label l "@b;zones" T "\n"}
+ addUserKnob {20 zones_grp l "" +STARTLINE n -2}
+ addUserKnob {20 z1_grp l "high / low"}
+ addUserKnob {26 zone_high_label l " " T <b>high}
+ addUserKnob {7 he l exposure R -4 4}
+ addUserKnob {7 hp l pivot R -4 4}
+ hp -1
+ addUserKnob {7 hf l falloff}
+ hf 0.6
+ addUserKnob {26 zone_low_label l " " T <b>low}
+ addUserKnob {7 le l exposure R -4 4}
+ addUserKnob {6 lo_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 lp l pivot R -4 4}
+ lp 1
+ addUserKnob {7 lf l falloff}
+ lf 0.6
+ addUserKnob {20 z2_grp l "higher / lower"}
+ addUserKnob {26 zone_higher_label l " " T <b>higher}
+ addUserKnob {7 he2 l exposure R -4 4}
+ addUserKnob {7 hp2 l pivot R -4 4}
+ hp2 1
+ addUserKnob {7 hf2 l falloff}
+ hf2 0.6
+ addUserKnob {26 zone_lower_label l " " T <b>lower}
+ addUserKnob {7 le2 l exposure R -4 4}
+ addUserKnob {6 lo2_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 lp2 l pivot R -4 4}
+ lp2 -1
+ addUserKnob {7 lf2 l falloff}
+ lf2 0.6
+ addUserKnob {20 endGroup n -3}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask T NodeWrapper.maskChannelMask}
+ addUserKnob {41 invert_mask l invert -STARTLINE T NodeWrapper.invert_mask}
+ addUserKnob {41 mix T NodeWrapper.mix}
+}
+ Input {
+  inputs 0
+  name Inputmask
+  xpos -40
+  ypos 62
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos -260
+  ypos -130
+ }
+set Nd7e1600 [stack 0]
+ Expression {
+  temp_name0 n
+  temp_expr0 max(r,g,b)/p
+  temp_name1 s
+  temp_expr1 c==1?m:n>0?pow(n,c-1)*m:1
+  expr0 (r+o)*s
+  expr1 (g+o)*s
+  expr2 (b+o)*s
+  name expr_global
+  xpos -260
+  ypos -82
+  addUserKnob {20 Params}
+  addUserKnob {7 off l offset R -0.1 0.1}
+  off {{go}}
+  addUserKnob {7 ex l exposure R -4 4}
+  ex {{ge}}
+  addUserKnob {7 c l contrast R 0.1 2}
+  c {{gc}}
+  addUserKnob {7 pv l pivot R -4 4}
+  pv {{gcp}}
+  addUserKnob {7 m R 0 10}
+  m {{pow(2,ex)}}
+  addUserKnob {7 p R 0 4}
+  p {{0.18*pow(2,pv)}}
+  addUserKnob {7 o R -0.1 0.1}
+  o {{this.off}}
+ }
+ Expression {
+  temp_name0 n
+  temp_expr0 max(r,g,b)
+  temp_name1 s
+  temp_expr1 n<t0?1:n>x1?(m*(n-x1)+y1)/n:(_a*pow(n,p)+_b)/n
+  expr0 r*s
+  expr1 g*s
+  expr2 b*s
+  name exp_high
+  xpos -260
+  ypos -34
+  addUserKnob {20 Params}
+  addUserKnob {7 ex l exposure R -4 4}
+  ex {{he}}
+  addUserKnob {7 pv l pivot R -4 4}
+  pv {{hp}}
+  addUserKnob {7 fa l falloff}
+  fa {{hf}}
+  addUserKnob {7 f R 0 4}
+  f {{5*pow(fa,1.6)+1}}
+  addUserKnob {7 p R 0 10}
+  p {{fabs(ex+f)<1e-8?1e-8:(ex+f)/f}}
+  addUserKnob {7 m R 0 10}
+  m {{pow(2,ex)}}
+  addUserKnob {7 t0}
+  t0 {{0.18*pow(2,pv)}}
+  addUserKnob {7 _a R -10 10}
+  _a {{pow(t0,1-p)/p}}
+  addUserKnob {7 _b R -10 10}
+  _b {{t0*(1-1/p)}}
+  addUserKnob {7 x1 R -10 10}
+  x1 {{t0*pow(2,f)}}
+  addUserKnob {7 y1 R -10 10}
+  y1 {{_a*pow(x1,p)+_b}}
+ }
+ Expression {
+  temp_name0 n
+  temp_expr0 max(r,g,b)
+  temp_name1 s
+  temp_expr1 n<t0?1:n>x1?(m*(n-x1)+y1)/n:(_a*pow(n,p)+_b)/n
+  expr0 r*s
+  expr1 g*s
+  expr2 b*s
+  name exp_higher
+  xpos -260
+  ypos -10
+  addUserKnob {20 Params}
+  addUserKnob {7 ex l exposure R -4 4}
+  ex {{he2}}
+  addUserKnob {7 pv l pivot R -4 4}
+  pv {{hp2}}
+  addUserKnob {7 fa l falloff}
+  fa {{hf2}}
+  addUserKnob {7 f R 0 4}
+  f {{5*pow(fa,1.6)+1}}
+  addUserKnob {7 p R 0 10}
+  p {{fabs(ex+f)<1e-8?1e-8:(ex+f)/f}}
+  addUserKnob {7 m R 0 10}
+  m {{pow(2,ex)}}
+  addUserKnob {7 t0}
+  t0 {{0.18*pow(2,pv)}}
+  addUserKnob {7 _a R -10 10}
+  _a {{pow(t0,1-p)/p}}
+  addUserKnob {7 _b R -10 10}
+  _b {{t0*(1-1/p)}}
+  addUserKnob {7 x1 R -10 10}
+  x1 {{t0*pow(2,f)}}
+  addUserKnob {7 y1 R -10 10}
+  y1 {{_a*pow(x1,p)+_b}}
+ }
+ Expression {
+  temp_name0 m
+  temp_expr0 max(r,g,b)
+  temp_name1 s
+  temp_expr1 m>t0?1:pow(m,p)*(_a*m+_b)+_c
+  expr0 r*s
+  expr1 g*s
+  expr2 b*s
+  name exp_low
+  xpos -260
+  ypos 38
+  addUserKnob {20 Params}
+  addUserKnob {7 ex l exposure R -4 4}
+  ex {{le}}
+  addUserKnob {7 pv l pivot R -3 3}
+  pv {{lp}}
+  addUserKnob {7 fa l falloff}
+  fa {{lf}}
+  addUserKnob {7 f}
+  f {{6-5*fa}}
+  addUserKnob {7 p R 0 10}
+  p {{min(f/2,f/2*pow(0.5,ex))}}
+  addUserKnob {7 t0}
+  t0 {{0.18*pow(2,pv)}}
+  addUserKnob {7 _a R -10 10}
+  _a {{pow(t0,-p-1)*p*(_c-1)}}
+  addUserKnob {7 _b R -10 10}
+  _b {{-pow(t0,-p)*(_c-1)*(p+1)}}
+  addUserKnob {7 _c R 0 10}
+  _c {{pow(2,ex)}}
+ }
+ Expression {
+  temp_name0 m
+  temp_expr0 max(r,g,b)
+  temp_name1 s
+  temp_expr1 m>t0?1:pow(m,p)*(_a*m+_b)+_c
+  expr0 r*s
+  expr1 g*s
+  expr2 b*s
+  name exp_lower
+  xpos -260
+  ypos 62
+  addUserKnob {20 Params}
+  addUserKnob {7 ex l exposure R -4 4}
+  ex {{le2}}
+  addUserKnob {7 pv l pivot R -3 3}
+  pv {{lp2}}
+  addUserKnob {7 fa l falloff}
+  fa {{lf2}}
+  addUserKnob {7 f}
+  f {{6-5*fa}}
+  addUserKnob {7 p R 0 10}
+  p {{min(f/2,f/2*pow(0.5,ex))}}
+  addUserKnob {7 t0}
+  t0 {{0.18*pow(2,pv)}}
+  addUserKnob {7 _a R -10 10}
+  _a {{pow(t0,-p-1)*p*(_c-1)}}
+  addUserKnob {7 _b R -10 10}
+  _b {{-pow(t0,-p)*(_c-1)*(p+1)}}
+  addUserKnob {7 _c R 0 10}
+  _c {{pow(2,ex)}}
+ }
+push $Nd7e1600
+ NodeWrapper {
+  inputs 2+1
+  channels rgb
+  name NodeWrapper
+  xpos -150
+  ypos 62
+ }
+ Output {
+  name Output
+  xpos -260
+  ypos 134
+ }
+end_group
