@@ -137,33 +137,33 @@ Here is what luminance weighted inverse rgb ratios looks like:
 
 "Forward" rgb ratios are also useful. They look like this. Instead of the achromatic axis being at 0.0, it is at 1.0. This means we can multiply these values to get a "more intense" color in certain regions. I'm not sure how to describe this properly, but it seems like an important facet of this model to achieve vibrant color.
 
-![HueSwatches24_07_rgb_ratios](img/HueSwatches24_07_rgb_ratios.png)
+![HueSwatches24_07_rgb_ratios](img/demo/HueSwatches24_07_rgb_ratios.png)
 
 # Engineering a Path to White
 
 Here is one method to engineer a path to white for high intensity input colors. This time we'll remove the chroma ramp, and keep fully saturated color from top to bottom.
 
-![HueSwatches24_demo_01](img/HueSwatches24_demo_01.png)
+![HueSwatches24_demo_01](img/demo/HueSwatches24_demo_01.png)
 
 And then we will expose up our image to get some insanely bright insanely saturated input colors to test. (Shown here with a simple gamma 2.2 transform - note the collapse towards the secondary colors: cyan magenta and yellow!)
 
-![HueSwatches24_demo_02](img/HueSwatches24_demo_02.png)
+![HueSwatches24_demo_02](img/demo/HueSwatches24_demo_02.png)
 
 We'll take the norm using our max(r,g,b) method (note that this image has the intensity compression curve - the Tonescale already applied for display purposes).
 
-![HueSwatches24_demo_03](img/HueSwatches24_demo_03.png)
+![HueSwatches24_demo_03](img/demo/HueSwatches24_demo_03.png)
 
 From the max(r,g,b) norm, we can calculate the inverse rgb ratios.
 
-![HueSwatches24_demo_04](img/HueSwatches24_demo_04.png)
+![HueSwatches24_demo_04](img/demo/HueSwatches24_demo_04.png)
 
 And the luminance weights
 
-![HueSwatches24_demo_05](img/HueSwatches24_demo_05.png)
+![HueSwatches24_demo_05](img/demo/HueSwatches24_demo_05.png)
 
 We can bias our compressed norm with something like a power function. This specifies how much of the highlight region we want to affect with our path to white.
 
-![HueSwatches24_demo_07](img/HueSwatches24_demo_07.png)
+![HueSwatches24_demo_07](img/demo/HueSwatches24_demo_07.png)
 
 We can then use the luminance weights and the path to white factor, and combine the two, but only in the upper regions of the luminance range. There's more intricacy to this, but I will leave it vague for now as I continue to work on developing the model to be simpler! If you're curious you can dig into the nuke node and poke around.
 
@@ -175,39 +175,39 @@ When a path to white is taken that goes directly from the chromaticity towards t
 
 I am using the excellent and extremely simple [oklab colorspace](https://bottosson.github.io/posts/oklab/) from [Bjorn Ottosson](https://bottosson.github.io). I am only using it to compensate for the path to white, not for the gamut compression, as it seems to behave a bit strangely for hues that are outside of the spectral locus. (Not surprising). Basically what I do is convert source and destination rgb ratios to oklab LCh cylindrical. Since we are operating on rgb ratios independently from luminance, we shouldn't see much of a luminance shift. Destination rgb ratios have had the path to white applied. We copy hue from source to destination, and then inverse back to render gamut rgb.
 
-![nodes_perceptual](img/nodes_perceptual.png)
+![nodes_perceptual](img/ui/nodes_perceptual.png)
 
 Here are two hue swatches: a pure blue, and a pure red, rendered through the display transform with a path to white applied. Note the purple and pinkish hues on the blue and red as it goes towards white.
 
-![perceptual_01_abney](img/perceptual_01_abney.png)
+![perceptual_01_abney](img/demo/perceptual_01_abney.png)
 
 Here is the same image with the oklab perceptual model applied.
 
-![perceptual_02_oklab](img/perceptual_02_oklab.png)
+![perceptual_02_oklab](img/demo/perceptual_02_oklab.png)
 
 And here is the notorious blue bar image, rendered through the Open Display Transform. First with a chromaticity linear path to white.
 
-![perceptual_03](img/perceptual_03.png)
+![perceptual_03](img/demo/perceptual_03.png)
 
 And next with a perceptually adjusted path to white.
 
-![perceptual_04](img/perceptual_04.png)
+![perceptual_04](img/demo/perceptual_04.png)
 
 It helps a bit with fire as well. Here is one of the images from the [Output Transform image submissions](www.dropbox.com/sh/zea11rkxkivv7w7/AADM8TB9tmpI9qdLB5JvRb-ra) - an explosion vdb lookdev'd and rendered by Liam Collod. First with a chromaticity-linear path to white.
 
-![perceptual_01](img/perceptual_01.png)
+![perceptual_01](img/demo/perceptual_01.png)
 
 And next with a perceptual path to white.
 
-![perceptual_02](img/perceptual_02.png)
+![perceptual_02](img/demo/perceptual_02.png)
 
 And it even helps preserve tonality in crazy images with really saturated out of gamut colors. First with chromaticity-linear path to white.
 
-![perceptual_05](img/perceptual_05.png)
+![perceptual_05](img/demo/perceptual_05.png)
 
 Next with perceptual path to white.
 
-![perceptual_06](img/perceptual_06.png)
+![perceptual_06](img/demo/perceptual_06.png)
 
 # Gamut Compression
 
@@ -223,22 +223,22 @@ Here is a particularly challenging image we'll use to show what this looks like.
 
 Here is the image rendered through the Open Display Transform node, without perceptual, without gamut compression.
 
-![gamut_compress_01](img/gamut_compress_01.png)
+![gamut_compress_01](img/demo/gamut_compress_01.png)
 
 And here is a plot of the chromaticities of the input image. In this processing, the image was converted from Alexa Wide Gamut linear to ACEScg. Note the chromaticities outside of the spectral locus in the blue corner.
 
-![compress_gamut_chromaticity_plot](img/compress_gamut_chromaticity_plot.png)
+![compress_gamut_chromaticity_plot](img/plot/compress_gamut_chromaticity_plot.png)
 
 If we enable a subtle gamut compression, it helps bring the highly saturated blue colors a bit closer to the achromatic axis, and we get a bit more tonality preserved. Note that the highlights were already pretty well handled by the path to white chroma compression, so it's a small change. Note that in the current implementation this gamut compression is *not* chromaticity linear - it uses the same idea as the GamutCompress tool, so it introduces some hue shifts. For blue hues it actually looks similar to the perceptual model though.
 
-![gamut_compress_02](img/gamut_compress_02.png)
+![gamut_compress_02](img/demo/gamut_compress_02.png)
 
 And if we enable our perceptual path to white processing, it removes some of those subtle purple hues in the highlights.
 
-![gamut_compress_03](img/gamut_compress_03.png)
+![gamut_compress_03](img/demo/gamut_compress_03.png)
 
 Finally, for comparison, here is the ACES Rec.709 Output Transform.
 
-![gamut_compress_04](img/gamut_compress_04.png)
+![gamut_compress_04](img/demo/gamut_compress_04.png)
 
 The artifacts here are are partly due to the lack of gamut mapping in the ACES transform, and partly due to the per-channel nature of the algorithm.
