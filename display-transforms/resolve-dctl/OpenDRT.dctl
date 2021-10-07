@@ -296,6 +296,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // Inverse output creative output whitepoint scale
     lms /= cats;
+    lms = clamp_max_f3(clamp_min_f3(lms, 0.0f), 1.0f);
 
     // Weighted vector length norm
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
