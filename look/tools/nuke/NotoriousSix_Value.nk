@@ -1,0 +1,492 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name NotoriousSix_Value
+ tile_color 0x536177ff
+ addUserKnob {20 NotoriousSix_Value_tab l NotoriousSix_Value}
+ addUserKnob {7 my l yellow R -1 1}
+ addUserKnob {7 mr l red R -1 1}
+ addUserKnob {7 mm l magenta R -1 1}
+ addUserKnob {7 mb l blue R -1 1}
+ addUserKnob {7 mc l cyan R -1 1}
+ addUserKnob {7 mg l green R -1 1}
+ addUserKnob {7 mo l custom R -1 1}
+ addUserKnob {7 sc_h l hue t "center for custom hue extraction" R 0 360}
+ sc_h 100
+ addUserKnob {7 sc_w l width t "width for custom hue extraction"}
+ sc_w 0.3
+ addUserKnob {26 ""}
+ addUserKnob {7 str l strength}
+ str 0.66
+ addUserKnob {6 ze l zoned t "enable zone limiting." +STARTLINE}
+ addUserKnob {4 zr l "" -STARTLINE M {low high ""}}
+ addUserKnob {7 zp l "zone range" t "set range affected: higher values affect a larger range" R -4 4}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask -STARTLINE T NodeWrapper1.maskChannelMask}
+ addUserKnob {41 invert_mask l invert -STARTLINE T NodeWrapper1.invert_mask}
+ addUserKnob {41 mix T NodeWrapper1.mix}
+}
+ Input {
+  inputs 0
+  name Inputmask
+  xpos 290
+  ypos -34
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos 180
+  ypos -778
+ }
+ Dot {
+  name Dot7
+  xpos 214
+  ypos -678
+ }
+set N446db200 [stack 0]
+ Dot {
+  name Dot5
+  xpos 104
+  ypos -678
+ }
+set N446dab00 [stack 0]
+ Dot {
+  name Dot9
+  xpos -6
+  ypos -678
+ }
+ Expression {
+  channel0 rgba
+  expr0 max(r,g,b)
+  channel3 none
+  name norm
+  xpos -40
+  ypos -634
+ }
+set N446d9d00 [stack 0]
+ Dot {
+  name Dot6
+  xpos -6
+  ypos -150
+ }
+set N446d9600 [stack 0]
+push $N446dab00
+ Dot {
+  name Dot27
+  xpos 104
+  ypos -222
+ }
+set N446d8f00 [stack 0]
+ MergeExpression {
+  inputs 2
+  temp_name0 n
+  temp_expr0 Ar
+  temp_name1 to
+  temp_expr1 (n*n/(n+fl))
+  temp_name2 flow
+  temp_expr2 pow((to/(to+1))/n,p)
+  temp_name3 fhi
+  temp_expr3 1-pow((n/(n+1))/n,p)
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 r
+  expr1 g
+  expr2 b
+  expr3 zr?fhi:flow
+  name Extract2
+  selected true
+  xpos 70
+  ypos -106
+  addUserKnob {20 Params}
+  addUserKnob {7 fl R 0 0.02}
+  fl 0.004
+  addUserKnob {7 p R 0 64}
+  p {{pow(2,-zp+1)}}
+ }
+push $N446d9600
+push $N446d9d00
+push $N446db200
+ MergeExpression {
+  inputs 2
+  temp_name0 n
+  temp_expr0 Ar
+  expr0 n==0?0:r/n
+  expr1 n==0?0:g/n
+  expr2 n==0?0:b/n
+  name RGBRatios
+  xpos 180
+  ypos -634
+ }
+ Expression {
+  temp_name0 th
+  temp_expr0 -1
+  expr0 max(th,r)
+  expr1 max(th,g)
+  expr2 max(th,b)
+  name ClampMin
+  xpos 180
+  ypos -610
+ }
+ Dot {
+  name Dot4
+  xpos 214
+  ypos -558
+ }
+set N45edb200 [stack 0]
+ Dot {
+  name Dot15
+  xpos 654
+  ypos -558
+ }
+ Expression {
+  temp_name0 M
+  temp_expr0 max(r,g,b)
+  temp_name1 C
+  temp_expr1 M-min(r,g,b)
+  channel0 rgba
+  expr0 (C==0?0:r==M?((g-b)/C+6)%6:g==M?(b-r)/C+2:b==M?(r-g)/C+4:0)
+  name Hue2
+  xpos 620
+  ypos -538
+ }
+ Dot {
+  name Dot1
+  xpos 654
+  ypos -486
+ }
+set N45ed9d00 [stack 0]
+ Dot {
+  name Dot2
+  xpos 654
+  ypos -390
+ }
+set N45ed9600 [stack 0]
+ Dot {
+  name Dot3
+  xpos 654
+  ypos -246
+ }
+ Expression {
+  temp_name0 h
+  temp_expr0 (r+o)%6
+  temp_name1 wl
+  temp_expr1 h<e1?clamp((h-e0)/(e1-e0)):clamp((h-e3)/(e2-e3))
+  temp_name2 ws
+  temp_expr2 wl*wl*(3-2*wl)
+  channel0 rgba
+  expr0 sm?ws:wl
+  name LinearWindow1
+  label Custom
+  xpos 510
+  ypos -256
+  addUserKnob {20 Param}
+  addUserKnob {7 o l offset R 0 6}
+  o {{sc_h/60}}
+  addUserKnob {7 e0 R 0 4}
+  e0 {{2-sc_w}}
+  addUserKnob {7 e1 R 0 4}
+  e1 2
+  addUserKnob {7 e2 R 0 4}
+  e2 2
+  addUserKnob {7 e3 R 0 4}
+  e3 {{2+sc_w}}
+  addUserKnob {6 sm l smoothstep +STARTLINE}
+ }
+ Expression {
+  temp_name0 pr
+  temp_expr0 1-pow(1-r,p)
+  channel0 rgb
+  expr0 (1-pr)+m*pr
+  expr3 1
+  enable_mix_luminance false
+  mix_luminance 1
+  name Multiply1
+  xpos 400
+  ypos -250
+  addUserKnob {20 Params}
+  addUserKnob {7 m R 0 4}
+  m {{pow(2,mo*4)}}
+  addUserKnob {7 p R 0 4}
+  p {{min(1,2/m)}}
+ }
+push $N45ed9600
+ Expression {
+  temp_name0 h0
+  temp_expr0 (r+o0)%6
+  temp_name1 h1
+  temp_expr1 (r+o1)%6
+  temp_name2 h2
+  temp_expr2 (r+o2)%6
+  expr0 clamp(h0>c0?(h0-c0-f0)/(c0-(c0+f0)):(h0-(c0-f0))/(c0-(c0-f0)))
+  expr1 clamp(h1>c1?(h1-c1-f1)/(c1-(c1+f1)):(h1-(c1-f1))/(c1-(c1-f1)))
+  expr2 clamp(h2>c2?(h2-c2-f2)/(c2-(c2+f2)):(h2-(c2-f2))/(c2-(c2-f2)))
+  expr3 h1
+  name LerpWindow4
+  label CMY
+  xpos 510
+  ypos -400
+  addUserKnob {20 Param}
+  addUserKnob {7 o0 R 0 6}
+  o0 5
+  addUserKnob {7 o1 R 0 6}
+  o1 3
+  addUserKnob {7 o2 R 0 6}
+  o2 1
+  addUserKnob {26 ""}
+  addUserKnob {7 c0 R 1 3}
+  c0 2
+  addUserKnob {7 f0 R 0.2 1.2}
+  f0 1
+  addUserKnob {7 c1 R 1 3}
+  c1 2
+  addUserKnob {7 f1 R 0.2 1.2}
+  f1 1
+  addUserKnob {7 c2 R 1 3}
+  c2 2
+  addUserKnob {7 f2 R 0.2 1.2}
+  f2 1
+ }
+ Expression {
+  temp_name0 pr
+  temp_expr0 1-pow(1-r,p.r)
+  temp_name1 pg
+  temp_expr1 1-pow(1-g,p.g)
+  temp_name2 pb
+  temp_expr2 1-pow(1-b,p.b)
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 (1-pr)+m.r*pr
+  expr1 (1-pg)+m.g*pg
+  expr2 (1-pb)+m.b*pb
+  expr3 1
+  enable_mix_luminance false
+  mix_luminance 1
+  name Multiply5
+  xpos 400
+  ypos -394
+  addUserKnob {20 Params}
+  addUserKnob {18 m R 0 4}
+  m {{pow(2,mc*4)} {pow(2,mm*4)} {pow(2,my*4)}}
+  addUserKnob {6 m_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {18 p R 0 4}
+  p {{min(1,2/m)} {min(1,2/m)} {min(1,2/m)}}
+  addUserKnob {6 p_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ }
+ Expression {
+  channel0 rgba
+  expr0 r*g*b
+  channel3 none
+  name norm9
+  xpos 400
+  ypos -346
+ }
+push $N45ed9d00
+ Expression {
+  temp_name0 h0
+  temp_expr0 (r+o0)%6
+  temp_name1 h1
+  temp_expr1 (r+o1)%6
+  temp_name2 h2
+  temp_expr2 (r+o2)%6
+  expr0 clamp(h0>c0?(h0-c0-f0)/(c0-(c0+f0)):(h0-(c0-f0))/(c0-(c0-f0)))
+  expr1 clamp(h1>c1?(h1-c1-f1)/(c1-(c1+f1)):(h1-(c1-f1))/(c1-(c1-f1)))
+  expr2 clamp(h2>c2?(h2-c2-f2)/(c2-(c2+f2)):(h2-(c2-f2))/(c2-(c2-f2)))
+  channel3 none
+  name LerpWindow8
+  label RGB
+  xpos 510
+  ypos -496
+  addUserKnob {20 Param}
+  addUserKnob {7 o0 R 0 6}
+  o0 2
+  addUserKnob {7 o1 R 0 6}
+  o1 6
+  addUserKnob {7 o2 R 0 6}
+  o2 4
+  addUserKnob {26 ""}
+  addUserKnob {7 c0 R 1 3}
+  c0 2
+  addUserKnob {7 f0 R 0.2 1.2}
+  f0 1
+  addUserKnob {7 c1 R 1 3}
+  c1 2
+  addUserKnob {7 f1 R 0.2 1.2}
+  f1 1
+  addUserKnob {7 c2 R 1 3}
+  c2 2
+  addUserKnob {7 f2 R 0.2 1.2}
+  f2 1
+ }
+ Expression {
+  temp_name0 pr
+  temp_expr0 1-pow(1-r,p.r)
+  temp_name1 pg
+  temp_expr1 1-pow(1-g,p.g)
+  temp_name2 pb
+  temp_expr2 1-pow(1-b,p.b)
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 (1-pr)+m.r*pr
+  expr1 (1-pg)+m.g*pg
+  expr2 (1-pb)+m.b*pb
+  expr3 1
+  enable_mix_luminance false
+  mix_luminance 1
+  name Multiply4
+  xpos 400
+  ypos -490
+  addUserKnob {20 Params}
+  addUserKnob {18 m R 0 4}
+  m {{pow(2,mr*4)} {pow(2,mg*4)} {pow(2,mb*4)}}
+  addUserKnob {6 m_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {18 p R 0 4}
+  p {{min(1,2/m)} {min(1,2/m)} {min(1,2/m)}}
+  addUserKnob {6 p_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ }
+ Expression {
+  channel0 rgba
+  expr0 r*g*b
+  channel3 none
+  name norm10
+  xpos 400
+  ypos -442
+ }
+push $N45edb200
+ Dot {
+  name Dot18
+  xpos 214
+  ypos -510
+ }
+set N43e8b200 [stack 0]
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 min(1,1/Ar)
+  temp_name1 c
+  temp_expr1 min(r,g,b)*(1-f)+f
+  temp_name2 cm
+  temp_expr2 min(r/c,g/c,b/c)
+  channel0 rgb
+  expr0 Ar
+  expr3 pow(cm,p)
+  name chroma_rgb5
+  xpos 290
+  ypos -442
+  addUserKnob {20 Params}
+  addUserKnob {7 p R 0.5 1.5}
+  p {{str}}
+ }
+push $N43e8b200
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 Aa
+  temp_name1 m
+  temp_expr1 Ar
+  expr0 m*r*(1-f)+r*f
+  expr1 m*g*(1-f)+g*f
+  expr2 m*b*(1-f)+b*f
+  name MergeExpression10
+  xpos 180
+  ypos -441
+ }
+set N43e8a400 [stack 0]
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 min(1,1/Ar)
+  temp_name1 c
+  temp_expr1 min(r,g,b)*(1-f)+f
+  temp_name2 cm
+  temp_expr2 min(r/c,g/c,b/c)
+  channel0 rgb
+  expr0 Ar
+  expr3 cm<1?pow(cm,p):pow(cm,p)
+  name chroma_rgb6
+  xpos 290
+  ypos -346
+  addUserKnob {20 Params}
+  addUserKnob {7 p R 0.5 1.5}
+  p {{str}}
+ }
+push $N43e8a400
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 Aa
+  temp_name1 m
+  temp_expr1 Ar
+  expr0 m*r*(1-f)+r*f
+  expr1 m*g*(1-f)+g*f
+  expr2 m*b*(1-f)+b*f
+  name MergeExpression13
+  xpos 180
+  ypos -346
+ }
+set N43e89600 [stack 0]
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 min(1,1/Ar)
+  temp_name1 c
+  temp_expr1 min(r,g,b)*(1-f)+f
+  temp_name2 cm
+  temp_expr2 min(r/c,g/c,b/c)
+  channel0 rgb
+  expr0 Ar
+  expr3 cm<1?pow(cm,p):pow(cm,p)
+  name chroma_rgb1
+  xpos 290
+  ypos -250
+  addUserKnob {20 Params}
+  addUserKnob {7 p R 0.5 1.5}
+  p {{str}}
+ }
+push $N43e89600
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 Aa
+  temp_name1 m
+  temp_expr1 Ar
+  expr0 m*r*(1-f)+r*f
+  expr1 m*g*(1-f)+g*f
+  expr2 m*b*(1-f)+b*f
+  name MergeExpression1
+  xpos 180
+  ypos -250
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 n
+  temp_expr0 Ar
+  expr0 n*r
+  expr1 n*g
+  expr2 n*b
+  name Recombine1
+  xpos 180
+  ypos -154
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 ze?Aa:1
+  expr0 Ar*(1-f)+Br*f
+  expr1 Ag*(1-f)+Bg*f
+  expr2 Ab*(1-f)+Bb*f
+  name Mix1
+  xpos 180
+  ypos -106
+ }
+push $N446d8f00
+ NodeWrapper {
+  inputs 2+1
+  channels rgb
+  name NodeWrapper1
+  xpos 180
+  ypos -34
+ }
+ Output {
+  name Output
+  xpos 180
+  ypos 38
+ }
+end_group
