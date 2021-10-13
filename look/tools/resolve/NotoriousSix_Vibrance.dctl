@@ -66,16 +66,16 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 {
   // Parameter setup
   float3 pp = make_float3(
-    (vr > 0.0f ? (vr + 1.0f) : (vr / 2.0f + 1.0f))*(vi+1.0f),
-    (vg > 0.0f ? (vg + 1.0f) : (vg / 2.0f + 1.0f))*(vi+1.0f),
-    (vb > 0.0f ? (vb + 1.0f) : (vb / 2.0f + 1.0f))*(vi+1.0f));
+    (vr + 1.0f) * (vi + 1.0f),
+    (vg + 1.0f) * (vi + 1.0f),
+    (vb + 1.0f) * (vi + 1.0f));
   float3 ps = make_float3(
-    (vc > 0.0f ? (vc + 1.0f) : (vc / 2.0f + 1.0f))*(vi+1.0f),
-    (vm > 0.0f ? (vm + 1.0f) : (vm / 2.0f + 1.0f))*(vi+1.0f),
-    (vy > 0.0f ? (vy + 1.0f) : (vy / 2.0f + 1.0f))*(vi+1.0f));
+    (vc + 1.0f) * (vi + 1.0f),
+    (vm + 1.0f) * (vi + 1.0f),
+    (vy + 1.0f) * (vi + 1.0f));
 
-  pp = powf3(pp, 2);
-  ps = powf3(ps, 0.5f);
+  // pp = powf3(pp, 2);
+  // ps = powf3(ps, 0.5f);
 
 
   float3 rgb = make_float3(p_R, p_G, p_B);

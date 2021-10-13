@@ -39,13 +39,13 @@ Group {
   xpos 214
   ypos -270
  }
-set N4de98f00 [stack 0]
+set N9d08f200 [stack 0]
  Dot {
   name Dot24
   xpos 104
   ypos -270
  }
-set N4de98800 [stack 0]
+set N9d08eb00 [stack 0]
  Dot {
   name Dot105
   xpos -6
@@ -64,20 +64,20 @@ set N4de98800 [stack 0]
   xpos -6
   ypos -174
  }
-set N73dab200 [stack 0]
+set N9d08d600 [stack 0]
  Dot {
   name Dot106
   xpos -6
   ypos 66
  }
-set N73daab00 [stack 0]
-push $N4de98800
+set N9d08cf00 [stack 0]
+push $N9d08eb00
  Dot {
   name Dot27
   xpos 104
   ypos 90
  }
-set N73daa400 [stack 0]
+set N9d08c800 [stack 0]
  MergeExpression {
   inputs 2
   temp_name0 n
@@ -100,10 +100,10 @@ set N73daa400 [stack 0]
   addUserKnob {7 fl R 0 0.02}
   fl 0.004
   addUserKnob {7 p R 0 64}
-  p {{pow(2,-zp+1)}}
+  p {{pow(2,-zp)}}
  }
-push $N73daab00
-push $N4de98f00
+push $N9d08cf00
+push $N9d08f200
  Expression {
   temp_name0 M
   temp_expr0 max(r,g,b)
@@ -120,7 +120,7 @@ push $N4de98f00
   xpos 544
   ypos -78
  }
-set N73da8f00 [stack 0]
+set N47ed3200 [stack 0]
  Dot {
   name Dot22
   xpos 544
@@ -162,20 +162,7 @@ set N73da8f00 [stack 0]
   addUserKnob {7 f2 R 0.2 1.2}
   f2 1
  }
- Expression {
-  expr0 pow(r,p)
-  expr1 pow(g,p)
-  expr2 pow(b,p)
-  channel3 none
-  maskChannelMask rgba.red
-  name Power1
-  xpos 290
-  ypos -10
-  addUserKnob {20 User}
-  addUserKnob {7 p R 0 4}
-  p 0.5
- }
-push $N73da8f00
+push $N47ed3200
  Expression {
   temp_name0 h0
   temp_expr0 (r+o0)%6
@@ -212,21 +199,8 @@ push $N73da8f00
   addUserKnob {7 f2 R 0.2 1.2}
   f2 1
  }
- Expression {
-  expr0 pow(r,p)
-  expr1 pow(g,p)
-  expr2 pow(b,p)
-  expr3 pow(a,p)
-  maskChannelMask rgba.red
-  name Power2
-  xpos 290
-  ypos -82
-  addUserKnob {20 User}
-  addUserKnob {7 p R 0 4}
-  p 2
- }
-push $N73dab200
-push $N4de98f00
+push $N9d08d600
+push $N9d08f200
  MergeExpression {
   inputs 2
   temp_name0 n
@@ -246,20 +220,20 @@ push $N4de98f00
   expr2 max(th,b)
   name ClampMin
   xpos 180
-  ypos -130
+  ypos -154
  }
  MergeExpression {
   inputs 2
   temp_name0 p0
-  temp_expr0 (mr>0?(mr+1):(mr/2+1))*(vi+1)
+  temp_expr0 (mr+1)*(vi+1)
   temp_name1 p1
-  temp_expr1 (mg>0?(mg/2+1):(mg/2+1))*(vi+1)
+  temp_expr1 (mg+1)*(vi+1)
   temp_name2 p2
-  temp_expr2 (mb>0?(mb+1):(mb/2+1))*(vi+1)
+  temp_expr2 (mb+1)*(vi+1)
   channel0 {rgba.red -rgba.green -rgba.blue none}
-  expr0 sign(r)*pow(fabs(r),p0)*Ar+sign(r)*pow(fabs(r),p1)*Ag+sign(r)*pow(fabs(r),p2)*Ab+r*(1-(Ar+Ag+Ab))
-  expr1 sign(g)*pow(fabs(g),p0)*Ar+sign(g)*pow(fabs(g),p1)*Ag+sign(g)*pow(fabs(g),p2)*Ab+g*(1-(Ar+Ag+Ab))
-  expr2 sign(b)*pow(fabs(b),p0)*Ar+sign(b)*pow(fabs(b),p1)*Ag+sign(b)*pow(fabs(b),p2)*Ab+b*(1-(Ar+Ag+Ab))
+  expr0 pow(r,p0)*Ar+pow(r,p1)*Ag+pow(r,p2)*Ab+r*(1-(Ar+Ag+Ab))
+  expr1 pow(g,p0)*Ar+pow(g,p1)*Ag+pow(g,p2)*Ab+g*(1-(Ar+Ag+Ab))
+  expr2 pow(b,p0)*Ar+pow(b,p1)*Ag+pow(b,p2)*Ab+b*(1-(Ar+Ag+Ab))
   name MergeExpression2
   xpos 180
   ypos -82
@@ -267,15 +241,15 @@ push $N4de98f00
  MergeExpression {
   inputs 2
   temp_name0 p0
-  temp_expr0 (mc>0?(mc+1):(mc/2+1))*(vi+1)
+  temp_expr0 (mc+1)*(vi+1)
   temp_name1 p1
-  temp_expr1 (mm>0?(mm+1):(mm/2+1))*(vi+1)
+  temp_expr1 (mm+1)*(vi+1)
   temp_name2 p2
-  temp_expr2 (my>0?(my+1):(my/2+1))*(vi+1)
+  temp_expr2 (my+1)*(vi+1)
   channel0 {rgba.red -rgba.green -rgba.blue none}
-  expr0 sign(r)*pow(fabs(r),p0)*Ar+sign(r)*pow(fabs(r),p1)*Ag+sign(r)*pow(fabs(r),p2)*Ab+r*(1-(Ar+Ag+Ab))
-  expr1 sign(g)*pow(fabs(g),p0)*Ar+sign(g)*pow(fabs(g),p1)*Ag+sign(g)*pow(fabs(g),p2)*Ab+g*(1-(Ar+Ag+Ab))
-  expr2 sign(b)*pow(fabs(b),p0)*Ar+sign(b)*pow(fabs(b),p1)*Ag+sign(b)*pow(fabs(b),p2)*Ab+b*(1-(Ar+Ag+Ab))
+  expr0 pow(r,p0)*Ar+pow(r,p1)*Ag+pow(r,p2)*Ab+r*(1-(Ar+Ag+Ab))
+  expr1 pow(g,p0)*Ar+pow(g,p1)*Ag+pow(g,p2)*Ab+g*(1-(Ar+Ag+Ab))
+  expr2 pow(b,p0)*Ar+pow(b,p1)*Ag+pow(b,p2)*Ab+b*(1-(Ar+Ag+Ab))
   name MergeExpression3
   xpos 180
   ypos -10
@@ -299,15 +273,15 @@ push $N4de98f00
   expr1 Ag*(1-f)+Bg*f
   expr2 Ab*(1-f)+Bb*f
   name Mix
-  selected true
   xpos 180
   ypos 134
  }
-push $N73daa400
+push $N9d08c800
  NodeWrapper {
   inputs 2+1
   channels rgb
   name NodeWrapper1
+  selected true
   xpos 180
   ypos 206
  }
