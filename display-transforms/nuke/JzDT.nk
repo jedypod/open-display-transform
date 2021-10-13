@@ -824,7 +824,7 @@ set Nfdafab00 [stack 0]
 push $Nfdafab00
  Expression {
   temp_name0 n
-  temp_expr0 max(r,g,b)
+  temp_expr0 max(1e-12,max(r,g,b))
   temp_name1 ns
   temp_expr1 sy*pow(n/(n+sx),p)
   temp_name2 nt

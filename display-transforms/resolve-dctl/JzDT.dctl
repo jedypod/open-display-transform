@@ -106,6 +106,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // Tonescale: https://www.desmos.com/calculator/ssx2a1bpsz
     float n = _fmaxf(lms.x, _fmaxf(lms.y, lms.z));
+    n = _fmaxf(1e-12f, n);
+    
     // if (euc == 1) n = _sqrtf(lms.x * lms.x + lms.y*lms.y+lms.z*lms.z)/_sqrtf(3.0f);
     float ns = sy * _powf(n / (n + sx), p);
     float nt = ns * ns / (ns + fl);
