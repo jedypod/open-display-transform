@@ -115,6 +115,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Zone extract
   if (ze == 1) {
+    n = _fmaxf(1e-12f, n);
     const float fl = 0.004f;
     float zpow = _powf(2.0f, -zp + 1.0f);
     float toe = (n * n / (n + fl));

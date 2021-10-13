@@ -3,7 +3,7 @@ push $cut_paste_input
 Group {
  name NotoriousSix_Vibrance
  tile_color 0x536177ff
- addUserKnob {20 NotoriousSix_Chroma_tab l NotoriousSix_Chroma}
+ addUserKnob {20 NotoriousSix_Vibrance_tab l NotoriousSix_Vibrance}
  addUserKnob {7 vi l global R -1 1}
  addUserKnob {26 ""}
  addUserKnob {7 my l yellow R -1 1}
@@ -81,7 +81,7 @@ set N73daa400 [stack 0]
  MergeExpression {
   inputs 2
   temp_name0 n
-  temp_expr0 Ar
+  temp_expr0 max(1e-12,Ar)
   temp_name1 to
   temp_expr1 (n*n/(n+fl))
   temp_name2 flow
@@ -93,7 +93,7 @@ set N73daa400 [stack 0]
   expr1 g
   expr2 b
   expr3 zr?fhi:flow
-  name Extract2
+  name Extract
   xpos 70
   ypos 134
   addUserKnob {20 Params}

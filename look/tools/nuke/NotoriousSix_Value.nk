@@ -81,7 +81,7 @@ set N446d8f00 [stack 0]
  MergeExpression {
   inputs 2
   temp_name0 n
-  temp_expr0 Ar
+  temp_expr0 max(1e-12,Ar)
   temp_name1 to
   temp_expr1 (n*n/(n+fl))
   temp_name2 flow
@@ -93,7 +93,7 @@ set N446d8f00 [stack 0]
   expr1 g
   expr2 b
   expr3 zr?fhi:flow
-  name Extract2
+  name Extract
   selected true
   xpos 70
   ypos -106
