@@ -115,7 +115,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb = mult_f3_f33(rgb, in_to_xyz);
     float3 lms = mult_f3_f33(rgb, xyz_to_tlms);
     lms /= catd65;
-    lms = minf3(1e-12f, lms);
+    lms = maxf3(1e-12f, lms);
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
     float ns = sy * _powf(n / (n + sx), p);
     float nt = ns * ns / (ns + fl);

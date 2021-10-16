@@ -196,7 +196,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     lms /= catd65;
 
     // Weighted vector length norm
-    lms = minf3(1e-12f, lms);
+    lms = maxf3(1e-12f, lms);
+    // lms = make_float3(_fmaxf(lms.x, 1e-12f), _fmaxf(lms.y, 1e-12f), _fmaxf(lms.z, 1e-12f));
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
 
     // Tonescale and flare compensation
@@ -212,7 +213,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Compress chroma: chromaticity-linear desaturation by ccf
     dlms = nt * (1.0f - ccf) + dlms * ccf;
 
-    dlms = minf3(0.0f, dlms);
     float3 yrg = lms_to_yrg(dlms, 1);
     yrg.y = compress_parabolic(yrg.y, 0.3f, 0.5f, 0.45f);
     dlms = yrg_to_lms(yrg, 1);
