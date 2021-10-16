@@ -20,7 +20,7 @@ DEFINE_UI_PARAMS(La, L adapt, DCTLUI_SLIDER_FLOAT, 63.61, 0, 200, 1)
 DEFINE_UI_PARAMS(meth, method, DCTLUI_COMBO_BOX, 1, {VAC, VCC}, {VAC, VCC})
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
 
-__CONSTANT__ float pi = 3.14159265359f;
+__CONSTANT__ float pi = 3.14159265358979323846f;
 
 // Custom 3x3 matrix struct float3x3
 typedef struct {
