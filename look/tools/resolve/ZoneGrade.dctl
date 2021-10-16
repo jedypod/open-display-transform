@@ -10,18 +10,18 @@ DEFINE_UI_PARAMS(ex, exposure, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
 DEFINE_UI_PARAMS(c, contrast, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
 DEFINE_UI_PARAMS(pv, pivot, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
 DEFINE_UI_PARAMS(off, offset, DCTLUI_SLIDER_FLOAT, 0.0, -0.02, 0.02, 0.0)
-DEFINE_UI_PARAMS(he, zone high exposure, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
-DEFINE_UI_PARAMS(hp, zone high pivot, DCTLUI_SLIDER_FLOAT, -1.0, -4.0, 4.0, 0.0)
-DEFINE_UI_PARAMS(hf, zone high falloff, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(le, zone low exposure, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
-DEFINE_UI_PARAMS(lp, zone low pivot, DCTLUI_SLIDER_FLOAT, 1.0, -4.0, 4.0, 0.0)
-DEFINE_UI_PARAMS(lf, zone low falloff, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(he2, zone higher exposure, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
-DEFINE_UI_PARAMS(hp2, zone higher pivot, DCTLUI_SLIDER_FLOAT, 1.0, -4.0, 4.0, 0.0)
-DEFINE_UI_PARAMS(hf2, zone higher falloff, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(le2, zone lower exposure, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
-DEFINE_UI_PARAMS(lp2, zone lower pivot, DCTLUI_SLIDER_FLOAT, -1.0, -4.0, 4.0, 0.0)
-DEFINE_UI_PARAMS(lf2, zone lower falloff, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(he, exposure - H, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(hp, pivot - H, DCTLUI_SLIDER_FLOAT, -1.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(hf, falloff - H, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(le, exposure - L, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(lp, pivot - L, DCTLUI_SLIDER_FLOAT, 1.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(lf, falloff - L, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(he2, exposure - H2, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(hp2, pivot - H2, DCTLUI_SLIDER_FLOAT, 1.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(hf2, falloff - H2, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(le2, exposure - L2, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(lp2, pivot - L2, DCTLUI_SLIDER_FLOAT, -1.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(lf2, falloff - L2, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
 
 
 __DEVICE__ float ex_high(float n, float ex, float pv, float fa) {
@@ -44,7 +44,7 @@ __DEVICE__ float ex_high(float n, float ex, float pv, float fa) {
 
 
 __DEVICE__ float ex_low(float n, float ex, float pv, float fa) {
-  // Zone shadow exposure with falloff : https://www.desmos.com/calculator/oz8eyxoo9k
+  // Zoned shadow exposure with falloff : https://www.desmos.com/calculator/oz8eyxoo9k
 
   // Parameter setup
   const float f = 6.0f - 5.0f * fa;
@@ -55,7 +55,7 @@ __DEVICE__ float ex_low(float n, float ex, float pv, float fa) {
   const float _b = -_powf(t0, -p) * (_c - 1.0f) * (p + 1.0f);
   
   // Calculate scale factor for rgb
-  float s = n > t0 ? 1.0f : _powf(n, p) * (_a * n + _b) + _c; // implicit divide by n here
+  float s = n > t0 || n < 0.0f ? 1.0f : _powf(n, p) * (_a * n + _b) + _c; // implicit divide by n here
   return s;
 }
 
