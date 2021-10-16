@@ -3,7 +3,8 @@ push $cut_paste_input
 Group {
  name NotoriousSix_Value
  tile_color 0x536177ff
- addUserKnob {20 NotoriousSix_Value_tab l NotoriousSix_Value}
+ addUserKnob {20 Value_tab l Value}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Notorious Six Value</b> created by Jed Smith\n<br>v0.0.1 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look>documentation</a><br>"}
  addUserKnob {7 my l yellow R -1 1}
  addUserKnob {7 mr l red R -1 1}
  addUserKnob {7 mm l magenta R -1 1}
@@ -363,7 +364,7 @@ set N43e8b200 [stack 0]
   temp_name1 c
   temp_expr1 min(r,g,b)*(1-f)+f
   temp_name2 cm
-  temp_expr2 min(r/c,g/c,b/c)
+  temp_expr2 c==0?0:min(r/c,g/c,b/c)
   channel0 rgb
   expr0 Ar
   expr3 pow(cm,p)
@@ -396,7 +397,7 @@ set N43e8a400 [stack 0]
   temp_name1 c
   temp_expr1 min(r,g,b)*(1-f)+f
   temp_name2 cm
-  temp_expr2 min(r/c,g/c,b/c)
+  temp_expr2 c==0?0:min(r/c,g/c,b/c)
   channel0 rgb
   expr0 Ar
   expr3 cm<1?pow(cm,p):pow(cm,p)
@@ -429,7 +430,7 @@ set N43e89600 [stack 0]
   temp_name1 c
   temp_expr1 min(r,g,b)*(1-f)+f
   temp_name2 cm
-  temp_expr2 min(r/c,g/c,b/c)
+  temp_expr2 c==0?0:min(r/c,g/c,b/c)
   channel0 rgb
   expr0 Ar
   expr3 cm<1?pow(cm,p):pow(cm,p)

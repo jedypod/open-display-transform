@@ -75,7 +75,7 @@ __DEVICE__ float chroma(float3 r, float m, float str) {
   // Calculate chroma based on exposure for primaries
   float ch = _fminf(1.0f, 1.0f / m);
   ch = _fminf(r.x, _fminf(r.y, r.z)) * (1.0f - ch) + ch;
-  ch = _fminf(r.x / ch, _fminf(r.y / ch, r.z / ch));
+  ch = ch == 0.0f ? 0.0f : _fminf(r.x / ch, _fminf(r.y / ch, r.z / ch));
   // Chroma factor strength: 1 is linear. Lower values affect chroma values less closer to achromatic
   ch = ch < 0.0f ? 0.0f : _powf(ch, str);
   return ch;
