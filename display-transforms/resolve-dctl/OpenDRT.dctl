@@ -196,7 +196,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     lms /= catd65;
 
     // Weighted vector length norm
-    lms = clamp_min_f3(lms, 1e-12f);
+    lms = minf3(1e-12f, lms);
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
 
     // Tonescale and flare compensation
@@ -212,7 +212,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Compress chroma: chromaticity-linear desaturation by ccf
     dlms = nt * (1.0f - ccf) + dlms * ccf;
 
-    dlms = clamp_min_f3(dlms, 0.0f);
+    dlms = minf3(0.0f, dlms);
     float3 yrg = lms_to_yrg(dlms, 1);
     yrg.y = compress_parabolic(yrg.y, 0.3f, 0.5f, 0.45f);
     dlms = yrg_to_lms(yrg, 1);
@@ -251,7 +251,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb *= ds;
 
     // Clamp
-    rgb = clamp_max_f3(clamp_min_f3(rgb, 0.0f), clamp_max);
+    rgb = clampf3(rgb, 0.0f, clamp_max);
 
     // Inverse EOTF
     float eotf_p = 2.0f + eotf * 0.2f; 
@@ -273,7 +273,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
         - Perceptual dechroma not included in inverse    
     */
     
-    rgb = clamp_max_f3(clamp_min_f3(rgb, 0.0f), 1.0f);
+    rgb = clampf3(rgb, 0.0f, 1.0f);
 
     // Forward EOTF
     float eotf_p = 2.0f + eotf * 0.2f;
@@ -296,7 +296,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // Inverse output creative output whitepoint scale
     lms /= cats;
-    lms = clamp_max_f3(clamp_min_f3(lms, 0.0f), 1.0f);
+    lms = clampf3(lms, 0.0f, 1.0f);
 
     // Weighted vector length norm
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;

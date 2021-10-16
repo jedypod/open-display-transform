@@ -95,7 +95,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float3 r; // RGB Ratios
   if (n == 0.0f) r = make_float3(0.0f, 0.0f, 0.0f);
   else r = rgb / n;
-  // r = clamp_min_f3(r, -1.0f);
+  // r = minf3(-1.0f, r);
 
   float h = hue(r);
 

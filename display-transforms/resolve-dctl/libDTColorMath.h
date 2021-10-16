@@ -107,23 +107,24 @@ __DEVICE__ float3 sqrtf3(float3 a) {
   return make_float3(_sqrtf(a.x), _sqrtf(a.y), _sqrtf(a.z));
 }
 
-__DEVICE__ float3 clamp_min_f3(float3 a, float b) {
-  // For each component of float3 a, return max of component and float b
-  return make_float3(_fmaxf(a.x, b), _fmaxf(a.y, b), _fmaxf(a.z, b));
-}
-
-__DEVICE__ float3 clamp_max_f3(float3 a, float b) { 
-  // For each component of float3 a, return min of component and float b
-  return make_float3(_fminf(a.x, b), _fminf(a.y, b), _fminf(a.z, b));
-}
-
-__DEVICE__ float3 clamp_f3(float3 a, float mn, float mx) { 
+__DEVICE__ float3 clampf3(float3 a, float mn, float mx) { 
   // Clamp each component of float3 a to be between float mn and float mx
   return make_float3(
     _fmaxf(_fminf(a.x, mx), mn),
     _fmaxf(_fminf(a.y, mx), mn),
     _fmaxf(_fminf(a.z, mx), mn));
 }
+
+__DEVICE__ float3 maxf3(float b, float3 a) {
+  // For each component of float3 a, return max of component and float b
+  return make_float3(_fmaxf(a.x, b), _fmaxf(a.y, b), _fmaxf(a.z, b));
+}
+
+__DEVICE__ float3 minf3(float b, float3 a) { 
+  // For each component of float3 a, return min of component and float b
+  return make_float3(_fminf(a.x, b), _fminf(a.y, b), _fminf(a.z, b));
+}
+
 
 __DEVICE__ float _sign(float x) {
   // Return the sign of float x
@@ -181,7 +182,6 @@ __DEVICE__ float3 extract_window_f3(float e0, float e1, float e2, float e3, floa
   // Linear window function to extract a range from float3 x
   return make_float3(extract_window(e0, e1, e2, e3, x.x), extract_window(e0, e1, e2, e3, x.y), extract_window(e0, e1, e2, e3, x.z));
 }
-
 
 __DEVICE__ float chroma(float3 rgb, int norm) {
   // Calculate and return classical chroma. If norm, normalize by mx

@@ -115,7 +115,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb = mult_f3_f33(rgb, in_to_xyz);
     float3 lms = mult_f3_f33(rgb, xyz_to_tlms);
     lms /= catd65;
-    lms = clamp_min_f3(lms, 1e-12f);
+    lms = minf3(1e-12f, lms);
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
     float ns = sy * _powf(n / (n + sx), p);
     float nt = ns * ns / (ns + fl);
@@ -140,7 +140,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     }
     rgb = mult_f3_f33(xyz, xyz_to_display);
     rgb *= ds;
-    rgb = clamp_f3(rgb, 0.0f, 1.0f);
+    rgb = clampf3(rgb, 0.0f, 1.0f);
     float eotf_p = 2.0f + eotf * 0.2f;
     if ((eotf > 0) && (eotf < 4)) {
       rgb = powf3(rgb, 1.0f / eotf_p);
@@ -151,7 +151,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     }
 
   } else {
-    rgb = clamp_max_f3(clamp_min_f3(rgb, 0.0f), 1.0f);
+    rgb = clampf3(rgb, 0.0f, 1.0f);
     float eotf_p = 2.0f + eotf * 0.2f;
     if ((eotf > 0) && (eotf < 4)) {
       rgb = powf3(rgb, eotf_p);
@@ -164,7 +164,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     float3 xyz = mult_f3_f33(rgb, display_to_xyz);
     float3 lms = mult_f3_f33(xyz, xyz_to_tlms);
     lms /= cats;
-    lms = clamp_max_f3(clamp_min_f3(lms, 0.0f), 1.0f);
+    lms = clampf3(lms, 0.0f, 1.0f);
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
     n = _fmaxf(1e-12f, _fminf(0.999f, n));
     float nt = (n + _sqrtf(n * (4.0f * fl + n))) / 2.0f;

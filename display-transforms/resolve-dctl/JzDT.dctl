@@ -128,7 +128,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb = mult_f3_f33(xyz, xyz_to_display);
     rgb *= ds;
 
-    rgb = clamp_f3(rgb, 0.0f, 1.0f);
+    rgb = clampf3(rgb, 0.0f, 1.0f);
     float eotf_p = 2.0f + eotf * 0.2f;
     if ((eotf > 0) && (eotf < 4)) {
       rgb = powf3(rgb, 1.0f / eotf_p);
@@ -138,7 +138,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       rgb = eotf_hlg(rgb, 1);
     }
   } else {
-    rgb = clamp_max_f3(clamp_min_f3(rgb, 0.0f), 1.0f);
+    rgb = clampf3(rgb, 0.0f, 1.0f);
     float eotf_p = 2.0f + eotf * 0.2f;
     if ((eotf > 0) && (eotf < 4)) {
       rgb = powf3(rgb, eotf_p);
