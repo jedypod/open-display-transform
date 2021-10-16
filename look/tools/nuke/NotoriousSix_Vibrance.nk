@@ -3,7 +3,8 @@ push $cut_paste_input
 Group {
  name NotoriousSix_Vibrance
  tile_color 0x536177ff
- addUserKnob {20 NotoriousSix_Vibrance_tab l NotoriousSix_Vibrance}
+ addUserKnob {20 Vibrance_tab l Vibrance}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Notorious Six Vibrance</b> created by Jed Smith\n<br>v0.0.1 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look>documentation</a><br>"}
  addUserKnob {7 vi l global R -1 1}
  addUserKnob {26 ""}
  addUserKnob {7 my l yellow R -1 1}
