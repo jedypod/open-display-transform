@@ -20,11 +20,11 @@ DEFINE_UI_PARAMS(mm, magenta, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(mb, blue, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(mc, cyan, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(mg, green, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(mo, custom, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(mc_h, hue, DCTLUI_SLIDER_FLOAT, 100, 0, 360, 0)
-DEFINE_UI_PARAMS(mc_w, width, DCTLUI_SLIDER_FLOAT, 0.3, 0, 2, 0)
+DEFINE_UI_PARAMS(mcu, custom, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(cuh, hue, DCTLUI_SLIDER_FLOAT, 100, 0, 360, 0)
+DEFINE_UI_PARAMS(cuw, width, DCTLUI_SLIDER_FLOAT, 0.3, 0, 2, 0)
 DEFINE_UI_PARAMS(str, strength, DCTLUI_SLIDER_FLOAT, 0.66, 0, 1, 0)
-DEFINE_UI_PARAMS(ze, zoned, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 0)
 DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
 DEFINE_UI_PARAMS(zr, zone, DCTLUI_COMBO_BOX, 0, {low, high}, {low, high})
 
@@ -167,9 +167,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   /* Custom hue angle: Defaults to orange
       ----------------------------  */
 
-  float hc = extract_hue_angle(h, mc_h / 60.0f, mc_w);
-  // hc = hc * hc * (3.0f - 2.0f * hc); // smoothstep
-  float m_c = _powf(2.0f, mo * 4.0f);
+  float hc = extract_hue_angle(h, cuh / 60.0f, cuw);
+  float m_c = _powf(2.0f, mcu * 4.0f);
   float m_p = _fminf(1.0f, 2.0f / m_c);
   float hc_w = 1.0f - _powf(1.0f - hc, m_p);
   float mfc = (1.0f - hc_w) + m_c * hc_w;
