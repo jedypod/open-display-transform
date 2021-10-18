@@ -1,5 +1,5 @@
 /* Notorious Six Vibrance
-    v0.0.1
+    v0.0.2
     ------------------
 
     Vibrance emulates what happens to color in the bottom end of
@@ -7,22 +7,28 @@
 
     Image "richness" is increased without slamming into the gamut boundary as with a 
     traditional saturation adjustment. 
-    
-    However hue shifts can occur. Sometimes disireable, sometimes not.
+
+    If chromaticity-linear is enabled, chroma is adjusted on a linear line between 
+    source chromaticity and the achromatic axis. Otherwise, hue bends toward primaries (RGB).    
 
     Written by Jed Smith
     github.com/jedypod/open-display-transform
 */
 
 
-DEFINE_UI_PARAMS(vi, global, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(vy, yellow, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(vr, red, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(vm, magenta, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(vb, blue, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(vc, cyan, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(vg, green, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(ze, zoned, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(mgl, global, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(my, yellow, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(mr, red, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(mm, magenta, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(mb, blue, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(mc, cyan, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(mg, green, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(mcu, custom, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(cuh, hue, DCTLUI_SLIDER_FLOAT, 100, 0, 360, 0)
+DEFINE_UI_PARAMS(cuw, width, DCTLUI_SLIDER_FLOAT, 0.3, 0, 2, 0)
+DEFINE_UI_PARAMS(str, strength, DCTLUI_SLIDER_FLOAT, 0.8, 0.001, 1, 0)
+DEFINE_UI_PARAMS(chl, chromaticity-linear, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 1)
 DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
 DEFINE_UI_PARAMS(zr, zone, DCTLUI_COMBO_BOX, 0, {low, high}, {low, high})
 
@@ -44,7 +50,7 @@ __DEVICE__ float extract_hue_angle(float h, float o, float w) {
   return hc;
 }
 
-__DEVICE__ float hue(float3 rgb) {
+__DEVICE__ float calc_hue(float3 rgb) {
   // Calculate and return hue in degrees between 0 and 6
   float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
   float mn = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
@@ -57,26 +63,20 @@ __DEVICE__ float hue(float3 rgb) {
   return h;
 }
 
-__DEVICE__ float3 powf3(float3 a, float b) { 
-  return make_float3(_powf(a.x, b), _powf(a.y, b), _powf(a.z, b));
-}
-
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
 {
   // Parameter setup
   float3 pp = make_float3(
-    (vr + 1.0f) * (vi + 1.0f),
-    (vg + 1.0f) * (vi + 1.0f),
-    (vb + 1.0f) * (vi + 1.0f));
+    (mr + 1.0f) * (mgl + 1.0f),
+    (mg + 1.0f) * (mgl + 1.0f),
+    (mb + 1.0f) * (mgl + 1.0f));
   float3 ps = make_float3(
-    (vc + 1.0f) * (vi + 1.0f),
-    (vm + 1.0f) * (vi + 1.0f),
-    (vy + 1.0f) * (vi + 1.0f));
-
-  // pp = powf3(pp, 2);
-  // ps = powf3(ps, 0.5f);
-
+    (mc + 1.0f) * (mgl + 1.0f),
+    (mm + 1.0f) * (mgl + 1.0f),
+    (my + 1.0f) * (mgl + 1.0f));
+  
+  float pc = (mcu + 1.0f);
 
   float3 rgb = make_float3(p_R, p_G, p_B);
   float3 in = rgb;
@@ -87,9 +87,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float3 r; // RGB Ratios
   if (n == 0.0f) r = make_float3(0.0f, 0.0f, 0.0f);
   else r = rgb / n;
-  // r = minf3(-1.0f, r);
+  // r = maxf3(-1.0f, r);
 
-  float h = hue(r);
+  float h = calc_hue(r);
 
   // hue extraction for primaries (RGB)
   float3 hp = make_float3(
@@ -103,13 +103,55 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     extract_hue_angle(h, 3.0f, 1.0f),
     extract_hue_angle(h, 1.0f, 1.0f));
 
-  r.x = r.x < 0.0f ? r.x : _powf(r.x, pp.x) * hp.x + _powf(r.x, pp.y) * hp.y + _powf(r.x, pp.z) * hp.z + r.x * (1.0f - (hp.x + hp.y + hp.z));
-  r.y = r.y < 0.0f ? r.y : _powf(r.y, pp.x) * hp.x + _powf(r.y, pp.y) * hp.y + _powf(r.y, pp.z) * hp.z + r.y * (1.0f - (hp.x + hp.y + hp.z));
-  r.z = r.z < 0.0f ? r.z : _powf(r.z, pp.x) * hp.x + _powf(r.z, pp.y) * hp.y + _powf(r.z, pp.z) * hp.z + r.z * (1.0f - (hp.x + hp.y + hp.z));
+  float hc = extract_hue_angle(h, cuh / 60.0f, cuw);
 
-  r.x = r.x < 0.0f ? r.x : _powf(r.x, ps.x) * hs.x + _powf(r.x, ps.y) * hs.y + _powf(r.x, ps.z) * hs.z + r.x * (1.0f - (hs.x + hs.y + hs.z));
-  r.y = r.y < 0.0f ? r.y : _powf(r.y, ps.x) * hs.x + _powf(r.y, ps.y) * hs.y + _powf(r.y, ps.z) * hs.z + r.y * (1.0f - (hs.x + hs.y + hs.z));
-  r.z = r.z < 0.0f ? r.z : _powf(r.z, ps.x) * hs.x + _powf(r.z, ps.y) * hs.y + _powf(r.z, ps.z) * hs.z + r.z * (1.0f - (hs.x + hs.y + hs.z));
+  if (chl == 0) {
+    // Primary hue angle vibrance adjustment
+    r.x = r.x < 0.0f ? r.x : _powf(r.x, pp.x) * hp.x + _powf(r.x, pp.y) * hp.y + _powf(r.x, pp.z) * hp.z + r.x * (1.0f - (hp.x + hp.y + hp.z));
+    r.y = r.y < 0.0f ? r.y : _powf(r.y, pp.x) * hp.x + _powf(r.y, pp.y) * hp.y + _powf(r.y, pp.z) * hp.z + r.y * (1.0f - (hp.x + hp.y + hp.z));
+    r.z = r.z < 0.0f ? r.z : _powf(r.z, pp.x) * hp.x + _powf(r.z, pp.y) * hp.y + _powf(r.z, pp.z) * hp.z + r.z * (1.0f - (hp.x + hp.y + hp.z));
+
+    // Secondary hue angle vibrance adjustment
+    r.x = r.x < 0.0f ? r.x : _powf(r.x, ps.x) * hs.x + _powf(r.x, ps.y) * hs.y + _powf(r.x, ps.z) * hs.z + r.x * (1.0f - (hs.x + hs.y + hs.z));
+    r.y = r.y < 0.0f ? r.y : _powf(r.y, ps.x) * hs.x + _powf(r.y, ps.y) * hs.y + _powf(r.y, ps.z) * hs.z + r.y * (1.0f - (hs.x + hs.y + hs.z));
+    r.z = r.z < 0.0f ? r.z : _powf(r.z, ps.x) * hs.x + _powf(r.z, ps.y) * hs.y + _powf(r.z, ps.z) * hs.z + r.z * (1.0f - (hs.x + hs.y + hs.z));
+
+    // Custom hue angle vibrance adjustment
+    r.x = r.x < 0.0f ? r.x : _powf(r.x, pc) * hc + r.x * (1.0f - hc);
+    r.y = r.y < 0.0f ? r.y : _powf(r.y, pc) * hc + r.y * (1.0f - hc);
+    r.z = r.z < 0.0f ? r.z : _powf(r.z, pc) * hc + r.z * (1.0f - hc);
+  } 
+  else {
+    // Chromaticity-linear
+    float c = _powf(1.0f - _fmaxf(1e-12f, _fminf(r.x, _fminf(r.y, r.z))), str);
+    
+    // Modify parameter scales for chromaticity-linear
+    pp = make_float3(
+      (mr < 0.0f ? mr * 0.9f + 1.0f : mr * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f),
+      (mg < 0.0f ? mg * 0.9f + 1.0f : mg * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f),
+      (mb < 0.0f ? mb * 0.9f + 1.0f : mb * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f));
+    ps = make_float3(
+      (mc < 0.0f ? mc * 0.9f + 1.0f : mc * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f),
+      (mm < 0.0f ? mm * 0.9f + 1.0f : mm * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f),
+      (my < 0.0f ? my * 0.9f + 1.0f : my * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f));
+    pc = (mcu < 0.0f ? mcu * 0.9f + 1.0f : mcu * 3.0f + 1.0f);
+
+    float m = _fminf(r.x, _fminf(r.y, r.z)) * (1.0 - str) + str;
+    float vf;
+
+    // Primaries
+    vf = c == 0.0f ? 1.0f : ((1.0f - _powf(1.0f - c, pp.x)) * hp.x + (1.0f - _powf(1.0f - c, pp.y)) * hp.y + (1.0f - _powf(1.0f - c, pp.z)) * hp.z + c * (1.0f - (hp.x + hp.y + hp.z))) / c;
+    r = m * (1.0f - vf) + r * vf;
+
+    // Secondaries
+    vf = c == 0.0f ? 1.0f : ((1.0f - _powf(1.0f - c, ps.x)) * hs.x + (1.0f - _powf(1.0f - c, ps.y)) * hs.y + (1.0f - _powf(1.0f - c, ps.z)) * hs.z + c * (1.0f - (hs.x + hs.y + hs.z))) / c;
+    r = m * (1.0f - vf) + r * vf;
+
+    // Custom
+    vf = c == 0.0f ? 1.0f : ((1.0f - _powf(1.0f - c, pc)) * hc + c * (1.0f - hc)) / c;
+    r = m * (1.0f - vf) + r * vf;
+    
+  }
 
   rgb = r * n;
 
