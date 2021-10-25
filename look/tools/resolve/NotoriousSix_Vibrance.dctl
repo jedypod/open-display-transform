@@ -123,8 +123,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   } 
   else {
     // Chromaticity-linear
-    float c = _powf(1.0f - _fmaxf(1e-12f, _fminf(r.x, _fminf(r.y, r.z))), str);
-    
+
+    float c =  1.0f - _fminf(r.x, _fminf(r.y, r.z)); // Chroma
+    c = _powf( _fmaxf(0.0f, c), str); 
+
     // Modify parameter scales for chromaticity-linear
     pp = make_float3(
       (mr < 0.0f ? mr * 0.9f + 1.0f : mr * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f),
