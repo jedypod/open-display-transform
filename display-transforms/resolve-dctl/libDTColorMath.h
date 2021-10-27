@@ -110,9 +110,9 @@ __DEVICE__ float3 sqrtf3(float3 a) {
 __DEVICE__ float3 clampf3(float3 a, float mn, float mx) { 
   // Clamp each component of float3 a to be between float mn and float mx
   return make_float3(
-    _fmaxf(_fminf(a.x, mx), mn),
-    _fmaxf(_fminf(a.y, mx), mn),
-    _fmaxf(_fminf(a.z, mx), mn));
+    _fminf(_fmaxf(a.x, mn), mx),
+    _fminf(_fmaxf(a.y, mn), mx),
+    _fminf(_fmaxf(a.z, mn), mx));
 }
 
 __DEVICE__ float3 maxf3(float b, float3 a) {
