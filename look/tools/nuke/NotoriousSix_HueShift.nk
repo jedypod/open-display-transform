@@ -20,9 +20,8 @@ Group {
  addUserKnob {26 ""}
  addUserKnob {7 str l strength R 0.1 1}
  str 0.33
- addUserKnob {6 chle l "chroma limit" t "affect only center chroma" +STARTLINE}
- addUserKnob {7 chl l "" t "chroma limit strength" -STARTLINE}
- chl 0.5
+ addUserKnob {7 chl l "chroma limit"}
+ chl 0.33
  addUserKnob {6 ze l "zone extract" t "effect a limited range of luminance." +STARTLINE}
  addUserKnob {4 zr l "" -STARTLINE M {low high ""}}
  zr 1
@@ -157,7 +156,7 @@ set Nbcff8800 [stack 0]
   temp_name2 cl
   temp_expr2 chl<0.5?c*f0+c*(1-c)*(1-f0):c*pow(1-c,f0)
   channel0 rgba
-  expr0 chle?cl:c
+  expr0 cl
   name hch
   xpos -150
   ypos -178

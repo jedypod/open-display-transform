@@ -19,8 +19,7 @@ DEFINE_UI_PARAMS(scu, custom, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(cuh, custom hue, DCTLUI_SLIDER_FLOAT, 100, 0, 360, 0)
 DEFINE_UI_PARAMS(cuw, custom width, DCTLUI_SLIDER_FLOAT, 0.3, 0, 2, 0)
 DEFINE_UI_PARAMS(str, strength, DCTLUI_SLIDER_FLOAT, 0.33, 0.1, 1, 0)
-DEFINE_UI_PARAMS(chle, chroma limit enable, DCTLUI_CHECK_BOX, 0)
-DEFINE_UI_PARAMS(chl, chroma limit strength, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
+DEFINE_UI_PARAMS(chl, chroma limit, DCTLUI_SLIDER_FLOAT, 0.33, 0, 1, 0)
 DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 0)
 DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
 DEFINE_UI_PARAMS(zr, zone, DCTLUI_COMBO_BOX, 1, {low, high}, {low, high})
@@ -79,10 +78,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Chroma limit: reduces effect on more saturated colors, depending on chroma limit strength
   // 0.5 < chl < 1 : power function on limit
   // 0 < chl < 0.5 : mix back limit (better handles out of gamut colorimetry)
-  if (chle == 1) {
-    float f0 = chl < 0.5f ? _fmaxf(0.0f, 0.5f - chl) * 2.0f : 1.0f / _fmaxf(1e-3f, (1.0f - chl) * 2.0f);
-    ch = chl < 0.5f ? ch * f0 + ch * (1.0f - ch) * (1.0f - f0) : ch * _powf(_fmaxf(0.0f, 1.0f - ch), f0);
-  }
+  float f0 = chl < 0.5f ? _fmaxf(0.0f, 0.5f - chl) * 2.0f : 1.0f / _fmaxf(1e-3f, (1.0f - chl) * 2.0f);
+  ch = chl < 0.5f ? ch * f0 + ch * (1.0f - ch) * (1.0f - f0) : ch * _powf(_fmaxf(0.0f, 1.0f - ch), f0);
 
   // Hue
   float hue = calc_hue(r);
