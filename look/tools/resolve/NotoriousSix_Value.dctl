@@ -1,5 +1,5 @@
 /* Notorious Six Value
-    v0.0.1
+    v0.0.2
     ------------------
 
     Value (borrowing the term from painting), refers to the brightness of a color. 
@@ -23,7 +23,7 @@ DEFINE_UI_PARAMS(mg, green, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(mcu, custom, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(cuh, hue, DCTLUI_SLIDER_FLOAT, 100, 0, 360, 0)
 DEFINE_UI_PARAMS(cuw, width, DCTLUI_SLIDER_FLOAT, 0.3, 0, 2, 0)
-DEFINE_UI_PARAMS(str, strength, DCTLUI_SLIDER_FLOAT, 0.66, 0, 1, 0)
+DEFINE_UI_PARAMS(str, strength, DCTLUI_SLIDER_FLOAT, 0.8, 0, 1, 0)
 DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 0)
 DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
 DEFINE_UI_PARAMS(zr, zone, DCTLUI_COMBO_BOX, 0, {low, high}, {low, high})
@@ -40,9 +40,11 @@ __DEVICE__ float extract_window(float e0, float e1, float e2, float e3, float x)
   return x < e1 ? extract(e0, e1, x) : extract(e3, e2, x);
 }
 
-__DEVICE__ float extract_hue_angle(float h, float o, float w) {
+__DEVICE__ float extract_hue_angle(float h, float o, float w, int sm) {
   // Given hue, offset, width, extract hue angle
   float hc = extract_window(2.0f - w, 2.0f, 2.0f, 2.0f + w, _fmod(h + o, 6.0f));
+  if (sm == 1) 
+    hc = hc * hc * (3.0f - 2.0f * hc); // smoothstep
   return hc;
 }
 
@@ -76,8 +78,9 @@ __DEVICE__ float chroma(float3 r, float m, float str) {
   float ch = _fminf(1.0f, 1.0f / m);
   ch = _fminf(r.x, _fminf(r.y, r.z)) * (1.0f - ch) + ch;
   ch = ch == 0.0f ? 0.0f : _fminf(r.x / ch, _fminf(r.y / ch, r.z / ch));
-  // Chroma factor strength: 1 is linear. Lower values affect chroma values less closer to achromatic
-  ch = ch < 0.0f ? 0.0f : _powf(ch, str);
+  // Chroma factor strength
+  // Full strength of 1.0 is linear. Reducing strength increasingly only affects more chrominous colors.
+  ch = ch * str + 1.0f - str; // 1 - lift
   return ch;
 }
 
@@ -105,9 +108,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Hue extraction
   float3 hp = make_float3(
-    extract_hue_angle(h, 2.0f, 1.0f),
-    extract_hue_angle(h, 6.0f, 1.0f),
-    extract_hue_angle(h, 4.0f, 1.0f));
+    extract_hue_angle(h, 2.0f, 1.0f, 1),
+    extract_hue_angle(h, 6.0f, 1.0f, 1),
+    extract_hue_angle(h, 4.0f, 1.0f, 1));
  
    // Exposure - input param range is -1 to 1, output exposure is +/- 4 stops.
   const float3 mp = make_float3(
@@ -139,9 +142,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   
   // Hue extraction
   float3 hs = make_float3(
-    extract_hue_angle(h, 5.0f, 1.0f),
-    extract_hue_angle(h, 3.0f, 1.0f),
-    extract_hue_angle(h, 1.0f, 1.0f));
+    extract_hue_angle(h, 5.0f, 1.0f, 1),
+    extract_hue_angle(h, 3.0f, 1.0f, 1),
+    extract_hue_angle(h, 1.0f, 1.0f, 1));
 
   const float3 ms = make_float3(
     _powf(2.0f, mc * 4.0f),
@@ -167,7 +170,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   /* Custom hue angle: Defaults to orange
       ----------------------------  */
 
-  float hc = extract_hue_angle(h, cuh / 60.0f, cuw);
+  float hc = extract_hue_angle(h, cuh / 60.0f, cuw, 1);
   float m_c = _powf(2.0f, mcu * 4.0f);
   float m_p = _fminf(1.0f, 2.0f / m_c);
   float hc_w = 1.0f - _powf(1.0f - hc, m_p);
