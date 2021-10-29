@@ -1,13 +1,4 @@
-/* Notorious Six Hue Shift
-    v0.0.3
-    ------------------
-    Per hue-angle hue shift tool. Good for color cross-talk effects and
-    precise control over hue shifts over specific luminance and/or chrominance ranges.
-
-    Written by Jed Smith
-    github.com/jedypod/open-display-transform
-*/
-
+#include "libLMT.h"
 
 DEFINE_UI_PARAMS(sy, yellow, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(sr, red, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
@@ -22,122 +13,17 @@ DEFINE_UI_PARAMS(str, strength, DCTLUI_SLIDER_FLOAT, 0.33, 0.1, 1, 0)
 DEFINE_UI_PARAMS(chl, chroma limit, DCTLUI_SLIDER_FLOAT, 0.33, 0, 1, 0)
 DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 0)
 DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
-DEFINE_UI_PARAMS(zr, zone, DCTLUI_COMBO_BOX, 1, {low, high}, {low, high})
-
-
-__DEVICE__ float extract(float e0, float e1, float x) {
-  // Extract a range from e0 to e1 from f, clamping values above or below.
-  return _clampf((x - e0) / (e1 - e0), 0.0f, 1.0f);
-}
-
-__DEVICE__ float extract_window(float e0, float e1, float e2, float e3, float x) {
-  // Linear window function to extract a range from float x
-  // https://www.desmos.com/calculator/uzsk5ta5v7
-  return x < e1 ? extract(e0, e1, x) : extract(e3, e2, x);
-}
-
-__DEVICE__ float extract_hue_angle(float h, float o, float w) {
-  // Given hue, offset, width, and chroma, extract hue angle
-  float hc = extract_window(2.0f - w, 2.0f, 2.0f, 2.0f + w, _fmod(h + o, 6.0f));
-  return hc;
-}
-
-__DEVICE__ float calc_hue(float3 rgb) {
-  // Calculate and return hue in degrees between 0 and 6
-  float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
-  float mn = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
-  float ch = mx - mn;
-  float h;
-  if (ch == 0.0f) h = 0.0f;
-  else if (mx == rgb.x) h = _fmod((rgb.y - rgb.z) / ch + 6.0f, 6.0f);
-  else if (mx == rgb.y) h = (rgb.z - rgb.x) / ch + 2.0f;
-  else if (mx == rgb.z) h = (rgb.x - rgb.y) / ch + 4.0f;
-  return h;
-}
+DEFINE_UI_PARAMS(zone, zone, DCTLUI_COMBO_BOX, 1, {low, high}, {low, high})
 
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
 {
   float3 rgb = make_float3(p_R, p_G, p_B);
-  float3 in = rgb;
 
-  // max(r,g,b) norm
-  float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  int zr = 0;
+  if (zone == high) zr = 1;
+
+  rgb = nosix_hueshift(rgb, sy, sr, sm, sb, sc, sg, scu, cuh, cuw, str, chl, ze, zp, zr);
   
-  // RGB Ratios
-  float3 r;
-  if (n == 0.0f) r = make_float3(0.0f, 0.0f, 0.0f);
-  else r = rgb / n;
-  // r = minf3(-1.0f, r);
-  
-  // Chroma
-  // Strength controls a lerp between min(r,g,b) and max(r,g,b) for the calculation of chroma
-  float ch = _fminf(r.x, _fminf(r.y, r.z)) * (1.0f - str) + str;
-  ch = ch == 0.0f ? 0.0f : _fminf(1.0f, 1.0f - _fminf(r.x / ch, _fminf(r.y / ch, r.z / ch)));
-  
-  // Chroma limit: reduces effect on more saturated colors, depending on chroma limit strength
-  // 0.5 < chl < 1 : power function on limit
-  // 0 < chl < 0.5 : mix back limit (better handles out of gamut colorimetry)
-  float f0 = chl < 0.5f ? _fmaxf(0.0f, 0.5f - chl) * 2.0f : 1.0f / _fmaxf(1e-3f, (1.0f - chl) * 2.0f);
-  ch = chl < 0.5f ? ch * f0 + ch * (1.0f - ch) * (1.0f - f0) : ch * _powf(_fmaxf(0.0f, 1.0f - ch), f0);
-
-  // Hue
-  float hue = calc_hue(r);
-
-  // Hue extraction for primaries (RGB)
-  float3 hp = make_float3(
-    extract_hue_angle(hue, 2.0f, 1.0f),
-    extract_hue_angle(hue, 6.0f, 1.0f),
-    extract_hue_angle(hue, 4.0f, 1.0f));
-  hp = hp * ch;
-
-  // Hue extraction for secondaries (CMY)
-  float3 hs = make_float3(
-    extract_hue_angle(hue, 5.0f, 1.0f),
-    extract_hue_angle(hue, 3.0f, 1.0f),
-    extract_hue_angle(hue, 1.0f, 1.0f));
-  hs = hs * ch;
-
-  // Hue shift primaries
-  r.x = (r.x - sb) * hp.z + (r.x + sg) * hp.y + r.x * (1.0f - (hp.z + hp.y));
-  r.y = (r.y + sr) * hp.x + (r.y + sb) * hp.z + r.y * (1.0f - (hp.x + hp.z));
-  r.z = (r.z - sr) * hp.x + (r.z - sg) * hp.y + r.z * (1.0f - (hp.x + hp.y));
-  
-  // Hue shift secondaries
-  r.x = (r.x + sy) * hs.z + (r.x - sm) * hs.y + r.x * (1.0f - (hs.z + hs.y));
-  r.y = (r.y + sc) * hs.x + (r.y - sy) * hs.z + r.y * (1.0f - (hs.x + hs.z));
-  r.z = (r.z - sc) * hs.x + (r.z + sm) * hs.y + r.z * (1.0f - (hs.x + hs.y));
-
-
-  // Hue extraction for custom
-  float hc = extract_hue_angle(hue, cuh / 60.0f, cuw);
-  hc = hc * ch;
-  
-  // Calculate params for custom hue angle shift
-  float h = cuh / 60.0f; // Convert degrees to 0-6 hue angle
-  float s = scu * cuw; // Rotate only as much as the custom width
-  // Calculate per-channel shift values based on hue angle
-  float sc0 = 1.0f<=h&&h<2.0f?s*(h-1.0f):2.0f<=h&&h<3.0f?s*(3.0f-h):4.0f<=h&&h<5.0f?-s*(h-4.0f):5.0f<=h&&h<6.0f?-s*(6.0f-h):0.0f;
-  float sc1 = 0.0f<=h&&h<1.0f?s*(1.0f-h):2.0f<=h&&h<3.0f?-s*(h-2.0f):3.0f<=h&&h<4.0f?-s*(4.0f-h):5.0f<=h&&h<6.0f?s*(h-5.0f):0.0f;
-  float sc2 = 0.0f<=h&&h<1.0f?-s*(h-0.0f):1.0f<=h&&h<2.0f?-s*(2.0f-h):3.0f<=h&&h<4.0f?s*(h-3.0f):4.0f<=h&&h<5.0f?s*(5.0f-h):0.0f;
-
-  // Hue shift custom
-  r.x = (r.x + sc2) * hc + (r.x - sc1) * hc + r.x * (1.0f - (hc + hc));
-  r.y = (r.y + sc0) * hc + (r.y - sc2) * hc + r.y * (1.0f - (hc + hc));
-  r.z = (r.z - sc0) * hc + (r.z + sc1) * hc + r.z * (1.0f - (hc + hc));
-  
-  rgb = r * n;
-
-  // Zone extract
-  if (ze == 1) {
-    n = _fmaxf(1e-12f, n);
-    const float fl = 0.004f;
-    float zpow = _powf(2.0f, -zp + 1.0f);
-    float toe = (n * n / (n + fl));
-    float f = _powf((toe / (toe + 1.0f)) / n, zpow);
-    if (zr == high) f = 1.0f - _powf((n / (n + 1.0f)) / n, zpow);
-    rgb = in * (1.0f - f) + rgb * f;
-  }
-
   return rgb;
 }

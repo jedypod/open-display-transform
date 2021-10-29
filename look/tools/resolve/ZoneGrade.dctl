@@ -1,10 +1,4 @@
-/* Zone Grade
-    v0.0.1
-    Chromaticity-preserving grading tool.
-
-    Written by Jed Smith
-    github.com/jedypod/open-display-transform
-*/
+#include "libLMT.h"
 
 DEFINE_UI_PARAMS(ex, exposure, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
 DEFINE_UI_PARAMS(c, contrast, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
@@ -24,71 +18,9 @@ DEFINE_UI_PARAMS(lp2, pivot - L2, DCTLUI_SLIDER_FLOAT, -1.0, -4.0, 4.0, 0.0)
 DEFINE_UI_PARAMS(lf2, falloff - L2, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
 
 
-__DEVICE__ float ex_high(float n, float ex, float pv, float fa) {
-  // Zoned highlight exposure with falloff : https://www.desmos.com/calculator/csupr8rjk8
-
-  // Parameter setup
-  const float f = 5.0f * _powf(fa, 1.6f) + 1.0f;
-  const float p = _fabs(ex + f) < 1e-8f ? 1e-8f : (ex + f) / f;
-  const float m = _powf(2.0f, ex);
-  const float t0 = 0.18f * _powf(2.0f, pv);
-  const float a = _powf(t0, 1.0f - p) / p;
-  const float b = t0 * (1.0f - 1.0f / p);
-  const float x1 = t0 * _powf(2.0f, f);
-  const float y1 = a * _powf(x1, p) + b;
-
-  // Calculate scale factor for rgb
-  float s = n < t0 ? 1.0f : n > x1 ? (m * (n - x1) + y1) / n : (a * _powf(n, p) + b) / n;
-  return s;
-}
-
-
-__DEVICE__ float ex_low(float n, float ex, float pv, float fa) {
-  // Zoned shadow exposure with falloff : https://www.desmos.com/calculator/oz8eyxoo9k
-
-  // Parameter setup
-  const float f = 6.0f - 5.0f * fa;
-  const float p = _fminf(f / 2.0f, f / 2.0f * _powf(0.5, ex));
-  const float t0 = 0.18f * _powf(2.0f, pv);
-  const float _c = _powf(2.0f, ex);
-  const float _a = _powf(t0, -p - 1.0f) * p * (_c - 1.0f);
-  const float _b = -_powf(t0, -p) * (_c - 1.0f) * (p + 1.0f);
-  
-  // Calculate scale factor for rgb
-  float s = n > t0 || n < 0.0f ? 1.0f : _powf(n, p) * (_a * n + _b) + _c; // implicit divide by n here
-  return s;
-}
-
-
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
 {
-  // Parameter setup
-  const float m = _powf(2.0f, ex);
-  const float p = 0.18f * _powf(2.0f, pv);
-
   float3 rgb = make_float3(p_R, p_G, p_B);
-  float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
-
-  // Global controls
-  rgb += off;
-  float s = c == 1.0f ? m : n < 0.0f ? 1.0f : _powf(n / p, c - 1.0f) * m;
-  rgb *= s;
-
-  // Zone High
-  n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
-  rgb *= ex_high(n, he, hp, hf);
-  
-  // Zone Low
-  n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
-  rgb *= ex_low(n, le, lp, lf);
-
-  // Zone Higher
-  n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
-  rgb *= ex_high(n, he2, hp2, hf2);
-  
-  // Zone Lower
-  n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
-  rgb *= ex_low(n, le2, lp2, lf2);
-
+  rgb = zone_grade(rgb, ex, c, pv, off, he, hp, hf, le, lp, lf, he2, hp2, hf2, le2, lp2, lf2);
   return rgb;
 }
