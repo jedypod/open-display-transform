@@ -19,7 +19,6 @@ Group {
  cuw 0.3
  addUserKnob {26 ""}
  addUserKnob {6 chl l "chromaticity linear" t "chroma is moved on a linear line between the chromaticity and the achromatic axis." +STARTLINE}
- chl true
  addUserKnob {7 str l strength t "adjust strength of chromaticity-linear vibrance adjustment"}
  str 0.8
  addUserKnob {6 ze l "zone extract" t "effect a limited range of luminance." +STARTLINE}
