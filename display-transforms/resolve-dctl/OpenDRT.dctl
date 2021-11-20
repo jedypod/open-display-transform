@@ -1,6 +1,6 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.0.90b2
+      v0.0.90b3
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 */
@@ -209,6 +209,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // Display-referred LMS
     float3 dlms = lms * nt / n;
+    
+    // Display referred LMS without chroma compression
+    lms = dlms;
 
     // Compress chroma: chromaticity-linear desaturation by ccf
     dlms = nt * (1.0f - ccf) + dlms * ccf;
