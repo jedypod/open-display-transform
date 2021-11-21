@@ -135,7 +135,7 @@ __DEVICE__ float3 nosix_value(float3 rgb,
   float mfp = ((1.0f - hp_w.x) + mp.x * hp_w.x) * ((1.0f - hp_w.y) + mp.y * hp_w.y) * ((1.0f - hp_w.z) + mp.z * hp_w.z);
 
   // Chroma
-  float chp = chroma(r, mfp, str);
+  float chp = _fmaxf(0.0f, chroma(r, mfp, str));
   
 
   /* Secondary hue angles: CMY
@@ -165,7 +165,7 @@ __DEVICE__ float3 nosix_value(float3 rgb,
   float mfs = ((1.0f - hs_w.x) + ms.x * hs_w.x) * ((1.0f - hs_w.y) + ms.y * hs_w.y) * ((1.0f - hs_w.z) + ms.z * hs_w.z);
 
   // Chroma
-  float chs = chroma(r, mfs, str);
+  float chs = _fmaxf(0.0f, chroma(r, mfs, str));
 
 
   /* Custom hue angle: Defaults to orange
@@ -176,7 +176,7 @@ __DEVICE__ float3 nosix_value(float3 rgb,
   float m_p = _fminf(1.0f, 2.0f / m_c);
   float hc_w = 1.0f - _powf(1.0f - hc, m_p);
   float mfc = (1.0f - hc_w) + m_c * hc_w;
-  float chc = chroma(r, mfc, str);
+  float chc = _fmaxf(0.0f, chroma(r, mfc, str));
 
   // Apply exposure
   r = mfp * r * (1.0f - chp) + r * chp;
@@ -188,7 +188,7 @@ __DEVICE__ float3 nosix_value(float3 rgb,
   // Zone extract
   if (ze == 1) {
     n = _fmaxf(1e-12f, n);
-    const float fl = 0.004f;
+    const float fl = 0.01f;
     float zpow = _powf(2.0f, -zp + 1.0f);
     float toe = (n * n / (n + fl));
     float f = _powf((toe / (toe + 1.0f)) / n, zpow);
