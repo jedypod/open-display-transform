@@ -63,7 +63,7 @@ set Nd7e1600 [stack 0]
   temp_name0 n
   temp_expr0 max(r,g,b)/p
   temp_name1 s
-  temp_expr1 c==1?m:n>0?pow(n,c-1)*m:1
+  temp_expr1 co==1?_m:n>0?pow(n,co-1)*_m:1
   expr0 (r+o)*s
   expr1 (g+o)*s
   expr2 (b+o)*s
@@ -75,12 +75,12 @@ set Nd7e1600 [stack 0]
   off {{go}}
   addUserKnob {7 ex l exposure R -4 4}
   ex {{ge}}
-  addUserKnob {7 c l contrast R 0.1 2}
-  c {{gc}}
+  addUserKnob {7 co l contrast R 0.1 2}
+  co {{gc}}
   addUserKnob {7 pv l pivot R -4 4}
   pv {{gcp}}
-  addUserKnob {7 m R 0 10}
-  m {{pow(2,ex)}}
+  addUserKnob {7 _m R 0 10}
+  _m {{pow(2,ex)}}
   addUserKnob {7 p R 0 4}
   p {{0.18*pow(2,pv)}}
   addUserKnob {7 o R -0.1 0.1}
