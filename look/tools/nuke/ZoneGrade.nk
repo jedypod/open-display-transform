@@ -90,7 +90,7 @@ set Nd7e1600 [stack 0]
   temp_name0 n
   temp_expr0 max(r,g,b)
   temp_name1 s
-  temp_expr1 n<t0?1:n>x1?(m*(n-x1)+y1)/n:(_a*pow(n,p)+_b)/n
+  temp_expr1 n<t0?1:n>x1?(_m*(n-x1)+y1)/n:(_a*pow(n,p)+_b)/n
   expr0 r*s
   expr1 g*s
   expr2 b*s
@@ -108,8 +108,8 @@ set Nd7e1600 [stack 0]
   f {{5*pow(fa,1.6)+1}}
   addUserKnob {7 p R 0 10}
   p {{fabs(ex+f)<1e-8?1e-8:(ex+f)/f}}
-  addUserKnob {7 m R 0 10}
-  m {{pow(2,ex)}}
+  addUserKnob {7 _m R 0 10}
+  _m {{pow(2,ex)}}
   addUserKnob {7 t0}
   t0 {{0.18*pow(2,pv)}}
   addUserKnob {7 _a R -10 10}
@@ -125,7 +125,7 @@ set Nd7e1600 [stack 0]
   temp_name0 n
   temp_expr0 max(r,g,b)
   temp_name1 s
-  temp_expr1 n<t0?1:n>x1?(m*(n-x1)+y1)/n:(_a*pow(n,p)+_b)/n
+  temp_expr1 n<t0?1:n>x1?(_m*(n-x1)+y1)/n:(_a*pow(n,p)+_b)/n
   expr0 r*s
   expr1 g*s
   expr2 b*s
@@ -143,8 +143,8 @@ set Nd7e1600 [stack 0]
   f {{5*pow(fa,1.6)+1}}
   addUserKnob {7 p R 0 10}
   p {{fabs(ex+f)<1e-8?1e-8:(ex+f)/f}}
-  addUserKnob {7 m R 0 10}
-  m {{pow(2,ex)}}
+  addUserKnob {7 _m R 0 10}
+  _m {{pow(2,ex)}}
   addUserKnob {7 t0}
   t0 {{0.18*pow(2,pv)}}
   addUserKnob {7 _a R -10 10}
