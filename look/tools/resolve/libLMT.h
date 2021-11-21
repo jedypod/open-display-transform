@@ -440,7 +440,7 @@ __DEVICE__ float3 nosix_hueshift(float3 rgb,
 
 
 __DEVICE__ float ex_high(float n, float ex, float pv, float fa) {
-  // Zoned highlight exposure with falloff : https://www.desmos.com/calculator/csupr8rjk8
+  // Zoned highlight exposure with falloff : https://www.desmos.com/calculator/ylq5yvkhoq
 
   // Parameter setup
   const float f = 5.0f * _powf(fa, 1.6f) + 1.0f;
@@ -474,22 +474,29 @@ __DEVICE__ float ex_low(float n, float ex, float pv, float fa) {
   return s;
 }
 
+
+__DEVICE__ float3 grade(float3 rgb, float ex, float c, float pv, float off) {
+  // Simple chromaticity-preserving grade operator: exposure, pivoted contrast, offset
+  float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  const float m = _powf(2.0f, ex);
+  const float p = 0.18f * _powf(2.0f, pv);
+  rgb += off;
+  float s = c == 1.0f ? m : n < 0.0f ? 1.0f : _powf(n / p, c - 1.0f) * m;
+  rgb *= s;
+  return rgb;
+}
+
+
 __DEVICE__ float3 zone_grade(float3 rgb, 
     float ex, float c, float pv, float off, 
     float he, float hp, float hf, float le, float lp, float lf, 
     float he2, float hp2, float hf2, float le2, float lp2, float lf2) {
-
-  // Parameter setup
-  const float m = _powf(2.0f, ex);
-  const float p = 0.18f * _powf(2.0f, pv);
-
-  float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
-
-  // Global controls
-  rgb += off;
-  float s = c == 1.0f ? m : n < 0.0f ? 1.0f : _powf(n / p, c - 1.0f) * m;
-  rgb *= s;
-
+  
+  float n;
+  
+  // Global grade
+  rgb = grade(rgb, ex, c, pv, off);
+  
   // Zone High
   n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
   rgb *= ex_high(n, he, hp, hf);
