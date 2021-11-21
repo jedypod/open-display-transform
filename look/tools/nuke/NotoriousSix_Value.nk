@@ -99,7 +99,7 @@ set Nc7e36b00 [stack 0]
   ypos -106
   addUserKnob {20 Params}
   addUserKnob {7 fl R 0 0.02}
-  fl 0.004
+  fl 0.01
   addUserKnob {7 p R 0 64}
   p {{pow(2,-zp+1)}}
  }
@@ -187,17 +187,17 @@ set Nc7e03900 [stack 0]
   temp_name0 pr
   temp_expr0 1-pow(1-r,p)
   channel0 rgb
-  expr0 (1-pr)+m*pr
+  expr0 (1-pr)+_m*pr
   enable_mix_luminance false
   mix_luminance 1
   name Multiply1
   xpos 400
   ypos -274
   addUserKnob {20 Params}
-  addUserKnob {7 m R 0 4}
-  m {{pow(2,mo*4)}}
+  addUserKnob {7 _m R 0 4}
+  _m {{pow(2,mo*4)}}
   addUserKnob {7 p R 0 4}
-  p {{min(1,2/m)}}
+  p {{min(1,2/_m)}}
  }
 push $Nc7e03900
  Expression {
@@ -356,12 +356,12 @@ push $Nc7e35600
  MergeExpression {
   inputs 2
   temp_name0 f
-  temp_expr0 Aa
-  temp_name1 m
+  temp_expr0 max(0,Aa)
+  temp_name1 _m
   temp_expr1 Ar
-  expr0 m*r*(1-f)+r*f
-  expr1 m*g*(1-f)+g*f
-  expr2 m*b*(1-f)+b*f
+  expr0 _m*r*(1-f)+r*f
+  expr1 _m*g*(1-f)+g*f
+  expr2 _m*b*(1-f)+b*f
   name MergeExpression10
   xpos 180
   ypos -442
@@ -389,12 +389,12 @@ push $Nc7dccf00
  MergeExpression {
   inputs 2
   temp_name0 f
-  temp_expr0 Aa
-  temp_name1 m
+  temp_expr0 max(0,Aa)
+  temp_name1 _m
   temp_expr1 Ar
-  expr0 m*r*(1-f)+r*f
-  expr1 m*g*(1-f)+g*f
-  expr2 m*b*(1-f)+b*f
+  expr0 _m*r*(1-f)+r*f
+  expr1 _m*g*(1-f)+g*f
+  expr2 _m*b*(1-f)+b*f
   name MergeExpression13
   xpos 180
   ypos -346
@@ -404,10 +404,10 @@ set Nc7dcc100 [stack 0]
   inputs 2
   temp_name0 f
   temp_expr0 min(1,1/Ar)
-  temp_name1 c
+  temp_name1 _c
   temp_expr1 min(r,g,b)*(1-f)+f
   temp_name2 cm
-  temp_expr2 c==0?0:min(r/c,g/c,b/c)
+  temp_expr2 _c==0?0:min(r/_c,g/_c,b/_c)
   channel0 rgb
   expr0 Ar
   expr3 cm*p+1-p
@@ -422,12 +422,12 @@ push $Nc7dcc100
  MergeExpression {
   inputs 2
   temp_name0 f
-  temp_expr0 Aa
-  temp_name1 m
+  temp_expr0 max(0,Aa)
+  temp_name1 _m
   temp_expr1 Ar
-  expr0 m*r*(1-f)+r*f
-  expr1 m*g*(1-f)+g*f
-  expr2 m*b*(1-f)+b*f
+  expr0 _m*r*(1-f)+r*f
+  expr1 _m*g*(1-f)+g*f
+  expr2 _m*b*(1-f)+b*f
   name MergeExpression1
   xpos 180
   ypos -274
