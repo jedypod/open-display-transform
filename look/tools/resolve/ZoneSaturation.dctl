@@ -3,7 +3,7 @@
     The zones are defined by a hyperbolic extraction of input
 
     Input should be scene-linear.
-    Requires ./libDTColorMath.h
+    Requires ./libDRT.h
   ---------------------------------------------------
     v0.0.1
     Written by Jed Smith
@@ -25,7 +25,7 @@ DEFINE_UI_PARAMS(sg, sat green, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
 DEFINE_UI_PARAMS(pch, perceptual, DCTLUI_CHECK_BOX, 0)
 DEFINE_UI_PARAMS(zha, zone hue angle, DCTLUI_COMBO_BOX, 1, {none, low, high}, {none, low, high})
 
-#include "libDTColorMath.h"
+#include "libDRT.h"
 
 __DEVICE__ float extract_hue_angle(float h, float o, float w) {
   // Given hue, offset, width, and chroma, extract hue angle

@@ -10,7 +10,7 @@
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
-      Requires ./libDTColorMath.h
+      Requires ./libDRT.h
     -------------------------------------------------
 */
 
@@ -28,7 +28,7 @@ DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
 DEFINE_UI_PARAMS(pdch, perceptual dechroma, DCTLUI_CHECK_BOX, 1)
 DEFINE_UI_PARAMS(gcmp, gamut compress, DCTLUI_CHECK_BOX, 1)
 
-#include "libDTColorMath.h"
+#include "libDRT.h"
 
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
