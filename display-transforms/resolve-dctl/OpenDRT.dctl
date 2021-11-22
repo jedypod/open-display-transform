@@ -1,6 +1,6 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.0.90b3
+      v0.0.90b4
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 */
@@ -10,6 +10,8 @@ DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, a
 DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 0, {sdr_rec1886, sdr_srgb, sdr_applep3, sdr_rec2020, hdr_rec2020_pq_100nit, hdr_rec2020_pq_600nit, hdr_rec2020_pq_1000nit, hdr_rec2020_hlg_1000nit, hdr_rec2020_pq_2000nit, hdr_rec2020_pq_4000nit, hdr_p3d65_pq_100nit, hdr_p3d65_pq_600nit, hdr_p3d65_pq_1000nit, hdr_p3d65_pq_2000nit, hdr_p3d65_pq_4000nit, dci_p3d60, dci_p3d65, dci_p3dci, dci_dcdm}, {Rec.1886: 2.4 Power | Rec.709, sRGB Display: 2.2 Power | Rec.709, Apple Display P3: 2.2 Power | P3D65, Rec.2020: 2.4 Power | Rec.2020, Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit, Rec.2100: HLG | Rec.2020 | 1000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit, Dolby: ST 2084 PQ | P3D65 | 100 nit, Dolby: ST 2084 PQ | P3D65 | 600 nit, Dolby: ST 2084 PQ | P3D65 | 1000 nit, Dolby: ST 2084 PQ | P3D65 | 2000 nit, Dolby: ST 2084 PQ | P3D65 | 4000 nit, DCI: 2.6 Power | P3 D60, DCI: 2.6 Power | P3 D65, DCI: 2.6 Power | P3 DCI, DCI: 2.6 Power | DCDM XYZ})
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93})
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(pdch, perceptual dechroma, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(gcmp, gamut compress, DCTLUI_CHECK_BOX, 1)
 
 #include "libDRT.h"
 
@@ -87,9 +89,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // highlight dechroma 
   const float dch = 0.5f;
 
-  // Enable perceptual highlight dechroma
-  const int pdch = 1;
-  
   /* Set up presets
      ----------------------- */
   int eotf;
@@ -195,37 +194,41 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Normalize D65 white to equal energy
     lms /= catd65;
 
+    float3 dlms_ndc = lms; // Store for perceptual dechroma
+
+    // Chroma compression for highly out of gamut values. Values tuned to protect CC24 values.
+    if (gcmp == 1) {
+      float3 yrg = lms_to_yrg(lms, 1);
+      float gcf = compress_parabolic(yrg.y, 0.3f, 1.0f, 0.45f) / yrg.y;
+      lms = (lms.x + lms.y + lms.z) / 3.0f * (1.0f - gcf) + lms * gcf;
+    }
+    
     // Weighted vector length norm
     lms = maxf3(1e-12f, lms);
-    // lms = make_float3(_fmaxf(lms.x, 1e-12f), _fmaxf(lms.y, 1e-12f), _fmaxf(lms.z, 1e-12f));
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
 
     // Tonescale and flare compensation
     float ns = sy * _powf(n / (n + sx), p);
     float nt = ns * ns / (ns + fl);
+    float ts = nt / n; // tone scale
 
     // Chroma compression factor
     float ccf = _powf(sx / (n + sx), dch) * sat;
 
     // Display-referred LMS
-    float3 dlms = lms * nt / n;
+    float3 dlms = lms * ts;
     
     // Display referred LMS without chroma compression
-    lms = dlms;
+    dlms_ndc = dlms_ndc * ts;
 
     // Compress chroma: chromaticity-linear desaturation by ccf
     dlms = nt * (1.0f - ccf) + dlms * ccf;
 
-    float3 yrg = lms_to_yrg(dlms, 1);
-    yrg.y = compress_parabolic(yrg.y, 0.3f, 0.5f, 0.45f);
-    dlms = yrg_to_lms(yrg, 1);
-
     // Apply output creative output whitepoint scale to both scene lms and display lms
     // Also normalize by w_n so that channels are not pushed above display peak luminance. 
     // For example if using a D55 whitepoint, without normalization the R channel would be > 1
-    // TODO: determine if it is a mistake to do gamut compression _after_ creative whitepoint adjustment
     dlms *= cats / w_n;
-    lms *= cats / w_n;
+    dlms_ndc *= cats / w_n;
     
     // Convert from Truelight LMS to XYZ
     float3 xyz = mult_f3_f33(dlms, tlms_to_xyz);
@@ -233,12 +236,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Distort chromaticity-linear chroma compression along perceptual hue paths using JzAzBz
     if (pdch == 1) {
       float3 jz = xyz_to_jzazbz(xyz, 1);
-    
-      // Apply gamut compression to C in JCh. Values tuned to protect CC24 values.
-      jz.y = compress_parabolic(jz.y, 0.015f, 0.05f, 0.02f);
 
       // Scene-linear XYZ tristimulus without any chroma compression. To use as our source hue.
-      float3 xyz_ndc = mult_f3_f33(lms, tlms_to_xyz);
+      float3 xyz_ndc = mult_f3_f33(dlms_ndc, tlms_to_xyz);
       float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
       
       // Copy hue from jz_ndc: Effectively warps the hue from chromaticity-linear to perceptual.
