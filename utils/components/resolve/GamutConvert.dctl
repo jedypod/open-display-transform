@@ -6,7 +6,7 @@ DEFINE_UI_PARAMS(out_gamut, out gamut, DCTLUI_COMBO_BOX, 1, {o_ap0, o_ap1, o_p3d
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
 
 
-#include "libDTColorMath.h"
+#include "libDRT.h"
 
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
