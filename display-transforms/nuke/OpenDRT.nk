@@ -968,7 +968,7 @@ push $N50678800
  }
  Expression {
   temp_name0 n
-  temp_expr0 max(1e-12,sqrt(pow(w.0*r,2)+pow(w.1*g,2)+pow(w.2*b,2))/sum)
+  temp_expr0 sqrt(max(1e-12,w.0*r)**2+max(1e-12,w.1*g)**2+max(1e-12,w.2*b)**2)/sum
   temp_name1 ns
   temp_expr1 sy*pow(n/(n+sx),p)
   temp_name2 nt
