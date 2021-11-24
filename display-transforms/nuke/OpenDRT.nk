@@ -954,7 +954,7 @@ push $N50678800
   disable {{!parent.gcmp}}
   addUserKnob {20 Params_tab l Params}
   addUserKnob {7 t0 t "threshold to start compression\n" R 0 2}
-  t0 0.3
+  t0 0.35
   addUserKnob {7 x0 t "x coordinate to compress to" R 0 2}
   x0 1
   addUserKnob {7 y0 t "y coordinate to compress to" R 0 2}

@@ -118,7 +118,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     float3 dlms_ndc = lms;
     if (gcmp == 1) {
       float3 yrg = lms_to_yrg(lms, 1);
-      float gcf = compress_parabolic(yrg.y, 0.3f, 1.0f, 0.45f) / yrg.y;
+      float gcf = compress_parabolic(yrg.y, 0.35f, 1.0f, 0.45f) / yrg.y;
       lms = (lms.x + lms.y + lms.z) / 3.0f * (1.0f - gcf) + lms * gcf;
     }
     lms = maxf3(1e-12f, lms);
