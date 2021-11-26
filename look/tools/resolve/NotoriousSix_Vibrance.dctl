@@ -10,8 +10,7 @@ DEFINE_UI_PARAMS(mg, green, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(mcu, custom, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(cuh, hue, DCTLUI_SLIDER_FLOAT, 100, 0, 360, 0)
 DEFINE_UI_PARAMS(cuw, width, DCTLUI_SLIDER_FLOAT, 0.3, 0, 2, 0)
-DEFINE_UI_PARAMS(str, strength, DCTLUI_SLIDER_FLOAT, 0.8, 0.001, 1, 0)
-DEFINE_UI_PARAMS(chl, chromaticity-linear, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(hl, hue-linear, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
 DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 1)
 DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
 DEFINE_UI_PARAMS(zone, zone, DCTLUI_COMBO_BOX, 0, {low, high}, {low, high})
@@ -24,7 +23,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   int zr = 0;
   if (zone == high) zr = 1;
   
-  rgb = nosix_vibrance(rgb, mgl, my, mr, mm, mb, mc, mg, mcu, cuh, cuw, str, chl, ze, zp, zr);
+  rgb = nosix_vibrance(rgb, mgl, my, mr, mm, mb, mc, mg, mcu, cuh, cuw, hl, ze, zp, zr);
   
   return rgb;
 }

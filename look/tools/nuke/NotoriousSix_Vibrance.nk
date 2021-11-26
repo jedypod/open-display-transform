@@ -4,7 +4,7 @@ Group {
  name NotoriousSix_Vibrance
  tile_color 0x536177ff
  addUserKnob {20 Vibrance_tab l Vibrance}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Notorious Six Vibrance</b> created by Jed Smith\n<br>v0.0.2 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look>documentation</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Notorious Six Vibrance</b> created by Jed Smith\n<br>v0.0.3 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look>documentation</a><br>"}
  addUserKnob {7 mgl l global R -1 1}
  addUserKnob {7 my l yellow R -1 1}
  addUserKnob {7 mr l red R -1 1}
@@ -18,9 +18,8 @@ Group {
  addUserKnob {7 cuw l "custom width" t "width for custom hue angle extraction"}
  cuw 0.3
  addUserKnob {26 ""}
- addUserKnob {6 chl l "chromaticity linear" t "chroma is moved on a linear line between the chromaticity and the achromatic axis." +STARTLINE}
- addUserKnob {7 str l strength t "adjust strength of chromaticity-linear vibrance adjustment"}
- str 0.8
+ addUserKnob {7 hl l hue-linear}
+ hl 0.5
  addUserKnob {6 ze l "zone extract" t "effect a limited range of luminance." +STARTLINE}
  ze true
  addUserKnob {4 zr l "" -STARTLINE M {low high ""}}
@@ -48,13 +47,13 @@ Group {
   xpos 214
   ypos -270
  }
-set N78993900 [stack 0]
+set Na64fcf00 [stack 0]
  Dot {
   name Dot24
   xpos 104
   ypos -270
  }
-set N78993200 [stack 0]
+set Na64fc800 [stack 0]
  Dot {
   name Dot105
   xpos -6
@@ -73,20 +72,20 @@ set N78993200 [stack 0]
   xpos -6
   ypos -198
  }
-set N78991d00 [stack 0]
+set Na2713200 [stack 0]
  Dot {
   name Dot106
   xpos -6
   ypos 114
  }
-set N78991600 [stack 0]
-push $N78993200
+set Na2712b00 [stack 0]
+push $Na64fc800
  Dot {
   name Dot27
   xpos 104
   ypos 66
  }
-set N78990f00 [stack 0]
+set Na2712400 [stack 0]
  MergeExpression {
   inputs 2
   temp_name0 n
@@ -111,16 +110,18 @@ set N78990f00 [stack 0]
   addUserKnob {7 p R 0 64}
   p {{pow(2,-zp)}}
  }
-push $N78991600
-push $N78991d00
-push $N78993900
+push $Na2712b00
+push $Na2713200
+push $Na64fcf00
  MergeExpression {
   inputs 2
   temp_name0 n
   temp_expr0 Ar
-  expr0 n==0?0:r/n
-  expr1 n==0?0:g/n
-  expr2 n==0?0:b/n
+  temp_name1 mn
+  temp_expr1 -1
+  expr0 n==0?0:max(mn,r/n)
+  expr1 n==0?0:max(mn,g/n)
+  expr2 n==0?0:max(mn,b/n)
   name RGBRatios
   xpos 180
   ypos -202
@@ -130,46 +131,43 @@ push $N78993900
   xpos 214
   ypos -150
  }
-set N7f3cb900 [stack 0]
+set Na2710f00 [stack 0]
  Expression {
   temp_name0 C
   temp_expr0 1-min(r,g,b)
   channel0 {rgba.red rgba.green rgba.blue none}
   expr0 (C==0?0:r==1?((g-b)/C+6)%6:g==1?(b-r)/C+2:b==1?(r-g)/C+4:0)
-  expr3 pow(1-min(r,g,b),p)
+  expr3 C
   name hue
   xpos 510
   ypos -154
-  addUserKnob {20 Params}
-  addUserKnob {7 p}
-  p {{str}}
  }
  Dot {
   name Dot5
   xpos 544
-  ypos -78
+  ypos -102
  }
-set N7f3cab00 [stack 0]
+set Na2710100 [stack 0]
  Dot {
   name Dot6
   xpos 544
-  ypos -30
+  ypos -54
  }
-set N7f3ca400 [stack 0]
+set Na6f63900 [stack 0]
  Dot {
   name Dot7
   xpos 544
-  ypos 18
+  ypos -6
  }
  Expression {
   temp_name0 h
   temp_expr0 (r+o)%6
   channel0 {rgba.red rgba.green rgba.blue none}
-  expr0 h<e1?clamp((h-e0)/(e1-e0)):clamp((h-e3)/(e2-e3))
+  expr0 (h<e1?clamp((h-e0)/(e1-e0)):clamp((h-e3)/(e2-e3)))*a
   name LinearWindow1
   label Custom
   xpos 400
-  ypos 8
+  ypos -16
   addUserKnob {20 Param}
   addUserKnob {7 o l offset R 0 6}
   o {{cuh/60}}
@@ -182,8 +180,8 @@ set N7f3ca400 [stack 0]
   addUserKnob {7 e3 R 0 4}
   e3 {{2+cuw}}
  }
-set N7f3c9600 [stack 0]
-push $N7f3ca400
+set Na6f62b00 [stack 0]
+push $Na6f63900
  Expression {
   temp_name0 h0
   temp_expr0 (r+o0)%6
@@ -191,14 +189,14 @@ push $N7f3ca400
   temp_expr1 (r+o1)%6
   temp_name2 h2
   temp_expr2 (r+o2)%6
-  expr0 clamp(h0>c0?(h0-c0-f0)/(c0-(c0+f0)):(h0-(c0-f0))/(c0-(c0-f0)))
-  expr1 clamp(h1>c1?(h1-c1-f1)/(c1-(c1+f1)):(h1-(c1-f1))/(c1-(c1-f1)))
-  expr2 clamp(h2>c2?(h2-c2-f2)/(c2-(c2+f2)):(h2-(c2-f2))/(c2-(c2-f2)))
+  expr0 clamp(h0>c0?(h0-c0-f0)/(c0-(c0+f0)):(h0-(c0-f0))/(c0-(c0-f0)))*a
+  expr1 clamp(h1>c1?(h1-c1-f1)/(c1-(c1+f1)):(h1-(c1-f1))/(c1-(c1-f1)))*a
+  expr2 clamp(h2>c2?(h2-c2-f2)/(c2-(c2+f2)):(h2-(c2-f2))/(c2-(c2-f2)))*a
   channel3 none
   name LerpWindow4
   label CMY
   xpos 400
-  ypos -40
+  ypos -64
   addUserKnob {20 Param}
   addUserKnob {7 o0 R 0 6}
   o0 5
@@ -220,8 +218,8 @@ push $N7f3ca400
   addUserKnob {7 f2 R 0.2 1.2}
   f2 1
  }
-set N7f3c8f00 [stack 0]
-push $N7f3cab00
+set Na6f62400 [stack 0]
+push $Na2710100
  Expression {
   temp_name0 h0
   temp_expr0 (r+o0)%6
@@ -229,14 +227,14 @@ push $N7f3cab00
   temp_expr1 (r+o1)%6
   temp_name2 h2
   temp_expr2 (r+o2)%6
-  expr0 clamp(h0>c0?(h0-c0-f0)/(c0-(c0+f0)):(h0-(c0-f0))/(c0-(c0-f0)))
-  expr1 clamp(h1>c1?(h1-c1-f1)/(c1-(c1+f1)):(h1-(c1-f1))/(c1-(c1-f1)))
-  expr2 clamp(h2>c2?(h2-c2-f2)/(c2-(c2+f2)):(h2-(c2-f2))/(c2-(c2-f2)))
+  expr0 clamp(h0>c0?(h0-c0-f0)/(c0-(c0+f0)):(h0-(c0-f0))/(c0-(c0-f0)))*a
+  expr1 clamp(h1>c1?(h1-c1-f1)/(c1-(c1+f1)):(h1-(c1-f1))/(c1-(c1-f1)))*a
+  expr2 clamp(h2>c2?(h2-c2-f2)/(c2-(c2+f2)):(h2-(c2-f2))/(c2-(c2-f2)))*a
   channel3 none
   name LerpWindow2
   label RGB
   xpos 400
-  ypos -88
+  ypos -112
   addUserKnob {20 Param}
   addUserKnob {7 o0 R 0 6}
   o0 2
@@ -258,129 +256,132 @@ push $N7f3cab00
   addUserKnob {7 f2 R 0.2 1.2}
   f2 1
  }
-set N7f3c8800 [stack 0]
-push $N7f3cb900
+set Na6f61d00 [stack 0]
+push $Na2710f00
  MergeExpression {
   inputs 2
   temp_name0 m
-  temp_expr0 min(r,g,b)*(1-mf)+mf
+  temp_expr0 1.1
   temp_name1 c
   temp_expr1 Aa
-  temp_name2 f
-  temp_expr2 c==0?1:((1-pow(1-c,p0))*Ar+(1-pow(1-c,p1))*Ag+(1-pow(1-c,p2))*Ab+c*(1-(Ar+Ag+Ab)))/c
+  temp_name3 f
+  temp_expr3 c==0||c>1?1:((1-pow(1-c,p0))*Ar+(1-pow(1-c,p1))*Ag+(1-pow(1-c,p2))*Ab+c*(1-(Ar+Ag+Ab)))/c
   channel0 {rgba.red -rgba.green -rgba.blue none}
   expr0 m*(1-f)+r*f
   expr1 m*(1-f)+g*f
   expr2 m*(1-f)+b*f
-  name MergeExpression5
+  expr3 f
+  name vihl_rgb
   xpos 180
-  ypos -82
+  ypos -106
   addUserKnob {20 Params}
-  addUserKnob {7 mf}
-  mf {{str}}
   addUserKnob {7 p0 R 0 4}
-  p0 {{(mr<0?mr+1:(mr*3)+1)*(mgl+1)}}
+  p0 {{3**mr*3**mgl}}
   addUserKnob {7 p1 R 0 4}
-  p1 {{(mg<0?mg+1:(mg*3)+1)*(mgl+1)}}
+  p1 {{3**mg*3**mgl}}
   addUserKnob {7 p2 R 0 4}
-  p2 {{(mb<0?mb+1:(mb*3)+1)*(mgl+1)}}
+  p2 {{3**mb*3**mgl}}
  }
  MergeExpression {
   inputs 2
   temp_name0 m
-  temp_expr0 min(r,g,b)*(1-str)+str
+  temp_expr0 1
   temp_name1 c
   temp_expr1 Aa
-  temp_name2 f
-  temp_expr2 c==0?1:((1-pow(1-c,p0))*Ar+(1-pow(1-c,p1))*Ag+(1-pow(1-c,p2))*Ab+c*(1-(Ar+Ag+Ab)))/c
+  temp_name3 f
+  temp_expr3 c==0?1:((1-pow(1-c,p0))*Ar+(1-pow(1-c,p1))*Ag+(1-pow(1-c,p2))*Ab+c*(1-(Ar+Ag+Ab)))/c
   channel0 {rgba.red -rgba.green -rgba.blue none}
   expr0 m*(1-f)+r*f
   expr1 m*(1-f)+g*f
   expr2 m*(1-f)+b*f
-  name MergeExpression7
+  name vihl_cmy
   xpos 180
+  ypos -58
+  addUserKnob {20 Params}
+  addUserKnob {7 p0 R 0 4}
+  p0 {{3**mc*3**mgl}}
+  addUserKnob {7 p1 R 0 4}
+  p1 {{3**mm*3**mgl}}
+  addUserKnob {7 p2 R 0 4}
+  p2 {{3**my*2**mgl}}
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 m
+  temp_expr0 1
+  temp_name1 c
+  temp_expr1 Aa
+  temp_name3 f
+  temp_expr3 c==0?1:((1-pow(1-c,p))*Ar+c*(1-Ar))/c
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 m*(1-f)+r*f
+  expr1 m*(1-f)+g*f
+  expr2 m*(1-f)+b*f
+  name vihl_cu
+  xpos 180
+  ypos -10
+  addUserKnob {20 Params}
+  addUserKnob {7 p R 0 4}
+  p {{3**mcu}}
+ }
+push $Na6f62b00
+push $Na6f62400
+push $Na6f61d00
+push $Na2710f00
+ MergeExpression {
+  inputs 2
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 pow(r,p0)*Ar+pow(r,p1)*Ag+pow(r,p2)*Ab+r*(1-(Ar+Ag+Ab))
+  expr1 pow(g,p0)*Ar+pow(g,p1)*Ag+pow(g,p2)*Ab+g*(1-(Ar+Ag+Ab))
+  expr2 pow(b,p0)*Ar+pow(b,p1)*Ag+pow(b,p2)*Ab+b*(1-(Ar+Ag+Ab))
+  name vi_rgb
+  xpos 290
+  ypos -82
+  addUserKnob {20 Params}
+  addUserKnob {7 p0 R 0 4}
+  p0 {{parent.vihl_rgb.p0}}
+  addUserKnob {7 p1 R 0 4}
+  p1 {{parent.vihl_rgb.p1}}
+  addUserKnob {7 p2 R 0 4}
+  p2 {{parent.vihl_rgb.p2}}
+ }
+ MergeExpression {
+  inputs 2
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 pow(r,p0)*Ar+pow(r,p1)*Ag+pow(r,p2)*Ab+r*(1-(Ar+Ag+Ab))
+  expr1 pow(g,p0)*Ar+pow(g,p1)*Ag+pow(g,p2)*Ab+g*(1-(Ar+Ag+Ab))
+  expr2 pow(b,p0)*Ar+pow(b,p1)*Ag+pow(b,p2)*Ab+b*(1-(Ar+Ag+Ab))
+  name vi_cmy
+  xpos 290
   ypos -34
   addUserKnob {20 Params}
   addUserKnob {7 p0 R 0 4}
-  p0 {{(mc<0?mc+1:(mc*3)+1)*(mgl+1)}}
+  p0 {{parent.vihl_cmy.p0}}
   addUserKnob {7 p1 R 0 4}
-  p1 {{(mm<0?mm+1:(mm*3)+1)*(mgl+1)}}
+  p1 {{parent.vihl_cmy.p1}}
   addUserKnob {7 p2 R 0 4}
-  p2 {{(my<0?my+1:(my*3)+1)*(mgl+1)}}
+  p2 {{parent.vihl_cmy.p2}}
  }
  MergeExpression {
   inputs 2
-  temp_name0 m
-  temp_expr0 min(r,g,b)*(1-str)+str
-  temp_name1 c
-  temp_expr1 Aa
-  temp_name2 f
-  temp_expr2 c==0?1:((1-pow(1-c,p))*Ar+c*(1-Ar))/c
-  channel0 {rgba.red -rgba.green -rgba.blue none}
-  expr0 m*(1-f)+r*f
-  expr1 m*(1-f)+g*f
-  expr2 m*(1-f)+b*f
-  name MergeExpression8
-  xpos 180
-  ypos 14
-  addUserKnob {20 Params}
-  addUserKnob {7 p R 0 4}
-  p {{1+mcu}}
- }
-push $N7f3c9600
-push $N7f3c8f00
-push $N7f3c8800
-push $N7f3cb900
- MergeExpression {
-  inputs 2
-  temp_name0 p0
-  temp_expr0 (mr+1)*(mgl+1)
-  temp_name1 p1
-  temp_expr1 (mg+1)*(mgl+1)
-  temp_name2 p2
-  temp_expr2 (mb+1)*(mgl+1)
-  channel0 {rgba.red -rgba.green -rgba.blue none}
-  expr0 pow(r,p0)*Ar+pow(r,p1)*Ag+pow(r,p2)*Ab+r*(1-(Ar+Ag+Ab))
-  expr1 pow(g,p0)*Ar+pow(g,p1)*Ag+pow(g,p2)*Ab+g*(1-(Ar+Ag+Ab))
-  expr2 pow(b,p0)*Ar+pow(b,p1)*Ag+pow(b,p2)*Ab+b*(1-(Ar+Ag+Ab))
-  name MergeExpression2
-  xpos 290
-  ypos -58
- }
- MergeExpression {
-  inputs 2
-  temp_name0 p0
-  temp_expr0 (mc+1)*(mgl+1)
-  temp_name1 p1
-  temp_expr1 (mm+1)*(mgl+1)
-  temp_name2 p2
-  temp_expr2 (my+1)*(mgl+1)
-  channel0 {rgba.red -rgba.green -rgba.blue none}
-  expr0 pow(r,p0)*Ar+pow(r,p1)*Ag+pow(r,p2)*Ab+r*(1-(Ar+Ag+Ab))
-  expr1 pow(g,p0)*Ar+pow(g,p1)*Ag+pow(g,p2)*Ab+g*(1-(Ar+Ag+Ab))
-  expr2 pow(b,p0)*Ar+pow(b,p1)*Ag+pow(b,p2)*Ab+b*(1-(Ar+Ag+Ab))
-  name MergeExpression3
-  xpos 290
-  ypos -10
- }
- MergeExpression {
-  inputs 2
-  temp_name0 p0
-  temp_expr0 (mcu+1)
   channel0 {rgba.red -rgba.green -rgba.blue none}
   expr0 pow(r,p0)*Ar+r*(1-Ar)
   expr1 pow(g,p0)*Ar+g*(1-Ar)
   expr2 pow(b,p0)*Ar+b*(1-Ar)
-  name MergeExpression1
+  name vi_cu
   xpos 290
-  ypos 38
+  ypos 17
+  addUserKnob {20 Params}
+  addUserKnob {7 p0 R 0 4}
+  p0 {{parent.vihl_cu.p}}
  }
- Switch {
+ Dissolve {
   inputs 2
-  which {{chl}}
-  name Switch_chl
+  channels rgb
+  which {{hl}}
+  name Mix_hue_linear
   xpos 180
-  ypos 62
+  ypos 63
  }
  MergeExpression {
   inputs 2
@@ -404,7 +405,7 @@ push $N7f3cb900
   xpos 180
   ypos 158
  }
-push $N78990f00
+push $Na2712400
  NodeWrapper {
   inputs 2+1
   channels rgb

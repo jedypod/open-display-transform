@@ -15,6 +15,11 @@
 */
 
 
+__DEVICE__ float3 maxf3(float b, float3 a) {
+  // For each component of float3 a, return max of component and float b
+  return make_float3(_fmaxf(a.x, b), _fmaxf(a.y, b), _fmaxf(a.z, b));
+}
+
 
 // Extract a range from e0 to e1 from f, clamping values above or below.
 __DEVICE__ float extract(float e0, float e1, float x) {
@@ -47,6 +52,26 @@ __DEVICE__ float calc_hue(float3 rgb) {
   return h;
 }
 
+
+
+
+
+
+
+/*  ##########################################################################
+    Notorious Six Value
+    v0.0.2
+    ------------------
+
+    Value (borrowing the term from painting), refers to the brightness of a color. 
+    This tool allows you to adjust the value of different colors. Includes:
+      - Primary and secondary hue angle adjustments
+      - Custom hue angle 
+      - Zone extraction controls (disabled by default)
+      - Strength parameter: controls how much colors near grey are affected.
+*/
+
+
 /* Chroma
     In the RGB Ratios model, traditional chroma is 1-min(r,g,b). This is equal to (max(r,g,b)-min(r,g,b))/max(r,g,b)
     Traditional chroma is unsuiteable to use as a factor for adjusting color "value" or "exposure",
@@ -68,24 +93,6 @@ __DEVICE__ float chroma(float3 r, float m, float str) {
   ch = ch * str + 1.0f - str; // 1 - lift
   return ch;
 }
-
-
-
-
-
-
-/*  ##########################################################################
-    Notorious Six Value
-    v0.0.2
-    ------------------
-
-    Value (borrowing the term from painting), refers to the brightness of a color. 
-    This tool allows you to adjust the value of different colors. Includes:
-      - Primary and secondary hue angle adjustments
-      - Custom hue angle 
-      - Zone extraction controls (disabled by default)
-      - Strength parameter: controls how much colors near grey are affected.
-*/
 
 
 __DEVICE__ float3 nosix_value(float3 rgb, 
@@ -205,38 +212,47 @@ __DEVICE__ float3 nosix_value(float3 rgb,
 
 
 /* Notorious Six Vibrance
-    v0.0.2
+    v0.0.3
     ------------------
 
-    Vibrance emulates what happens to color in the bottom end of
-    a per-channel contrast increase: Secondary hues are bent towards primary hues.
+    **Description**
+      Vibrance creates a nonlinear compression of chroma towards the gamut boundary.
+      Effectively this increases apparent colorfullness for "mid-range" chroma values,
+      without pushing colors beyond the gamut boundary like a traditional 
+      distance-based saturation control.
 
-    Image "richness" is increased without slamming into the gamut boundary as with a 
-    traditional saturation adjustment. 
-
-    If chromaticity-linear is enabled, chroma is adjusted on a linear line between 
-    source chromaticity and the achromatic axis. Otherwise, hue bends toward primaries (RGB).    
+    **Controls**
+      - Global vibrance control
+      - Per hue-angle controls
+      - Custom hue-angle control
+      - Hue-linear control. If at 1.0, chroma is adjusted on a linear line between 
+        original chromaticity and the achromatic axis. Otherwise, hues are bent
+        towards primary hue angles (RGB), similar to what happens in per-channel
+        contrast increase.
+      - Optional zone range extraction to limit effect to shadows or highlights
 
 */
 
 
 __DEVICE__ float3 nosix_vibrance(float3 rgb, 
     float mgl, float my, float mr, float mm, float mb, float mc, float mg, float mcu, 
-    float cuh, float cuw, float str, float chl, int ze, float zp, int zr) {
+    float cuh, float cuw, float hl, int ze, float zp, int zr) {
 
   float3 in = rgb;
 
-  // Parameter setup
-  float3 pp = make_float3(
-    (mr + 1.0f) * (mgl + 1.0f),
-    (mg + 1.0f) * (mgl + 1.0f),
-    (mb + 1.0f) * (mgl + 1.0f));
-  float3 ps = make_float3(
-    (mc + 1.0f) * (mgl + 1.0f),
-    (mm + 1.0f) * (mgl + 1.0f),
-    (my + 1.0f) * (mgl + 1.0f));
-  
-  float pc = (mcu + 1.0f);
+  // Parameter setup for nonlinear vibrance
+  const float p_base = 3.0f; // strength of controls
+  const float mgl_str = _powf(p_base, mgl); // global strength multiplier
+  const float3 pp = make_float3(
+    _powf(p_base, mr) * mgl_str,
+    _powf(p_base, mg) * mgl_str,
+    _powf(p_base, mb) * mgl_str);
+  const float3 ps = make_float3(
+    _powf(p_base, mc) * mgl_str,
+    _powf(p_base, mm) * mgl_str,
+    _powf(p_base, my) * _powf(p_base / 1.5f, mgl)); // reduce influence for yellow
+  const float pc = _powf(p_base, mcu);
+
 
   // max(r,g,b) norm
   float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
@@ -244,75 +260,90 @@ __DEVICE__ float3 nosix_vibrance(float3 rgb,
   float3 r; // RGB Ratios
   if (n == 0.0f) r = make_float3(0.0f, 0.0f, 0.0f);
   else r = rgb / n;
-  // r = maxf3(-1.0f, r);
+  
+  // Protect against crazy negative values
+  r = maxf3(-1.0f, r); 
 
+  // Calculate hue angle and chroma
   float h = calc_hue(r);
+  float c =  1.0f - _fminf(r.x, _fminf(r.y, r.z));
+  
+  float3 r_hl = r; // rgb ratios for hue-linear vibrance
 
   // hue extraction for primaries (RGB)
   float3 hp = make_float3(
     extract_hue_angle(h, 2.0f, 1.0f, 0),
     extract_hue_angle(h, 6.0f, 1.0f, 0),
     extract_hue_angle(h, 4.0f, 1.0f, 0));
+  hp = hp * c;
 
   // hue extraction for secondaries (CMY)
   float3 hs = make_float3(
     extract_hue_angle(h, 5.0f, 1.0f, 0),
     extract_hue_angle(h, 3.0f, 1.0f, 0),
     extract_hue_angle(h, 1.0f, 1.0f, 0));
+  hs = hs * c;
 
   float hc = extract_hue_angle(h, cuh / 60.0f, cuw, 0);
+  hc = hc * c;
 
-  if (chl == 0) {
-    // Primary hue angle vibrance adjustment
-    r.x = r.x < 0.0f ? r.x : _powf(r.x, pp.x) * hp.x + _powf(r.x, pp.y) * hp.y + _powf(r.x, pp.z) * hp.z + r.x * (1.0f - (hp.x + hp.y + hp.z));
-    r.y = r.y < 0.0f ? r.y : _powf(r.y, pp.x) * hp.x + _powf(r.y, pp.y) * hp.y + _powf(r.y, pp.z) * hp.z + r.y * (1.0f - (hp.x + hp.y + hp.z));
-    r.z = r.z < 0.0f ? r.z : _powf(r.z, pp.x) * hp.x + _powf(r.z, pp.y) * hp.y + _powf(r.z, pp.z) * hp.z + r.z * (1.0f - (hp.x + hp.y + hp.z));
+  // Primary hue angle vibrance adjustment
+  r.x = r.x < 0.0f ? r.x : 
+    _powf(r.x, pp.x) * hp.x + _powf(r.x, pp.y) * hp.y + _powf(r.x, pp.z) * hp.z + r.x * 
+    (1.0f - (hp.x + hp.y + hp.z));
+  r.y = r.y < 0.0f ? r.y : 
+    _powf(r.y, pp.x) * hp.x + _powf(r.y, pp.y) * hp.y + _powf(r.y, pp.z) * hp.z + r.y * 
+    (1.0f - (hp.x + hp.y + hp.z));
+  r.z = r.z < 0.0f ? r.z : 
+    _powf(r.z, pp.x) * hp.x + _powf(r.z, pp.y) * hp.y + _powf(r.z, pp.z) * hp.z + r.z * 
+    (1.0f - (hp.x + hp.y + hp.z));
 
-    // Secondary hue angle vibrance adjustment
-    r.x = r.x < 0.0f ? r.x : _powf(r.x, ps.x) * hs.x + _powf(r.x, ps.y) * hs.y + _powf(r.x, ps.z) * hs.z + r.x * (1.0f - (hs.x + hs.y + hs.z));
-    r.y = r.y < 0.0f ? r.y : _powf(r.y, ps.x) * hs.x + _powf(r.y, ps.y) * hs.y + _powf(r.y, ps.z) * hs.z + r.y * (1.0f - (hs.x + hs.y + hs.z));
-    r.z = r.z < 0.0f ? r.z : _powf(r.z, ps.x) * hs.x + _powf(r.z, ps.y) * hs.y + _powf(r.z, ps.z) * hs.z + r.z * (1.0f - (hs.x + hs.y + hs.z));
+  // Secondary hue angle vibrance adjustment
+  r.x = r.x < 0.0f ? r.x : 
+    _powf(r.x, ps.x) * hs.x + _powf(r.x, ps.y) * hs.y + _powf(r.x, ps.z) * hs.z + r.x * 
+    (1.0f - (hs.x + hs.y + hs.z));
+  r.y = r.y < 0.0f ? r.y : 
+    _powf(r.y, ps.x) * hs.x + _powf(r.y, ps.y) * hs.y + _powf(r.y, ps.z) * hs.z + r.y * 
+    (1.0f - (hs.x + hs.y + hs.z));
+  r.z = r.z < 0.0f ? r.z : 
+    _powf(r.z, ps.x) * hs.x + _powf(r.z, ps.y) * hs.y + _powf(r.z, ps.z) * hs.z + r.z * 
+    (1.0f - (hs.x + hs.y + hs.z));
 
-    // Custom hue angle vibrance adjustment
-    r.x = r.x < 0.0f ? r.x : _powf(r.x, pc) * hc + r.x * (1.0f - hc);
-    r.y = r.y < 0.0f ? r.y : _powf(r.y, pc) * hc + r.y * (1.0f - hc);
-    r.z = r.z < 0.0f ? r.z : _powf(r.z, pc) * hc + r.z * (1.0f - hc);
-  } 
-  else {
-    // Chromaticity-linear
+  // Custom hue angle vibrance adjustment
+  r.x = r.x < 0.0f ? r.x : _powf(r.x, pc) * hc + r.x * (1.0f - hc);
+  r.y = r.y < 0.0f ? r.y : _powf(r.y, pc) * hc + r.y * (1.0f - hc);
+  r.z = r.z < 0.0f ? r.z : _powf(r.z, pc) * hc + r.z * (1.0f - hc);
 
-    float c =  1.0f - _fminf(r.x, _fminf(r.y, r.z)); // Chroma
-    c = _powf( _fmaxf(0.0f, c), str); 
 
-    // Modify parameter scales for chromaticity-linear
-    pp = make_float3(
-      (mr < 0.0f ? mr * 0.9f + 1.0f : mr * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f),
-      (mg < 0.0f ? mg * 0.9f + 1.0f : mg * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f),
-      (mb < 0.0f ? mb * 0.9f + 1.0f : mb * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f));
-    ps = make_float3(
-      (mc < 0.0f ? mc * 0.9f + 1.0f : mc * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f),
-      (mm < 0.0f ? mm * 0.9f + 1.0f : mm * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f),
-      (my < 0.0f ? my * 0.9f + 1.0f : my * 3.0f + 1.0f) * ((mgl > 0.0f ? mgl * 3.0f : mgl * 0.9f) + 1.0f));
-    pc = (mcu < 0.0f ? mcu * 0.9f + 1.0f : mcu * 3.0f + 1.0f);
+  // Chromaticity-linear vibrance adjustment
+  float m, vf;
 
-    float m = _fminf(r.x, _fminf(r.y, r.z)) * (1.0 - str) + str;
-    float vf;
+  // Primary hue angles
+  vf = c == 0.0f || c > 1.0f ? 1.0f : 
+    ((1.0f - _powf(1.0f - c, pp.x)) * hp.x + (1.0f - _powf(1.0f - c, pp.y)) * hp.y + 
+    (1.0f - _powf(1.0f - c, pp.z)) * hp.z + c * (1.0f - (hp.x + hp.y + hp.z))) / c;
+  m = 1.1f; // lerp target > 1 darkens vibrance boosted colors. 1.1 tuned by eye to match per-channel 
+  r_hl = m * (1.0f - vf) + r_hl * vf;
 
-    // Primaries
-    vf = c == 0.0f ? 1.0f : ((1.0f - _powf(1.0f - c, pp.x)) * hp.x + (1.0f - _powf(1.0f - c, pp.y)) * hp.y + (1.0f - _powf(1.0f - c, pp.z)) * hp.z + c * (1.0f - (hp.x + hp.y + hp.z))) / c;
-    r = m * (1.0f - vf) + r * vf;
+  // Secondary hue angles
+  vf = c == 0.0f || c > 1.0f ? 1.0f : 
+    ((1.0f - _powf(1.0f - c, ps.x)) * hs.x + (1.0f - _powf(1.0f - c, ps.y)) * hs.y + 
+    (1.0f - _powf(1.0f - c, ps.z)) * hs.z + c * (1.0f - (hs.x + hs.y + hs.z))) / c;
+  m = 1.0f; // don't want to darken secondaries.
+  r_hl = m * (1.0f - vf) + r_hl * vf;
 
-    // Secondaries
-    vf = c == 0.0f ? 1.0f : ((1.0f - _powf(1.0f - c, ps.x)) * hs.x + (1.0f - _powf(1.0f - c, ps.y)) * hs.y + (1.0f - _powf(1.0f - c, ps.z)) * hs.z + c * (1.0f - (hs.x + hs.y + hs.z))) / c;
-    r = m * (1.0f - vf) + r * vf;
+  // Custom hue angle
+  vf = c == 0.0f || c > 1.0f ? 1.0f : 
+    ((1.0f - _powf(1.0f - c, pc)) * hc + c * (1.0f - hc)) / c;
+  r_hl = m * (1.0f - vf) + r_hl * vf;
 
-    // Custom
-    vf = c == 0.0f ? 1.0f : ((1.0f - _powf(1.0f - c, pc)) * hc + c * (1.0f - hc)) / c;
-    r = m * (1.0f - vf) + r * vf;
-    
-  }
+
+  // Mix between nonlinear and hue-linear vibrance adjustment
+  r = r * (1.0f - hl) + r_hl * hl;
+
 
   rgb = r * n;
+
 
   // Zone extract
   if (ze == 1) {
