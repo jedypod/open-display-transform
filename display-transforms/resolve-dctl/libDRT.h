@@ -167,21 +167,6 @@ __DEVICE__ float3 _smoothstepf3(float e0, float e1, float3 x) {
   return make_float3(_smoothstepf(e0, e1, x.x), _smoothstepf(e0, e1, x.y), _smoothstepf(e0, e1, x.z));
 }
 
-__DEVICE__ float extract(float e0, float e1, float x) {
-  // Extract a range from e0 to e1 from f, clamping values above or below.
-  return _clampf((x - e0) / (e1 - e0), 0.0f, 1.0f);
-}
-
-__DEVICE__ float extract_window(float e0, float e1, float e2, float e3, float x) {
-  // Linear window function to extract a range from float x
-  // https://www.desmos.com/calculator/uzsk5ta5v7
-  return x < e1 ? extract(e0, e1, x) : extract(e3, e2, x);
-}
-
-__DEVICE__ float3 extract_window_f3(float e0, float e1, float e2, float e3, float3 x) {
-  // Linear window function to extract a range from float3 x
-  return make_float3(extract_window(e0, e1, e2, e3, x.x), extract_window(e0, e1, e2, e3, x.y), extract_window(e0, e1, e2, e3, x.z));
-}
 
 __DEVICE__ float chroma(float3 rgb, int norm) {
   // Calculate and return classical chroma. If norm, normalize by mx

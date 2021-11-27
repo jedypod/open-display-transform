@@ -15,12 +15,6 @@
 */
 
 
-__DEVICE__ float3 maxf3(float b, float3 a) {
-  // For each component of float3 a, return max of component and float b
-  return make_float3(_fmaxf(a.x, b), _fmaxf(a.y, b), _fmaxf(a.z, b));
-}
-
-
 // Extract a range from e0 to e1 from f, clamping values above or below.
 __DEVICE__ float extract(float e0, float e1, float x) {
   return _clampf((x - e0) / (e1 - e0), 0.0f, 1.0f);
@@ -262,7 +256,7 @@ __DEVICE__ float3 nosix_vibrance(float3 rgb,
   else r = rgb / n;
   
   // Protect against crazy negative values
-  r = maxf3(-1.0f, r); 
+  r = make_float3(_fmaxf(r.x, -1.0f), _fmaxf(r.y, -1.0f), _fmaxf(r.z, -1.0f));
 
   // Calculate hue angle and chroma
   float h = calc_hue(r);
