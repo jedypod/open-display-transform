@@ -136,10 +136,10 @@ push $Nc4e74100
  end_group
  Expression {
   temp_name0 mx
-  temp_expr0 dcdm?1:s
-  expr0 parent.clamp?max(0,min(mx,r/s)):r/s
-  expr1 parent.clamp?max(0,min(mx,g/s)):g/s
-  expr2 parent.clamp?max(0,min(mx,b/s)):b/s
+  temp_expr0 dcdm?1:_s
+  expr0 parent.clamp?max(0,min(mx,r/_s)):r/_s
+  expr1 parent.clamp?max(0,min(mx,g/_s)):g/_s
+  expr2 parent.clamp?max(0,min(mx,b/_s)):b/_s
   name InvDisplayScale
   xpos 510
   ypos -442
@@ -150,8 +150,8 @@ push $Nc4e74100
   hlg {{eotf==5}}
   addUserKnob {6 dcdm -STARTLINE}
   dcdm {{eotf==3&&display_gamut==5}}
-  addUserKnob {7 s}
-  s {{pq?Lw/10000:hlg?Lw/1000:dcdm?48/52.37:1}}
+  addUserKnob {7 _s}
+  _s {{pq?Lw/10000:hlg?Lw/1000:dcdm?48/52.37:1}}
  }
  ColorMatrix {
   matrix {
@@ -1023,6 +1023,7 @@ push $N50678800
   expr0 r*w.0/n
   expr1 g*w.1/n
   expr2 b*w.2/n
+  expr3 1
   name Scale1
   xpos 70
   ypos -202
@@ -1182,6 +1183,7 @@ push $N2905600
   expr0 r*w.0/wn
   expr1 g*w.1/wn
   expr2 b*w.2/wn
+  expr3 1
   name Scale
   xpos 180
   ypos -202
@@ -1602,10 +1604,10 @@ push $N141b9600
  end_group
  Expression {
   temp_name0 mx
-  temp_expr0 dcdm?1:s
-  expr0 parent.clamp?max(0,min(mx,r*s)):r*s
-  expr1 parent.clamp?max(0,min(mx,g*s)):g*s
-  expr2 parent.clamp?max(0,min(mx,b*s)):b*s
+  temp_expr0 dcdm?1:_s
+  expr0 parent.clamp?max(0,min(mx,r*_s)):r*_s
+  expr1 parent.clamp?max(0,min(mx,g*_s)):g*_s
+  expr2 parent.clamp?max(0,min(mx,b*_s)):b*_s
   name DisplayScale1
   xpos 180
   ypos 86
@@ -1616,8 +1618,8 @@ push $N141b9600
   hlg {{eotf==5}}
   addUserKnob {6 dcdm -STARTLINE}
   dcdm {{eotf==3&&display_gamut==5}}
-  addUserKnob {7 s}
-  s {{pq?Lw/10000:hlg?Lw/1000:dcdm?48/52.37:1}}
+  addUserKnob {7 _s}
+  _s {{pq?Lw/10000:hlg?Lw/1000:dcdm?48/52.37:1}}
  }
  Group {
   name InverseEOTF
