@@ -940,13 +940,12 @@ push $N50678800
   temp_name0 _c
   temp_expr0 Ag
   temp_name1 f
-  temp_expr1 (_c<t0?_c:s*sqrt(_c-ox)+oy)/_c
+  temp_expr1 (_c<t0?_c:sc*sqrt(_c-ox)+oy)/_c
   temp_name2 ac
   temp_expr2 (r+g+b)/3
   expr0 ac*(1-f)+r*f
   expr1 ac*(1-f)+g*f
   expr2 ac*(1-f)+b*f
-  expr3 ac
   maskChannelMask rgba.red
   name compress_chroma
   xpos 180
@@ -959,12 +958,12 @@ push $N50678800
   x0 1
   addUserKnob {7 y0 t "y coordinate to compress to" R 0 2}
   y0 0.45
-  addUserKnob {7 s}
-  s {{(y0-t0)/sqrt(x0-y0)}}
+  addUserKnob {7 sc}
+  sc {{(y0-t0)/sqrt(x0-y0)}}
   addUserKnob {7 ox R -2 2}
-  ox {{t0-s*s/4}}
+  ox {{t0-sc*sc/4}}
   addUserKnob {7 oy R -2 2}
-  oy {{t0-s*sqrt(s*s/4)}}
+  oy {{t0-sc*sqrt(sc*sc/4)}}
  }
  Expression {
   temp_name0 n

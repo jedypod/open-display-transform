@@ -121,15 +121,15 @@ push $N5c554800
   }
  end_group
  Expression {
-  expr0 r*s
-  expr1 g*s
-  expr2 b*s
+  expr0 r*sc
+  expr1 g*sc
+  expr2 b*sc
   name InvDisplayScale
   xpos 180
   ypos -130
   addUserKnob {20 Params}
-  addUserKnob {7 s}
-  s {{parent.DisplayScale.s}}
+  addUserKnob {7 sc}
+  sc {{parent.DisplayScale.sc}}
  }
  Multiply {
   channels rgb
@@ -597,10 +597,10 @@ push $N5c2a7200
  }
  Expression {
   temp_name0 mx
-  temp_expr0 dcdm?1:s
-  expr0 parent.clamp?max(0,min(mx,r*s)):r*s
-  expr1 parent.clamp?max(0,min(mx,g*s)):g*s
-  expr2 parent.clamp?max(0,min(mx,b*s)):b*s
+  temp_expr0 dcdm?1:sc
+  expr0 parent.clamp?max(0,min(mx,r*sc)):r*sc
+  expr1 parent.clamp?max(0,min(mx,g*sc)):g*sc
+  expr2 parent.clamp?max(0,min(mx,b*sc)):b*sc
   name DisplayScale
   xpos -40
   ypos 110
@@ -611,8 +611,8 @@ push $N5c2a7200
   hlg {{eotf==5}}
   addUserKnob {6 dcdm -STARTLINE}
   dcdm {{eotf==3&&display_gamut==5}}
-  addUserKnob {7 s}
-  s {{pq?Lw/10000:hlg?Lw/1000:dcdm?48/52.37:1}}
+  addUserKnob {7 sc}
+  sc {{pq?Lw/10000:hlg?Lw/1000:dcdm?48/52.37:1}}
  }
  Group {
   name InverseEOTF

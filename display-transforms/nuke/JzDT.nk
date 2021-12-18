@@ -13,6 +13,7 @@ Group {
  addUserKnob {41 eotf T InverseEOTF.eotf}
  addUserKnob {41 display_gamut l "display gamut" -STARTLINE T XYZ_to_DisplayGamut.gamut}
  addUserKnob {6 clamp -STARTLINE}
+ clamp true
  addUserKnob {4 direction M {forward inverse}}
 }
  Input {
@@ -122,15 +123,15 @@ push $Ndaad1600
   }
  end_group
  Expression {
-  expr0 r*s
-  expr1 g*s
-  expr2 b*s
+  expr0 r*sc
+  expr1 g*sc
+  expr2 b*sc
   name InvDisplayScale
   xpos 180
   ypos -106
   addUserKnob {20 Params}
-  addUserKnob {7 s}
-  s {{parent.DisplayScale.s}}
+  addUserKnob {7 sc}
+  sc {{parent.DisplayScale.sc}}
  }
  ColorMatrix {
   matrix {
@@ -956,7 +957,7 @@ push $Nfdafab00
   }
  end_group
  Expression {
-  expr1 g<t0?g:s*sqrt(g-ox)+oy
+  expr1 g<t0?g:sc*sqrt(g-ox)+oy
   maskChannelMask rgba.red
   name compress_parabolic
   xpos -40
@@ -968,12 +969,12 @@ push $Nfdafab00
   x0 0.05
   addUserKnob {7 y0 t "y coordinate to compress to" R 0 0.1}
   y0 0.025
-  addUserKnob {7 s}
-  s {{(y0-t0)/sqrt(x0-y0)}}
+  addUserKnob {7 sc}
+  sc {{(y0-t0)/sqrt(x0-y0)}}
   addUserKnob {7 ox R -2 2}
-  ox {{t0-s*s/4}}
+  ox {{t0-sc*sc/4}}
   addUserKnob {7 oy R -2 2}
-  oy {{t0-s*sqrt(s*s/4)}}
+  oy {{t0-sc*sqrt(sc*sc/4)}}
  }
  Copy {
   inputs 2
@@ -1244,10 +1245,10 @@ push $N8f82b200
  }
  Expression {
   temp_name0 mx
-  temp_expr0 dcdm?1:s
-  expr0 parent.clamp?max(0,min(mx,r*s)):r*s
-  expr1 parent.clamp?max(0,min(mx,g*s)):g*s
-  expr2 parent.clamp?max(0,min(mx,b*s)):b*s
+  temp_expr0 dcdm?1:sc
+  expr0 parent.clamp?max(0,min(mx,r*sc)):r*sc
+  expr1 parent.clamp?max(0,min(mx,g*sc)):g*sc
+  expr2 parent.clamp?max(0,min(mx,b*sc)):b*sc
   name DisplayScale
   xpos -40
   ypos 350
@@ -1258,8 +1259,8 @@ push $N8f82b200
   hlg {{eotf==5}}
   addUserKnob {6 dcdm -STARTLINE}
   dcdm {{eotf==3&&display_gamut==5}}
-  addUserKnob {7 s}
-  s {{pq?Lw/10000:hlg?Lw/1000:dcdm?48/52.37:1}}
+  addUserKnob {7 sc}
+  sc {{pq?Lw/10000:hlg?Lw/1000:dcdm?48/52.37:1}}
  }
  Group {
   name InverseEOTF
