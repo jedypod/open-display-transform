@@ -13,7 +13,7 @@ All tools are available as a node for Nuke or Nuke Non-Commercial, and as a DCTL
 - **JzDT**  
   Another experiment using the max(r,g,b) norm and the JzAzBz LMS space.
 
-## [Look Transforms](look)
+## [Look Transforms](look-transforms)
 A collection of tools designed to creatively adjust image appearance.
 
 
