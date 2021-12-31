@@ -1,20 +1,21 @@
 # Open Display Transform
-![OpenDRT v0.0.82 Nuke](/docs/img/ui/OpenDRT_Nuke_v0.0.81b3.png)
-![OpenDRT v0.0.81b3 Resolve](/docs/img/ui/OpenDRT_Resolve_v0.0.81b3.png)
 
-A simple and robust open source display transform for rendering wide gamut high dynamic range scene-linear images on an SDR or HDR display device.
+An open collection of tools and experiments for rendering wide-gamut scene-linear data into an image for an SDR or HDR display device.
 
-Available as a node for Nuke or Nuke Non-Commercial, and a DCTL for Resolve Studio.
+All tools are available as a node for Nuke or Nuke Non-Commercial, and as a DCTL for Resolve Studio. Matchbox shaders are in development.
 
-## Design Goals
+## [Display Transforms](display-transforms)
+- **OpenDRT**  
+  A simple and robust display transform based on [CIE 2006 LMS](https://doi.org/10.2352/issn.2169-2629.2019.27.38) and the [Michaelis-Menten](http://retina.anatomy.upenn.edu/~rob/lance/michaelis.html) [Equation](https://community.acescentral.com/t/output-transform-tone-scale/3498/14).  
+  Neutral appearance. Color preserving where possible, faithful to input image data.
+- **rgbDT**  
+  A classic per-channel display-transform. Uses a custom rendering gamut designed to handle input colorimetry beyond the bounds of the spectral locus without sacrificing image appearance.
+- **JzDT**  
+  Another experiment using the max(r,g,b) norm and the JzAzBz LMS space.
 
-- **Simple** - Simplicity of design 
-- **Robust** - Handle extremes without breaking
-- **Neutral** - No strong look, no creative intent, faithful to input image colorimetry
-- **Chromaticity Preserving** - Faithfully represent the chromaticity values of the input image
-- **Information Preserving** - Preserve as much data as possible from the input image
-- **Invertible** - Can operate in the forward and inverse directions within the limitations of display-referred imagery
-- **Look Not Included** - Intended to be used in conjunction with a look transform upstream
+## [Look Transforms](look)
+A collection of tools designed to creatively adjust image appearance.
 
-# Documentation
-Get started with [installation instructions](/docs/doc_installation.md), or read through the [Documentation](/docs)
+
+# [Documentation](https://github.com/jedypod/open-display-transform/wiki)
+There is a collection of documentation [available on the wiki](https://github.com/jedypod/open-display-transform/wiki).
