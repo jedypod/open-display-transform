@@ -137,9 +137,9 @@ push $Nc4e74100
  Expression {
   temp_name0 mx
   temp_expr0 dcdm?1:_s
-  expr0 parent.clamp?max(0,min(mx,r/_s)):r/_s
-  expr1 parent.clamp?max(0,min(mx,g/_s)):g/_s
-  expr2 parent.clamp?max(0,min(mx,b/_s)):b/_s
+  expr0 parent.clamp?max(0,min(mx,r)/_s):r/_s
+  expr1 parent.clamp?max(0,min(mx,g)/_s):g/_s
+  expr2 parent.clamp?max(0,min(mx,b)/_s):b/_s
   name InvDisplayScale
   xpos 510
   ypos -442
