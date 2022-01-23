@@ -1,7 +1,7 @@
 set cut_paste_input [stack 0]
 push $cut_paste_input
 Group {
- name NotoriousSix_Value
+ name N6Value
  tile_color 0x536177ff
  addUserKnob {20 Value_tab l Value}
  addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Notorious Six Value</b> created by Jed Smith\n<br>v0.0.2 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look>documentation</a><br>"}
