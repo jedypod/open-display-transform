@@ -181,9 +181,9 @@ set Nd7e1600 [stack 0]
   addUserKnob {7 t0}
   t0 {{0.18*pow(2,pv)}}
   addUserKnob {7 _a R -10 10}
-  _a {{pow(t0,-p-1)*p*(_c-1)}}
+  _a {{p*(_c-1)/(t0**(p+1))}}
   addUserKnob {7 _b R -10 10}
-  _b {{-pow(t0,-p)*(_c-1)*(p+1)}}
+  _b {{(1-_c)*(p+1)/(t0**p)}}
   addUserKnob {7 _c R 0 10}
   _c {{pow(2,ex)}}
  }
@@ -212,9 +212,9 @@ set Nd7e1600 [stack 0]
   addUserKnob {7 t0}
   t0 {{0.18*pow(2,pv)}}
   addUserKnob {7 _a R -10 10}
-  _a {{pow(t0,-p-1)*p*(_c-1)}}
+  _a {{p*(_c-1)/(t0**(p+1))}}
   addUserKnob {7 _b R -10 10}
-  _b {{-pow(t0,-p)*(_c-1)*(p+1)}}
+  _b {{(1-_c)*(p+1)/(t0**p)}}
   addUserKnob {7 _c R 0 10}
   _c {{pow(2,ex)}}
  }
