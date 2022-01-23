@@ -1,0 +1,59 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name ShadowContrast
+ addUserKnob {20 ShadowContrast_tab l ShadowContrast}
+ addUserKnob {41 ex l exposure T expr_ShadowContrast.ex}
+ addUserKnob {41 str l strength T expr_ShadowContrast.str}
+ addUserKnob {41 invert T expr_ShadowContrast.invert}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask -STARTLINE T expr_ShadowContrast.maskChannelMask}
+ addUserKnob {41 invert_mask l invert -STARTLINE T expr_ShadowContrast.invert_mask}
+ addUserKnob {41 mix T expr_ShadowContrast.mix}
+}
+ Input {
+  inputs 0
+  name Inputmask
+  xpos -1140
+  ypos -106
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos -1250
+  ypos -154
+ }
+ Expression {
+  inputs 1+1
+  temp_name0 p0
+  temp_expr0 max(r,g,b)**2-3*_m*w
+  temp_name1 p1
+  temp_expr1 2*max(r,g,b)**2+27*w-9*_m*w
+  temp_name2 p2
+  temp_expr2 pow(sqrt(max(r,g,b)**2*p1*p1-4*p0*p0*p0)/2+max(r,g,b)*p1/2,1/3)
+  temp_name3 s
+  temp_expr3 invert?((max(r,g,b)**2-3*_m*w)/(3*p2)+p2/3+max(r,g,b)/3)/max(r,g,b):(max(r,g,b)**2+_m*w)/(max(r,g,b)**2+w)
+  expr0 r*s
+  expr1 g*s
+  expr2 b*s
+  name expr_ShadowContrast
+  label "https://www.desmos.com/calculator/ubgteikoke\nhttps://colab.research.google.com/drive/1JT_-S96RZyfHPkZ620QUPIRfxmS_rKlx"
+  xpos -1250
+  ypos -118
+  addUserKnob {20 Params}
+  addUserKnob {7 ex l exposure R -6 0}
+  addUserKnob {7 str l strength}
+  str 0.5
+  addUserKnob {7 _m R 0 4}
+  _m {{2**ex}}
+  addUserKnob {7 w}
+  w {{2**(-(1-str)*10)}}
+  addUserKnob {6 invert +STARTLINE}
+ }
+ Output {
+  name Output
+  xpos -1250
+  ypos -58
+ }
+end_group

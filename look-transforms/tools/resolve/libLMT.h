@@ -542,3 +542,22 @@ __DEVICE__ float3 zone_grade(float3 rgb,
 
   return rgb;
 }
+
+
+/* Shadow Contrast
+    Invertible cubic shadow exposure function
+*/
+__DEVICE__ float shd_con(float n, float m, float w, int invert) {
+  // https://www.desmos.com/calculator/ubgteikoke
+  // https://colab.research.google.com/drive/1JT_-S96RZyfHPkZ620QUPIRfxmS_rKlx
+  float n2 = n*n;
+  if (invert == 0) {
+    n = n*(n2 + m*w)/(n2 + w);
+  } else {
+    float p0 = n2 - 3.0f*m*w;
+    float p1 = 2.0f*n2 + 27.0f*w - 9.0f*m*w;
+    float p2 = _powf(_sqrtf(n2*p1*p1 - 4*p0*p0*p0)/2.0f + n*p1/2.0f,1.0f/3.0f);
+    n = (p0/(3.0f*p2) + p2/3.0f + n/3.0f);
+  }
+  return n;
+}

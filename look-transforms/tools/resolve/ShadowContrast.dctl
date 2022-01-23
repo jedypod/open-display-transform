@@ -1,0 +1,27 @@
+DEFINE_UI_PARAMS(ex, exposure, DCTLUI_SLIDER_FLOAT, 0.0, -6.0, 0.0, 0.0)
+DEFINE_UI_PARAMS(str, strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(pc, rgb, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+
+#include "libLMT.h"
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
+{
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  // Parameter setup
+  const float m = _powf(2.0f, ex);
+  const float w = _powf(2.0f, -(1.0f-str)*10.0f);
+
+  if (pc == 0) {
+    float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+    float s = shd_con(n, m, w, invert) / n;
+    rgb *= s;
+  } else {
+    // Per-channel shadow contrast
+    rgb.x = shd_con(rgb.x, m, w, invert);
+    rgb.y = shd_con(rgb.y, m, w, invert);
+    rgb.z = shd_con(rgb.z, m, w, invert);
+  }
+  return rgb;
+}
