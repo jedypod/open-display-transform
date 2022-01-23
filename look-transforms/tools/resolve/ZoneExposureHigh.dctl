@@ -1,0 +1,13 @@
+#include "libLMT.h"
+
+DEFINE_UI_PARAMS(ex, exposure, DCTLUI_SLIDER_FLOAT, 0.0, -5.0, 5.0, 0.0)
+DEFINE_UI_PARAMS(pv, pivot, DCTLUI_SLIDER_FLOAT, -1.0, -5.0, 5.0, 0.0)
+DEFINE_UI_PARAMS(fa, falloff, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
+{
+  float3 rgb = make_float3(p_R, p_G, p_B);
+  rgb = ex_high(rgb, ex, pv, fa, invert);
+  return rgb;
+}
