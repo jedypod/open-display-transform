@@ -464,7 +464,7 @@ __DEVICE__ float3 nosix_hueshift(float3 rgb,
 */
 
 
-__DEVICE__ float3 ex_high(float3 rgb, float ex, float pv, float fa) {
+__DEVICE__ float3 ex_high(float3 rgb, float ex, float pv, float fa, int inv) {
   // Zoned highlight exposure with falloff : https://www.desmos.com/calculator/ylq5yvkhoq
 
   // Parameter setup
@@ -479,10 +479,13 @@ __DEVICE__ float3 ex_high(float3 rgb, float ex, float pv, float fa) {
 
   // Calculate scale factor for rgb
   float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
-  float s = n < t0 ? 1.0f : n > x1 ? (m * (n - x1) + y1) / n : (a * _powf(n, p) + b) / n;
+  float s;
+  if (inv == 1)
+    s = n < t0 ? 1.0f : n > y1 ? ((m * x1 - y1 + n) / m) / n : _powf((n - b) / a, 1.0f / p) / n;
+  else
+    s = n < t0 ? 1.0f : n > x1 ? (m * (n - x1) + y1) / n : (a * _powf(n, p) + b) / n;
   return rgb * s;
 }
-
 
 __DEVICE__ float3 ex_low(float3 rgb, float ex, float pv, float fa) {
   // Zoned shadow exposure with falloff : https://www.desmos.com/calculator/my116fpnix
@@ -526,13 +529,13 @@ __DEVICE__ float3 zone_grade(float3 rgb,
   rgb = grade(rgb, ex, c, pv, off);
   
   // Zone High
-  rgb = ex_high(rgb, he, hp, hf);
+  rgb = ex_high(rgb, he, hp, hf, 0);
   
   // Zone Low
   rgb = ex_low(rgb, le, lp, lf);
 
   // Zone Higher
-  rgb = ex_high(rgb, he2, hp2, hf2);
+  rgb = ex_high(rgb, he2, hp2, hf2, 0);
   
   // Zone Lower
   rgb = ex_low(rgb, le2, lp2, lf2);
