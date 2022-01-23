@@ -485,15 +485,16 @@ __DEVICE__ float3 ex_high(float3 rgb, float ex, float pv, float fa) {
 
 
 __DEVICE__ float3 ex_low(float3 rgb, float ex, float pv, float fa) {
-  // Zoned shadow exposure with falloff : https://www.desmos.com/calculator/oz8eyxoo9k
+  // Zoned shadow exposure with falloff : https://www.desmos.com/calculator/my116fpnix
+  // https://colab.research.google.com/drive/1GAoiqR33U2zlW5fw1byUdZBw7eqJibjN
 
   // Parameter setup
   const float f = 6.0f - 5.0f * fa;
   const float p = _fminf(f / 2.0f, f / 2.0f * _powf(0.5, ex));
   const float t0 = 0.18f * _powf(2.0f, pv);
   const float _c = _powf(2.0f, ex);
-  const float _a = _powf(t0, -p - 1.0f) * p * (_c - 1.0f);
-  const float _b = -_powf(t0, -p) * (_c - 1.0f) * (p + 1.0f);
+  const float _a = p*(_c - 1.0f)/_powf(t0, p + 1.0f);
+  const float _b = (1.0f - _c)*(p + 1.0f)/_powf(t0, p);
   
   // Calculate scale factor for rgb
   float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
