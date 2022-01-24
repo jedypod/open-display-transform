@@ -1,5 +1,3 @@
-#include "libLMT.h"
-
 DEFINE_UI_PARAMS(my, yellow, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(mr, red, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(mm, magenta, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
@@ -13,7 +11,9 @@ DEFINE_UI_PARAMS(str, strength, DCTLUI_SLIDER_FLOAT, 0.8, 0, 1, 0)
 DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 0)
 DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
 DEFINE_UI_PARAMS(zone, zone, DCTLUI_COMBO_BOX, 0, {low, high}, {low, high})
+DEFINE_UI_PARAMS(smst, smooth hue extract, DCTLUI_CHECK_BOX, 1)
 
+#include "libLMT.h"
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
 {
@@ -22,7 +22,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   int zr = 0;
   if (zone == high) zr = 1;
 
-  rgb = nosix_value(rgb, my, mr, mm, mb, mc, mg, mcu, cuh, cuw, str, ze, zp, zr);
+  rgb = n6_chroma_value(rgb, my, mr, mm, mb, mc, mg, mcu, cuh, cuw, str, ze, zp, zr, smst);
   
   return rgb;
 }

@@ -23,7 +23,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   int zr = 0;
   if (zone == high) zr = 1;
 
-  rgb = nosix_hueshift(rgb, sy, sr, sm, sb, sc, sg, scu, cuh, cuw, str, chl, ze, zp, zr);
+  rgb = n6_hueshift(rgb, sy, sr, sm, sb, sc, sg, scu, cuh, cuw, str, chl, ze, zp, zr);
   
   return rgb;
 }

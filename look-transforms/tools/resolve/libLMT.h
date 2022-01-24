@@ -53,8 +53,8 @@ __DEVICE__ float calc_hue(float3 rgb) {
 
 
 /*  ##########################################################################
-    Notorious Six Value
-    v0.0.2
+    Notorious Six Chroma Value
+    v0.0.3
     ------------------
 
     Value (borrowing the term from painting), refers to the brightness of a color. 
@@ -77,21 +77,22 @@ __DEVICE__ float calc_hue(float3 rgb) {
     distance from achromatic is achieved.
     In the RGB Ratios model, this simplifies to min(r,g,b)*(1-f)+f, since max(r,g,b) is always 1
 */
+
 // Calculate chroma based on exposure for primaries
 __DEVICE__ float chroma(float3 r, float m, float str) {
   float ch = _fminf(1.0f, 1.0f / m);
   ch = _fminf(r.x, _fminf(r.y, r.z)) * (1.0f - ch) + ch;
-  ch = ch == 0.0f ? 0.0f : _fminf(r.x / ch, _fminf(r.y / ch, r.z / ch));
-  // Chroma factor strength
-  // Full strength of 1.0 is linear. Reducing strength increasingly only affects more chrominous colors.
-  ch = ch * str + 1.0f - str; // 1 - lift
+  ch = ch == 0.0f ? 1.0f : 1.0f - _fminf(r.x / ch, _fminf(r.y / ch, r.z / ch));
+  // Chroma strength: 1 is linear. Reducing strength increasingly affects only more pure colors.
+  float w = 1.0f - str;
+  ch = ch == 0.0f ? 1.0f : _powf(ch, w + 2.0f) / (_powf(ch, w + 1.0f) + w);
   return ch;
 }
 
 
-__DEVICE__ float3 nosix_value(float3 rgb, 
+__DEVICE__ float3 n6_chroma_value(float3 rgb, 
     float my, float mr, float mm, float mb, float mc, float mg, float mcu, 
-    float cuh, float cuw, float str, int ze, float zp, int zr) {
+    float cuh, float cuw, float str, int ze, float zp, int zr, int smst) {
 
   float3 in = rgb;
   
@@ -110,9 +111,9 @@ __DEVICE__ float3 nosix_value(float3 rgb,
 
   // Hue extraction
   float3 hp = make_float3(
-    extract_hue_angle(h, 2.0f, 1.0f, 1),
-    extract_hue_angle(h, 6.0f, 1.0f, 1),
-    extract_hue_angle(h, 4.0f, 1.0f, 1));
+    extract_hue_angle(h, 2.0f, 1.0f, smst),
+    extract_hue_angle(h, 6.0f, 1.0f, smst),
+    extract_hue_angle(h, 4.0f, 1.0f, smst));
  
    // Exposure - input param range is -1 to 1, output exposure is +/- 4 stops.
   const float3 mp = make_float3(
@@ -136,7 +137,7 @@ __DEVICE__ float3 nosix_value(float3 rgb,
   float mfp = ((1.0f - hp_w.x) + mp.x * hp_w.x) * ((1.0f - hp_w.y) + mp.y * hp_w.y) * ((1.0f - hp_w.z) + mp.z * hp_w.z);
 
   // Chroma
-  float chp = _fmaxf(0.0f, chroma(r, mfp, str));
+  float chp = _fminf(2.0f, chroma(r, mfp, str));
   
 
   /* Secondary hue angles: CMY
@@ -144,9 +145,9 @@ __DEVICE__ float3 nosix_value(float3 rgb,
   
   // Hue extraction
   float3 hs = make_float3(
-    extract_hue_angle(h, 5.0f, 1.0f, 1),
-    extract_hue_angle(h, 3.0f, 1.0f, 1),
-    extract_hue_angle(h, 1.0f, 1.0f, 1));
+    extract_hue_angle(h, 5.0f, 1.0f, smst),
+    extract_hue_angle(h, 3.0f, 1.0f, smst),
+    extract_hue_angle(h, 1.0f, 1.0f, smst));
 
   const float3 ms = make_float3(
     _powf(2.0f, mc * 4.0f),
@@ -166,23 +167,23 @@ __DEVICE__ float3 nosix_value(float3 rgb,
   float mfs = ((1.0f - hs_w.x) + ms.x * hs_w.x) * ((1.0f - hs_w.y) + ms.y * hs_w.y) * ((1.0f - hs_w.z) + ms.z * hs_w.z);
 
   // Chroma
-  float chs = _fmaxf(0.0f, chroma(r, mfs, str));
+  float chs = _fminf(2.0f, chroma(r, mfs, str));
 
 
   /* Custom hue angle: Defaults to orange
       ----------------------------  */
 
-  float hc = extract_hue_angle(h, cuh / 60.0f, cuw, 1);
+  float hc = extract_hue_angle(h, cuh / 60.0f, cuw, smst);
   float m_c = _powf(2.0f, mcu * 4.0f);
   float m_p = _fminf(1.0f, 2.0f / m_c);
   float hc_w = 1.0f - _powf(1.0f - hc, m_p);
   float mfc = (1.0f - hc_w) + m_c * hc_w;
-  float chc = _fmaxf(0.0f, chroma(r, mfc, str));
+  float chc = _fminf(2.0f, chroma(r, mfc, str));
 
   // Apply exposure
-  r = mfp * r * (1.0f - chp) + r * chp;
-  r = mfs * r * (1.0f - chs) + r * chs;
-  r = mfc * r * (1.0f - chc) + r * chc;
+  r = mfp * r * chp + r * (1.0f - chp);
+  r = mfs * r * chs + r * (1.0f - chs);
+  r = mfc * r * chc + r * (1.0f - chc);
   
   rgb = r * n;
 
@@ -228,7 +229,7 @@ __DEVICE__ float3 nosix_value(float3 rgb,
 */
 
 
-__DEVICE__ float3 nosix_vibrance(float3 rgb, 
+__DEVICE__ float3 n6_vibrance(float3 rgb, 
     float mgl, float my, float mr, float mm, float mb, float mc, float mg, float mcu, 
     float cuh, float cuw, float hl, int ze, float zp, int zr) {
 
@@ -367,7 +368,7 @@ __DEVICE__ float3 nosix_vibrance(float3 rgb,
 */
 
 
-__DEVICE__ float3 nosix_hueshift(float3 rgb, 
+__DEVICE__ float3 n6_hueshift(float3 rgb, 
     float sy, float sr, float sm, float sb, float sc, float sg, float scu, 
     float cuh, float cuw, float str, float chl, int ze, float zp, int zr) {
   
