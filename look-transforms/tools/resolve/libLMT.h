@@ -84,8 +84,9 @@ __DEVICE__ float chroma(float3 r, float m, float str) {
   ch = _fminf(r.x, _fminf(r.y, r.z)) * (1.0f - ch) + ch;
   ch = ch == 0.0f ? 1.0f : 1.0f - _fminf(r.x / ch, _fminf(r.y / ch, r.z / ch));
   // Chroma strength: 1 is linear. Reducing strength increasingly affects only more pure colors.
+  // We use a variable-width power compression function, but this could be a multiply
   float w = 1.0f - str;
-  ch = ch == 0.0f ? 1.0f : _powf(ch, w + 2.0f) / (_powf(ch, w + 1.0f) + w);
+  ch = ch == 0.0f ? 0.0f : _powf(ch, w + 2.0f) / (_powf(ch, w + 1.0f) + w);
   return ch;
 }
 
