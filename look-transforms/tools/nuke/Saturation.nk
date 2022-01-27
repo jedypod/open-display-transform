@@ -1,0 +1,209 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name Saturation
+ tile_color 0x536177ff
+ addUserKnob {20 Saturation_tab l Saturation}
+ addUserKnob {26 global_label l " " T <b>global}
+ addUserKnob {41 sag l sat T Saturation.sag}
+ addUserKnob {26 huesat_label l " " T <b>hue}
+ addUserKnob {41 sah l sat T Saturation.sah}
+ addUserKnob {32 sr l "<font color=#e00><b>R" T "knobs this \{ho 2\}" +STARTLINE}
+ addUserKnob {32 sg l "<font color=#0e0><b>G" -STARTLINE T "knobs this \{ho 6\}"}
+ addUserKnob {32 sb l "<font color=#00e><b>B" -STARTLINE T "knobs this \{ho 4\}"}
+ addUserKnob {32 sc l "<font color=#0ee><b>C" -STARTLINE T "knobs this \{ho 5\}"}
+ addUserKnob {32 sm l "<font color=#e0e><b>M" -STARTLINE T "knobs this \{ho 3\}"}
+ addUserKnob {32 sy l "<font color=#ee0><b>Y" -STARTLINE T "knobs this \{ho 1\}"}
+ addUserKnob {41 ho l hue T HueAngle.ho}
+ addUserKnob {41 w l width T HueAngle.w}
+ addUserKnob {26 luminance_weights_label l " " T "<b>luminance weights"}
+ addUserKnob {35 lw_presets l " " t "select luminance weight preset" -STARTLINE M {preset/ACEScg "knobs this \{wr 0.26806405 wb 0.05947147\}" preset/Rec.2020 "knobs this \{wr 0.26270026 wb 0.05930173\}" preset/P3D65 "knobs this \{wr 0.22897467 wb 0.07928693\}" preset/Rec.709 "knobs this \{wr 0.21263911 wb 0.07219233\}"}}
+ addUserKnob {41 wr T Saturation.wr}
+ addUserKnob {41 wb T Saturation.wb}
+ addUserKnob {6 lg l "in log" t "applies saturation in -7 +7 stop lg2 " +STARTLINE}
+ lg true
+ addUserKnob {26 ""}
+ addUserKnob {26 zonelimit_label l " " T "<b>zone limiting"}
+ addUserKnob {6 ze l zoned t "enable zone limiting." +STARTLINE}
+ addUserKnob {83 zr l "" -STARTLINE M {low high}}
+ zr high
+ addUserKnob {7 zp l "zone range" t "set range affected: higher values affect a larger range" R -4 4}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask -STARTLINE T NodeWrapper1.maskChannelMask}
+ addUserKnob {41 invert_mask l invert -STARTLINE T NodeWrapper1.invert_mask}
+ addUserKnob {41 mix T NodeWrapper1.mix}
+}
+ Input {
+  inputs 0
+  name Inputmask
+  xpos 290
+  ypos -514
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos 180
+  ypos -730
+ }
+ Dot {
+  name Dot7
+  xpos 214
+  ypos -702
+ }
+set Nfcdbc100 [stack 0]
+ Expression {
+  temp_name0 n
+  temp_expr0 max(1e-12,max(r,g,b))
+  temp_name1 to
+  temp_expr1 (n*n/(n+fl))
+  temp_name2 flow
+  temp_expr2 pow((to/(to+1))/n,p)
+  temp_name3 fhi
+  temp_expr3 1-pow((n/(n+1))/n,p)
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 r
+  expr1 g
+  expr2 b
+  expr3 zr?fhi:flow
+  name Extract
+  xpos 70
+  ypos -634
+  addUserKnob {20 Params}
+  addUserKnob {7 fl R 0 0.02}
+  fl 0.01
+  addUserKnob {7 p R 0 64}
+  p {{pow(2,-zp)}}
+ }
+push $Nfcdbc100
+ Expression {
+  temp_name0 M
+  temp_expr0 max(r,g,b)
+  temp_name1 C
+  temp_expr1 M-min(r,g,b)
+  temp_name2 H
+  temp_expr2 (C==0?0:r==M?((g-b)/C+6)%6:g==M?(b-r)/C+2:b==M?(r-g)/C+4:0)
+  temp_name3 h
+  temp_expr3 (H+ho)%6
+  channel0 rgba
+  expr0 h<cn?clamp((h-e0)/(cn-e0)):clamp((h-e1)/(cn-e1))
+  name HueAngle
+  xpos 290
+  ypos -682
+  addUserKnob {20 Params}
+  addUserKnob {7 ho l hue R 0 6}
+  ho 1
+  addUserKnob {7 cn l center R 0 4}
+  cn 2
+  addUserKnob {7 w l width R 0.5 1.5}
+  w 1
+  addUserKnob {7 e0 R 0 4}
+  e0 {{cn-w}}
+  addUserKnob {7 e1 R 0 4}
+  e1 {{cn+w}}
+ }
+push $Nfcdbc100
+ Expression {
+  temp_name0 n
+  temp_expr0 max(r,g,b)
+  temp_name1 dr
+  temp_expr1 n*0.2+r*0.8
+  temp_name2 dg
+  temp_expr2 n*0.2+g*0.8
+  temp_name3 db
+  temp_expr3 n*0.2+b*0.8
+  expr0 dr>sp?(log(dr/0.18)/log(2)-mn)/(mx-mn):(dr-sp)/ls+lo
+  expr1 dg>sp?(log(dg/0.18)/log(2)-mn)/(mx-mn):(dg-sp)/ls+lo
+  expr2 db>sp?(log(db/0.18)/log(2)-mn)/(mx-mn):(db-sp)/ls+lo
+  name lin_to_log_lx
+  xpos 180
+  ypos -657
+  disable {{!lg}}
+  addUserKnob {20 Params}
+  addUserKnob {7 mn R -12 0}
+  mn -7
+  addUserKnob {7 mx R 0 12}
+  mx 7
+  addUserKnob {7 sp t "splice point"}
+  sp {{2**-7}}
+  addUserKnob {7 lo t "linear offset"}
+  lo {{(log(sp/0.18)/log(2)-mn)/(mx-mn)}}
+  addUserKnob {7 ls t "linear slope"}
+  ls {{sp*(mx-mn)*log(2)}}
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 L
+  temp_expr0 wr*r+wg*g+wb*b
+  temp_name1 f
+  temp_expr1 Ar
+  expr0 L-sag*(f*sah-f+1)*(L-r)
+  expr1 L-sag*(f*sah-f+1)*(L-g)
+  expr2 L-sag*(f*sah-f+1)*(L-b)
+  name Saturation
+  xpos 180
+  ypos -634
+  addUserKnob {20 Params}
+  addUserKnob {7 sag l saturation R 0 2}
+  sag 1
+  addUserKnob {7 sah l saturation R 0 2}
+  sah 1
+  addUserKnob {7 wr}
+  wr 0.13
+  addUserKnob {7 wg}
+  wg {{1-(wr+wb)}}
+  addUserKnob {7 wb}
+ }
+ Expression {
+  temp_name0 dr
+  temp_expr0 r>lo?0.18*pow(2,(r*(mx-mn)+mn)):ls*(r-lo)+sp
+  temp_name1 dg
+  temp_expr1 g>lo?0.18*pow(2,(g*(mx-mn)+mn)):ls*(g-lo)+sp
+  temp_name2 db
+  temp_expr2 b>lo?0.18*pow(2,(b*(mx-mn)+mn)):ls*(b-lo)+sp
+  temp_name3 n
+  temp_expr3 max(dr,dg,db)
+  expr0 dr*1.25-n/4
+  expr1 dg*1.25-n/4
+  expr2 db*1.25-n/4
+  name log_to_lin_lx
+  xpos 180
+  ypos -609
+  disable {{!lg}}
+  addUserKnob {20 Params}
+  addUserKnob {7 mn R -12 0}
+  mn -7
+  addUserKnob {7 mx R 0 12}
+  mx 7
+  addUserKnob {7 sp t "splice point"}
+  sp {{2**-7}}
+  addUserKnob {7 lo t "linear offset"}
+  lo {{(log(sp/0.18)/log(2)-mn)/(mx-mn)}}
+  addUserKnob {7 ls t "linear slope"}
+  ls {{sp*(mx-mn)*log(2)}}
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 ze?Aa:1
+  expr0 Ar*(1-f)+Br*f
+  expr1 Ag*(1-f)+Bg*f
+  expr2 Ab*(1-f)+Bb*f
+  name Mix1
+  xpos 180
+  ypos -562
+ }
+push $Nfcdbc100
+ NodeWrapper {
+  inputs 2+1
+  channels rgb
+  name NodeWrapper1
+  xpos 180
+  ypos -514
+ }
+ Output {
+  name Output
+  xpos 180
+  ypos -466
+ }
+end_group
