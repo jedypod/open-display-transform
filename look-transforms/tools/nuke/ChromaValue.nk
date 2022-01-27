@@ -188,7 +188,7 @@ push $N7c569600
   temp_expr2 _c==0?1:1-min(r/_c,g/_c,b/_c)
   channel0 rgb
   expr0 Ar
-  expr3 n==0?1:(n**(w+2))/(n**(w+1)+w)
+  expr3 n==0?0:(n**(w+2))/(n**(w+1)+w)
   name chroma_rgb1
   xpos 290
   ypos -514
