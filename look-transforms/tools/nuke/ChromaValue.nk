@@ -22,6 +22,7 @@ Group {
  addUserKnob {83 zr l "" -STARTLINE M {low high}}
  zr high
  addUserKnob {7 zp l "zone range" t "set range affected: higher values affect a larger range" R -4 4}
+ addUserKnob {6 invert +STARTLINE}
  addUserKnob {26 ""}
  addUserKnob {41 maskChannelMask l mask -STARTLINE T NodeWrapper1.maskChannelMask}
  addUserKnob {41 invert_mask l invert -STARTLINE T NodeWrapper1.invert_mask}
@@ -31,7 +32,7 @@ Group {
   inputs 0
   name Inputmask
   xpos 290
-  ypos -394
+  ypos -322
   number 1
  }
  Input {
@@ -45,13 +46,13 @@ Group {
   xpos 214
   ypos -678
  }
-set N6755cf00 [stack 0]
+set Nc39c3200 [stack 0]
  Dot {
   name Dot5
   xpos 104
   ypos -678
  }
-set N6755c800 [stack 0]
+set Nc39c2b00 [stack 0]
  Dot {
   name Dot9
   xpos -6
@@ -65,20 +66,20 @@ set N6755c800 [stack 0]
   xpos -40
   ypos -634
  }
-set N7c56b900 [stack 0]
+set Nc39c1d00 [stack 0]
  Dot {
   name Dot6
   xpos -6
-  ypos -486
+  ypos -414
  }
-set N7c56b200 [stack 0]
-push $N6755c800
+set Nc39c1600 [stack 0]
+push $Nc39c2b00
  Dot {
   name Dot27
   xpos 104
   ypos -582
  }
-set N7c56ab00 [stack 0]
+set Nc39c0f00 [stack 0]
  MergeExpression {
   inputs 2
   temp_name0 n
@@ -96,16 +97,16 @@ set N7c56ab00 [stack 0]
   expr3 zr?fhi:flow
   name Extract
   xpos 70
-  ypos -442
+  ypos -370
   addUserKnob {20 Params}
   addUserKnob {7 fl R 0 0.02}
   fl 0.01
   addUserKnob {7 p R 0 64}
   p {{pow(2,-zp+1)}}
  }
-push $N7c56b200
-push $N7c56b900
-push $N6755cf00
+push $Nc39c1600
+push $Nc39c1d00
+push $Nc39c3200
  MergeExpression {
   inputs 2
   temp_name0 n
@@ -124,7 +125,13 @@ push $N6755cf00
   xpos 214
   ypos -582
  }
-set N7c569600 [stack 0]
+set N4bb3f900 [stack 0]
+ Dot {
+  name Dot1
+  xpos 324
+  ypos -582
+ }
+set N24917200 [stack 0]
  Expression {
   temp_name0 M
   temp_expr0 max(r,g,b)
@@ -137,7 +144,7 @@ set N7c569600 [stack 0]
   channel0 rgba
   expr0 h<cn?clamp((h-e0)/(cn-e0)):clamp((h-e1)/(cn-e1))
   name HueAngle
-  xpos 290
+  xpos 400
   ypos -586
   addUserKnob {20 Param}
   addUserKnob {7 o l hue R 0 6}
@@ -156,7 +163,7 @@ set N7c569600 [stack 0]
   expr1 g*g*(3-2*g)
   expr2 b*b*(3-2*b)
   name SmoothStepInput1
-  xpos 290
+  xpos 400
   ypos -562
   disable {{!parent.smst}}
  }
@@ -168,7 +175,7 @@ set N7c569600 [stack 0]
   enable_mix_luminance false
   mix_luminance 1
   name Multiply
-  xpos 290
+  xpos 400
   ypos -538
   addUserKnob {20 Params}
   addUserKnob {7 ex l exposure R -4 4}
@@ -177,7 +184,7 @@ set N7c569600 [stack 0]
   addUserKnob {7 p R 0 4}
   p {{min(1,2/_m)}}
  }
-push $N7c569600
+push $N24917200
  MergeExpression {
   inputs 2
   temp_name0 f
@@ -191,14 +198,34 @@ push $N7c569600
   expr3 n==0?0:(n**(w+2))/(n**(w+1)+w)
   name chroma_rgb1
   xpos 290
-  ypos -514
+  ypos -538
   addUserKnob {20 Params}
   addUserKnob {7 st l strength}
   st 1
   addUserKnob {7 w}
   w {{1-st}}
  }
-push $N7c569600
+set N4bb3dd00 [stack 0]
+push $N4bb3f900
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 min(2,Aa)
+  temp_name1 _m
+  temp_expr1 Ar
+  temp_name2 d0
+  temp_expr2 (f*(_m-1)+1)
+  temp_name3 d
+  temp_expr3 d0==0?1:d0
+  expr0 r/d
+  expr1 g/d
+  expr2 b/d
+  name MergeExpression2
+  xpos 290
+  ypos -479
+ }
+push $N4bb3dd00
+push $N4bb3f900
  MergeExpression {
   inputs 2
   temp_name0 f
@@ -210,7 +237,14 @@ push $N7c569600
   expr2 _m*b*f+b*(1-f)
   name MergeExpression1
   xpos 180
-  ypos -514
+  ypos -538
+ }
+ Switch {
+  inputs 2
+  which {{invert}}
+  name SwitchInvert
+  xpos 180
+  ypos -478
  }
  MergeExpression {
   inputs 2
@@ -221,7 +255,7 @@ push $N7c569600
   expr2 n*b
   name Recombine1
   xpos 180
-  ypos -490
+  ypos -418
  }
  MergeExpression {
   inputs 2
@@ -232,19 +266,19 @@ push $N7c569600
   expr2 Ab*(1-f)+Bb*f
   name Mix1
   xpos 180
-  ypos -442
+  ypos -370
  }
-push $N7c56ab00
+push $Nc39c0f00
  NodeWrapper {
   inputs 2+1
   channels rgb
   name NodeWrapper1
   xpos 180
-  ypos -394
+  ypos -322
  }
  Output {
   name Output
   xpos 180
-  ypos -322
+  ypos -250
  }
 end_group
