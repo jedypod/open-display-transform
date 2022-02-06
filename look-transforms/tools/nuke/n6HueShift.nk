@@ -4,7 +4,7 @@ Group {
  name N6HueShift
  tile_color 0x53617700
  addUserKnob {20 HueShift_tab l HueShift}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Notorious Six HueShift</b> created by Jed Smith\n<br>v0.0.3 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look>documentation</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Notorious Six HueShift</b> created by Jed Smith\n<br>v0.0.4 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look>documentation</a><br>"}
  addUserKnob {26 ""}
  addUserKnob {7 sy l yellow R -1 1}
  addUserKnob {7 sr l red R -1 1}
@@ -334,41 +334,41 @@ push $Nbc7deb00
 push $Nbcff8f00
  MergeExpression {
   inputs 2
-  expr0 (r-sb)*Ab+(r+sg)*Ag+r*(1-(Ab+Ag))
-  expr1 (g+sr)*Ar+(g+sb)*Ab+g*(1-(Ar+Ab))
-  expr2 (b-sr)*Ar+(b-sg)*Ag+b*(1-(Ar+Ag))
+  expr0 r+Ab*s2-Ag*s1
+  expr1 g+Ar*s0-Ab*s2
+  expr2 b+Ag*s1-Ar*s0
   name Shift_RGB
   xpos -260
   ypos -106
   addUserKnob {20 Params}
-  addUserKnob {7 sr R -1 1}
-  sr {{parent.sr}}
-  addUserKnob {7 sg R -1 1}
-  sg {{parent.sg}}
-  addUserKnob {7 sb R -1 1}
-  sb {{parent.sb}}
+  addUserKnob {7 s0 R -1 1}
+  s0 {{sr}}
+  addUserKnob {7 s1 R -1 1}
+  s1 {{sg}}
+  addUserKnob {7 s2 R -1 1}
+  s2 {{sb}}
  }
- MergeExpression {
+  MergeExpression {
   inputs 2
-  expr0 (r+sy)*Ab+(r-sm)*Ag+r*(1-(Ab+Ag))
-  expr1 (g+sc)*Ar+(g-sy)*Ab+g*(1-(Ar+Ab))
-  expr2 (b-sc)*Ar+(b+sm)*Ag+b*(1-(Ar+Ag))
+  expr0 r+Ab*s2-Ag*s1
+  expr1 g+Ar*s0-Ab*s2
+  expr2 b+Ag*s1-Ar*s0
   name Shift_CMY
   xpos -260
   ypos -34
   addUserKnob {20 Params}
-  addUserKnob {7 sc R -1 1}
-  sc {{parent.sc}}
-  addUserKnob {7 sm R -1 1}
-  sm {{parent.sm}}
-  addUserKnob {7 sy R -1 1}
-  sy {{parent.sy}}
+  addUserKnob {7 s0 R -1 1}
+  s0 {{sc}}
+  addUserKnob {7 s1 R -1 1}
+  s1 {{sm}}
+  addUserKnob {7 s2 R -1 1}
+  s2 {{sy}}
  }
  MergeExpression {
   inputs 2
-  expr0 (r+sc2)*Ar+(r-sc1)*Ar+r*(1-(Ar+Ar))
-  expr1 (g+sc0)*Ar+(g-sc2)*Ar+g*(1-(Ar+Ar))
-  expr2 (b-sc0)*Ar+(b+sc1)*Ar+b*(1-(Ar+Ar))
+  expr0 r+Ar*(sc2-sc1)
+  expr1 g+Ar*(sc0-sc2)
+  expr2 b+Ar*(sc1-sc0)
   name Shift_Custom
   xpos -260
   ypos 38
@@ -378,11 +378,11 @@ push $Nbcff8f00
   addUserKnob {7 s R -1 1}
   s {{scu*cuw}}
   addUserKnob {7 sc0 R -1 1}
-  sc0 {{1<=h&&h<2?s*(h-1):2<=h&&h<3?s*(3-h):4<=h&&h<5?-s*(h-4):5<=h&&h<6?-s*(6-h):0}}
+  sc0 {{h<3?s-s*min(1,fabs(h-2)):s*min(1,fabs(h-5))-s}}
   addUserKnob {7 sc1 R -1 1}
-  sc1 {{0<=h&&h<1?s*(1-h):2<=h&&h<3?-s*(h-2):3<=h&&h<4?-s*(4-h):5<=h&&h<6?s*(h-5):0}}
+  sc1 {{h<1?s-s*min(1,fabs(h)):h<5?s*min(1,fabs(h-3))-s:s-s*min(1,fabs(h-6))}}
   addUserKnob {7 sc2 R -1 1}
-  sc2 {{0<=h&&h<1?-s*(h-0):1<=h&&h<2?-s*(2-h):3<=h&&h<4?s*(h-3):4<=h&&h<5?s*(5-h):0}}
+  sc2 {{h<2?s*min(1,fabs(h-1))-s:s-s*min(1,fabs(h-4))}}
  }
  MergeExpression {
   inputs 2
