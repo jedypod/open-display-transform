@@ -59,8 +59,24 @@ __DEVICE__ float calc_hue(float3 rgb) {
 }
 
 
+__DEVICE__ float lin_to_log_lx(float x, float mn, float mx, float sps) {
+  // linear to log2 with linear extension
+  
+  float sp = 0.18f*_powf(2.0f, sps); // splice point in stops around 0.18
+  float lo = (_log2f(sp/0.18f) - mn)/(mx - mn); // Linear offset
+  float ls = sp*(mx - mn)*_logf(2.0f); // Linear scale
+  return x > sp ? (_log2f(x/0.18f) - mn)/(mx - mn):(x - sp)/ls + lo;
+}
 
+__DEVICE__ float log_to_lin_lx(float x, float mn, float mx, float sps) {
+  // linear to log2 with linear extension
+  
+  float sp = 0.18f*_powf(2.0f, sps); // splice point in stops around 0.18
+  float lo = (_log2f(sp/0.18f) - mn)/(mx - mn); // Linear offset
+  float ls = sp*(mx - mn)*_logf(2.0f); // Linear scale
 
+  return x > lo ? 0.18*_powf(2.0f, (x*(mx - mn) + mn)) : ls*(x - lo) + sp;
+}
 
 
 
@@ -548,4 +564,50 @@ __DEVICE__ float shd_con(float n, float m, float w, int invert) {
     n = (p0/(3.0f*p2) + p2/3.0f + n/3.0f);
   }
   return n;
+}
+
+
+/* Saturation
+
+*/
+
+__DEVICE__ float3 saturation(float3 rgb, float sag, float sah, 
+  float ho, float hw, float wr, float wb, int lg, int ze, float zp, int zr) {
+
+  float wg = 1.0f - (wr + wb);
+  
+  float3 in = rgb;
+
+  float hf = extract_hue_angle(calc_hue(rgb), ho, hw, 0);
+  hf = _fmaxf(0.0f, hf);
+
+  // If apply in log, expand gamut 20% then convert to log2
+  if (lg == 1) {
+    // Expand gamut 20%
+    rgb = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z))*0.2f + rgb*0.8f;
+
+    rgb.x = lin_to_log_lx(rgb.x, -7.0f, 7.0f, -4.0f);
+    rgb.y = lin_to_log_lx(rgb.y, -7.0f, 7.0f, -4.0f);
+    rgb.z = lin_to_log_lx(rgb.z, -7.0f, 7.0f, -4.0f);
+  }
+
+  // "Luminance"
+  float L = wr*rgb.x + wg*rgb.y + wb*rgb.z;
+
+  // Apply saturation
+  rgb = L - sag*(hf*sah - hf + 1.0f)*(L - rgb);
+
+  if (lg == 1) {
+    rgb.x = log_to_lin_lx(rgb.x, -7.0f, 7.0f, -4.0f);
+    rgb.y = log_to_lin_lx(rgb.y, -7.0f, 7.0f, -4.0f);
+    rgb.z = log_to_lin_lx(rgb.z, -7.0f, 7.0f, -4.0f);
+    
+    // Reduce gamut 20%
+    rgb = rgb*1.25f - _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z))/4.0f;
+  }
+
+  // Zone extract
+  if (ze == 1) rgb = zone_extract(in, rgb, zp, zr);
+
+  return rgb;
 }

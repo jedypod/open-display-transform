@@ -1,0 +1,23 @@
+DEFINE_UI_PARAMS(sag, global sat, DCTLUI_SLIDER_FLOAT, 1, 0, 2, 0)
+DEFINE_UI_PARAMS(sah, hue sat, DCTLUI_SLIDER_FLOAT, 1, 0, 2, 0)
+DEFINE_UI_PARAMS(ho, hue angle, DCTLUI_SLIDER_FLOAT, 1, 0, 6, 0)
+DEFINE_UI_PARAMS(hw, hue width, DCTLUI_SLIDER_FLOAT, 1, 0.1, 1.5, 0)
+DEFINE_UI_PARAMS(wr, weight red, DCTLUI_SLIDER_FLOAT, 0.23, 0, 1, 0)
+DEFINE_UI_PARAMS(wb, weight blue, DCTLUI_SLIDER_FLOAT, 0.08, 0, 1, 0)
+DEFINE_UI_PARAMS(lg, in log, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
+DEFINE_UI_PARAMS(zone, zone, DCTLUI_COMBO_BOX, 1, {low, high}, {low, high})
+
+#include "libLMT.h"
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
+{
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  int zr = zone == high ? 0 : 1;
+
+  rgb = saturation(rgb, sag, sah, ho, hw, wr, wb, lg, ze, zp, zr);
+
+  return rgb;
+}
