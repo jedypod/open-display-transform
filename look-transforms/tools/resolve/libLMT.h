@@ -25,6 +25,18 @@ __DEVICE__ float extract_window(float e0, float e1, float e2, float e3, float x)
   return x < e1 ? extract(e0, e1, x) : extract(e3, e2, x);
 }
 
+
+__DEVICE__ float3 zone_extract(float3 in, float3 rgb, float zp, int zr) {
+  float n = _fmaxf(1e-12f, _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z)));
+  const float fl = 0.01f;
+  float zpow = _powf(2.0f, -zp + 1.0f);
+  float toe = (n * n / (n + fl));
+  float f = _powf((toe / (toe + 1.0f)) / n, zpow);
+  if (zr == 1) f = 1.0f - _powf((n / (n + 1.0f)) / n, zpow);
+  return in * (1.0f - f) + rgb * f;
+}
+
+
 // Given hue, offset, width, extract hue angle
 __DEVICE__ float extract_hue_angle(float h, float o, float w, int sm) {
   float hc = extract_window(2.0f - w, 2.0f, 2.0f, 2.0f + w, _fmod(h + o, 6.0f));
@@ -189,15 +201,7 @@ __DEVICE__ float3 n6_chroma_value(float3 rgb,
   rgb = r * n;
 
   // Zone extract
-  if (ze == 1) {
-    n = _fmaxf(1e-12f, n);
-    const float fl = 0.01f;
-    float zpow = _powf(2.0f, -zp + 1.0f);
-    float toe = (n * n / (n + fl));
-    float f = _powf((toe / (toe + 1.0f)) / n, zpow);
-    if (zr == 1) f = 1.0f - _powf((n / (n + 1.0f)) / n, zpow);
-    rgb = in * (1.0f - f) + rgb * f;
-  }
+  if (ze == 1) rgb = zone_extract(in, rgb, zp, zr);
 
   return rgb;
 }
@@ -337,20 +341,10 @@ __DEVICE__ float3 n6_vibrance(float3 rgb,
   // Mix between nonlinear and hue-linear vibrance adjustment
   r = r * (1.0f - hl) + r_hl * hl;
 
-
   rgb = r * n;
 
-
   // Zone extract
-  if (ze == 1) {
-    n = _fmaxf(1e-12f, n);
-    const float fl = 0.004f;
-    float zpow = _powf(2.0f, -zp + 1.0f);
-    float toe = (n * n / (n + fl));
-    float f = _powf((toe / (toe + 1.0f)) / n, zpow);
-    if (zr == 1) f = 1.0f - _powf((n / (n + 1.0f)) / n, zpow);
-    rgb = in * (1.0f - f) + rgb * f;
-  }
+  if (ze == 1) rgb = zone_extract(in, rgb, zp, zr);
 
   return rgb;
 }
@@ -441,15 +435,7 @@ __DEVICE__ float3 n6_hueshift(float3 rgb,
   rgb = r * n;
 
   // Zone extract
-  if (ze == 1) {
-    n = _fmaxf(1e-12f, n);
-    const float fl = 0.004f;
-    float zpow = _powf(2.0f, -zp + 1.0f);
-    float toe = (n * n / (n + fl));
-    float f = _powf((toe / (toe + 1.0f)) / n, zpow);
-    if (zr == 1) f = 1.0f - _powf((n / (n + 1.0f)) / n, zpow);
-    rgb = in * (1.0f - f) + rgb * f;
-  }
+  if (ze == 1) rgb = zone_extract(in, rgb, zp, zr);
 
   return rgb;
 }
