@@ -361,7 +361,7 @@ __DEVICE__ float3 n6_vibrance(float3 rgb,
 
 
 /* Notorious Six Hue Shift
-    v0.0.3
+    v0.0.4
     ------------------
     Per hue-angle hue shift tool. Good for color cross-talk effects and
     precise control over hue shifts over specific luminance and/or chrominance ranges.
@@ -412,14 +412,14 @@ __DEVICE__ float3 n6_hueshift(float3 rgb,
   hs = hs * ch;
 
   // Hue shift primaries
-  r.x = (r.x - sb) * hp.z + (r.x + sg) * hp.y + r.x * (1.0f - (hp.z + hp.y));
-  r.y = (r.y + sr) * hp.x + (r.y + sb) * hp.z + r.y * (1.0f - (hp.x + hp.z));
-  r.z = (r.z - sr) * hp.x + (r.z - sg) * hp.y + r.z * (1.0f - (hp.x + hp.y));
+  r.x = r.x + sb*hp.z - sg*hp.y;
+  r.y = r.y + sr*hp.x - sb*hp.z;
+  r.z = r.z + sg*hp.y - sr*hp.x;
   
   // Hue shift secondaries
-  r.x = (r.x + sy) * hs.z + (r.x - sm) * hs.y + r.x * (1.0f - (hs.z + hs.y));
-  r.y = (r.y + sc) * hs.x + (r.y - sy) * hs.z + r.y * (1.0f - (hs.x + hs.z));
-  r.z = (r.z - sc) * hs.x + (r.z + sm) * hs.y + r.z * (1.0f - (hs.x + hs.y));
+  r.x = r.x + sy*hs.z - sm*hs.y;
+  r.y = r.y + sc*hs.x - sy*hs.z;
+  r.z = r.z + sm*hs.y - sc*hs.x;
 
   // Hue extraction for custom
   float hc = extract_hue_angle(hue, cuh / 60.0f, cuw, 0);
@@ -429,14 +429,14 @@ __DEVICE__ float3 n6_hueshift(float3 rgb,
   float h = cuh / 60.0f; // Convert degrees to 0-6 hue angle
   float s = scu * cuw; // Rotate only as much as the custom width
   // Calculate per-channel shift values based on hue angle
-  float sc0 = 1.0f<=h&&h<2.0f?s*(h-1.0f):2.0f<=h&&h<3.0f?s*(3.0f-h):4.0f<=h&&h<5.0f?-s*(h-4.0f):5.0f<=h&&h<6.0f?-s*(6.0f-h):0.0f;
-  float sc1 = 0.0f<=h&&h<1.0f?s*(1.0f-h):2.0f<=h&&h<3.0f?-s*(h-2.0f):3.0f<=h&&h<4.0f?-s*(4.0f-h):5.0f<=h&&h<6.0f?s*(h-5.0f):0.0f;
-  float sc2 = 0.0f<=h&&h<1.0f?-s*(h-0.0f):1.0f<=h&&h<2.0f?-s*(2.0f-h):3.0f<=h&&h<4.0f?s*(h-3.0f):4.0f<=h&&h<5.0f?s*(5.0f-h):0.0f;
+  float sc0 = h < 3.0f ? s - s*_fminf(1, _fabs(h - 2.0f)) : s*_fminf(1.0f, _fabs(h - 5.0f)) - s;
+  float sc1 = h < 1.0f ? s - s*_fminf(1.0f, _fabs(h)) : h < 5.0f ? s*_fminf(1.0f, _fabs(h - 3.0f)) - s : s - s*_fminf(1.0f, _fabs(h - 6.0f));
+  float sc2 = h < 2.0f ? s*_fminf(1.0f, _fabs(h - 1.0f)) - s : s - s*_fminf(1.0f, _fabs(h - 4.0f));
 
   // Hue shift custom
-  r.x = (r.x + sc2) * hc + (r.x - sc1) * hc + r.x * (1.0f - (hc + hc));
-  r.y = (r.y + sc0) * hc + (r.y - sc2) * hc + r.y * (1.0f - (hc + hc));
-  r.z = (r.z - sc0) * hc + (r.z + sc1) * hc + r.z * (1.0f - (hc + hc));
+  r.x = r.x + hc*(sc2-sc1);
+  r.y = r.y + hc*(sc0-sc2);
+  r.z = r.z + hc*(sc1-sc0);
   
   rgb = r * n;
 
