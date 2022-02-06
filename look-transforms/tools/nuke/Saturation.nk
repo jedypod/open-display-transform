@@ -21,7 +21,6 @@ Group {
  addUserKnob {41 wr T Saturation.wr}
  addUserKnob {41 wb T Saturation.wb}
  addUserKnob {6 lg l "in log" t "applies saturation in -7 +7 stop lg2 " +STARTLINE}
- lg true
  addUserKnob {26 ""}
  addUserKnob {26 zonelimit_label l " " T "<b>zone limiting"}
  addUserKnob {6 ze l zoned t "enable zone limiting." +STARTLINE}
@@ -149,10 +148,11 @@ push $Nfcdbc100
   addUserKnob {7 sah l saturation R 0 2}
   sah 1
   addUserKnob {7 wr}
-  wr 0.13
+  wr 0.23
   addUserKnob {7 wg}
   wg {{1-(wr+wb)}}
   addUserKnob {7 wb}
+  wb 0.08
  }
  Expression {
   temp_name0 dr
