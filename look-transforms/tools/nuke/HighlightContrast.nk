@@ -1,0 +1,63 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name HighlightContrast
+ addUserKnob {20 HighlightContrast_tab l HighlightContrast}
+ addUserKnob {41 ex T hl_con.ex}
+ addUserKnob {41 th T hl_con.th}
+ addUserKnob {41 invert T hl_con.invert}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask -STARTLINE T hl_con.maskChannelMask}
+ addUserKnob {41 invert_mask l invert -STARTLINE T hl_con.invert_mask}
+ addUserKnob {41 mix T hl_con.mix}
+}
+ Input {
+  inputs 0
+  name Inputmask
+  xpos -1140
+  ypos -106
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos -1250
+  ypos -154
+ }
+ Expression {
+  inputs 1+1
+  temp_name0 n
+  temp_expr0 max(r,g,b)
+  temp_name1 si
+  temp_expr1 (_a*pow(n,p)+_b)/n
+  temp_name2 sf
+  temp_expr2 pow((n-_b)/_a,1/p)/n
+  temp_name3 s
+  temp_expr3 n==0||n<t0?1:invert?si:sf
+  expr0 r*s
+  expr1 g*s
+  expr2 b*s
+  name hl_con
+  xpos -1250
+  ypos -106
+  addUserKnob {20 Params}
+  addUserKnob {7 ex R -4 4}
+  addUserKnob {7 th R -4 4}
+  th -1
+  addUserKnob {6 invert +STARTLINE}
+  addUserKnob {7 p R 0 10}
+  p {{2**-ex}}
+  addUserKnob {7 t0}
+  t0 {{0.18*2**th}}
+  addUserKnob {7 _a R -10 10}
+  _a {{pow(t0,1-p)/p}}
+  addUserKnob {7 _b R -10 10}
+  _b {{t0*(1-1/p)}}
+  label https://www.desmos.com/calculator/p7j4udnwkm
+ }
+ Output {
+  name Output
+  xpos -1250
+  ypos -58
+ }
+end_group

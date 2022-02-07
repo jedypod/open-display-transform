@@ -566,6 +566,29 @@ __DEVICE__ float shd_con(float n, float m, float w, int invert) {
   return n;
 }
 
+/* Highlight Contrast
+    Invertible quadratic highlight contrast function. Same as ex_high without lin ext
+    https://www.desmos.com/calculator/p7j4udnwkm
+*/
+__DEVICE__ float3 hl_con(float3 rgb, float ex, float th, int invert) {
+  float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  float p = _powf(2.0f, -ex);
+  float t0 = 0.18f*_powf(2.0f, th);
+  float a = _powf(t0, 1.0f - p)/p;
+  float b = t0*(1.0f - 1.0f/p);
+  float s;
+  if (n == 0.0f || n < t0) {
+    s = 1.0f;
+  } else {
+    if (invert == 1) 
+      s = (a*_powf(n, p) + b)/n;
+    else 
+      s = _powf((n - b)/a, 1.0f/p)/n;
+  }
+  return rgb * s;
+}
+
+
 
 /* Saturation
 
