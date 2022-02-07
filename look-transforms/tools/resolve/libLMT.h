@@ -549,17 +549,24 @@ __DEVICE__ float3 zone_grade(float3 rgb,
     https://www.desmos.com/calculator/ubgteikoke
     https://colab.research.google.com/drive/1JT_-S96RZyfHPkZ620QUPIRfxmS_rKlx
 */
-__DEVICE__ float shd_con(float n, float m, float w, int invert) {
+__DEVICE__ float3 shd_con(float3 rgb, float ex, float str, int invert) {
+  // Parameter setup
+  const float m = _powf(2.0f, ex);
+  const float w = _powf(2.0f, -(1.0f-str)*10.0f);
+
+  float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
   float n2 = n*n;
+  float s;
   if (invert == 0) {
-    n = n*(n2 + m*w)/(n2 + w);
+    s = (n2 + m*w)/(n2 + w); // Implicit divide by n
   } else {
     float p0 = n2 - 3.0f*m*w;
     float p1 = 2.0f*n2 + 27.0f*w - 9.0f*m*w;
     float p2 = _powf(_sqrtf(n2*p1*p1 - 4*p0*p0*p0)/2.0f + n*p1/2.0f,1.0f/3.0f);
-    n = (p0/(3.0f*p2) + p2/3.0f + n/3.0f);
+    s = (p0/(3.0f*p2) + p2/3.0f + n/3.0f) / n;
   }
-  return n;
+  rgb *= s;
+  return rgb;
 }
 
 /* Highlight Contrast
