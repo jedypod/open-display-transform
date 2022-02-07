@@ -60,8 +60,7 @@ __DEVICE__ float calc_hue(float3 rgb) {
 
 
 __DEVICE__ float lin_to_log_lx(float x, float mn, float mx, float sps) {
-  // linear to log2 with linear extension
-  
+  // linear to log2 with linear extension : https://www.desmos.com/calculator/qmbh2z6ms6
   float sp = 0.18f*_powf(2.0f, sps); // splice point in stops around 0.18
   float lo = (_log2f(sp/0.18f) - mn)/(mx - mn); // Linear offset
   float ls = sp*(mx - mn)*_logf(2.0f); // Linear scale
@@ -69,12 +68,9 @@ __DEVICE__ float lin_to_log_lx(float x, float mn, float mx, float sps) {
 }
 
 __DEVICE__ float log_to_lin_lx(float x, float mn, float mx, float sps) {
-  // linear to log2 with linear extension
-  
   float sp = 0.18f*_powf(2.0f, sps); // splice point in stops around 0.18
   float lo = (_log2f(sp/0.18f) - mn)/(mx - mn); // Linear offset
   float ls = sp*(mx - mn)*_logf(2.0f); // Linear scale
-
   return x > lo ? 0.18*_powf(2.0f, (x*(mx - mn) + mn)) : ls*(x - lo) + sp;
 }
 
@@ -550,10 +546,10 @@ __DEVICE__ float3 zone_grade(float3 rgb,
 
 /* Shadow Contrast
     Invertible cubic shadow exposure function
+    https://www.desmos.com/calculator/ubgteikoke
+    https://colab.research.google.com/drive/1JT_-S96RZyfHPkZ620QUPIRfxmS_rKlx
 */
 __DEVICE__ float shd_con(float n, float m, float w, int invert) {
-  // https://www.desmos.com/calculator/ubgteikoke
-  // https://colab.research.google.com/drive/1JT_-S96RZyfHPkZ620QUPIRfxmS_rKlx
   float n2 = n*n;
   if (invert == 0) {
     n = n*(n2 + m*w)/(n2 + w);
