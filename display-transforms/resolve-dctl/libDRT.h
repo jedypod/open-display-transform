@@ -1,6 +1,6 @@
 /* libDTColorMath
     --------------------------------------
-      v0.0.90b2
+      v0.1
     
       Library of commonly used functions for the Open Display Transform project
       Written by Jed Smith
