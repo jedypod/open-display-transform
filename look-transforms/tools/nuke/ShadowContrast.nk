@@ -48,7 +48,7 @@ Group {
   addUserKnob {7 _m R 0 4}
   _m {{2**ex}}
   addUserKnob {7 w}
-  w {{2**(-(1-str)*10)}}
+  w {{str**3}}
   addUserKnob {6 invert +STARTLINE}
  }
  Output {

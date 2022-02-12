@@ -552,7 +552,7 @@ __DEVICE__ float3 zone_grade(float3 rgb,
 __DEVICE__ float3 shd_con(float3 rgb, float ex, float str, int invert) {
   // Parameter setup
   const float m = _powf(2.0f, ex);
-  const float w = _powf(2.0f, -(1.0f-str)*10.0f);
+  const float w = _powf(str, 3.0f);
 
   float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
   float n2 = n*n;
