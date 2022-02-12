@@ -1,0 +1,22 @@
+/* LMT - Tonescale
+    Match OpenDRT SDR Rec.709 to ACES v1.2 SDR Rec.709
+    
+    Intentional massaging in the shadows so that there is a smooth falloff to 0 
+    instead of clipping input values below 0.002 like the ACES Tonescale.
+*/
+
+#include "libLMT.h"
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
+{
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  rgb += 0.001f;
+  rgb = shd_con(rgb, -1.2f, 0.097f, 0);
+  rgb = ex_high(rgb, -0.55f, -6.0f, 0.5f, 0);
+  rgb = ex_high(rgb, 0.5f, -3.0f, 0.5f, 0);
+  rgb = ex_high(rgb, 0.924f, -1.0f, 0.5f, 0);
+  rgb = ex_high(rgb, -0.15f, 2.68f, 0.19f, 0);
+
+  return rgb;
+}

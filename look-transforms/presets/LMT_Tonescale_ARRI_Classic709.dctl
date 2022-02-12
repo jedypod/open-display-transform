@@ -1,0 +1,21 @@
+/* LMT - Tonescale
+    Match OpenDRT SDR Rec.709 to ARRI SDR Classic709 LUT
+    
+*/
+
+#include "libLMT.h"
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
+{
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  rgb += 0.006f;
+  rgb = shd_con(rgb, -1.2f, 0.097f, 0);
+  rgb = ex_high(rgb, -0.618f, -3.84f, 0.3f, 0);
+  rgb = ex_high(rgb, 0.6f, -2.78f, 0.14f, 0);
+  rgb = ex_high(rgb, -0.55f, 0.06f, 0.77f, 0);
+  rgb = ex_high(rgb, 1.05f, 1.4f, 0.45f, 0);
+  rgb = ex_high(rgb, -1.45f, 6.08f, 0.35f, 0);
+
+  return rgb;
+}

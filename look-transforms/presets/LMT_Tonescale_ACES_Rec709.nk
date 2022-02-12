@@ -1,0 +1,362 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name LMT_Tonescale_ACES_Rec709
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 1170
+  ypos -490
+ }
+ Group {
+  name Offset4
+  xpos 1170
+  ypos -418
+  addUserKnob {20 Offset_tab l Offset}
+  addUserKnob {41 channels T Add1.channels}
+  addUserKnob {41 o l off T Add1.o}
+  addUserKnob {6 invert +STARTLINE}
+  addUserKnob {26 ""}
+  addUserKnob {41 maskChannelMask l mask -STARTLINE T Add1.maskChannelMask}
+  addUserKnob {41 invert_mask l invert -STARTLINE T Add1.invert_mask}
+  addUserKnob {41 mix T Add1.mix}
+ }
+  Input {
+   inputs 0
+   name Inputmask
+   xpos 70
+   ypos 206
+   number 1
+  }
+  Input {
+   inputs 0
+   name Input
+   xpos -40
+   ypos 158
+  }
+  Add {
+   inputs 1+1
+   channels rgb
+   value {{invert?-o:o} {invert?-o:o} {invert?-o:o} {invert?-o:o}}
+   name Add1
+   xpos -40
+   ypos 207
+   addUserKnob {20 Params}
+   addUserKnob {18 o l off R -0.1 0.1}
+   o 0.001
+   addUserKnob {6 o_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+   addUserKnob {6 off_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  }
+  Output {
+   name Output
+   xpos -40
+   ypos 254
+  }
+ end_group
+ Group {
+  name ZoneExposureHigh19
+  xpos 1170
+  ypos -394
+  addUserKnob {20 ZoneExposureHigh_tab l ZoneExposureHigh}
+  addUserKnob {41 he l exposure t "Exposure in stops for region above pivot." T exp_high.ex}
+  addUserKnob {41 hp l pivot t "Pivot point in stops around middle grey." T exp_high.pv}
+  addUserKnob {41 hf l falloff t "Softness or size of the transition from between pivot and linear section of exposure change." T exp_high.fa}
+  addUserKnob {41 invert t "Invert direction." T exp_high.invert}
+  addUserKnob {26 ""}
+  addUserKnob {41 maskChannelMask l mask -STARTLINE T exp_high.maskChannelMask}
+  addUserKnob {41 invert_mask l invert -STARTLINE T exp_high.invert_mask}
+  addUserKnob {41 mix T exp_high.mix}
+ }
+  Input {
+   inputs 0
+   name Inputmask
+   xpos -1140
+   ypos -106
+   number 1
+  }
+  Input {
+   inputs 0
+   name Input
+   xpos -1250
+   ypos -154
+  }
+  Expression {
+   inputs 1+1
+   temp_name0 n
+   temp_expr0 max(r,g,b)
+   temp_name1 sf
+   temp_expr1 n>x1?(_m*(n-x1)+y1)/n:(_a*pow(n,p)+_b)/n
+   temp_name2 si
+   temp_expr2 n>y1?((_m*x1-y1+n)/_m)/n:pow((n-_b)/_a,1/p)/n
+   temp_name3 s
+   temp_expr3 n<t0?1:invert?si:sf
+   expr0 r*s
+   expr1 g*s
+   expr2 b*s
+   name exp_high
+   label https://www.desmos.com/calculator/ylq5yvkhoq
+   xpos -1250
+   ypos -106
+   addUserKnob {20 Params}
+   addUserKnob {7 ex l exposure R -6 6}
+   ex -0.55
+   addUserKnob {7 pv l pivot R -4 4}
+   pv -6
+   addUserKnob {7 fa l falloff}
+   fa 0.5
+   addUserKnob {6 invert +STARTLINE}
+   addUserKnob {7 f R 0 4}
+   f {{5*pow(fa,1.6)+1}}
+   addUserKnob {7 p R 0 10}
+   p {{fabs(ex+f)<1e-8?1e-8:(ex+f)/f}}
+   addUserKnob {7 _m R 0 10}
+   _m {{pow(2,ex)}}
+   addUserKnob {7 t0}
+   t0 {{0.18*pow(2,pv)}}
+   addUserKnob {7 _a R -10 10}
+   _a {{pow(t0,1-p)/p}}
+   addUserKnob {7 _b R -10 10}
+   _b {{t0*(1-1/p)}}
+   addUserKnob {7 x1 R -10 10}
+   x1 {{t0*pow(2,f)}}
+   addUserKnob {7 y1 R -10 10}
+   y1 {{_a*pow(x1,p)+_b}}
+  }
+  Output {
+   name Output
+   xpos -1250
+   ypos -58
+  }
+ end_group
+ Group {
+  name ZoneExposureHigh20
+  xpos 1170
+  ypos -370
+  addUserKnob {20 ZoneExposureHigh_tab l ZoneExposureHigh}
+  addUserKnob {41 he l exposure t "Exposure in stops for region above pivot." T exp_high.ex}
+  addUserKnob {41 hp l pivot t "Pivot point in stops around middle grey." T exp_high.pv}
+  addUserKnob {41 hf l falloff t "Softness or size of the transition from between pivot and linear section of exposure change." T exp_high.fa}
+  addUserKnob {41 invert t "Invert direction." T exp_high.invert}
+  addUserKnob {26 ""}
+  addUserKnob {41 maskChannelMask l mask -STARTLINE T exp_high.maskChannelMask}
+  addUserKnob {41 invert_mask l invert -STARTLINE T exp_high.invert_mask}
+  addUserKnob {41 mix T exp_high.mix}
+ }
+  Input {
+   inputs 0
+   name Inputmask
+   xpos -1140
+   ypos -106
+   number 1
+  }
+  Input {
+   inputs 0
+   name Input
+   xpos -1250
+   ypos -154
+  }
+  Expression {
+   inputs 1+1
+   temp_name0 n
+   temp_expr0 max(r,g,b)
+   temp_name1 sf
+   temp_expr1 n>x1?(_m*(n-x1)+y1)/n:(_a*pow(n,p)+_b)/n
+   temp_name2 si
+   temp_expr2 n>y1?((_m*x1-y1+n)/_m)/n:pow((n-_b)/_a,1/p)/n
+   temp_name3 s
+   temp_expr3 n<t0?1:invert?si:sf
+   expr0 r*s
+   expr1 g*s
+   expr2 b*s
+   name exp_high
+   label https://www.desmos.com/calculator/ylq5yvkhoq
+   xpos -1250
+   ypos -106
+   addUserKnob {20 Params}
+   addUserKnob {7 ex l exposure R -6 6}
+   ex 0.5
+   addUserKnob {7 pv l pivot R -4 4}
+   pv -3
+   addUserKnob {7 fa l falloff}
+   fa 0.5
+   addUserKnob {6 invert +STARTLINE}
+   addUserKnob {7 f R 0 4}
+   f {{5*pow(fa,1.6)+1}}
+   addUserKnob {7 p R 0 10}
+   p {{fabs(ex+f)<1e-8?1e-8:(ex+f)/f}}
+   addUserKnob {7 _m R 0 10}
+   _m {{pow(2,ex)}}
+   addUserKnob {7 t0}
+   t0 {{0.18*pow(2,pv)}}
+   addUserKnob {7 _a R -10 10}
+   _a {{pow(t0,1-p)/p}}
+   addUserKnob {7 _b R -10 10}
+   _b {{t0*(1-1/p)}}
+   addUserKnob {7 x1 R -10 10}
+   x1 {{t0*pow(2,f)}}
+   addUserKnob {7 y1 R -10 10}
+   y1 {{_a*pow(x1,p)+_b}}
+  }
+  Output {
+   name Output
+   xpos -1250
+   ypos -58
+  }
+ end_group
+ Group {
+  name ZoneExposureHigh21
+  xpos 1170
+  ypos -346
+  addUserKnob {20 ZoneExposureHigh_tab l ZoneExposureHigh}
+  addUserKnob {41 he l exposure t "Exposure in stops for region above pivot." T exp_high.ex}
+  addUserKnob {41 hp l pivot t "Pivot point in stops around middle grey." T exp_high.pv}
+  addUserKnob {41 hf l falloff t "Softness or size of the transition from between pivot and linear section of exposure change." T exp_high.fa}
+  addUserKnob {41 invert t "Invert direction." T exp_high.invert}
+  addUserKnob {26 ""}
+  addUserKnob {41 maskChannelMask l mask -STARTLINE T exp_high.maskChannelMask}
+  addUserKnob {41 invert_mask l invert -STARTLINE T exp_high.invert_mask}
+  addUserKnob {41 mix T exp_high.mix}
+ }
+  Input {
+   inputs 0
+   name Inputmask
+   xpos -1140
+   ypos -106
+   number 1
+  }
+  Input {
+   inputs 0
+   name Input
+   xpos -1250
+   ypos -154
+  }
+  Expression {
+   inputs 1+1
+   temp_name0 n
+   temp_expr0 max(r,g,b)
+   temp_name1 sf
+   temp_expr1 n>x1?(_m*(n-x1)+y1)/n:(_a*pow(n,p)+_b)/n
+   temp_name2 si
+   temp_expr2 n>y1?((_m*x1-y1+n)/_m)/n:pow((n-_b)/_a,1/p)/n
+   temp_name3 s
+   temp_expr3 n<t0?1:invert?si:sf
+   expr0 r*s
+   expr1 g*s
+   expr2 b*s
+   name exp_high
+   label https://www.desmos.com/calculator/ylq5yvkhoq
+   xpos -1250
+   ypos -106
+   addUserKnob {20 Params}
+   addUserKnob {7 ex l exposure R -6 6}
+   ex 0.924
+   addUserKnob {7 pv l pivot R -4 4}
+   pv -1
+   addUserKnob {7 fa l falloff}
+   fa 0.5
+   addUserKnob {6 invert +STARTLINE}
+   addUserKnob {7 f R 0 4}
+   f {{5*pow(fa,1.6)+1}}
+   addUserKnob {7 p R 0 10}
+   p {{fabs(ex+f)<1e-8?1e-8:(ex+f)/f}}
+   addUserKnob {7 _m R 0 10}
+   _m {{pow(2,ex)}}
+   addUserKnob {7 t0}
+   t0 {{0.18*pow(2,pv)}}
+   addUserKnob {7 _a R -10 10}
+   _a {{pow(t0,1-p)/p}}
+   addUserKnob {7 _b R -10 10}
+   _b {{t0*(1-1/p)}}
+   addUserKnob {7 x1 R -10 10}
+   x1 {{t0*pow(2,f)}}
+   addUserKnob {7 y1 R -10 10}
+   y1 {{_a*pow(x1,p)+_b}}
+  }
+  Output {
+   name Output
+   xpos -1250
+   ypos -58
+  }
+ end_group
+ Group {
+  name ZoneExposureHigh22
+  xpos 1170
+  ypos -322
+  addUserKnob {20 ZoneExposureHigh_tab l ZoneExposureHigh}
+  addUserKnob {41 he l exposure t "Exposure in stops for region above pivot." T exp_high.ex}
+  addUserKnob {41 hp l pivot t "Pivot point in stops around middle grey." T exp_high.pv}
+  addUserKnob {41 hf l falloff t "Softness or size of the transition from between pivot and linear section of exposure change." T exp_high.fa}
+  addUserKnob {41 invert t "Invert direction." T exp_high.invert}
+  addUserKnob {26 ""}
+  addUserKnob {41 maskChannelMask l mask -STARTLINE T exp_high.maskChannelMask}
+  addUserKnob {41 invert_mask l invert -STARTLINE T exp_high.invert_mask}
+  addUserKnob {41 mix T exp_high.mix}
+ }
+  Input {
+   inputs 0
+   name Inputmask
+   xpos -1140
+   ypos -106
+   number 1
+  }
+  Input {
+   inputs 0
+   name Input
+   xpos -1250
+   ypos -154
+  }
+  Expression {
+   inputs 1+1
+   temp_name0 n
+   temp_expr0 max(r,g,b)
+   temp_name1 sf
+   temp_expr1 n>x1?(_m*(n-x1)+y1)/n:(_a*pow(n,p)+_b)/n
+   temp_name2 si
+   temp_expr2 n>y1?((_m*x1-y1+n)/_m)/n:pow((n-_b)/_a,1/p)/n
+   temp_name3 s
+   temp_expr3 n<t0?1:invert?si:sf
+   expr0 r*s
+   expr1 g*s
+   expr2 b*s
+   name exp_high
+   label https://www.desmos.com/calculator/ylq5yvkhoq
+   xpos -1250
+   ypos -106
+   addUserKnob {20 Params}
+   addUserKnob {7 ex l exposure R -6 6}
+   ex -0.15
+   addUserKnob {7 pv l pivot R -4 4}
+   pv 2.68
+   addUserKnob {7 fa l falloff}
+   fa 0.19
+   addUserKnob {6 invert +STARTLINE}
+   addUserKnob {7 f R 0 4}
+   f {{5*pow(fa,1.6)+1}}
+   addUserKnob {7 p R 0 10}
+   p {{fabs(ex+f)<1e-8?1e-8:(ex+f)/f}}
+   addUserKnob {7 _m R 0 10}
+   _m {{pow(2,ex)}}
+   addUserKnob {7 t0}
+   t0 {{0.18*pow(2,pv)}}
+   addUserKnob {7 _a R -10 10}
+   _a {{pow(t0,1-p)/p}}
+   addUserKnob {7 _b R -10 10}
+   _b {{t0*(1-1/p)}}
+   addUserKnob {7 x1 R -10 10}
+   x1 {{t0*pow(2,f)}}
+   addUserKnob {7 y1 R -10 10}
+   y1 {{_a*pow(x1,p)+_b}}
+  }
+  Output {
+   name Output
+   xpos -1250
+   ypos -58
+  }
+ end_group
+ Output {
+  name Output1
+  xpos 1170
+  ypos -274
+ }
+end_group
