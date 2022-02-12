@@ -1,22 +1,16 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.0.90b4
+      v0.1
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
       modified to expose more user parameters, for those who 
       know what they are doing and wish to experiment.
-
-      Preset Values
-      -------------
-      
       
     -------------------------------------------------
 */
 
-#include "libDRT.h"
-
-DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {AP0, AP1, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
 DEFINE_UI_PARAMS(sx, sx, DCTLUI_SLIDER_FLOAT, 0.7, 0.7, 20, 0.0)
 DEFINE_UI_PARAMS(sy, sy, DCTLUI_SLIDER_FLOAT, 1.04, 1.0, 1.24, 0.0)
@@ -32,8 +26,8 @@ DEFINE_UI_PARAMS(Lw, Lw, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 4000.0, 10.0)
 DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 4, {Rec2020, P3D65, P3D60, P3DCI, Rec709, DCDM}, {Rec.2020, P3 D65, P3 D60, P3 DCI, Rec.709, DCDM XYZ})
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
-DEFINE_UI_PARAMS(pdch, perceptual dechroma, DCTLUI_CHECK_BOX, 1)
-DEFINE_UI_PARAMS(gcmp, gamut compress, DCTLUI_CHECK_BOX, 1)
+
+#include "libDRT.h"
 
 __CONSTANT__ wpnorm wnd50 = {1.09063f, 1.1408f, 1.09928f, 1.2469f, 1.17646f, 1.0f};
 __CONSTANT__ wpnorm wnd55 = {1.05337f, 1.08334f, 1.04391f, 1.18409f, 1.10416f, 1.0f};
@@ -115,12 +109,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb = mult_f3_f33(rgb, in_to_xyz);
     float3 lms = mult_f3_f33(rgb, xyz_to_tlms);
     lms /= catd65;
-    float3 dlms_ndc = lms;
-    if (gcmp == 1) {
-      float3 yrg = lms_to_yrg(lms, 1);
-      float gcf = compress_parabolic(yrg.y, 0.35f, 1.0f, 0.45f) / yrg.y;
-      lms = (lms.x + lms.y + lms.z) / 3.0f * (1.0f - gcf) + lms * gcf;
-    }
     lms = maxf3(1e-12f, lms);
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
     float ns = sy * _powf(n / (n + sx), p);
@@ -128,18 +116,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     float ts = nt / n;
     float ccf = _powf(sx / (n + sx), dch) * sat;
     float3 dlms = lms * ts;
-    dlms_ndc = dlms_ndc * ts;
     dlms = nt * (1.0f - ccf) + dlms * ccf;
     dlms *= cats / w_n;
-    dlms_ndc *= cats / w_n;
     float3 xyz = mult_f3_f33(dlms, tlms_to_xyz);
-    if (pdch == 1) {
-      float3 jz = xyz_to_jzazbz(xyz, 1);
-      float3 xyz_ndc = mult_f3_f33(dlms_ndc, tlms_to_xyz);
-      float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
-      jz.z = jz_ndc.z;
-      xyz = jzazbz_to_xyz(jz, 1);
-    }
     rgb = mult_f3_f33(xyz, xyz_to_display);
     rgb *= ds;
     rgb = clampf3(rgb, 0.0f, 1.0f);
@@ -162,6 +141,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     } else if (eotf == 5) {
       rgb = eotf_hlg(rgb, 0);
     }
+    rgb = clampf3(rgb, 0.0f, 1.0f);
     rgb /= ds;
     float3 xyz = mult_f3_f33(rgb, display_to_xyz);
     float3 lms = mult_f3_f33(xyz, xyz_to_tlms);
@@ -177,13 +157,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     dlms *= catd65;
     lms *= catd65;
     xyz = mult_f3_f33(dlms, tlms_to_xyz);
-    if (pdch == 1) {
-      float3 jz = xyz_to_jzazbz(xyz, 1);
-      float3 xyz_ndc = mult_f3_f33(lms, tlms_to_xyz);
-      float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
-      jz.z = jz_ndc.z;
-      xyz = jzazbz_to_xyz(jz, 1);
-    }
     rgb = mult_f3_f33(xyz, xyz_to_in);
     rgb = lin2log(rgb, tf);
   }

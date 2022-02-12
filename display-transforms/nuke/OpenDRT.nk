@@ -3,7 +3,7 @@ push $cut_paste_input
 Group {
  name OpenDRT
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.0.90b4 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.1 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
  addUserKnob {41 gamut l "in gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer l " " T ""}
  addUserKnob {35 presets l " " M {"presets/Rec.1886: 2.4 Power | Rec.709" "knobs this \{Lw 100 su 1 sat 1.2 wp 3 eotf 2 display_gamut 4\}" "presets/sRGB Display: 2.2 Power | Rec.709" "knobs this \{Lw 100 su 0 sat 1.2 wp 3 eotf 1 display_gamut 4\}" "presets/Apple Display P3: 2.2 Power | P3D65" "knobs this \{Lw 100 su 0 sat 1.2 wp 3 eotf 1 display_gamut 1\}" "presets/Rec.2020: 2.4 Power | Rec.2020" "knobs this \{Lw 100 su 1 sat 1.2 wp 3 eotf 2 display_gamut 0\}" "presets/Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit" "knobs this \{Lw 100 su 1 sat 1.2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit" "knobs this \{Lw 600 su 2 sat 1 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit" "knobs this \{Lw 1000 su 2 sat 1 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: HLG | Rec.2020 | 1000 nit" "knobs this \{Lw 1000 su 2 sat 1 wp 3 eotf 5 display_gamut 0\}" "presets/Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit" "knobs this \{Lw 2000 su 2 sat 1 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit" "knobs this \{Lw 4000 su 2 sat 1 wp 3 eotf 4 display_gamut 0\}" "presets/Dolby: ST 2084 PQ | P3D65 | 100 nit" "knobs this \{Lw 100 su 1 sat 1.2 wp 3 eotf 4 display_gamut 1\}" "presets/Dolby: ST 2084 PQ | P3D65 | 600 nit" "knobs this \{Lw 600 su 2 sat 1 wp 3 eotf 4 display_gamut 1\}" "presets/Dolby: ST 2084 PQ | P3D65 | 1000 nit" "knobs this \{Lw 1000 su 2 sat 1 wp 3 eotf 4 display_gamut 1\}" "presets/Dolby: ST 2084 PQ | P3D65 | 2000 nit" "knobs this \{Lw 2000 su 2 sat 1 wp 3 eotf 4 display_gamut 1\}" "presets/Dolby: ST 2084 PQ | P3D65 | 4000 nit" "knobs this \{Lw 4000 su 2 sat 1 wp 3 eotf 4 display_gamut 1\}" "presets/DCI: 2.6 Power | P3 D60" "knobs this \{Lw 100 su 2 sat 1.2 wp 3 eotf 3 display_gamut 2\}" "presets/DCI: 2.6 Power | P3 D65" "knobs this \{Lw 100 su 2 sat 1.2 wp 3 eotf 3 display_gamut 1\}" "presets/DCI: 2.6 Power | P3 DCI" "knobs this \{Lw 100 su 2 sat 1.2 wp 3 eotf 3 display_gamut 3\}" "presets/DCI: 2.6 Power | DCDM XYZ" "knobs this \{Lw 100 su 2 sat 1.2 wp 3 eotf 3 display_gamut 5\}"}}
@@ -14,10 +14,6 @@ Group {
  addUserKnob {26 chroma_label l " " T "<br/>\n<b>chroma</b>"}
  addUserKnob {41 dch l dechroma T ToneScale.dch}
  addUserKnob {41 sat l saturation T ToneScale.sat}
- addUserKnob {6 pdch l "perceptual dechroma" t "uses a perceptual colorspace to bias hue paths for chroma compression." +STARTLINE}
- pdch true
- addUserKnob {6 gcmp l "gamut compression" t "enable gamut compression" -STARTLINE}
- gcmp true
  addUserKnob {41 wp l whitepoint T Scale.wp}
  addUserKnob {26 ""}
  addUserKnob {26 display_encoding_label l " " T "<b>display encoding</b>"}
@@ -34,10 +30,10 @@ Group {
   xpos 180
   ypos -586
  }
-set Nc4e74f00 [stack 0]
+set Nd0842400 [stack 0]
  Group {
   name EOTF
-  xpos 510
+  xpos 400
   ypos -490
   addUserKnob {20 EOTF_tab l EOTF}
   addUserKnob {4 eotf l EOTF t "Choose the inverse EOTF to apply for the target display device." M {None "sRGB Display" BT.1886 "Gamma 2.6" PQ HLG ""}}
@@ -49,7 +45,7 @@ set Nc4e74f00 [stack 0]
    xpos 400
    ypos -130
   }
-set Nc4e74100 [stack 0]
+set Nd0841600 [stack 0]
   Expression {
    expr0 r<=0.5?r*r/3:(exp((r-_c)/_a)+_b)/12
    expr1 g<=0.5?g*g/3:(exp((g-_c)/_a)+_b)/12
@@ -83,7 +79,7 @@ set Nc4e74100 [stack 0]
    addUserKnob {7 Lamb t "ambient luminance level in nits" R 0 200}
    Lamb 5
   }
-push $Nc4e74100
+push $Nd0841600
   Expression {
    temp_name0 rp
    temp_expr0 pow(r,1/m_2)
@@ -109,7 +105,7 @@ push $Nc4e74100
    addUserKnob {7 c_3}
    c_3 {{2392/128}}
   }
-push $Nc4e74100
+push $Nd0841600
   Expression {
    expr0 sign(r)*pow(fabs(r),p)
    expr1 sign(g)*pow(fabs(g),p)
@@ -141,7 +137,7 @@ push $Nc4e74100
   expr1 parent.clamp?max(0,min(mx,g)/_s):g/_s
   expr2 parent.clamp?max(0,min(mx,b)/_s):b/_s
   name InvDisplayScale
-  xpos 510
+  xpos 400
   ypos -442
   addUserKnob {20 Params}
   addUserKnob {6 pq +STARTLINE}
@@ -161,17 +157,17 @@ push $Nc4e74100
     }
   invert true
   name Inv_XYZ_to_DisplayGamut
-  xpos 510
+  xpos 400
   ypos -370
  }
  ColorMatrix {
   matrix {
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
+      {{parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix}}
+      {{parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix}}
+      {{parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix}}
     }
-  name Inv_tlms_to_XYZ6
-  xpos 510
+  name Inv_LMS_to_XYZ6
+  xpos 400
   ypos -346
  }
  Expression {
@@ -179,7 +175,7 @@ push $Nc4e74100
   expr1 n*g/w.1
   expr2 n*b/w.2
   name InvScale
-  xpos 510
+  xpos 400
   ypos -322
   addUserKnob {20 Params}
   addUserKnob {78 w n 3}
@@ -187,167 +183,9 @@ push $Nc4e74100
   addUserKnob {7 n R 0 4}
   n {{parent.Scale.wn}}
  }
-set Nf6ce3900 [stack 0]
- Expression {
-  expr0 r*w.0
-  expr1 g*w.1
-  expr2 b*w.2
-  name InvNormalize1
-  xpos 620
-  ypos -178
-  addUserKnob {20 Params}
-  addUserKnob {78 w n 3}
-  w {{parent.Normalize.w} {parent.Normalize.w} {parent.Normalize.w}}
- }
- ColorMatrix {
-  matrix {
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-    }
-  invert true
-  name Inv_XYZ_to_tlms1
-  xpos 620
-  ypos -154
- }
- Group {
-  name Colorspace_JzAzBz_Forward4
-  xpos 620
-  ypos -106
-  addUserKnob {20 JzAzBz_tab l JzAzBz}
-  addUserKnob {41 L_p T eotf_inverse_ST2084_.L_p}
-  addUserKnob {6 JCh t "Lightness, Chroma, hue angle" +STARTLINE}
-  JCh true
-  addUserKnob {35 const_d_presets l "" +STARTLINE M {"const d/JzAzBz" "knobs this \{d -0.56\}" "const d/CAM16-UCS" "knobs this \{d 0\}" "const d/IPT" "knobs this \{d -0.64\}" "const d/ICtCp" "knobs this \{d 1.1\}"}}
-  addUserKnob {7 d l "" t "the d constant which can can be adjusted to tune the lightness predictors to different colorspaces:\ndefault: -0.56\nCAM16-UCS: 0\nIPT: -0.64\nICtCp: 1.1" -STARTLINE R -1 1}
-  d -0.56
- }
-  StickyNote {
-   inputs 0
-   name StickyNote1
-   tile_color 0x40454aff
-   label "<left><b>JzAzBz Colorspace</b>\nSafdar, M., Cui, G., Kim, Y. J., & Luo, M. R. (2017).\n    Perceptually uniform color space for image signals including high dynamic\n    range and wide gamut. Optics Express, 25(13), 15131.\n    doi:10.1364/OE.25.015131\nhttps://www.osapublishing.org/oe/fulltext.cfm?uri=oe-25-13-15131&id=368272\nhttps://observablehq.com/@jrus/jzazbz"
-   note_font_size 14
-   xpos 107
-   ypos -332
-  }
-  Input {
-   inputs 0
-   name Input
-   xpos -40
-   ypos -394
-  }
-  Expression {
-   expr0 1.15*r-(1.15-1)*b
-   expr1 0.66*g-(0.66-1)*r
-   expr2 b
-   name Expression3
-   label "X_p Y_p Z"
-   xpos -40
-   ypos -333
-  }
-  ColorMatrix {
-   matrix {
-       {0.41478972 0.579999 0.014648}
-       {-0.20151 1.120649 0.0531008}
-       {-0.0166008 0.2648 0.6684799}
-     }
-   name ColorMatrix6
-   label XYZ_TO_LMS
-   xpos -40
-   ypos -295
-  }
-  Group {
-   name eotf_inverse_ST2084_
-   xpos -40
-   ypos -250
-   addUserKnob {20 CONSTANTS_tab l CONSTANTS}
-   addUserKnob {7 m_1}
-   m_1 {{2610/4096*(1/4)}}
-   addUserKnob {7 m_2}
-   m_2 {{1.7*2523/2**5}}
-   addUserKnob {7 c_1}
-   c_1 {{3424/4096}}
-   addUserKnob {7 c_2}
-   c_2 {{2413/4096*32}}
-   addUserKnob {7 c_3}
-   c_3 {{2392/4096*32}}
-   addUserKnob {7 L_p R 100 10000}
-   L_p 10000
-  }
-   Input {
-    inputs 0
-    name Input
-    xpos -40
-    ypos -290
-   }
-   Expression {
-    expr0 "pow(r/L_p, m_1)"
-    expr1 "pow(g/L_p, m_1)"
-    expr2 "pow(b/L_p, m_1)"
-    name Expression4
-    label Y_p
-    xpos -40
-    ypos -255
-   }
-   Expression {
-    expr0 "pow((c_1+c_2*r)/(c_3*r+1), m_2)"
-    expr1 "pow((c_1+c_2*g)/(c_3*g+1), m_2)"
-    expr2 "pow((c_1+c_2*b)/(c_3*b+1), m_2)"
-    name Expression8
-    label N
-    xpos -40
-    ypos -215
-   }
-   Output {
-    name Output
-    xpos -40
-    ypos -170
-   }
-  end_group
-  ColorMatrix {
-   matrix {
-       {0.5 0.5 0}
-       {3.524 -4.066708 0.542708}
-       {0.199076 1.096799 -1.295875}
-     }
-   name ColorMatrix2
-   label LMS_P_TO_IZAZBZ
-   xpos -40
-   ypos -224
-  }
-  Expression {
-   temp_name0 d_0
-   temp_expr0 1.6295499532821565e-11
-   expr0 r*(1+d)/(1+d*r)-d_0
-   expr1 g
-   expr2 b
-   name Expression1
-   label Jz
-   xpos -40
-   ypos -184
-  }
-  Expression {
-   expr0 r
-   expr1 sqrt(g*g+b*b)
-   expr2 atan2(b,g)
-   channel3 none
-   name Expression5
-   label "JzAzBz to JCh"
-   xpos -40
-   ypos -136
-   disable {{!parent.JCh}}
-  }
-  Output {
-   name Output
-   xpos -40
-   ypos -58
-  }
- end_group
-push $Nf6ce3900
  Expression {
   temp_name0 n
-  temp_expr0 sqrt(pow(w.0*r,2)+pow(w.1*g,2)+pow(w.2*b,2))/sum
+  temp_expr0 clamp(sqrt(pow(w.0*r,2)+pow(w.1*g,2)+pow(w.2*b,2))/sum)
   temp_name1 nt
   temp_expr1 (n+sqrt(n*(4*fl+n)))/2
   temp_name2 ns
@@ -357,10 +195,9 @@ push $Nf6ce3900
   expr0 n==0?0:(n*(ccf-1)+r)/ccf*ns/n
   expr1 n==0?0:(n*(ccf-1)+g)/ccf*ns/n
   expr2 n==0?0:(n*(ccf-1)+b)/ccf*ns/n
-  expr3 ccf
   name InvToneScale
-  xpos 510
-  ypos -250
+  xpos 400
+  ypos -274
   addUserKnob {20 Params}
   addUserKnob {7 Lw R 100 4000}
   Lw {{parent.ToneScale.Lw}}
@@ -377,7 +214,7 @@ push $Nf6ce3900
   addUserKnob {7 sat l saturation R 0.9 1.6}
   sat {{parent.ToneScale.sat}}
   addUserKnob {78 w n 3}
-  w {0.24 0.1 0.09}
+  w {{parent.ToneScale.w.0} {parent.ToneScale.w.1} {parent.ToneScale.w.2}}
   addUserKnob {7 sum t "Normalize so achromatic in=out" R 0 2}
   sum {{sqrt(w.0*w.0+w.1*w.1+w.2*w.2)}}
  }
@@ -386,293 +223,23 @@ push $Nf6ce3900
   expr1 g*w.1
   expr2 b*w.2
   name InvNormalize
-  xpos 510
-  ypos -178
+  xpos 400
+  ypos -202
   addUserKnob {20 Params}
   addUserKnob {78 w n 3}
   w {{parent.Normalize.w} {parent.Normalize.w} {parent.Normalize.w}}
  }
  ColorMatrix {
   matrix {
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
+      {{parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix}}
+      {{parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix}}
+      {{parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix}}
     }
   invert true
-  name Inv_XYZ_to_tlms
-  xpos 510
-  ypos -154
+  name Inv_XYZ_to_LMS
+  xpos 400
+  ypos -163
  }
- Group {
-  name Colorspace_JzAzBz_Forward3
-  xpos 510
-  ypos -106
-  addUserKnob {20 JzAzBz_tab l JzAzBz}
-  addUserKnob {41 L_p T eotf_inverse_ST2084_.L_p}
-  addUserKnob {6 JCh t "Lightness, Chroma, hue angle" +STARTLINE}
-  JCh true
-  addUserKnob {35 const_d_presets l "" +STARTLINE M {"const d/JzAzBz" "knobs this \{d -0.56\}" "const d/CAM16-UCS" "knobs this \{d 0\}" "const d/IPT" "knobs this \{d -0.64\}" "const d/ICtCp" "knobs this \{d 1.1\}"}}
-  addUserKnob {7 d l "" t "the d constant which can can be adjusted to tune the lightness predictors to different colorspaces:\ndefault: -0.56\nCAM16-UCS: 0\nIPT: -0.64\nICtCp: 1.1" -STARTLINE R -1 1}
-  d {{parent.Colorspace_JzAzBz_Forward4.d}}
- }
-  StickyNote {
-   inputs 0
-   name StickyNote1
-   tile_color 0x40454aff
-   label "<left><b>JzAzBz Colorspace</b>\nSafdar, M., Cui, G., Kim, Y. J., & Luo, M. R. (2017).\n    Perceptually uniform color space for image signals including high dynamic\n    range and wide gamut. Optics Express, 25(13), 15131.\n    doi:10.1364/OE.25.015131\nhttps://www.osapublishing.org/oe/fulltext.cfm?uri=oe-25-13-15131&id=368272\nhttps://observablehq.com/@jrus/jzazbz"
-   note_font_size 14
-   xpos 107
-   ypos -332
-  }
-  Input {
-   inputs 0
-   name Input
-   xpos -40
-   ypos -394
-  }
-  Expression {
-   expr0 1.15*r-(1.15-1)*b
-   expr1 0.66*g-(0.66-1)*r
-   expr2 b
-   name Expression3
-   label "X_p Y_p Z"
-   xpos -40
-   ypos -333
-  }
-  ColorMatrix {
-   matrix {
-       {0.41478972 0.579999 0.014648}
-       {-0.20151 1.120649 0.0531008}
-       {-0.0166008 0.2648 0.6684799}
-     }
-   name ColorMatrix6
-   label XYZ_TO_LMS
-   xpos -40
-   ypos -295
-  }
-  Group {
-   name eotf_inverse_ST2084_
-   xpos -40
-   ypos -250
-   addUserKnob {20 CONSTANTS_tab l CONSTANTS}
-   addUserKnob {7 m_1}
-   m_1 {{2610/4096*(1/4)}}
-   addUserKnob {7 m_2}
-   m_2 {{1.7*2523/2**5}}
-   addUserKnob {7 c_1}
-   c_1 {{3424/4096}}
-   addUserKnob {7 c_2}
-   c_2 {{2413/4096*32}}
-   addUserKnob {7 c_3}
-   c_3 {{2392/4096*32}}
-   addUserKnob {7 L_p R 100 10000}
-   L_p {{parent.parent.Colorspace_JzAzBz_Forward4.eotf_inverse_ST2084_.L_p}}
-  }
-   Input {
-    inputs 0
-    name Input
-    xpos -40
-    ypos -290
-   }
-   Expression {
-    expr0 "pow(r/L_p, m_1)"
-    expr1 "pow(g/L_p, m_1)"
-    expr2 "pow(b/L_p, m_1)"
-    name Expression4
-    label Y_p
-    xpos -40
-    ypos -255
-   }
-   Expression {
-    expr0 "pow((c_1+c_2*r)/(c_3*r+1), m_2)"
-    expr1 "pow((c_1+c_2*g)/(c_3*g+1), m_2)"
-    expr2 "pow((c_1+c_2*b)/(c_3*b+1), m_2)"
-    name Expression8
-    label N
-    xpos -40
-    ypos -215
-   }
-   Output {
-    name Output
-    xpos -40
-    ypos -170
-   }
-  end_group
-  ColorMatrix {
-   matrix {
-       {0.5 0.5 0}
-       {3.524 -4.066708 0.542708}
-       {0.199076 1.096799 -1.295875}
-     }
-   name ColorMatrix2
-   label LMS_P_TO_IZAZBZ
-   xpos -40
-   ypos -224
-  }
-  Expression {
-   temp_name0 d_0
-   temp_expr0 1.6295499532821565e-11
-   expr0 r*(1+d)/(1+d*r)-d_0
-   expr1 g
-   expr2 b
-   name Expression1
-   label Jz
-   xpos -40
-   ypos -184
-  }
-  Expression {
-   expr0 r
-   expr1 sqrt(g*g+b*b)
-   expr2 atan2(b,g)
-   channel3 none
-   name Expression5
-   label "JzAzBz to JCh"
-   xpos -40
-   ypos -136
-   disable {{!parent.JCh}}
-  }
-  Output {
-   name Output
-   xpos -40
-   ypos -58
-  }
- end_group
- Copy {
-  inputs 2
-  from0 rgba.blue
-  to0 rgba.blue
-  name Copy1
-  xpos 510
-  ypos -64
-  disable {{!pdch}}
- }
- Group {
-  name Colorspace_JzAzBz_Inverse2
-  xpos 510
-  ypos -10
-  addUserKnob {20 JzAzBz_tab l JzAzBz}
-  addUserKnob {41 L_p T eotf_ST2084_.L_p}
-  addUserKnob {6 JCh t "Lightness, Chroma, hue angle" +STARTLINE}
-  JCh true
-  addUserKnob {35 const_d_presets l "" +STARTLINE M {"const d/JzAzBz" "knobs this \{d -0.56\}" "const d/CAM16-UCS" "knobs this \{d 0\}" "const d/IPT" "knobs this \{d -0.64\}" "const d/ICtCp" "knobs this \{d 1.1\}"}}
-  addUserKnob {7 d l "" t "the d constant which can can be adjusted to tune the lightness predictors to different colorspaces:\ndefault: -0.56\nCAM16-UCS: 0\nIPT: -0.64\nICtCp: 1.1" -STARTLINE R -1 1}
-  d {{parent.Colorspace_JzAzBz_Forward4.d}}
- }
-  Input {
-   inputs 0
-   name Input
-   xpos -40
-   ypos -490
-  }
-  Expression {
-   expr0 r
-   expr1 g*cos(b)
-   expr2 g*sin(b)
-   channel3 none
-   name Expression6
-   label "JCh to JzAzBz"
-   xpos -40
-   ypos -376
-   disable {{!parent.JCh}}
-  }
-  Expression {
-   temp_name0 d_0
-   temp_expr0 1.6295499532821565e-11
-   expr0 (r+d_0)/(1+d-d*(r+d_0))
-   expr1 g
-   expr2 b
-   name Expression4
-   label Iz
-   xpos -40
-   ypos -328
-  }
-  ColorMatrix {
-   matrix {
-       {0.5 0.5 0}
-       {3.524 -4.066708 0.542708}
-       {0.199076 1.096799 -1.295875}
-     }
-   invert true
-   name ColorMatrix4
-   label IZAZBZ_TO_LMS_P
-   xpos -40
-   ypos -280
-  }
-  Group {
-   name eotf_ST2084_
-   xpos -40
-   ypos -226
-   addUserKnob {20 CONSTANTS_tab l CONSTANTS}
-   addUserKnob {7 m_1}
-   m_1 {{2610/4096*(1/4)}}
-   addUserKnob {7 m_2}
-   m_2 {{1.7*2523/2**5}}
-   addUserKnob {7 c_1}
-   c_1 {{3424/4096}}
-   addUserKnob {7 c_2}
-   c_2 {{2413/4096*32}}
-   addUserKnob {7 c_3}
-   c_3 {{2392/4096*32}}
-   addUserKnob {7 L_p R 0 10000}
-   L_p {{parent.parent.Colorspace_JzAzBz_Forward4.eotf_inverse_ST2084_.L_p}}
-  }
-   Input {
-    inputs 0
-    name Input
-    xpos -40
-    ypos -290
-   }
-   Expression {
-    expr0 "pow(r, 1/m_2)"
-    expr1 "pow(g, 1/m_2)"
-    expr2 "pow(b, 1/m_2)"
-    name Expression1
-    label V_p
-    xpos -40
-    ypos -256
-   }
-   Expression {
-    expr0 pow(((r-c_1)/(c_2-c_3*r)),1/m_1)*L_p
-    expr1 pow(((g-c_1)/(c_2-c_3*g)),1/m_1)*L_p
-    expr2 pow(((b-c_1)/(c_2-c_3*b)),1/m_1)*L_p
-    name Expression2
-    label C
-    xpos -40
-    ypos -218
-   }
-   Output {
-    name Output
-    xpos -40
-    ypos -169
-   }
-  end_group
-  ColorMatrix {
-   matrix {
-       {0.41478972 0.579999 0.014648}
-       {-0.20151 1.120649 0.0531008}
-       {-0.0166008 0.2648 0.6684799}
-     }
-   invert true
-   name ColorMatrix5
-   label LMS_TO_XYZ
-   xpos -40
-   ypos -184
-  }
-  Expression {
-   expr0 (r+(1.15-1)*b)/1.15
-   expr1 (g+(0.66-1)*((r+(1.15-1)*b)/1.15))/0.66
-   expr2 b
-   name Expression2
-   label "X_p Y_p Z"
-   xpos -40
-   ypos -136
-  }
-  Output {
-   name Output
-   xpos -40
-   ypos 42
-  }
- end_group
  ColorMatrix {
   matrix {
       {{parent.InGamut_to_XYZ.ColorMatrix.matrix} {parent.InGamut_to_XYZ.ColorMatrix.matrix} {parent.InGamut_to_XYZ.ColorMatrix.matrix}}
@@ -681,15 +248,15 @@ push $Nf6ce3900
     }
   invert true
   name Inv_InGamut_to_XYZ1
-  xpos 510
-  ypos 38
+  xpos 400
+  ypos -130
  }
-push $Nc4e74f00
+push $Nd0842400
  Group {
   name InGamut_to_XYZ
   tile_color 0x429940ff
   xpos 180
-  ypos -514
+  ypos -525
   addUserKnob {20 InputGamut_to_XYZ_tab l InputGamut_to_XYZ}
   addUserKnob {4 gamut l "in gamut" M {ACES ACEScg P3D65 Rec.2020 Rec.709 "Alexa WideGamut" "Red WideGamutRGB" "Sony SGamut3" "Filmlight E-Gamut" "DaVinci Wide Gamut" "" "" ""}}
   gamut ACEScg
@@ -707,7 +274,7 @@ push $Nc4e74f00
    xpos 324
    ypos -546
   }
-set N702d8f00 [stack 0]
+set N1c405d00 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -723,14 +290,14 @@ set N702d8f00 [stack 0]
    xpos 290
    ypos -250
   }
-push $N702d8f00
+push $N1c405d00
   Dot {
    name Dot391
    label " *RGB to XYZ D65 CAT: XYZ Scaling"
    xpos 434
    ypos -546
   }
-set N152c7900 [stack 0]
+set N1c404800 [stack 0]
   ColorMatrix {
    matrix {
        {0.7006223202 0.1487748027 0.101058729}
@@ -742,7 +309,7 @@ set N152c7900 [stack 0]
    xpos 1390
    ypos -466
   }
-push $N152c7900
+push $N1c404800
   ColorMatrix {
    matrix {
        {0.705396831 0.1640413404 0.08101775497}
@@ -754,7 +321,7 @@ push $N152c7900
    xpos 1280
    ypos -466
   }
-push $N152c7900
+push $N1c404800
   ColorMatrix {
    matrix {
        {0.5990839005 0.2489254922 0.1024464965}
@@ -766,7 +333,7 @@ push $N152c7900
    xpos 1170
    ypos -465
   }
-push $N152c7900
+push $N1c404800
   ColorMatrix {
    matrix {
        {0.735275209 0.06860940903 0.1465712786}
@@ -778,7 +345,7 @@ push $N152c7900
    xpos 1060
    ypos -466
   }
-push $N152c7900
+push $N1c404800
   ColorMatrix {
    matrix {
        {0.6380076408 0.2147038132 0.09774445742}
@@ -790,7 +357,7 @@ push $N152c7900
    xpos 950
    ypos -466
   }
-push $N152c7900
+push $N1c404800
   ColorMatrix {
    matrix {
        {0.4123909175 0.3575843573 0.1804807931}
@@ -802,7 +369,7 @@ push $N152c7900
    xpos 840
    ypos -466
   }
-push $N152c7900
+push $N1c404800
   ColorMatrix {
    matrix {
        {0.6369581223 0.1446169168 0.1688809693}
@@ -814,7 +381,7 @@ push $N152c7900
    xpos 730
    ypos -466
   }
-push $N152c7900
+push $N1c404800
   ColorMatrix {
    matrix {
        {0.4865711331 0.2656677067 0.1982173175}
@@ -826,7 +393,7 @@ push $N152c7900
    xpos 620
    ypos -466
   }
-push $N152c7900
+push $N1c404800
   ColorMatrix {
    matrix {
        {0.6609312296 0.1336961389 0.1558285803}
@@ -838,7 +405,7 @@ push $N152c7900
    xpos 510
    ypos -466
   }
-push $N152c7900
+push $N1c404800
   ColorMatrix {
    matrix {
        {0.9503623843 0 9.346324805e-05}
@@ -864,7 +431,7 @@ push $N152c7900
       {-0.394427 1.1758 0.106423}
       {0.064856 -0.07625 0.559067}
     }
-  name XYZ_to_tlms
+  name XYZ_to_LMS
   xpos 180
   ypos -490
  }
@@ -874,96 +441,11 @@ push $N152c7900
   expr2 b/w.2
   name Normalize
   xpos 180
-  ypos -466
+  ypos -442
   addUserKnob {20 Params}
   addUserKnob {35 presets l "" +STARTLINE M {presets/D50 "knobs this \{w \{1.08221 0.883260 0.447579\}\}" presets/D55 "knobs this \{w \{1.07730 0.896467 0.500927\}\}" presets/D60 "knobs this \{w \{1.07344 0.907523 0.549381\}\}" presets/D65 "knobs this \{w \{1.07046 0.916817 0.594251\}\}" presets/D75 "knobs this \{w \{1.06600 0.931715 0.670839\}\}" presets/D93 "knobs this \{w \{1.06098 0.950462 0.776150\}\}"}}
   addUserKnob {78 w n 3}
   w {1.07046 0.916817 0.594251}
- }
- Dot {
-  name Dot1
-  xpos 214
-  ypos -414
- }
-set N50678800 [stack 0]
- Group {
-  name LMS_to_Yrg
-  xpos 290
-  ypos -418
- }
-  Input {
-   inputs 0
-   name Input
-   xpos 400
-   ypos -394
-  }
-  Expression {
-   temp_name0 _a
-   temp_expr0 r+g+b
-   temp_name1 l
-   temp_expr1 _a==0?0:r/_a
-   temp_name2 m
-   temp_expr2 _a==0?0:g/_a
-   expr0 0.68990272*r+0.34832189*g
-   expr1 1.0671*l-0.6873*m+0.02062-0.14722
-   expr2 -0.0362*l+1.7182*m-0.05155-0.50911666
-   name LMS_to_Yrg
-   xpos 400
-   ypos -346
-  }
-  Expression {
-   temp_name0 l
-   temp_expr0 1
-   expr1 fabs(g)>l?sign(g)*l:g
-   expr2 fabs(b)>l?sign(b)*l:b
-   name Limiter
-   xpos 400
-   ypos -311
-  }
-  Expression {
-   expr0 r
-   expr1 hypot(g,b)
-   expr2 atan2(b,g)
-   name cartesian_to_polar1
-   xpos 400
-   ypos -274
-  }
-  Output {
-   name Output
-   xpos 400
-   ypos -226
-  }
- end_group
-push $N50678800
- MergeExpression {
-  inputs 2
-  temp_name0 _c
-  temp_expr0 Ag
-  temp_name1 f
-  temp_expr1 (_c<t0?_c:sc*sqrt(_c-ox)+oy)/_c
-  temp_name2 ac
-  temp_expr2 (r+g+b)/3
-  expr0 ac*(1-f)+r*f
-  expr1 ac*(1-f)+g*f
-  expr2 ac*(1-f)+b*f
-  maskChannelMask rgba.red
-  name compress_chroma
-  xpos 180
-  ypos -370
-  disable {{!parent.gcmp}}
-  addUserKnob {20 Params_tab l Params}
-  addUserKnob {7 t0 t "threshold to start compression\n" R 0 2}
-  t0 0.35
-  addUserKnob {7 x0 t "x coordinate to compress to" R 0 2}
-  x0 1
-  addUserKnob {7 y0 t "y coordinate to compress to" R 0 2}
-  y0 0.45
-  addUserKnob {7 sc}
-  sc {{(y0-t0)/sqrt(x0-y0)}}
-  addUserKnob {7 ox R -2 2}
-  ox {{t0-sc*sc/4}}
-  addUserKnob {7 oy R -2 2}
-  oy {{t0-sc*sqrt(sc*sc/4)}}
  }
  Expression {
   temp_name0 n
@@ -977,10 +459,9 @@ push $N50678800
   expr0 nt*(1-ccf)+r*(nt/n)*ccf
   expr1 nt*(1-ccf)+g*(nt/n)*ccf
   expr2 nt*(1-ccf)+b*(nt/n)*ccf
-  expr3 nt/n
   name ToneScale
   xpos 180
-  ypos -322
+  ypos -394
   addUserKnob {20 Params}
   addUserKnob {7 Lw R 100 4000}
   Lw 100
@@ -1001,183 +482,10 @@ push $N50678800
   addUserKnob {7 sat l saturation R 0.9 1.6}
   sat 1.2
   addUserKnob {78 w n 3}
-  w {0.24 0.1 0.09}
+  w {0.24 -0.195 0.1}
   addUserKnob {7 sum t "Normalize so achromatic in=out" R 0 2}
   sum {{sqrt(w.0*w.0+w.1*w.1+w.2*w.2)}}
  }
-set N2905600 [stack 0]
-push $N50678800
- MergeExpression {
-  inputs 2
-  temp_name0 s
-  temp_expr0 Aa
-  expr0 r*s
-  expr1 g*s
-  expr2 b*s
-  name MergeExpression1
-  xpos 70
-  ypos -322
- }
- Expression {
-  expr0 r*w.0/n
-  expr1 g*w.1/n
-  expr2 b*w.2/n
-  expr3 1
-  name Scale1
-  xpos 70
-  ypos -202
-  addUserKnob {20 Params}
-  addUserKnob {78 w n 3}
-  w {{parent.Scale.w} {parent.Scale.w} {parent.Scale.w}}
-  addUserKnob {7 n R 0 2}
-  n {{parent.Scale.wn}}
- }
- ColorMatrix {
-  matrix {
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-    }
-  invert true
-  name tlms_to_XYZ1
-  xpos 70
-  ypos -178
- }
- Group {
-  name Colorspace_JzAzBz_Forward1
-  xpos 70
-  ypos -130
-  addUserKnob {20 JzAzBz_tab l JzAzBz}
-  addUserKnob {41 L_p T eotf_inverse_ST2084_.L_p}
-  addUserKnob {6 JCh t "Lightness, Chroma, hue angle" +STARTLINE}
-  JCh true
-  addUserKnob {35 const_d_presets l "" +STARTLINE M {"const d/JzAzBz" "knobs this \{d -0.56\}" "const d/CAM16-UCS" "knobs this \{d 0\}" "const d/IPT" "knobs this \{d -0.64\}" "const d/ICtCp" "knobs this \{d 1.1\}"}}
-  addUserKnob {7 d l "" t "the d constant which can can be adjusted to tune the lightness predictors to different colorspaces:\ndefault: -0.56\nCAM16-UCS: 0\nIPT: -0.64\nICtCp: 1.1" -STARTLINE R -1 1}
-  d {{parent.Colorspace_JzAzBz_Forward2.d}}
- }
-  StickyNote {
-   inputs 0
-   name StickyNote1
-   tile_color 0x40454aff
-   label "<left><b>JzAzBz Colorspace</b>\nSafdar, M., Cui, G., Kim, Y. J., & Luo, M. R. (2017).\n    Perceptually uniform color space for image signals including high dynamic\n    range and wide gamut. Optics Express, 25(13), 15131.\n    doi:10.1364/OE.25.015131\nhttps://www.osapublishing.org/oe/fulltext.cfm?uri=oe-25-13-15131&id=368272\nhttps://observablehq.com/@jrus/jzazbz"
-   note_font_size 14
-   xpos 107
-   ypos -332
-  }
-  Input {
-   inputs 0
-   name Input
-   xpos -40
-   ypos -394
-  }
-  Expression {
-   expr0 1.15*r-(1.15-1)*b
-   expr1 0.66*g-(0.66-1)*r
-   expr2 b
-   name Expression3
-   label "X_p Y_p Z"
-   xpos -40
-   ypos -333
-  }
-  ColorMatrix {
-   matrix {
-       {0.41478972 0.579999 0.014648}
-       {-0.20151 1.120649 0.0531008}
-       {-0.0166008 0.2648 0.6684799}
-     }
-   name ColorMatrix6
-   label XYZ_TO_LMS
-   xpos -40
-   ypos -295
-  }
-  Group {
-   name eotf_inverse_ST2084_
-   xpos -40
-   ypos -250
-   addUserKnob {20 CONSTANTS_tab l CONSTANTS}
-   addUserKnob {7 m_1}
-   m_1 {{2610/4096*(1/4)}}
-   addUserKnob {7 m_2}
-   m_2 {{1.7*2523/2**5}}
-   addUserKnob {7 c_1}
-   c_1 {{3424/4096}}
-   addUserKnob {7 c_2}
-   c_2 {{2413/4096*32}}
-   addUserKnob {7 c_3}
-   c_3 {{2392/4096*32}}
-   addUserKnob {7 L_p R 100 10000}
-   L_p {{parent.parent.Colorspace_JzAzBz_Forward2.eotf_inverse_ST2084_.L_p}}
-  }
-   Input {
-    inputs 0
-    name Input
-    xpos -40
-    ypos -290
-   }
-   Expression {
-    expr0 "pow(r/L_p, m_1)"
-    expr1 "pow(g/L_p, m_1)"
-    expr2 "pow(b/L_p, m_1)"
-    name Expression4
-    label Y_p
-    xpos -40
-    ypos -255
-   }
-   Expression {
-    expr0 "pow((c_1+c_2*r)/(c_3*r+1), m_2)"
-    expr1 "pow((c_1+c_2*g)/(c_3*g+1), m_2)"
-    expr2 "pow((c_1+c_2*b)/(c_3*b+1), m_2)"
-    name Expression8
-    label N
-    xpos -40
-    ypos -215
-   }
-   Output {
-    name Output
-    xpos -40
-    ypos -170
-   }
-  end_group
-  ColorMatrix {
-   matrix {
-       {0.5 0.5 0}
-       {3.524 -4.066708 0.542708}
-       {0.199076 1.096799 -1.295875}
-     }
-   name ColorMatrix2
-   label LMS_P_TO_IZAZBZ
-   xpos -40
-   ypos -224
-  }
-  Expression {
-   temp_name0 d_0
-   temp_expr0 1.6295499532821565e-11
-   expr0 r*(1+d)/(1+d*r)-d_0
-   expr1 g
-   expr2 b
-   name Expression1
-   label Jz
-   xpos -40
-   ypos -184
-  }
-  Expression {
-   expr0 r
-   expr1 sqrt(g*g+b*b)
-   expr2 atan2(b,g)
-   channel3 none
-   name Expression5
-   label "JzAzBz to JCh"
-   xpos -40
-   ypos -136
-   disable {{!parent.JCh}}
-  }
-  Output {
-   name Output
-   xpos -40
-   ypos -58
-  }
- end_group
-push $N2905600
  Expression {
   expr0 r*w.0/wn
   expr1 g*w.1/wn
@@ -1185,7 +493,7 @@ push $N2905600
   expr3 1
   name Scale
   xpos 180
-  ypos -202
+  ypos -346
   addUserKnob {20 Params}
   addUserKnob {4 wp M {D50 D55 D60 D65 D75 D93}}
   wp D65
@@ -1196,290 +504,20 @@ push $N2905600
  }
  ColorMatrix {
   matrix {
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
-      {{parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix} {parent.XYZ_to_tlms.matrix}}
+      {{parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix}}
+      {{parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix}}
+      {{parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix} {parent.XYZ_to_LMS.matrix}}
     }
   invert true
-  name tlms_to_XYZ
+  name LMS_to_XYZ
   xpos 180
-  ypos -178
+  ypos -322
  }
- Group {
-  name Colorspace_JzAzBz_Forward2
-  xpos 180
-  ypos -130
-  addUserKnob {20 JzAzBz_tab l JzAzBz}
-  addUserKnob {41 L_p T eotf_inverse_ST2084_.L_p}
-  addUserKnob {6 JCh t "Lightness, Chroma, hue angle" +STARTLINE}
-  JCh true
-  addUserKnob {35 const_d_presets l "" +STARTLINE M {"const d/JzAzBz" "knobs this \{d -0.56\}" "const d/CAM16-UCS" "knobs this \{d 0\}" "const d/IPT" "knobs this \{d -0.64\}" "const d/ICtCp" "knobs this \{d 1.1\}"}}
-  addUserKnob {7 d l "" t "the d constant which can can be adjusted to tune the lightness predictors to different colorspaces:\ndefault: -0.56\nCAM16-UCS: 0\nIPT: -0.64\nICtCp: 1.1" -STARTLINE R -1 1}
-  d -0.56
- }
-  StickyNote {
-   inputs 0
-   name StickyNote1
-   tile_color 0x40454aff
-   label "<left><b>JzAzBz Colorspace</b>\nSafdar, M., Cui, G., Kim, Y. J., & Luo, M. R. (2017).\n    Perceptually uniform color space for image signals including high dynamic\n    range and wide gamut. Optics Express, 25(13), 15131.\n    doi:10.1364/OE.25.015131\nhttps://www.osapublishing.org/oe/fulltext.cfm?uri=oe-25-13-15131&id=368272\nhttps://observablehq.com/@jrus/jzazbz"
-   note_font_size 14
-   xpos 107
-   ypos -332
-  }
-  Input {
-   inputs 0
-   name Input
-   xpos -40
-   ypos -394
-  }
-  Expression {
-   expr0 1.15*r-(1.15-1)*b
-   expr1 0.66*g-(0.66-1)*r
-   expr2 b
-   name Expression3
-   label "X_p Y_p Z"
-   xpos -40
-   ypos -333
-  }
-  ColorMatrix {
-   matrix {
-       {0.41478972 0.579999 0.014648}
-       {-0.20151 1.120649 0.0531008}
-       {-0.0166008 0.2648 0.6684799}
-     }
-   name ColorMatrix6
-   label XYZ_TO_LMS
-   xpos -40
-   ypos -295
-  }
-  Group {
-   name eotf_inverse_ST2084_
-   xpos -40
-   ypos -250
-   addUserKnob {20 CONSTANTS_tab l CONSTANTS}
-   addUserKnob {7 m_1}
-   m_1 {{2610/4096*(1/4)}}
-   addUserKnob {7 m_2}
-   m_2 {{1.7*2523/2**5}}
-   addUserKnob {7 c_1}
-   c_1 {{3424/4096}}
-   addUserKnob {7 c_2}
-   c_2 {{2413/4096*32}}
-   addUserKnob {7 c_3}
-   c_3 {{2392/4096*32}}
-   addUserKnob {7 L_p R 100 10000}
-   L_p 10000
-  }
-   Input {
-    inputs 0
-    name Input
-    xpos -40
-    ypos -290
-   }
-   Expression {
-    expr0 "pow(r/L_p, m_1)"
-    expr1 "pow(g/L_p, m_1)"
-    expr2 "pow(b/L_p, m_1)"
-    name Expression4
-    label Y_p
-    xpos -40
-    ypos -255
-   }
-   Expression {
-    expr0 "pow((c_1+c_2*r)/(c_3*r+1), m_2)"
-    expr1 "pow((c_1+c_2*g)/(c_3*g+1), m_2)"
-    expr2 "pow((c_1+c_2*b)/(c_3*b+1), m_2)"
-    name Expression8
-    label N
-    xpos -40
-    ypos -215
-   }
-   Output {
-    name Output
-    xpos -40
-    ypos -170
-   }
-  end_group
-  ColorMatrix {
-   matrix {
-       {0.5 0.5 0}
-       {3.524 -4.066708 0.542708}
-       {0.199076 1.096799 -1.295875}
-     }
-   name ColorMatrix2
-   label LMS_P_TO_IZAZBZ
-   xpos -40
-   ypos -224
-  }
-  Expression {
-   temp_name0 d_0
-   temp_expr0 1.6295499532821565e-11
-   expr0 r*(1+d)/(1+d*r)-d_0
-   expr1 g
-   expr2 b
-   name Expression1
-   label Jz
-   xpos -40
-   ypos -184
-  }
-  Expression {
-   expr0 r
-   expr1 sqrt(g*g+b*b)
-   expr2 atan2(b,g)
-   channel3 none
-   name Expression5
-   label "JzAzBz to JCh"
-   xpos -40
-   ypos -136
-   disable {{!parent.JCh}}
-  }
-  Output {
-   name Output
-   xpos -40
-   ypos -58
-  }
- end_group
- Copy {
-  inputs 2
-  from0 rgba.blue
-  to0 rgba.blue
-  name Copy2
-  xpos 180
-  ypos -64
-  disable {{!pdch}}
- }
- Group {
-  name Colorspace_JzAzBz_Inverse1
-  xpos 180
-  ypos -10
-  addUserKnob {20 JzAzBz_tab l JzAzBz}
-  addUserKnob {41 L_p T eotf_ST2084_.L_p}
-  addUserKnob {6 JCh t "Lightness, Chroma, hue angle" +STARTLINE}
-  JCh true
-  addUserKnob {35 const_d_presets l "" +STARTLINE M {"const d/JzAzBz" "knobs this \{d -0.56\}" "const d/CAM16-UCS" "knobs this \{d 0\}" "const d/IPT" "knobs this \{d -0.64\}" "const d/ICtCp" "knobs this \{d 1.1\}"}}
-  addUserKnob {7 d l "" t "the d constant which can can be adjusted to tune the lightness predictors to different colorspaces:\ndefault: -0.56\nCAM16-UCS: 0\nIPT: -0.64\nICtCp: 1.1" -STARTLINE R -1 1}
-  d {{parent.Colorspace_JzAzBz_Forward2.d}}
- }
-  Input {
-   inputs 0
-   name Input
-   xpos -40
-   ypos -490
-  }
-  Expression {
-   expr0 r
-   expr1 g*cos(b)
-   expr2 g*sin(b)
-   channel3 none
-   name Expression6
-   label "JCh to JzAzBz"
-   xpos -40
-   ypos -376
-   disable {{!parent.JCh}}
-  }
-  Expression {
-   temp_name0 d_0
-   temp_expr0 1.6295499532821565e-11
-   expr0 (r+d_0)/(1+d-d*(r+d_0))
-   expr1 g
-   expr2 b
-   name Expression4
-   label Iz
-   xpos -40
-   ypos -328
-  }
-  ColorMatrix {
-   matrix {
-       {0.5 0.5 0}
-       {3.524 -4.066708 0.542708}
-       {0.199076 1.096799 -1.295875}
-     }
-   invert true
-   name ColorMatrix4
-   label IZAZBZ_TO_LMS_P
-   xpos -40
-   ypos -280
-  }
-  Group {
-   name eotf_ST2084_
-   xpos -40
-   ypos -226
-   addUserKnob {20 CONSTANTS_tab l CONSTANTS}
-   addUserKnob {7 m_1}
-   m_1 {{2610/4096*(1/4)}}
-   addUserKnob {7 m_2}
-   m_2 {{1.7*2523/2**5}}
-   addUserKnob {7 c_1}
-   c_1 {{3424/4096}}
-   addUserKnob {7 c_2}
-   c_2 {{2413/4096*32}}
-   addUserKnob {7 c_3}
-   c_3 {{2392/4096*32}}
-   addUserKnob {7 L_p R 0 10000}
-   L_p {{parent.parent.Colorspace_JzAzBz_Forward2.eotf_inverse_ST2084_.L_p}}
-  }
-   Input {
-    inputs 0
-    name Input
-    xpos -40
-    ypos -290
-   }
-   Expression {
-    expr0 "pow(r, 1/m_2)"
-    expr1 "pow(g, 1/m_2)"
-    expr2 "pow(b, 1/m_2)"
-    name Expression1
-    label V_p
-    xpos -40
-    ypos -256
-   }
-   Expression {
-    expr0 pow(((r-c_1)/(c_2-c_3*r)),1/m_1)*L_p
-    expr1 pow(((g-c_1)/(c_2-c_3*g)),1/m_1)*L_p
-    expr2 pow(((b-c_1)/(c_2-c_3*b)),1/m_1)*L_p
-    name Expression2
-    label C
-    xpos -40
-    ypos -218
-   }
-   Output {
-    name Output
-    xpos -40
-    ypos -169
-   }
-  end_group
-  ColorMatrix {
-   matrix {
-       {0.41478972 0.579999 0.014648}
-       {-0.20151 1.120649 0.0531008}
-       {-0.0166008 0.2648 0.6684799}
-     }
-   invert true
-   name ColorMatrix5
-   label LMS_TO_XYZ
-   xpos -40
-   ypos -184
-  }
-  Expression {
-   expr0 (r+(1.15-1)*b)/1.15
-   expr1 (g+(0.66-1)*((r+(1.15-1)*b)/1.15))/0.66
-   expr2 b
-   name Expression2
-   label "X_p Y_p Z"
-   xpos -40
-   ypos -136
-  }
-  Output {
-   name Output
-   xpos -40
-   ypos 42
-  }
- end_group
  Group {
   name XYZ_to_DisplayGamut
   tile_color 0x425440ff
   xpos 180
-  ypos 38
+  ypos -250
   addUserKnob {20 XYZ_to_DisplayGamut_tab l XYZ_to_DisplayGamut}
   addUserKnob {4 gamut l "display gamut" t "Choose the target display device chromaticities." M {Rec.2020 "P3 D65" "P3 D60" "P3 DCI" Rec.709 "DCDM X'Y'Z'"}}
   gamut Rec.709
@@ -1498,7 +536,7 @@ push $N2905600
    xpos 324
    ypos -516
   }
-set N141bab00 [stack 0]
+set N1c390100 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -1514,14 +552,14 @@ set N141bab00 [stack 0]
    xpos 290
    ypos -310
   }
-push $N141bab00
+push $N1c390100
   Dot {
    name Dot1
    label " XYZ D65 to *RGB CAT: XYZ Scaling"
    xpos 434
    ypos -516
   }
-set N141b9600 [stack 0]
+set N1c32ab00 [stack 0]
   ColorMatrix {
    matrix {
        {1 0 0}
@@ -1533,7 +571,7 @@ set N141b9600 [stack 0]
    xpos 950
    ypos -465
   }
-push $N141b9600
+push $N1c32ab00
   ColorMatrix {
    matrix {
        {3.240968943 -1.537382722 -0.4986106157}
@@ -1545,7 +583,7 @@ push $N141b9600
    xpos 840
    ypos -465
   }
-push $N141b9600
+push $N1c32ab00
   ColorMatrix {
    matrix {
        {2.72539258 -1.01800251 -0.4401629865}
@@ -1557,7 +595,7 @@ push $N141b9600
    xpos 730
    ypos -465
   }
-push $N141b9600
+push $N1c32ab00
   ColorMatrix {
    matrix {
        {2.40274024 -0.8974836469 -0.3880532086}
@@ -1569,7 +607,7 @@ push $N141b9600
    xpos 620
    ypos -465
   }
-push $N141b9600
+push $N1c32ab00
   ColorMatrix {
    matrix {
        {2.493495464 -0.9313831329 -0.4027105868}
@@ -1581,7 +619,7 @@ push $N141b9600
    xpos 510
    ypos -465
   }
-push $N141b9600
+push $N1c32ab00
   ColorMatrix {
    matrix {
        {1.716650844 -0.3556707203 -0.2533662021}
@@ -1609,7 +647,7 @@ push $N141b9600
   expr2 parent.clamp?max(0,min(mx,b*_s)):b*_s
   name DisplayScale1
   xpos 180
-  ypos 86
+  ypos -202
   addUserKnob {20 Params}
   addUserKnob {6 pq +STARTLINE}
   pq {{eotf==4}}
@@ -1623,7 +661,7 @@ push $N141b9600
  Group {
   name InverseEOTF
   xpos 180
-  ypos 110
+  ypos -154
   addUserKnob {20 EOTF_tab l EOTF}
   addUserKnob {4 eotf t "Choose the inverse EOTF to apply for the target display device." M {None "sRGB Display" BT.1886 "Gamma 2.6" PQ HLG "" "" ""}}
   eotf BT.1886
@@ -1634,7 +672,7 @@ push $N141b9600
    xpos 400
    ypos -130
   }
-set N15ac4f00 [stack 0]
+set N1c2f2400 [stack 0]
   Expression {
    temp_name0 Yd
    temp_expr0 0.2627*r+0.6780*g+0.0593*b
@@ -1667,7 +705,7 @@ set N15ac4f00 [stack 0]
    addUserKnob {7 _c}
    _c {{0.5-_a*log(4*_a)}}
   }
-push $N15ac4f00
+push $N1c2f2400
   Expression {
    temp_name0 rp
    temp_expr0 pow(r,m_1)
@@ -1693,7 +731,7 @@ push $N15ac4f00
    addUserKnob {7 c_3}
    c_3 {{2392/128}}
   }
-push $N15ac4f00
+push $N1c2f2400
   Expression {
    expr0 sign(r)*pow(fabs(r),1/p)
    expr1 sign(g)*pow(fabs(g),1/p)
@@ -1723,11 +761,11 @@ push $N15ac4f00
   which {{parent.direction}}
   name SwitchDirection
   xpos 180
-  ypos 206
+  ypos -82
  }
  Output {
   name Output
   xpos 180
-  ypos 278
+  ypos -10
  }
 end_group

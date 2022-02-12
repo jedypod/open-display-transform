@@ -1,17 +1,15 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.0.90b4
+      v0.1
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 */
 
-DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {AP0, AP1, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
 DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 0, {sdr_rec1886, sdr_srgb, sdr_applep3, sdr_rec2020, hdr_rec2020_pq_100nit, hdr_rec2020_pq_600nit, hdr_rec2020_pq_1000nit, hdr_rec2020_hlg_1000nit, hdr_rec2020_pq_2000nit, hdr_rec2020_pq_4000nit, hdr_p3d65_pq_100nit, hdr_p3d65_pq_600nit, hdr_p3d65_pq_1000nit, hdr_p3d65_pq_2000nit, hdr_p3d65_pq_4000nit, dci_p3d60, dci_p3d65, dci_p3dci, dci_dcdm}, {Rec.1886: 2.4 Power | Rec.709, sRGB Display: 2.2 Power | Rec.709, Apple Display P3: 2.2 Power | P3D65, Rec.2020: 2.4 Power | Rec.2020, Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit, Rec.2100: HLG | Rec.2020 | 1000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit, Dolby: ST 2084 PQ | P3D65 | 100 nit, Dolby: ST 2084 PQ | P3D65 | 600 nit, Dolby: ST 2084 PQ | P3D65 | 1000 nit, Dolby: ST 2084 PQ | P3D65 | 2000 nit, Dolby: ST 2084 PQ | P3D65 | 4000 nit, DCI: 2.6 Power | P3 D60, DCI: 2.6 Power | P3 D65, DCI: 2.6 Power | P3 DCI, DCI: 2.6 Power | DCDM XYZ})
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93})
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
-DEFINE_UI_PARAMS(pdch, perceptual dechroma, DCTLUI_CHECK_BOX, 1)
-DEFINE_UI_PARAMS(gcmp, gamut compress, DCTLUI_CHECK_BOX, 1)
 
 #include "libDRT.h"
 
@@ -194,15 +192,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Normalize D65 white to equal energy
     lms /= catd65;
 
-    float3 dlms_ndc = lms; // Store for perceptual dechroma
-
-    // Chroma compression for highly out of gamut values. Values tuned to protect CC24 values.
-    if (gcmp == 1) {
-      float3 yrg = lms_to_yrg(lms, 1);
-      float gcf = compress_parabolic(yrg.y, 0.35f, 1.0f, 0.45f) / yrg.y;
-      lms = (lms.x + lms.y + lms.z) / 3.0f * (1.0f - gcf) + lms * gcf;
-    }
-    
     // Weighted vector length norm
     lms = maxf3(1e-12f, lms);
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
@@ -218,34 +207,16 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Display-referred LMS
     float3 dlms = lms * ts;
     
-    // Display referred LMS without chroma compression
-    dlms_ndc = dlms_ndc * ts;
-
-    // Compress chroma: chromaticity-linear desaturation by ccf
+     // Compress chroma: chromaticity-linear desaturation by ccf
     dlms = nt * (1.0f - ccf) + dlms * ccf;
 
     // Apply output creative output whitepoint scale to both scene lms and display lms
     // Also normalize by w_n so that channels are not pushed above display peak luminance. 
     // For example if using a D55 whitepoint, without normalization the R channel would be > 1
     dlms *= cats / w_n;
-    dlms_ndc *= cats / w_n;
     
     // Convert from Truelight LMS to XYZ
     float3 xyz = mult_f3_f33(dlms, tlms_to_xyz);
-
-    // Distort chromaticity-linear chroma compression along perceptual hue paths using JzAzBz
-    if (pdch == 1) {
-      float3 jz = xyz_to_jzazbz(xyz, 1);
-
-      // Scene-linear XYZ tristimulus without any chroma compression. To use as our source hue.
-      float3 xyz_ndc = mult_f3_f33(dlms_ndc, tlms_to_xyz);
-      float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
-      
-      // Copy hue from jz_ndc: Effectively warps the hue from chromaticity-linear to perceptual.
-      jz.z = jz_ndc.z;
-    
-      xyz = jzazbz_to_xyz(jz, 1);
-    }
 
     // Convert XYZ to display gamut
     rgb = mult_f3_f33(xyz, xyz_to_display);
@@ -272,8 +243,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
         Inverse will not be an exact match, due to multiple factors:
         - Limitations of display gamut volume
         - Mis-matches in more saturated colors due to weighted vector length norm
-        - Gamut compression not included in inverse
-        - Perceptual dechroma not included in inverse    
     */
     
     rgb = clampf3(rgb, 0.0f, 1.0f);
@@ -288,11 +257,15 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       rgb = eotf_hlg(rgb, 0);
     }
 
+    rgb = clampf3(rgb, 0.0f, 1.0f);
+
     // Inverse output scale
     rgb /= ds;
 
     // display gamut to XYZ
     float3 xyz = mult_f3_f33(rgb, display_to_xyz);
+    xyz = clampf3(xyz, 0.0f, 1.0f);
+
 
     // XYZ to LMS
     float3 lms = mult_f3_f33(xyz, xyz_to_tlms);
@@ -308,6 +281,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Inverse tone scale 
     float nt = (n + _sqrtf(n * (4.0f * fl + n))) / 2.0f;
     float np = _powf(nt / sy, 1.0f / p);
+
     float ns = (np/(1.0f - np)) * sx;
     float ccf = ns == 0.0f ? 0.0f : _powf(_powf(nt, 1.0f / p) / (ns / sx), dch) * sat;
 
@@ -316,24 +290,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // Inverse D65 Normalization
     dlms *= catd65;
-    lms *= catd65;
 
     // LMS to XYZ
     xyz = mult_f3_f33(dlms, tlms_to_xyz);
-
-    // Un-Distort chromaticity-linear chroma compression along perceptual hue paths using JzAzBz
-    if (pdch == 1) {
-      float3 jz = xyz_to_jzazbz(xyz, 1);
-    
-      // Scene-linear XYZ tristimulus without any chroma compression. To use as our source hue.
-      float3 xyz_ndc = mult_f3_f33(lms, tlms_to_xyz);
-      float3 jz_ndc = xyz_to_jzazbz(xyz_ndc, 1);
-      
-      // Copy hue from jz_ndc: Effectively warps the hue from perceptual to chromaticity-linear.
-      jz.z = jz_ndc.z;
-    
-      xyz = jzazbz_to_xyz(jz, 1);
-    }
 
     // XYZ to input gamut.
     rgb = mult_f3_f33(xyz, xyz_to_in);
