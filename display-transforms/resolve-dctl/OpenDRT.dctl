@@ -1,6 +1,6 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.1
+      v0.1.0
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 */
@@ -166,7 +166,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   
 
   // R G B weights for vector length norm. Affects luminance and chroma of output color.
-  const float3 vw = make_float3(0.25f, 0.1f, 0.09f);
+  const float3 vw = make_float3(0.16f, 0.1f, 0.1f);
 
   // Normalization for weighted vector length norm so that achromatic values are not scaled
   const float vwn = _sqrtf(vw.x*vw.x + vw.y*vw.y + vw.z*vw.z);
