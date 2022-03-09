@@ -1,11 +1,11 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.1.0
+      v0.1.1
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 */
 
-DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {AP0, AP1, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES AP0, ACES AP1, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
 DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 0, {sdr_rec1886, sdr_srgb, sdr_applep3, sdr_rec2020, hdr_rec2020_pq_100nit, hdr_rec2020_pq_600nit, hdr_rec2020_pq_1000nit, hdr_rec2020_hlg_1000nit, hdr_rec2020_pq_2000nit, hdr_rec2020_pq_4000nit, hdr_p3d65_pq_100nit, hdr_p3d65_pq_600nit, hdr_p3d65_pq_1000nit, hdr_p3d65_pq_2000nit, hdr_p3d65_pq_4000nit, dci_p3d60, dci_p3d65, dci_p3dci, dci_dcdm}, {Rec.1886: 2.4 Power | Rec.709, sRGB Display: 2.2 Power | Rec.709, Apple Display P3: 2.2 Power | P3D65, Rec.2020: 2.4 Power | Rec.2020, Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit, Rec.2100: HLG | Rec.2020 | 1000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit, Dolby: ST 2084 PQ | P3D65 | 100 nit, Dolby: ST 2084 PQ | P3D65 | 600 nit, Dolby: ST 2084 PQ | P3D65 | 1000 nit, Dolby: ST 2084 PQ | P3D65 | 2000 nit, Dolby: ST 2084 PQ | P3D65 | 4000 nit, DCI: 2.6 Power | P3 D60, DCI: 2.6 Power | P3 D65, DCI: 2.6 Power | P3 DCI, DCI: 2.6 Power | DCDM XYZ})
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93})
@@ -85,35 +85,34 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   
 
   // highlight dechroma 
-  const float dch = 0.5f;
+  const float dch = 0.4f;
 
   /* Set up presets
      ----------------------- */
   int eotf;
-  float Lw, ps, sat, w_n;
+  float Lp, ps, w_n;
   float3x3 xyz_to_display;
 
-  if (preset == sdr_rec1886) Lw = 100.0f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 2;
-  else if (preset == sdr_srgb) Lw = 100.0f, ps = 0.9f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 1;
-  else if (preset == sdr_applep3) Lw = 100.0f, ps = 0.9f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 1;
-  else if (preset == sdr_rec2020) Lw = 100.0f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 2;
-  else if (preset == dci_p3d60) Lw = 100.0f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d60_to_xyz), w_n = wn.p3d60, eotf = 3;
-  else if (preset == dci_p3d65) Lw = 100.0f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 3;
-  else if (preset == dci_p3dci) Lw = 100.0f, ps = 1.0f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3dci_to_xyz), w_n = wn.p3dci, eotf = 3;
-  else if (preset == dci_dcdm) Lw = 100.0f,  52.37f / 48.0f, ps = 1.0f, sat = 1.2f, xyz_to_display = identity_mtx, w_n = wn.dcdm, eotf = 3;
-  else if (preset == hdr_rec2020_pq_100nit) Lw = 100.0f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_pq_600nit) Lw = 600.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_pq_1000nit) Lw = 1000.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_hlg_1000nit) Lw = 1000.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 5;
-  else if (preset == hdr_rec2020_pq_2000nit) Lw = 2000.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_pq_4000nit) Lw = 4000.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_p3d65_pq_100nit) Lw = 100.0f, ps = 0.95f, sat = 1.2f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_600nit) Lw = 600.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_1000nit) Lw = 1000.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_2000nit) Lw = 2000.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_4000nit) Lw = 4000.0f, ps = 1.0f, sat = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  if (preset == sdr_rec1886) Lp = 100.0f, ps = 0.95f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 2;
+  else if (preset == sdr_srgb) Lp = 100.0f, ps = 0.9f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 1;
+  else if (preset == sdr_applep3) Lp = 100.0f, ps = 0.9f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 1;
+  else if (preset == sdr_rec2020) Lp = 100.0f, ps = 0.95f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 2;
+  else if (preset == dci_p3d60) Lp = 100.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d60_to_xyz), w_n = wn.p3d60, eotf = 3;
+  else if (preset == dci_p3d65) Lp = 100.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 3;
+  else if (preset == dci_p3dci) Lp = 100.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3dci_to_xyz), w_n = wn.p3dci, eotf = 3;
+  else if (preset == dci_dcdm) Lp = 100.0f,  52.37f / 48.0f, ps = 1.0f, xyz_to_display = identity_mtx, w_n = wn.dcdm, eotf = 3;
+  else if (preset == hdr_rec2020_pq_100nit) Lp = 100.0f, ps = 0.95f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_pq_600nit) Lp = 600.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_pq_1000nit) Lp = 1000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_hlg_1000nit) Lp = 1000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 5;
+  else if (preset == hdr_rec2020_pq_2000nit) Lp = 2000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_pq_4000nit) Lp = 4000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_p3d65_pq_100nit) Lp = 100.0f, ps = 0.95f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_600nit) Lp = 600.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_1000nit) Lp = 1000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_2000nit) Lp = 2000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_4000nit) Lp = 4000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
 
-  
   const float3x3 display_to_xyz = inv_f33(xyz_to_display);
 
   /* Tone Scale
@@ -121,7 +120,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       to map scene-referred to display-referred. Then a parabolic 
       toe compression function is used for flare compensation. 
       The behavior of the tonescale function is controlled using a simple
-      model, driven by a single variable (Lw) describing display peak luminance.
+      model, driven by a single variable (Lp) describing display peak luminance.
       https://www.desmos.com/calculator/ssx2a1bpsz
 
       And another plot which does not include the parameter model:
@@ -139,9 +138,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       This is a simple model for describing how the function changes with 
       different display luminance and surround illumination conditions.
     Parameters:
-      - Lw: Peak display luminance. Drives the model for the tonescale.
+      - Lp: Peak display luminance. Drives the model for the tonescale.
       - Contrast: Power function applied to the compressed image.
-        Model smoothly varies between ~1.4 in @ Lw = 100 nits to ~1.17 @ Lw = 4000 nits
+        Model smoothly varies between ~1.4 in @ Lp = 100 nits to ~1.17 @ Lp = 4000 nits
       - Surround: Power function to compensate for surround illumination.
         We "gamma up" a bit when surround illumination is increased.
       - Flare: Display-referred flare or glare compensation.
@@ -152,17 +151,22 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
         - Compensate for creative whitepoint adjustments.
   */
   
+  
   // Calculate tonescale parameters
-  const float c = 12.0f * _powf(Lw, -0.86f) + 1.17f;
+  const float sat = _fmaxf(1.0f, 1.125f - 0.00025f*Lp);
+  const float c = 15.2401f*_powf(Lp, -0.912658f) + 1.17214f;
   const float p = c * ps;
-  const float fl = 1.0f / Lw;
-  const float sx = 0.016f * _powf(Lw, 0.87f) - 0.17f;
-  const float sy = 1.036f + 0.00005f * Lw;
+  const float fl = 600.0f*_powf(c, -65.0f) + 0.008f;
+  const float gr = 0.00753136f*_powf(Lp, 0.31418f) + 0.067997f;
+  const float g1 = gr + _sqrtf(gr*(4.0f*fl + gr))/2.0f;
+  const float w1 = Lp/24530.0f + 1.037f;
+  const float sy = w1*Lp/100.0f;
+  const float sx = 0.18f*_powf(sy/g1, 1.0f/c) - 0.18f;
 
   // Display output normalization
-  const float ds = eotf == 4 ? Lw / 10000.0f : eotf == 5 ? Lw / 1000.0f : preset == dci_dcdm ? 48.0f / 52.37f : 1.0f;
+  const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : preset == dci_dcdm ? 48.0f / 52.37f : 1.0f;
   // Display maximum for display-linear clamp.
-  const float clamp_max = preset == dci_dcdm ? 1.0f : ds;
+  const float clamp_max = preset == dci_dcdm ? 1.0f : ds*Lp/100.0f;
   
 
   // R G B weights for vector length norm. Affects luminance and chroma of output color.
@@ -196,27 +200,29 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     lms = maxf3(1e-12f, lms);
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
 
+    // RGB Ratios
+    lms /= n;
+
     // Tonescale and flare compensation
-    float ns = sy * _powf(n / (n + sx), p);
-    float nt = ns * ns / (ns + fl);
-    float ts = nt / n; // tone scale
+    float ts = sy*_powf(n/(n + sx), p);
+    ts = ts*ts/(ts + fl);
 
     // Chroma compression factor
-    float ccf = _powf(sx / (n + sx), dch) * sat;
+    float ccf = _powf(sx/(n + sx), dch)*sat;
+    
+     // Compress chroma: chromaticity-linear desaturation by ccf (lerp towards 1.0 in rgb ratios)
+    lms = (1.0f - ccf) + lms*ccf;
 
     // Display-referred LMS
-    float3 dlms = lms * ts;
+    lms *= ts;
     
-     // Compress chroma: chromaticity-linear desaturation by ccf
-    dlms = nt * (1.0f - ccf) + dlms * ccf;
-
     // Apply output creative output whitepoint scale to both scene lms and display lms
     // Also normalize by w_n so that channels are not pushed above display peak luminance. 
     // For example if using a D55 whitepoint, without normalization the R channel would be > 1
-    dlms *= cats / w_n;
+    lms *= cats / w_n;
     
     // Convert from Truelight LMS to XYZ
-    float3 xyz = mult_f3_f33(dlms, tlms_to_xyz);
+    float3 xyz = mult_f3_f33(lms, tlms_to_xyz);
 
     // Convert XYZ to display gamut
     rgb = mult_f3_f33(xyz, xyz_to_display);
@@ -257,42 +263,43 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       rgb = eotf_hlg(rgb, 0);
     }
 
-    rgb = clampf3(rgb, 0.0f, 1.0f);
 
     // Inverse output scale
     rgb /= ds;
 
     // display gamut to XYZ
     float3 xyz = mult_f3_f33(rgb, display_to_xyz);
-    xyz = clampf3(xyz, 0.0f, 1.0f);
-
 
     // XYZ to LMS
     float3 lms = mult_f3_f33(xyz, xyz_to_tlms);
 
     // Inverse output creative output whitepoint scale
     lms /= cats;
-    lms = clampf3(lms, 0.0f, 1.0f);
 
     // Weighted vector length norm
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
-    n = _fmaxf(1e-12f, _fminf(0.999f, n));
+
+    // RGB Ratios
+    lms /= n;
 
     // Inverse tone scale 
-    float nt = (n + _sqrtf(n * (4.0f * fl + n))) / 2.0f;
-    float np = _powf(nt / sy, 1.0f / p);
+    float ts = (n + _sqrtf(n*(4.0f*fl + n)))/2.0f;
+    ts = sx/(_powf(sy/ts, 1.0f/p) - 1.0f);
+    
+    // Chroma compression factor
+    float ccf = _powf(sx / (n + sx), dch) * sat;
 
-    float ns = (np/(1.0f - np)) * sx;
-    float ccf = ns == 0.0f ? 0.0f : _powf(_powf(nt, 1.0f / p) / (ns / sx), dch) * sat;
+    // Inverse chroma compression
+    lms = ((ccf - 1.0f) + lms)/ccf;
 
-    // chroma expand
-    float3 dlms = (n * (ccf - 1.0f) + lms) / ccf * ns / n;
+    // Scene-referred LMS
+    lms *= ts;
 
     // Inverse D65 Normalization
-    dlms *= catd65;
+    lms *= catd65;
 
     // LMS to XYZ
-    xyz = mult_f3_f33(dlms, tlms_to_xyz);
+    xyz = mult_f3_f33(lms, tlms_to_xyz);
 
     // XYZ to input gamut.
     rgb = mult_f3_f33(xyz, xyz_to_in);
