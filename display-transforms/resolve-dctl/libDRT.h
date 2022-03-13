@@ -1,6 +1,5 @@
 /* libDTColorMath
     --------------------------------------
-      v0.1
     
       Library of commonly used functions for the Open Display Transform project
       Written by Jed Smith
@@ -67,16 +66,6 @@ typedef struct {
 */
 #define matrix_xyz_to_truelightlms make_float3x3(make_float3(0.257085f, 0.859943f, -0.031061f), make_float3(-0.394427, 1.175800f, 0.106423f), make_float3(0.064856f, -0.07625f, 0.559067f))
 
-
-/* Custom rendering gamut for "rgbDT" display transform
-    rxy 0.859 0.264
-    gxy 0.137 1.12
-    bxy 0.085 -0.096
-    wxy 0.3127 0.329
-*/
-#define matrix_rgbdt_to_xyz make_float3x3(make_float3(0.72113842f, 0.11148937f, 0.11782813f), make_float3(0.22163042f, 0.91144598f, -0.13307647f), make_float3(-0.10325963f, -0.20914429f, 1.40146172f))
-// 10% Rec.709 weighted desaturation
-#define matrix_rgbdt_desat make_float3x3(make_float3(0.921264f, 0.0715169f, 0.00721923f), make_float3(0.0212639f, 0.971517f, 0.00721923f), make_float3(0.0212639f, 0.0715169f, 0.907219f))
 
 // Whitepoint scaling factors for Truelight LMS
 // eg: (1, 1, 1) in RGB (D65 whitepoint) -> XYZ -> TLMS /= catd65 *= catd55 -> XYZ -> Yxy == D65 white

@@ -1,7 +1,7 @@
 /*  RGB Display Transform 
       a very simple classic per-channel display transform
     -------------------------------------------------
-      v0.0.1
+      v0.0.2
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -11,13 +11,24 @@
 
 DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
-DEFINE_UI_PARAMS(Lw, Lw, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 4000.0, 10.0)
+DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 4000.0, 10.0)
 DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 4, {Rec2020, P3D65, P3D60, P3DCI, Rec709, DCDM}, {Rec.2020, P3 D65, P3 D60, P3 DCI, Rec.709, DCDM XYZ})
 DEFINE_UI_PARAMS(surround, surround, DCTLUI_COMBO_BOX, 1, {average, dim, dark}, {average, dim, dark})
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
 
 #include "libDRT.h"
+
+/* Custom rendering gamut for "rgbDT" display transform
+    rxy 0.859 0.264
+    gxy 0.137 1.12
+    bxy 0.085 -0.096
+    wxy 0.3127 0.329
+*/
+#define matrix_rgbdt_to_xyz make_float3x3(make_float3(0.72113842f, 0.11148937f, 0.11782813f), make_float3(0.22163042f, 0.91144598f, -0.13307647f), make_float3(-0.10325963f, -0.20914429f, 1.40146172f))
+// 10% Rec.709 weighted desaturation
+#define matrix_rgbdt_desat make_float3x3(make_float3(0.921264f, 0.0715169f, 0.00721923f), make_float3(0.0212639f, 0.971517f, 0.00721923f), make_float3(0.0212639f, 0.0715169f, 0.907219f))
+
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
 {
@@ -71,14 +82,19 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (EOTF == pq)      eotf = 4;
   else if (EOTF == hlg)     eotf = 5;
 
-  const float ds = eotf == 4 ? Lw / 10000.0f : eotf == 5 ? Lw / 1000.0f : 1.0f;
-  
+  // Display scale: remap peak white depending on output inverse EOTF
+  const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : 100.0f/Lp;
+
   // Calculate tonescale parameters
-  const float c = 12.0f * _powf(Lw, -0.86f) + 1.17f;
+  const float sat = _fmaxf(1.0f, 1.125f - 0.00025f*Lp);
+  const float c = 15.2401f*_powf(Lp, -0.912658f) + 1.17214f;
   const float p = c * ps;
-  const float fl = 1.0f / Lw;
-  const float sx = 0.016f * _powf(Lw, 0.87f) - 0.17f;
-  const float sy = 1.036f + 0.00005f * Lw;
+  const float fl = 600.0f*_powf(c, -65.0f) + 0.008f;
+  const float gr = 0.00753136f*_powf(Lp, 0.31418f) + 0.067997f;
+  const float g1 = gr + _sqrtf(gr*(4.0f*fl + gr))/2.0f;
+  const float w1 = Lp/24530.0f + 1.037f;
+  const float sy = w1*Lp/100.0f;
+  const float sx = 0.18f*_powf(sy/g1, 1.0f/c) - 0.18f;
 
 
   float3 rgb = make_float3(p_R, p_G, p_B);
@@ -112,6 +128,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     } else if (eotf == 5) {
       rgb = eotf_hlg(rgb, 1);
     }
+
   } else {
     float eotf_p = 2.0f + eotf * 0.2f;
     if ((eotf > 0) && (eotf < 4)) {
@@ -135,5 +152,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb = mult_f3_f33(rgb, xyz_to_in);
     rgb = lin2log(rgb, tf);
   }
+
   return rgb;
 }
