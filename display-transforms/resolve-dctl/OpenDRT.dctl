@@ -261,6 +261,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb /= ds;
 
     // display gamut to XYZ
+    rgb = maxf3(0.0f, rgb);
     float3 xyz = mult_f3_f33(rgb, display_to_xyz);
 
     // XYZ to LMS

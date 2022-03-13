@@ -151,6 +151,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     }
     rgb = clampf3(rgb, 0.0f, 1.0f);
     rgb /= ds;
+    rgb = maxf3(0.0f, rgb);
     float3 xyz = mult_f3_f33(rgb, display_to_xyz);
     float3 lms = mult_f3_f33(xyz, xyz_to_tlms);
     lms /= cats;
