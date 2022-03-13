@@ -1,6 +1,6 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.1.1
+      v0.1.2
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 */
@@ -85,92 +85,84 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   
 
   // highlight dechroma 
-  const float dch = 0.4f;
+  const float dch = 0.55f;
 
   /* Set up presets
      ----------------------- */
   int eotf;
-  float Lp, ps, w_n;
+  float Lp, su, w_n;
   float3x3 xyz_to_display;
 
-  if (preset == sdr_rec1886) Lp = 100.0f, ps = 0.95f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 2;
-  else if (preset == sdr_srgb) Lp = 100.0f, ps = 0.9f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 1;
-  else if (preset == sdr_applep3) Lp = 100.0f, ps = 0.9f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 1;
-  else if (preset == sdr_rec2020) Lp = 100.0f, ps = 0.95f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 2;
-  else if (preset == dci_p3d60) Lp = 100.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d60_to_xyz), w_n = wn.p3d60, eotf = 3;
-  else if (preset == dci_p3d65) Lp = 100.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 3;
-  else if (preset == dci_p3dci) Lp = 100.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3dci_to_xyz), w_n = wn.p3dci, eotf = 3;
-  else if (preset == dci_dcdm) Lp = 100.0f,  52.37f / 48.0f, ps = 1.0f, xyz_to_display = identity_mtx, w_n = wn.dcdm, eotf = 3;
-  else if (preset == hdr_rec2020_pq_100nit) Lp = 100.0f, ps = 0.95f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_pq_600nit) Lp = 600.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_pq_1000nit) Lp = 1000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_hlg_1000nit) Lp = 1000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 5;
-  else if (preset == hdr_rec2020_pq_2000nit) Lp = 2000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_pq_4000nit) Lp = 4000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_p3d65_pq_100nit) Lp = 100.0f, ps = 0.95f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_600nit) Lp = 600.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_1000nit) Lp = 1000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_2000nit) Lp = 2000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_4000nit) Lp = 4000.0f, ps = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  if (preset == sdr_rec1886) Lp = 100.0f, su = 0.95f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 2;
+  else if (preset == sdr_srgb) Lp = 100.0f, su = 0.9f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 1;
+  else if (preset == sdr_applep3) Lp = 100.0f, su = 0.9f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 1;
+  else if (preset == sdr_rec2020) Lp = 100.0f, su = 0.95f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 2;
+  else if (preset == dci_p3d60) Lp = 100.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d60_to_xyz), w_n = wn.p3d60, eotf = 3;
+  else if (preset == dci_p3d65) Lp = 100.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 3;
+  else if (preset == dci_p3dci) Lp = 100.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3dci_to_xyz), w_n = wn.p3dci, eotf = 3;
+  else if (preset == dci_dcdm) Lp = 100.0f,  52.37f / 48.0f, su = 1.0f, xyz_to_display = identity_mtx, w_n = wn.dcdm, eotf = 3;
+  else if (preset == hdr_rec2020_pq_100nit) Lp = 100.0f, su = 0.95f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_pq_600nit) Lp = 600.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_pq_1000nit) Lp = 1000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_hlg_1000nit) Lp = 1000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 5;
+  else if (preset == hdr_rec2020_pq_2000nit) Lp = 2000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_rec2020_pq_4000nit) Lp = 4000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
+  else if (preset == hdr_p3d65_pq_100nit) Lp = 100.0f, su = 0.95f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_600nit) Lp = 600.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_1000nit) Lp = 1000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_2000nit) Lp = 2000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  else if (preset == hdr_p3d65_pq_4000nit) Lp = 4000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
 
   const float3x3 display_to_xyz = inv_f33(xyz_to_display);
 
   /* Tone Scale
-      OpenDRT uses a simple tonescale based on the Michaelis-Menten equation
-      to map scene-referred to display-referred. Then a parabolic 
-      toe compression function is used for flare compensation. 
-      The behavior of the tonescale function is controlled using a simple
-      model, driven by a single variable (Lp) describing display peak luminance.
-      https://www.desmos.com/calculator/ssx2a1bpsz
+      OpenDRT uses a 3-stage tonescale model. 
+      - Stage 1 is a middle-grey pivoted  power function with linear extension. 
+      - Stage 2 is a hyperbolic compression function based on the Michaelis-Menten equation. 
+      - Stage 3 is a parabolic toe compression function used for flare compensation. 
 
-      And another plot which does not include the parameter model:
-      https://www.desmos.com/calculator/85ctrzzt4y
-      
-      The Michaelis-Menten equation has been shown to describe the response of photoreceptor
-      cells in the retina:
-      http://retina.anatomy.upenn.edu/~rob/lance/michaelis.html
-      https://pubmed.ncbi.nlm.nih.gov/6666056/2
+      More details with math
+      https://colab.research.google.com/drive/1aEjQDPlPveWPvhNoEfK4vGH5Tet8y1EB
+      https://colab.research.google.com/drive/10C3HvDuoAhYad1qOG2r0v8fGR-5VdpO5
 
       This implementation is inspired by Daniele Siragusano's post:
       https://community.acescentral.com/t/output-transform-tone-scale/3498/14
 
-      First we set up the parameter space which controls the function.
-      This is a simple model for describing how the function changes with 
-      different display luminance and surround illumination conditions.
-    Parameters:
-      - Lp: Peak display luminance. Drives the model for the tonescale.
-      - Contrast: Power function applied to the compressed image.
-        Model smoothly varies between ~1.4 in @ Lp = 100 nits to ~1.17 @ Lp = 4000 nits
-      - Surround: Power function to compensate for surround illumination.
-        We "gamma up" a bit when surround illumination is increased.
-      - Flare: Display-referred flare or glare compensation.
-      - Input Scale: scene-linear exposure adjustment or input domain scale.
-      - Output Scale: display-linear scale. 
-        - Boost scale so we clip at some finite scene-referred value.
-        - Normalize for PQ or HLG HDR output (PQ defines 1.0 as 10,000 nits).
-        - Compensate for creative whitepoint adjustments.
+      The parameter space are all const floats specified by user parameters.
+      The constants are used in the rendering code to do the tonescale.
   */
   
   
   // Calculate tonescale parameters
   const float sat = _fmaxf(1.0f, 1.125f - 0.00025f*Lp);
-  const float c = 15.2401f*_powf(Lp, -0.912658f) + 1.17214f;
-  const float p = c * ps;
-  const float fl = 600.0f*_powf(c, -65.0f) + 0.008f;
-  const float gr = 0.00753136f*_powf(Lp, 0.31418f) + 0.067997f;
-  const float g1 = gr + _sqrtf(gr*(4.0f*fl + gr))/2.0f;
-  const float w1 = Lp/24530.0f + 1.037f;
-  const float sy = w1*Lp/100.0f;
-  const float sx = 0.18f*_powf(sy/g1, 1.0f/c) - 0.18f;
+  
+  // flare
+  const float fl = 0.01f;
+  
+  // contrast
+  const float c0 = 1.4f; // pre-tonemap contrast
+  const float cs = _powf(0.18, 1.0f-c0);  // pivoted contrast scale
+  const float c1 = 1.1f; // post-tonemap contrast
+  const float p = c1 * su; // surround compensation, unconstrained
+  
+  // boost peak to clip : ~32@100nits, ~75~1000nits, 100@4000nits
+  const float w1 = _powf(0.595f*Lp/10000.0f, 0.931f) + 1.037f;
+  const float sy = w1*Lp/100.0f; // scale y: 1@100nits, 40@4000nits
 
-  // Display output normalization
-  const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : preset == dci_dcdm ? 48.0f / 52.37f : 1.0f;
+  const float ex = -0.26f; // 0.18 -> 0.1 @ 100nits
+  const float eb = 0.08f; // exposure boost with > Lp
+  const float e0 = _powf(2.0f, ex + eb*_log2f(sy));
+  const float sx = _powf(sy/e0, 1.0f/c1);
+  
+  // Display scale: remap peak white depending on output inverse EOTF
+  const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : preset == dci_dcdm ? 48.0f / 52.37f :100.0f/Lp;
+  
   // Display maximum for display-linear clamp.
   const float clamp_max = preset == dci_dcdm ? 1.0f : ds*Lp/100.0f;
   
 
   // R G B weights for vector length norm. Affects luminance and chroma of output color.
-  const float3 vw = make_float3(0.16f, 0.1f, 0.1f);
+  const float3 vw = make_float3(0.18f, 0.1f, 0.1f);
 
   // Normalization for weighted vector length norm so that achromatic values are not scaled
   const float vwn = _sqrtf(vw.x*vw.x + vw.y*vw.y + vw.z*vw.z);
@@ -204,7 +196,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     lms /= n;
 
     // Tonescale and flare compensation
-    float ts = sy*_powf(n/(n + sx), p);
+    float ts = n < 0.18f ? cs*_powf(n, c0) : c0*(n - 0.18f) + 0.18f;
+    ts = sy*_powf(ts/(ts + sx), p);
     ts = ts*ts/(ts + fl);
 
     // Chroma compression factor
@@ -285,6 +278,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Inverse tone scale 
     float ts = (n + _sqrtf(n*(4.0f*fl + n)))/2.0f;
     ts = sx/(_powf(sy/ts, 1.0f/p) - 1.0f);
+    ts = ts < 0.18f ? _powf(ts/cs, 1.0f/c0) : (ts - 0.18f)/c0 + 0.18f;
     
     // Chroma compression factor
     float ccf = _powf(sx / (n + sx), dch) * sat;

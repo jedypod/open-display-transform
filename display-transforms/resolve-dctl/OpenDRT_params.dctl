@@ -1,6 +1,6 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.1.1
+      v0.1.2
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -12,13 +12,14 @@
 
 DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {AP0, AP1, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
-DEFINE_UI_PARAMS(sx, sx, DCTLUI_SLIDER_FLOAT, 0.7, 0.7, 20, 0.0)
-DEFINE_UI_PARAMS(sy, sy, DCTLUI_SLIDER_FLOAT, 1.04, 1.0, 1.24, 0.0)
-DEFINE_UI_PARAMS(p, contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1, 2.0, 0.0)
+DEFINE_UI_PARAMS(ex, exposure, DCTLUI_SLIDER_FLOAT, -0.26, -2, 2, 0.0)
+DEFINE_UI_PARAMS(w1, white clip, DCTLUI_SLIDER_FLOAT, 1.04, 1.0, 1.24, 0.0)
+DEFINE_UI_PARAMS(c0, contrast 0, DCTLUI_SLIDER_FLOAT, 1.2, 1, 1.4, 0.0)
+DEFINE_UI_PARAMS(p, contrast 1, DCTLUI_SLIDER_FLOAT, 1.1, 0.8, 1.2, 0.0)
 DEFINE_UI_PARAMS(fl, flare, DCTLUI_SLIDER_FLOAT, 0.01, 0.0, 0.02, 0.001)
-DEFINE_UI_PARAMS(dch, dechroma, DCTLUI_SLIDER_FLOAT, 0.4, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch, dechroma, DCTLUI_SLIDER_FLOAT, 0.55, 0.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(sat, saturation, DCTLUI_SLIDER_FLOAT, 1.1, 0.5, 1.5, 0.0)
-DEFINE_UI_PARAMS(wr, red weight, DCTLUI_SLIDER_FLOAT, 0.16, 0.0, 0.33, 0.0)
+DEFINE_UI_PARAMS(wr, red weight, DCTLUI_SLIDER_FLOAT, 0.18, 0.0, 0.33, 0.0)
 DEFINE_UI_PARAMS(wg, green weight, DCTLUI_SLIDER_FLOAT, 0.1, 0.0, 0.33, 0.0)
 DEFINE_UI_PARAMS(wb, blue weight, DCTLUI_SLIDER_FLOAT, 0.1, 0.0, 0.33, 0.0)
 DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93})
@@ -95,7 +96,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (EOTF == pq)      eotf = 4;
   else if (EOTF == hlg)     eotf = 5;
 
-  const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : 1.0f;
+  const float cs = _powf(0.18, 1.0f-c0);
+  const float sy = w1*Lp/100.0f;
+  const float e0 = _powf(2.0f, ex);
+  const float sx = _powf(sy/e0, 1.0f/p);
+
+  const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : 100.0f/Lp;
   const float clamp_max = ds*Lp/100.0f;
 
   const float3 vw = make_float3(wr, wg, wb);
@@ -113,7 +119,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     lms = maxf3(1e-12f, lms);
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
     lms /= n;
-    float ts = sy*_powf(n/(n + sx), p);
+    float ts = n < 0.18f ? cs*_powf(n, c0) : c0*(n - 0.18f) + 0.18f;
+    ts = sy*_powf(ts/(ts + sx), p);
     ts = ts*ts/(ts + fl);
     float ccf = _powf(sx/(n + sx), dch)*sat;
     lms = (1.0f - ccf) + lms*ccf;
@@ -151,6 +158,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     lms /= n;
     float ts = (n + _sqrtf(n*(4.0f*fl + n)))/2.0f;
     ts = sx/(_powf(sy/ts, 1.0f/p) - 1.0f);
+    ts = ts < 0.18f ? _powf(ts/cs, 1.0f/c0) : (ts - 0.18f)/c0 + 0.18f;
     float ccf = _powf(sx / (n + sx), dch) * sat;
     lms = ((ccf - 1.0f) + lms)/ccf;
     lms *= ts;
