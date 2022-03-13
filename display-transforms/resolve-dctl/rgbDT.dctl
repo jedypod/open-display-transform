@@ -69,10 +69,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   const float3x3 display_to_xyz = inv_f33(xyz_to_display);
 
   // Surround compensation
-  float ps;
-  if (surround == average)    ps = 0.9f;
-  else if (surround == dim)   ps = 0.95f;
-  else if (surround == dark)  ps = 1.0f;
+  float su;
+  if (surround == average)    su = 0.9f;
+  else if (surround == dim)   su = 0.95f;
+  else if (surround == dark)  su = 1.0f;
 
   int eotf;
   if (EOTF == lin)          eotf = 0;
@@ -85,17 +85,24 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Display scale: remap peak white depending on output inverse EOTF
   const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : 100.0f/Lp;
 
+  
   // Calculate tonescale parameters
-  const float sat = _fmaxf(1.0f, 1.125f - 0.00025f*Lp);
-  const float c = 15.2401f*_powf(Lp, -0.912658f) + 1.17214f;
-  const float p = c * ps;
-  const float fl = 600.0f*_powf(c, -65.0f) + 0.008f;
-  const float gr = 0.00753136f*_powf(Lp, 0.31418f) + 0.067997f;
-  const float g1 = gr + _sqrtf(gr*(4.0f*fl + gr))/2.0f;
-  const float w1 = Lp/24530.0f + 1.037f;
-  const float sy = w1*Lp/100.0f;
-  const float sx = 0.18f*_powf(sy/g1, 1.0f/c) - 0.18f;
+  const float fl = 0.01f; // flare
+  const float c0 = 1.4f; // pre-tonemap contrast
+  const float cs = _powf(0.18, 1.0f-c0);  // pivoted contrast scale
+  const float c1 = 1.1f; // post-tonemap contrast
+  const float p = c1 * su; // surround compensation, unconstrained
+  
+  // boost peak to clip : ~32@100nits, ~75~1000nits, 100@4000nits
+  const float w1 = _powf(0.595f*Lp/10000.0f, 0.931f) + 1.037f;
+  const float sy = w1*Lp/100.0f; // scale y: 1@100nits, 40@4000nits
 
+  const float ex = -0.26f; // 0.18 -> 0.1 @ 100nits
+  const float eb = 0.08f; // exposure boost with > Lp
+  const float e0 = _powf(2.0f, ex + eb*_log2f(sy));
+  const float sx = _powf(sy/e0, 1.0f/c1);
+
+  
 
   float3 rgb = make_float3(p_R, p_G, p_B);
 
@@ -110,6 +117,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb = maxf3(0.0f, rgb);
 
     // Tonescale
+    rgb.x = rgb.x < 0.18f ? cs*_powf(rgb.x, c0) : c0*(rgb.x - 0.18f) + 0.18f;
+    rgb.y = rgb.y < 0.18f ? cs*_powf(rgb.y, c0) : c0*(rgb.y - 0.18f) + 0.18f;
+    rgb.z = rgb.z < 0.18f ? cs*_powf(rgb.z, c0) : c0*(rgb.z - 0.18f) + 0.18f;
     rgb = sy * powf3(rgb / (rgb + sx), p);
     rgb = rgb * rgb / (rgb + fl);
 
@@ -143,10 +153,13 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb = mult_f3_f33(rgb, inv_f33(matrix_rgbdt_desat));
     rgb = mult_f3_f33(rgb, display_to_xyz);
     rgb = mult_f3_f33(rgb, inv_f33(matrix_rgbdt_to_xyz));
+
     // Tonescale
     rgb = (rgb + sqrtf3(rgb * (4.0f * fl + rgb))) / 2.0f;
-    rgb = powf3(rgb / sy, 1.0f / p);
-    rgb = (rgb / (1.0f - rgb)) * sx;
+    rgb = sx/(powf3(sy/rgb, 1.0f/p) - 1.0f);
+    rgb.x = rgb.x < 0.18f ? _powf(rgb.x/cs, 1.0f/c0) : (rgb.x - 0.18f)/c0 + 0.18f;
+    rgb.y = rgb.y < 0.18f ? _powf(rgb.y/cs, 1.0f/c0) : (rgb.y - 0.18f)/c0 + 0.18f;
+    rgb.z = rgb.z < 0.18f ? _powf(rgb.z/cs, 1.0f/c0) : (rgb.z - 0.18f)/c0 + 0.18f;
 
     rgb = mult_f3_f33(rgb, matrix_rgbdt_to_xyz);
     rgb = mult_f3_f33(rgb, xyz_to_in);
