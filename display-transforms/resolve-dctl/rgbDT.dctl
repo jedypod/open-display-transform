@@ -95,12 +95,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   
   // boost peak to clip : ~32@100nits, ~75~1000nits, 100@4000nits
   const float w1 = _powf(0.595f*Lp/10000.0f, 0.931f) + 1.037f;
-  const float sy = w1*Lp/100.0f; // scale y: 1@100nits, 40@4000nits
+  const float s1 = w1*Lp/100.0f; // scale y: 1@100nits, 40@4000nits
 
   const float ex = -0.26f; // 0.18 -> 0.1 @ 100nits
   const float eb = 0.08f; // exposure boost with > Lp
-  const float e0 = _powf(2.0f, ex + eb*_log2f(sy));
-  const float sx = _powf(sy/e0, 1.0f/c1);
+  const float e0 = _powf(2.0f, ex + eb*_log2f(s1));
+  const float s0 = _powf(s1/e0, 1.0f/c1);
 
   
 
@@ -120,7 +120,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb.x = rgb.x < 0.18f ? cs*_powf(rgb.x, c0) : c0*(rgb.x - 0.18f) + 0.18f;
     rgb.y = rgb.y < 0.18f ? cs*_powf(rgb.y, c0) : c0*(rgb.y - 0.18f) + 0.18f;
     rgb.z = rgb.z < 0.18f ? cs*_powf(rgb.z, c0) : c0*(rgb.z - 0.18f) + 0.18f;
-    rgb = sy * powf3(rgb / (rgb + sx), p);
+    rgb = s1 * powf3(rgb / (rgb + s0), p);
     rgb = rgb * rgb / (rgb + fl);
 
     rgb = mult_f3_f33(rgb, matrix_rgbdt_to_xyz);
@@ -156,7 +156,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // Tonescale
     rgb = (rgb + sqrtf3(rgb * (4.0f * fl + rgb))) / 2.0f;
-    rgb = sx/(powf3(sy/rgb, 1.0f/p) - 1.0f);
+    rgb = s0/(powf3(s1/rgb, 1.0f/p) - 1.0f);
     rgb.x = rgb.x < 0.18f ? _powf(rgb.x/cs, 1.0f/c0) : (rgb.x - 0.18f)/c0 + 0.18f;
     rgb.y = rgb.y < 0.18f ? _powf(rgb.y/cs, 1.0f/c0) : (rgb.y - 0.18f)/c0 + 0.18f;
     rgb.z = rgb.z < 0.18f ? _powf(rgb.z/cs, 1.0f/c0) : (rgb.z - 0.18f)/c0 + 0.18f;
