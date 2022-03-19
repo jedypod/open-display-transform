@@ -450,8 +450,10 @@ push $N4e89b900
   p {{c*(0.9+0.05*su)}}
   addUserKnob {7 fl l flare R 0 0.01}
   fl 0.01
+  addUserKnob {7 w1 R 1 1.4}
+  w1 {{(0.595*Lp/10000)**0.931+1.037}}
   addUserKnob {7 sy R 0 4}
-  sy {{1.036+5e-5*Lp}}
+  sy {{w1*Lp/100}}
   addUserKnob {7 ex R -2 2}
   ex -0.26
   addUserKnob {7 eb R 0 0.2}
@@ -463,7 +465,7 @@ push $N4e89b900
  }
  Expression {
   temp_name0 mx
-  temp_expr0 dcdm?1:sc
+  temp_expr0 dcdm?1:sc*Lp/100
   expr0 parent.clamp?max(0,min(mx,r*sc)):r*sc
   expr1 parent.clamp?max(0,min(mx,g*sc)):g*sc
   expr2 parent.clamp?max(0,min(mx,b*sc)):b*sc
