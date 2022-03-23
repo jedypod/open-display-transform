@@ -1,6 +1,6 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.1.2
+      v0.1.3
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 */
@@ -85,7 +85,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   
 
   // highlight dechroma 
-  const float dch = 0.55f;
+  const float dch = 0.5f;
 
   /* Set up presets
      ----------------------- */
@@ -117,11 +117,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   /* Tone Scale
       OpenDRT uses a 3-stage tonescale model. 
-      - Stage 1 is a middle-grey pivoted  power function with linear extension. 
-      - Stage 2 is a hyperbolic compression function based on the Michaelis-Menten equation. 
-      - Stage 3 is a parabolic toe compression function used for flare compensation. 
+      - Stage 1 is a hyperbolic compression function based on the Michaelis-Menten equation. 
+      - Stage 2 is a power function applied after the hyperbolic compression to adjust contrast.
+      - Stage 3 is a parabolic toe compression function used for flare compensation.
 
-      More details with math
+      More details with math (see the "Michaelis-Menten Spring with Varying Power model")
       https://colab.research.google.com/drive/1aEjQDPlPveWPvhNoEfK4vGH5Tet8y1EB
       https://colab.research.google.com/drive/10C3HvDuoAhYad1qOG2r0v8fGR-5VdpO5
 
@@ -129,7 +129,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       https://community.acescentral.com/t/output-transform-tone-scale/3498/14
 
       The parameter space are all const floats specified by user parameters.
-      The constants are used in the rendering code to do the tonescale.
+      The constants are used in the rendering code to apply the tonescale.
   */
   
   
@@ -140,19 +140,16 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   const float fl = 0.01f;
   
   // contrast
-  const float c0 = 1.4f; // pre-tonemap contrast
-  const float cs = _powf(0.18, 1.0f-c0);  // pivoted contrast scale
-  const float c1 = 1.1f; // post-tonemap contrast
-  const float p = c1 * su; // surround compensation, unconstrained
+  const float c = 26.5f*_powf(Lp, -1.1f)+1.18f; // post-tonemap contrast
+  const float p = c*su; // surround compensation, unconstrained
   
-  // boost peak to clip : ~32@100nits, ~75~1000nits, 100@4000nits
-  const float w1 = _powf(0.595f*Lp/10000.0f, 0.931f) + 1.037f;
-  const float sy = w1*Lp/100.0f; // scale y: 1@100nits, 40@4000nits
+  // boost peak to clip : ~32@100nits, ~75~1000nits, ~100@4000nits
+  const float w1 = _powf(0.44f*Lp/10000.0f, 0.8534f) + 1.033f;
+  const float s1 = w1*Lp/100.0f; // scale y: 1@100nits, 40@4000nits
 
-  const float ex = -0.26f; // 0.18 -> 0.1 @ 100nits
-  const float eb = 0.08f; // exposure boost with > Lp
-  const float e0 = _powf(2.0f, ex + eb*_log2f(sy));
-  const float sx = _powf(sy/e0, 1.0f/c1);
+  // middle grey position / exposure: ~10nits at 100nits SDR, ~16.3nits at 4000nits HDR
+  const float e0 = 0.0153f*_powf(Lp, 0.5224f) + 1.1656f;
+  const float s0 = s1/e0;
   
   // Display scale: remap peak white depending on output inverse EOTF
   const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : preset == dci_dcdm ? 48.0f / 52.37f :100.0f/Lp;
@@ -162,7 +159,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   
 
   // R G B weights for vector length norm. Affects luminance and chroma of output color.
-  const float3 vw = make_float3(0.18f, 0.1f, 0.1f);
+  const float3 vw = make_float3(0.24f, 0.1f, 0.1f);
 
   // Normalization for weighted vector length norm so that achromatic values are not scaled
   const float vwn = _sqrtf(vw.x*vw.x + vw.y*vw.y + vw.z*vw.z);
@@ -196,12 +193,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     lms /= n;
 
     // Tonescale and flare compensation
-    float ts = n < 0.18f ? cs*_powf(n, c0) : c0*(n - 0.18f) + 0.18f;
-    ts = sy*_powf(ts/(ts + sx), p);
+    float ts = s1*_powf(n/(n + s0), p);
     ts = ts*ts/(ts + fl);
 
     // Chroma compression factor
-    float ccf = _powf(sx/(n + sx), dch)*sat;
+    float ccf = _powf(s0/(n + s0), dch)*sat;
     
      // Compress chroma: chromaticity-linear desaturation by ccf (lerp towards 1.0 in rgb ratios)
     lms = (1.0f - ccf) + lms*ccf;
@@ -278,11 +274,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
     // Inverse tone scale 
     float ts = (n + _sqrtf(n*(4.0f*fl + n)))/2.0f;
-    ts = sx/(_powf(sy/ts, 1.0f/p) - 1.0f);
-    ts = ts < 0.18f ? _powf(ts/cs, 1.0f/c0) : (ts - 0.18f)/c0 + 0.18f;
+    ts = s0/(_powf(s1/ts, 1.0f/p) - 1.0f);
     
     // Chroma compression factor
-    float ccf = _powf(sx / (ts + sx), dch) * sat;
+    float ccf = _powf(s0 / (ts + s0), dch) * sat;
 
     // Inverse chroma compression
     lms = ((ccf - 1.0f) + lms)/ccf;

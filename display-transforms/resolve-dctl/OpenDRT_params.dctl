@@ -1,6 +1,6 @@
 /*  OpenDRT 
     -------------------------------------------------
-      v0.1.2
+      v0.1.3
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -12,12 +12,11 @@
 
 DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {AP0, AP1, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
-DEFINE_UI_PARAMS(ex, exposure, DCTLUI_SLIDER_FLOAT, -0.26, -2, 2, 0.0)
+DEFINE_UI_PARAMS(ex, exposure, DCTLUI_SLIDER_FLOAT, 0.5, -2, 2, 0.0)
 DEFINE_UI_PARAMS(w1, white clip, DCTLUI_SLIDER_FLOAT, 1.04, 1.0, 1.24, 0.0)
-DEFINE_UI_PARAMS(c0, contrast 0, DCTLUI_SLIDER_FLOAT, 1.2, 1, 1.4, 0.0)
-DEFINE_UI_PARAMS(p, contrast 1, DCTLUI_SLIDER_FLOAT, 1.1, 0.8, 1.2, 0.0)
+DEFINE_UI_PARAMS(p, contrast, DCTLUI_SLIDER_FLOAT, 1.3, 0.8, 1.5, 0.0)
 DEFINE_UI_PARAMS(fl, flare, DCTLUI_SLIDER_FLOAT, 0.01, 0.0, 0.02, 0.001)
-DEFINE_UI_PARAMS(dch, dechroma, DCTLUI_SLIDER_FLOAT, 0.55, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch, dechroma, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(sat, saturation, DCTLUI_SLIDER_FLOAT, 1.1, 0.5, 1.5, 0.0)
 DEFINE_UI_PARAMS(wr, red weight, DCTLUI_SLIDER_FLOAT, 0.18, 0.0, 0.33, 0.0)
 DEFINE_UI_PARAMS(wg, green weight, DCTLUI_SLIDER_FLOAT, 0.1, 0.0, 0.33, 0.0)
@@ -27,6 +26,7 @@ DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 4000.0, 10.0)
 DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 4, {Rec2020, P3D65, P3D60, P3DCI, Rec709, DCDM}, {Rec.2020, P3 D65, P3 D60, P3 DCI, Rec.709, DCDM XYZ})
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(lpnorm, lpnorm, DCTLUI_CHECK_BOX, 0)
 
 #include "libDRT.h"
 
@@ -96,12 +96,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (EOTF == pq)      eotf = 4;
   else if (EOTF == hlg)     eotf = 5;
 
-  const float cs = _powf(0.18, 1.0f-c0);
-  const float sy = w1*Lp/100.0f;
+  const float s1 = w1*Lp/100.0f;
   const float e0 = _powf(2.0f, ex);
-  const float sx = _powf(sy/e0, 1.0f/p);
+  const float s0 = _powf(s1/e0, 1.0f/p);
 
-  const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : 100.0f/Lp;
+  const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : lpnorm == 1 ? 100.0f/Lp : 1.0f;
   const float clamp_max = ds*Lp/100.0f;
 
   const float3 vw = make_float3(wr, wg, wb);
@@ -119,10 +118,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     lms = maxf3(1e-12f, lms);
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
     lms /= n;
-    float ts = n < 0.18f ? cs*_powf(n, c0) : c0*(n - 0.18f) + 0.18f;
-    ts = sy*_powf(ts/(ts + sx), p);
+    float ts = s1*_powf(n/(n + s0), p);
     ts = ts*ts/(ts + fl);
-    float ccf = _powf(sx/(n + sx), dch)*sat;
+    float ccf = _powf(s0/(n + s0), dch)*sat;
     lms = (1.0f - ccf) + lms*ccf;
     lms *= ts;
     lms *= cats / w_n;
@@ -158,9 +156,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
     lms /= n;
     float ts = (n + _sqrtf(n*(4.0f*fl + n)))/2.0f;
-    ts = sx/(_powf(sy/ts, 1.0f/p) - 1.0f);
-    ts = ts < 0.18f ? _powf(ts/cs, 1.0f/c0) : (ts - 0.18f)/c0 + 0.18f;
-    float ccf = _powf(sx / (n + sx), dch) * sat;
+    ts = s0/(_powf(s1/ts, 1.0f/p) - 1.0f);
+    float ccf = _powf(s0 / (ts + s0), dch) * sat;
     lms = ((ccf - 1.0f) + lms)/ccf;
     lms *= ts;
     lms *= catd65;

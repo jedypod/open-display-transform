@@ -3,7 +3,7 @@ push $cut_paste_input
 Group {
  name OpenDRT
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.1.2 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.1.3 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
  addUserKnob {41 gamut l "in gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer l " " T ""}
  addUserKnob {35 presets l " " M {"presets/Rec.1886: 2.4 Power | Rec.709" "knobs this \{Lp 100 su 1 wp 3 eotf 2 display_gamut 4\}" "presets/sRGB Display: 2.2 Power | Rec.709" "knobs this \{Lp 100 su 0 wp 3 eotf 1 display_gamut 4\}" "presets/Apple Display P3: 2.2 Power | P3D65" "knobs this \{Lp 100 su 0 wp 3 eotf 1 display_gamut 1\}" "presets/Rec.2020: 2.4 Power | Rec.2020" "knobs this \{Lp 100 su 1 wp 3 eotf 2 display_gamut 0\}" "presets/Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit" "knobs this \{Lp 100 su 1 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit" "knobs this \{Lp 600 su 2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit" "knobs this \{Lp 1000 su 2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: HLG | Rec.2020 | 1000 nit" "knobs this \{Lp 1000 su 2 wp 3 eotf 5 display_gamut 0\}" "presets/Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit" "knobs this \{Lp 2000 su 2 wp 3 eotf 4 display_gamut 0\}" "presets/Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit" "knobs this \{Lp 4000 su 2 wp 3 eotf 4 display_gamut 0\}" "presets/Dolby: ST 2084 PQ | P3D65 | 100 nit" "knobs this \{Lp 100 su 1 wp 3 eotf 4 display_gamut 1\}" "presets/Dolby: ST 2084 PQ | P3D65 | 600 nit" "knobs this \{Lp 600 su 2 wp 3 eotf 4 display_gamut 1\}" "presets/Dolby: ST 2084 PQ | P3D65 | 1000 nit" "knobs this \{Lp 1000 su 2 wp 3 eotf 4 display_gamut 1\}" "presets/Dolby: ST 2084 PQ | P3D65 | 2000 nit" "knobs this \{Lp 2000 su 2 wp 3 eotf 4 display_gamut 1\}" "presets/Dolby: ST 2084 PQ | P3D65 | 4000 nit" "knobs this \{Lp 4000 su 2 wp 3 eotf 4 display_gamut 1\}" "presets/DCI: 2.6 Power | P3 D60" "knobs this \{Lp 100 su 2 wp 3 eotf 3 display_gamut 2\}" "presets/DCI: 2.6 Power | P3 D65" "knobs this \{Lp 100 su 2 wp 3 eotf 3 display_gamut 1\}" "presets/DCI: 2.6 Power | P3 DCI" "knobs this \{Lp 100 su 2 wp 3 eotf 3 display_gamut 3\}" "presets/DCI: 2.6 Power | DCDM XYZ" "knobs this \{Lp 100 su 2 wp 3 eotf 3 display_gamut 5\}"}}
@@ -206,21 +206,15 @@ set Nf58f8800 [stack 0]
   temp_expr0 (r+sqrt(r*(4*fl+r)))/2
   temp_name1 ts
   temp_expr1 s0/((s1/tf)**(1/p)-1)
-  temp_name2 tc
-  temp_expr2 ts<0.18?(ts/cs)**(1/c0):(ts-0.18)/c0+0.18
   temp_name3 ccf
-  temp_expr3 pow(s0/(tc+s0),dch)*sat
+  temp_expr3 pow(s0/(ts+s0),dch)*sat
   channel0 {rgba.red rgba.green rgba.blue none}
-  expr0 tc
+  expr0 ts
   expr3 ccf
   name InvToneScale
-  xpos 398
-  ypos -264
+  xpos 400
+  ypos -271
   addUserKnob {20 Params}
-  addUserKnob {7 c0 R 0 4}
-  c0 {{parent.ToneScale.c0}}
-  addUserKnob {7 cs R 0 4}
-  cs {{0.18**(1-c0)}}
   addUserKnob {7 p R 1 1.4}
   p {{parent.ToneScale.p}}
   addUserKnob {7 fl R 0 0.02}
@@ -512,16 +506,14 @@ set Nf3c40800 [stack 0]
   ypos -395
   addUserKnob {20 Params}
   addUserKnob {78 w l weights n 3}
-  w {0.18 0.1 0.1}
+  w {0.24 0.1 0.1}
   addUserKnob {7 sum t "Normalize so achromatic in=out" R 0 2}
   sum {{sqrt(w.0*w.0+w.1*w.1+w.2*w.2)}}
  }
 set Nf3c40100 [stack 0]
  Expression {
-  temp_name0 tc
-  temp_expr0 r<0.18?cs*r**c0:c0*(r-0.18)+0.18
   temp_name1 ts
-  temp_expr1 s1*(tc/(s0+tc))**p
+  temp_expr1 s1*(r/(s0+r))**p
   temp_name2 tf
   temp_expr2 ts*ts/(ts+fl)
   temp_name3 ccf
@@ -535,35 +527,27 @@ set Nf3c40100 [stack 0]
   addUserKnob {20 Params}
   addUserKnob {7 Lp R 100 4000}
   Lp 100
-  addUserKnob {4 su l surround t "dark = 1.0\ndim = 0.95\naverage = 0.90" M {average dim dark}}
+  addUserKnob {4 su t "\"gamma up\" a bit to compensate for brighter surround conditions. values based on a simple perceptual experiment matching a set of images between varying surround conditions.\n\ndark (0 nits) = 1.0\ndim (5 nits) = 0.95\naverage (35 nits) = 0.90" M {average dim dark ""}}
   su dim
-  addUserKnob {7 c0 t "pre-tonemap contrast" R 1 1.4}
-  c0 1.2
-  addUserKnob {7 cs t "pivoted contrast scale" R 0 4}
-  cs {{0.18**(1-c0)}}
-  addUserKnob {7 c1 t "post-tonemap contrast" R 1 1.2}
-  c1 1.1
+  addUserKnob {7 c R 0 2}
+  c {{26.5*Lp**-1.1+1.18}}
   addUserKnob {7 p R 1 1.4}
-  p {{c1*(0.9+0.05*su)}}
+  p {{c*(0.9+0.05*su)}}
   addUserKnob {26 ""}
   addUserKnob {7 w1 R 1 1.3}
-  w1 {{(0.595*Lp/10000)**0.931+1.037}}
+  w1 {{(0.44*Lp/10000)**0.8534+1.033}}
   addUserKnob {7 s1 R 1 40}
   s1 {{w1*Lp/100}}
   addUserKnob {26 ""}
-  addUserKnob {7 ex t exposure R -2 2}
-  ex -0.26
-  addUserKnob {7 eb R 0 0.2}
-  eb 0.08
   addUserKnob {7 e0 R 0 4}
-  e0 {{2**(ex+eb*log(s1)/log(2))}}
+  e0 {{0.0153*Lp**0.5224+1.1656}}
   addUserKnob {7 s0 R 0 4}
-  s0 {{(s1/e0)**(1/c1)}}
+  s0 {{s1/e0}}
   addUserKnob {7 fl l flare R 0 0.02}
   fl 0.01
   addUserKnob {26 ""}
   addUserKnob {7 dch l dechroma}
-  dch 0.55
+  dch 0.5
   addUserKnob {7 sat l saturation R 1 1.2}
   sat {{max(1,1.125-0.00025*Lp)}}
  }
