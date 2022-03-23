@@ -282,7 +282,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     ts = ts < 0.18f ? _powf(ts/cs, 1.0f/c0) : (ts - 0.18f)/c0 + 0.18f;
     
     // Chroma compression factor
-    float ccf = _powf(sx / (n + sx), dch) * sat;
+    float ccf = _powf(sx / (ts + sx), dch) * sat;
 
     // Inverse chroma compression
     lms = ((ccf - 1.0f) + lms)/ccf;
