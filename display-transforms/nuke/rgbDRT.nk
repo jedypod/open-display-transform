@@ -140,7 +140,6 @@ push $N5a25c800
       {{parent.XYZ_to_DisplayGamut.ColorMatrix.matrix} {parent.XYZ_to_DisplayGamut.ColorMatrix.matrix} {parent.XYZ_to_DisplayGamut.ColorMatrix.matrix}}
       {{parent.XYZ_to_DisplayGamut.ColorMatrix.matrix} {parent.XYZ_to_DisplayGamut.ColorMatrix.matrix} {parent.XYZ_to_DisplayGamut.ColorMatrix.matrix}}
     }
-  invert true
   name DisplayGamut_to_XYZ
   xpos 180
   ypos -82
