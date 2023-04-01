@@ -21,11 +21,11 @@ Group {
  addUserKnob {41 wr T Saturation.wr}
  addUserKnob {41 wb T Saturation.wb}
  addUserKnob {6 lg l "in log" t "applies saturation in -7 +7 stop lg2 " +STARTLINE}
+ addUserKnob {41 invert t "invert the saturation adjustment. Warning: not supported with zone limiting, nor with log" T Saturation.invert}
  addUserKnob {26 ""}
  addUserKnob {26 zonelimit_label l " " T "<b>zone limiting"}
  addUserKnob {6 ze l zoned t "enable zone limiting." +STARTLINE}
  addUserKnob {83 zr l "" -STARTLINE M {low high}}
- zr high
  addUserKnob {7 zp l "zone range" t "set range affected: higher values affect a larger range" R -4 4}
  addUserKnob {26 ""}
  addUserKnob {41 maskChannelMask l mask -STARTLINE T NodeWrapper1.maskChannelMask}
@@ -50,7 +50,7 @@ Group {
   xpos 214
   ypos -702
  }
-set Nfcdbc100 [stack 0]
+set N2adc9910 [stack 0]
  Expression {
   temp_name0 n
   temp_expr0 max(1e-12,max(r,g,b))
@@ -74,7 +74,7 @@ set Nfcdbc100 [stack 0]
   addUserKnob {7 p R 0 64}
   p {{pow(2,-zp)}}
  }
-push $Nfcdbc100
+push $N2adc9910
  Expression {
   temp_name0 M
   temp_expr0 max(r,g,b)
@@ -87,8 +87,8 @@ push $Nfcdbc100
   channel0 rgba
   expr0 h<cn?clamp((h-e0)/(cn-e0)):clamp((h-e1)/(cn-e1))
   name HueAngle
-  xpos 290
-  ypos -682
+  xpos 299
+  ypos -673
   addUserKnob {20 Params}
   addUserKnob {7 ho l hue R 0 6}
   ho 1
@@ -101,7 +101,7 @@ push $Nfcdbc100
   addUserKnob {7 e1 R 0 4}
   e1 {{cn+w}}
  }
-push $Nfcdbc100
+push $N2adc9910
  Expression {
   temp_name0 n
   temp_expr0 max(r,g,b)
@@ -116,7 +116,7 @@ push $Nfcdbc100
   expr2 db>sp?(log(db/0.18)/log(2)-mn)/(mx-mn):(db-sp)/ls+lo
   name lin_to_log_lx
   xpos 180
-  ypos -657
+  ypos -658
   disable {{!lg}}
   addUserKnob {20 Params}
   addUserKnob {7 mn R -12 0}
@@ -135,11 +135,13 @@ push $Nfcdbc100
   temp_name0 L
   temp_expr0 wr*r+wg*g+wb*b
   temp_name1 f
-  temp_expr1 Ar
-  expr0 L-sag*(f*sah-f+1)*(L-r)
-  expr1 L-sag*(f*sah-f+1)*(L-g)
-  expr2 L-sag*(f*sah-f+1)*(L-b)
+  temp_expr1 (1-Ar+sah*Ar)*sag
+  expr0 invert?(L*(f-1)+r)/f:L*(1-f)+r*f
+  expr1 invert?(L*(f-1)+g)/f:L*(1-f)+g*f
+  expr2 invert?(L*(f-1)+b)/f:L*(1-f)+b*f
+  expr3 f
   name Saturation
+  selected true
   xpos 180
   ypos -634
   addUserKnob {20 Params}
@@ -153,6 +155,7 @@ push $Nfcdbc100
   wg {{1-(wr+wb)}}
   addUserKnob {7 wb}
   wb 0.08
+  addUserKnob {6 invert +STARTLINE}
  }
  Expression {
   temp_name0 dr
@@ -168,7 +171,7 @@ push $Nfcdbc100
   expr2 db*1.25-n/4
   name log_to_lin_lx
   xpos 180
-  ypos -609
+  ypos -610
   disable {{!lg}}
   addUserKnob {20 Params}
   addUserKnob {7 mn R -12 0}
@@ -191,9 +194,9 @@ push $Nfcdbc100
   expr2 Ab*(1-f)+Bb*f
   name Mix1
   xpos 180
-  ypos -562
+  ypos -561
  }
-push $Nfcdbc100
+push $N2adc9910
  NodeWrapper {
   inputs 2+1
   channels rgb
