@@ -81,6 +81,12 @@ __DEVICE__ float calc_hue(float3 rgb) {
   else if (mx == rgb.y) h = (rgb.z - rgb.x) / ch + 2.0f;
   else if (mx == rgb.z) h = (rgb.x - rgb.y) / ch + 4.0f;
   return h;
+// Calculate classical HSV-style "chroma"
+__DEVICE__ float calc_chroma(float3 rgb) {
+  float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  float mn = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
+  float ch = mx - mn;
+  return sdivf(ch, mx);
 }
 
 
