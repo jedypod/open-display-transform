@@ -17,7 +17,7 @@
 
 // Safe division of float a by float b
 __DEVICE__ float sdivf(float a, float b) {
-  if (_fabs(b) < 1e-12f) return 0.0f;
+  if (_fabs(b) < 0.0001f) return 0.0f;
   else return a / b;
 }
 // Safe division of float3 a by float b
@@ -31,7 +31,7 @@ __DEVICE__ float3 sdivf3f3(float3 a, float3 b) {
 
 // Safe power function raising float a to power float b
 __DEVICE__ float spowf(float a, float b) {
-  if (a < 1e-12f) return a;
+  if (a <= 0.0f) return a;
   else return _powf(a, b);
 }
 // Safe power function raising float3 a to power float b
