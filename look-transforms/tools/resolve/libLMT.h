@@ -139,41 +139,26 @@ __DEVICE__ float3 n6_chroma_value(
 
   float3 in = rgb;
 
-  // max(r,g,b) norm
-  float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
-
-  // RGB Ratios
-  float3 rats = sdivf3f(rgb, n);
-
-  // Inverse RGB Ratios
-  rats = 1.0f - rats;
-  // Classical HSV-style chroma
-  float ch = _fmaxf(rats.x, _fmaxf(rats.y, rats.z));
+  float hue = calc_hue(rgb);
+  float ch = calc_chroma(rgb);
 
   // Calculate chroma strength
   float ch_str = spowf(_fminf(1.0f, ch), sdivf(1.0f, chs));
   ch_str = ch_str * spowf(1.0f - ch_str, chl);
 
-  // Get Hue Angles
-  // RGB hue-angle ratios (chroma variance normalized out)
-  rats = sdivf3f(rats, ch);
+  // hue extraction for primaries (RGB)
+  float3 hp = make_float3(
+    extract_hue_angle(hue, 2.0f, 1.0f, 0),
+    extract_hue_angle(hue, 6.0f, 1.0f, 0),
+    extract_hue_angle(hue, 4.0f, 1.0f, 0));
 
-  // Cyan, Magenta, Yellow secondary hue angles
-  float3 h_cmy = make_float3(
-    _fmaxf(0.0f, rats.x - (rats.y + rats.z)),
-    _fmaxf(0.0f, rats.y - (rats.x + rats.z)),
-    _fmaxf(0.0f, rats.z - (rats.x + rats.y)));
+  // hue extraction for secondaries (CMY)
+  float3 hs = make_float3(
+    extract_hue_angle(hue, 5.0f, 1.0f, 0),
+    extract_hue_angle(hue, 3.0f, 1.0f, 0),
+    extract_hue_angle(hue, 1.0f, 1.0f, 0));
 
-  // Red, Green, Blue primary hue angles
-  rats = 1.0f - rats;
-  float3 h_rgb = make_float3(
-    _fmaxf(0.0f, rats.x - (rats.y + rats.z)),
-    _fmaxf(0.0f, rats.y - (rats.x + rats.z)),
-    _fmaxf(0.0f, rats.z - (rats.x + rats.y)));
-
-
-  // Adjust hue width with inverse power function: "Smooth1". Width decreases with exposure.
-  // Controlled by "Hue Strength" user parameter hs_rgb
+  // Calculate the appropriate exponent for the given "hue strength" hs_rgb, and the given exposure
   const float3 pp = make_float3(
     _fminf(hs_rgb, hs_rgb / mp.x),
     _fminf(hs_rgb, hs_rgb / mp.y),
@@ -183,26 +168,31 @@ __DEVICE__ float3 n6_chroma_value(
     _fminf(hs_cmy, hs_cmy / ms.y),
     _fminf(hs_cmy, hs_cmy / ms.z));
 
+  // Adjust hue width with an inverse power function: "Smooth1"
+  // This basically controls how fast the exposure falls off in intensity as we move away from the center of the hue slice.
   float3 hp_w = make_float3(
-    1.0f - spowf(1.0f - h_rgb.x, pp.x),
-    1.0f - spowf(1.0f - h_rgb.y, pp.y),
-    1.0f - spowf(1.0f - h_rgb.z, pp.z));
+    1.0f - spowf(1.0f - hp.x, pp.x),
+    1.0f - spowf(1.0f - hp.y, pp.y),
+    1.0f - spowf(1.0f - hp.z, pp.z));
   float3 hs_w = make_float3(
-    1.0f - spowf(1.0f - h_cmy.x, ps.x),
-    1.0f - spowf(1.0f - h_cmy.y, ps.y),
-    1.0f - spowf(1.0f - h_cmy.z, ps.z));
+    1.0f - spowf(1.0f - hs.x, ps.x),
+    1.0f - spowf(1.0f - hs.y, ps.y),
+    1.0f - spowf(1.0f - hs.z, ps.z));
 
-  // Multiplication factor: Lerp between 1.0 and the multiply amount, based on the hue angle,
+  // Multiplication factor: Lerp between 1.0 and the multiply amount, based on the hue angle.
   // Then combine for each hue angle: RGB * CMY
   float mf = ((1.0f - hp_w.x) + mp.x * hp_w.x) * ((1.0f - hp_w.y) + mp.y * hp_w.y) * ((1.0f - hp_w.z) + mp.z * hp_w.z) *
              ((1.0f - hs_w.x) + ms.x * hs_w.x) * ((1.0f - hs_w.y) + ms.y * hs_w.y) * ((1.0f - hs_w.z) + ms.z * hs_w.z);
 
-
-  // Calculate the chroma factor used for mixing the result
-  // For the chroma factor we do not want to use the expose down mf (result looks bad)
+  /* Calculate the chroma factor used for mixing the result. The chroma factor is dependent on the multiply amount.
+      We need the correct chroma factor in order to accurately specify the "strength". ch_str==1 results in a linear increase in 
+      exposure as we move away from achromatic. For example, if we increase exposure of red by 1 stop, the slope of 
+      red will still be linear as it moves away from achromatic.
+      For exposing down, we do not want to preserve linearity (it looks bad), so we limit mf_lim to a minimum of 1.0 */
   float mf_lim = _fmaxf(1.0f, mf);
   float chf = ch_str / (ch_str * (1.0f - mf_lim) + mf_lim);
 
+  // Multiply input rgb by mf, and then lerp based on chf
   rgb = rgb * mf * chf + rgb * (1.0f - chf);
 
   // // Inverse lerp for inverse direction
