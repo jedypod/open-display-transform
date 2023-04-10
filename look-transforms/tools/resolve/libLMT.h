@@ -13,6 +13,31 @@
     Utility functions
     ---------------------------
 */
+// Math helper functions for zero-handling
+
+// Safe division of float a by float b
+__DEVICE__ float sdivf(float a, float b) {
+  if (_fabs(b) < 1e-12f) return 0.0f;
+  else return a / b;
+}
+// Safe division of float3 a by float b
+__DEVICE__ float3 sdivf3f(float3 a, float b) {
+  return make_float3(sdivf(a.x, b), sdivf(a.y, b), sdivf(a.z, b));
+}
+// Safe division of float3 a by float3 b
+__DEVICE__ float3 sdivf3f3(float3 a, float3 b) {
+  return make_float3(sdivf(a.x, b.x), sdivf(a.y, b.y), sdivf(a.z, b.z));
+}
+
+// Safe power function raising float a to power float b
+__DEVICE__ float spowf(float a, float b) {
+  if (a < 1e-12f) return a;
+  else return _powf(a, b);
+}
+// Safe power function raising float3 a to power float b
+__DEVICE__ float3 spowf3(float3 a, float b) {
+  return make_float3(_powf(a.x, b), _powf(a.y, b), _powf(a.z, b));
+}
 
 
 // Extract a range from e0 to e1 from f, clamping values above or below.
