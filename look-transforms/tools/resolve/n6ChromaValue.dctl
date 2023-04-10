@@ -1,17 +1,17 @@
-DEFINE_UI_PARAMS(my, yellow, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(mr, red, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(mm, magenta, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(mb, blue, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(mc, cyan, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(mg, green, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(mcu, custom, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(cuh, hue, DCTLUI_SLIDER_FLOAT, 100, 0, 360, 0)
-DEFINE_UI_PARAMS(cuw, width, DCTLUI_SLIDER_FLOAT, 0.3, 0, 2, 0)
-DEFINE_UI_PARAMS(str, strength, DCTLUI_SLIDER_FLOAT, 0.8, 0, 1, 0)
+DEFINE_UI_PARAMS(my, yellow, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
+DEFINE_UI_PARAMS(mr, red, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
+DEFINE_UI_PARAMS(mm, magenta, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
+DEFINE_UI_PARAMS(mb, blue, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
+DEFINE_UI_PARAMS(mc, cyan, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
+DEFINE_UI_PARAMS(mg, green, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
+DEFINE_UI_PARAMS(hs_rgb, hue strength rgb, DCTLUI_SLIDER_FLOAT, 2, 1, 4, 0)
+DEFINE_UI_PARAMS(hs_cmy, hue strength cmy, DCTLUI_SLIDER_FLOAT, 2, 1, 4, 0)
+DEFINE_UI_PARAMS(chs, chroma strength, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
+DEFINE_UI_PARAMS(chl, chroma limit, DCTLUI_SLIDER_FLOAT, 0.0, 0, 1, 0)
 DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 0)
 DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
-DEFINE_UI_PARAMS(zone, zone, DCTLUI_COMBO_BOX, 0, {low, high}, {low, high})
-DEFINE_UI_PARAMS(smst, smooth hue extract, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(zone, zone, DCTLUI_COMBO_BOX, 1, {low, high}, {low, high})
+
 
 #include "libLMT.h"
 
@@ -22,7 +22,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   int zr = 0;
   if (zone == high) zr = 1;
 
-  rgb = n6_chroma_value(rgb, my, mr, mm, mb, mc, mg, mcu, cuh, cuw, str, ze, zp, zr, smst);
+  rgb = n6_chroma_value(rgb, my, mr, mm, mb, mc, mg, hs_rgb, hs_cmy, chs, chl, ze, zp, zr);
   
   return rgb;
 }
