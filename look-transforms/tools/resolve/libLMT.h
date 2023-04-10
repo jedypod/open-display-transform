@@ -50,7 +50,7 @@ __DEVICE__ float extract_window(float e0, float e1, float e2, float e3, float x)
   return x < e1 ? extract(e0, e1, x) : extract(e3, e2, x);
 }
 
-
+// Mix between float3 in (original) and float3 rgb (modified), using a hyperbolic function
 __DEVICE__ float3 zone_extract(float3 in, float3 rgb, float zp, int zr) {
   float n = _fmaxf(1e-12f, _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z)));
   const float fl = 0.01f;
@@ -65,12 +65,12 @@ __DEVICE__ float3 zone_extract(float3 in, float3 rgb, float zp, int zr) {
 // Given hue, offset, width, extract hue angle
 __DEVICE__ float extract_hue_angle(float h, float o, float w, int sm) {
   float hc = extract_window(2.0f - w, 2.0f, 2.0f, 2.0f + w, _fmod(h + o, 6.0f));
-  if (sm == 1) 
+  if (sm == 1)
     hc = hc * hc * (3.0f - 2.0f * hc); // smoothstep
   return hc;
 }
 
-// Calculate and return hue in degrees between 0 and 6
+// Calculate hue as a value between 0 and 6
 __DEVICE__ float calc_hue(float3 rgb) {
   float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
   float mn = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
@@ -103,139 +103,104 @@ __DEVICE__ float log_to_lin_lx(float x, float mn, float mx, float sps) {
 
 /*  ##########################################################################
     Notorious Six Chroma Value
-    v0.0.3
+    v0.1.0
     ------------------
 
-    Value (borrowing the term from painting), refers to the brightness of a color. 
+    Value (borrowing the term from painting), refers to the brightness of a color.
     This tool allows you to adjust the value of different colors. Includes:
       - Primary and secondary hue angle adjustments
-      - Custom hue angle 
+      - Custom hue angle
       - Zone extraction controls (disabled by default)
       - Strength parameter: controls how much colors near grey are affected.
+
 */
 
 
-/* Chroma
-    In the RGB Ratios model, traditional chroma is 1-min(r,g,b). This is equal to (max(r,g,b)-min(r,g,b))/max(r,g,b)
-    Traditional chroma is unsuiteable to use as a factor for adjusting color "value" or "exposure",
-    because colors close to achromatic are affected too much.
-    In order to form a linear increase in exposure with increasing distance from achromatic,
-    we use a novel chroma model: a lerp between min(r,g,b) and max(r,g,b): hch = max(r,g,b)*(1-f)+min(r,g,b)*f,
-    where f is some factor between 0 and 1.
-    When chroma = 1-min(r/hch,g/hch,b/hch), and f = 1/multiply, a linear increase in exposure with increasing
-    distance from achromatic is achieved.
-    In the RGB Ratios model, this simplifies to min(r,g,b)*(1-f)+f, since max(r,g,b) is always 1
-*/
+__DEVICE__ float3 n6_chroma_value(
+  float3 rgb, float my, float mr, float mm, float mb, float mc, float mg,
+  float hs_rgb, float hs_cmy, float chs, float chl, int ze, float zp, int zr) {
 
-// Calculate chroma based on exposure for primaries
-__DEVICE__ float chroma(float3 r, float m, float str) {
-  float ch = _fminf(1.0f, 1.0f / m);
-  ch = _fminf(r.x, _fminf(r.y, r.z)) * (1.0f - ch) + ch;
-  ch = ch == 0.0f ? 1.0f : 1.0f - _fminf(r.x / ch, _fminf(r.y / ch, r.z / ch));
-  // Chroma strength: 1 is linear. Reducing strength increasingly affects only more pure colors.
-  // We use a variable-width power compression function, but this could be a multiply
-  float w = 1.0f - str;
-  ch = ch == 0.0f ? 0.0f : _powf(ch, w + 2.0f) / (_powf(ch, w + 1.0f) + w);
-  return ch;
-}
-
-
-__DEVICE__ float3 n6_chroma_value(float3 rgb, 
-    float my, float mr, float mm, float mb, float mc, float mg, float mcu, 
-    float cuh, float cuw, float str, int ze, float zp, int zr, int smst) {
+  // Parameter setup
+  // Adjust exposure of RGB primaries and CMY secondaries: parameter range is -4 to 4 stops
+  const float3 mp = make_float3(
+    _powf(2.0f, mr),
+    _powf(2.0f, mg),
+    _powf(2.0f, mb));
+  const float3 ms = make_float3(
+    _powf(2.0f, mc),
+    _powf(2.0f, mm),
+    _powf(2.0f, my));
 
   float3 in = rgb;
-  
+
   // max(r,g,b) norm
   float n = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
-  
-  float3 r; // RGB Ratios
-  if (n == 0.0f) r = make_float3(0.0f, 0.0f, 0.0f);
-  else r = rgb / n;
 
-  float h = calc_hue(r);
+  // RGB Ratios
+  float3 rats = sdivf3f(rgb, n);
 
+  // Inverse RGB Ratios
+  rats = 1.0f - rats;
+  // Classical HSV-style chroma
+  float ch = _fmaxf(rats.x, _fmaxf(rats.y, rats.z));
 
-  /* Primary hue angles: RGB
-      ----------------------------  */
+  // Calculate chroma strength
+  float ch_str = spowf(_fminf(1.0f, ch), sdivf(1.0f, chs));
+  ch_str = ch_str * spowf(1.0f - ch_str, chl);
 
-  // Hue extraction
-  float3 hp = make_float3(
-    extract_hue_angle(h, 2.0f, 1.0f, smst),
-    extract_hue_angle(h, 6.0f, 1.0f, smst),
-    extract_hue_angle(h, 4.0f, 1.0f, smst));
- 
-   // Exposure - input param range is -1 to 1, output exposure is +/- 4 stops.
-  const float3 mp = make_float3(
-    _powf(2.0f, mr * 4.0f),
-    _powf(2.0f, mg * 4.0f),
-    _powf(2.0f, mb * 4.0f));
- 
-   // Power
-  const float3 pp = make_float3(
-    _fminf(1.0f, 2.0f / mp.x),
-    _fminf(1.0f, 2.0f / mp.y),
-    _fminf(1.0f, 2.0f / mp.z));
+  // Get Hue Angles
+  // RGB hue-angle ratios (chroma variance normalized out)
+  rats = sdivf3f(rats, ch);
+
+  // Cyan, Magenta, Yellow secondary hue angles
+  float3 h_cmy = make_float3(
+    _fmaxf(0.0f, rats.x - (rats.y + rats.z)),
+    _fmaxf(0.0f, rats.y - (rats.x + rats.z)),
+    _fmaxf(0.0f, rats.z - (rats.x + rats.y)));
+
+  // Red, Green, Blue primary hue angles
+  rats = 1.0f - rats;
+  float3 h_rgb = make_float3(
+    _fmaxf(0.0f, rats.x - (rats.y + rats.z)),
+    _fmaxf(0.0f, rats.y - (rats.x + rats.z)),
+    _fmaxf(0.0f, rats.z - (rats.x + rats.y)));
+
 
   // Adjust hue width with inverse power function: "Smooth1". Width decreases with exposure.
-  float3 hp_w = make_float3(
-    1.0f - _powf(1.0f - hp.x, pp.x),
-    1.0f - _powf(1.0f - hp.y, pp.y),
-    1.0f - _powf(1.0f - hp.z, pp.z));
-
-  // Multiplication factor: combine for all hue angles
-  float mfp = ((1.0f - hp_w.x) + mp.x * hp_w.x) * ((1.0f - hp_w.y) + mp.y * hp_w.y) * ((1.0f - hp_w.z) + mp.z * hp_w.z);
-
-  // Chroma
-  float chp = _fminf(2.0f, chroma(r, mfp, str));
-  
-
-  /* Secondary hue angles: CMY
-        ----------------------------  */
-  
-  // Hue extraction
-  float3 hs = make_float3(
-    extract_hue_angle(h, 5.0f, 1.0f, smst),
-    extract_hue_angle(h, 3.0f, 1.0f, smst),
-    extract_hue_angle(h, 1.0f, 1.0f, smst));
-
-  const float3 ms = make_float3(
-    _powf(2.0f, mc * 4.0f),
-    _powf(2.0f, mm * 4.0f),
-    _powf(2.0f, my * 4.0f));
- 
+  // Controlled by "Hue Strength" user parameter hs_rgb
+  const float3 pp = make_float3(
+    _fminf(hs_rgb, hs_rgb / mp.x),
+    _fminf(hs_rgb, hs_rgb / mp.y),
+    _fminf(hs_rgb, hs_rgb / mp.z));
   const float3 ps = make_float3(
-    _fminf(1.0f, 2.0f / ms.x),
-    _fminf(1.0f, 2.0f / ms.y),
-    _fminf(1.0f, 2.0f / ms.z));
- 
+    _fminf(hs_cmy, hs_cmy / ms.x),
+    _fminf(hs_cmy, hs_cmy / ms.y),
+    _fminf(hs_cmy, hs_cmy / ms.z));
+
+  float3 hp_w = make_float3(
+    1.0f - spowf(1.0f - h_rgb.x, pp.x),
+    1.0f - spowf(1.0f - h_rgb.y, pp.y),
+    1.0f - spowf(1.0f - h_rgb.z, pp.z));
   float3 hs_w = make_float3(
-      1.0f - _powf(1.0f - hs.x, ps.x),
-      1.0f - _powf(1.0f - hs.y, ps.y),
-      1.0f - _powf(1.0f - hs.z, ps.z));
+    1.0f - spowf(1.0f - h_cmy.x, ps.x),
+    1.0f - spowf(1.0f - h_cmy.y, ps.y),
+    1.0f - spowf(1.0f - h_cmy.z, ps.z));
 
-  float mfs = ((1.0f - hs_w.x) + ms.x * hs_w.x) * ((1.0f - hs_w.y) + ms.y * hs_w.y) * ((1.0f - hs_w.z) + ms.z * hs_w.z);
+  // Multiplication factor: Lerp between 1.0 and the multiply amount, based on the hue angle,
+  // Then combine for each hue angle: RGB * CMY
+  float mf = ((1.0f - hp_w.x) + mp.x * hp_w.x) * ((1.0f - hp_w.y) + mp.y * hp_w.y) * ((1.0f - hp_w.z) + mp.z * hp_w.z) *
+             ((1.0f - hs_w.x) + ms.x * hs_w.x) * ((1.0f - hs_w.y) + ms.y * hs_w.y) * ((1.0f - hs_w.z) + ms.z * hs_w.z);
 
-  // Chroma
-  float chs = _fminf(2.0f, chroma(r, mfs, str));
 
+  // Calculate the chroma factor used for mixing the result
+  // For the chroma factor we do not want to use the expose down mf (result looks bad)
+  float mf_lim = _fmaxf(1.0f, mf);
+  float chf = ch_str / (ch_str * (1.0f - mf_lim) + mf_lim);
 
-  /* Custom hue angle: Defaults to orange
-      ----------------------------  */
+  rgb = rgb * mf * chf + rgb * (1.0f - chf);
 
-  float hc = extract_hue_angle(h, cuh / 60.0f, cuw, smst);
-  float m_c = _powf(2.0f, mcu * 4.0f);
-  float m_p = _fminf(1.0f, 2.0f / m_c);
-  float hc_w = 1.0f - _powf(1.0f - hc, m_p);
-  float mfc = (1.0f - hc_w) + m_c * hc_w;
-  float chc = _fminf(2.0f, chroma(r, mfc, str));
-
-  // Apply exposure
-  r = mfp * r * chp + r * (1.0f - chp);
-  r = mfs * r * chs + r * (1.0f - chs);
-  r = mfc * r * chc + r * (1.0f - chc);
-  
-  rgb = r * n;
+  // // Inverse lerp for inverse direction
+  // rgb = rgb / (mf * chf + 1.0f - chf);
 
   // Zone extract
   if (ze == 1) rgb = zone_extract(in, rgb, zp, zr);
