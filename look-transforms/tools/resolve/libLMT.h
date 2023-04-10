@@ -190,7 +190,7 @@ __DEVICE__ float3 n6_chroma_value(
       red will still be linear as it moves away from achromatic.
       For exposing down, we do not want to preserve linearity (it looks bad), so we limit mf_lim to a minimum of 1.0 */
   float mf_lim = _fmaxf(1.0f, mf);
-  float chf = ch_str / (ch_str * (1.0f - mf_lim) + mf_lim);
+  float chf = sdivf(ch_str, (ch_str * (1.0f - mf_lim) + mf_lim));
 
   // Multiply input rgb by mf, and then lerp based on chf
   rgb = rgb * mf * chf + rgb * (1.0f - chf);
