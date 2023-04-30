@@ -1,54 +1,266 @@
-/* 
+/* GamutConvert
+    Calculate a 3x3 matrix to convert between two gamuts.
+
+    Includes a Chromatic Adaptation Transform (CAT) if the whitepoint of gamut A does not match gamut B.
+    Does not rely on predefined matrices. Calculates the gamut conversion matrix at machine precision,
+    using the RGBW chromaticity coordinates of the gamut.
+
 */
 
-DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
-DEFINE_UI_PARAMS(out_gamut, out gamut, DCTLUI_COMBO_BOX, 1, {o_ap0, o_ap1, o_p3d65, o_rec2020, o_rec709, o_awg, o_rwg, o_sgamut3, o_blackmagicwg, o_egamut, o_davinciwg}, {ACES, ACEScg, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(ig, in gamut, DCTLUI_COMBO_BOX, 0, {i_xyz, i_xyz_d65, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, XYZ D65, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
+DEFINE_UI_PARAMS(og, out gamut, DCTLUI_COMBO_BOX, 0, {o_xyz, o_xyz_d65, o_ap0, o_ap1, o_p3d65, o_rec2020, o_rec709, o_awg3, o_awg4, o_rwg, o_sgamut3, o_sgamut3cine, o_bmdwg, o_egamut, o_davinciwg}, {XYZ, XYZ D65, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 
+// Struct for a 3x3 matrix
+typedef struct {
+  float3 x, y, z;
+} float3x3;
 
-#include "libDRT.h"
+// chromaticity coordinates for primaries and whitepoint of an rgb gamut
+typedef struct {
+  float2 r, g, b, w;
+} chr;
+
+// Helper function to create a float3x3
+__DEVICE__ float3x3 make_float3x3(float3 a, float3 b, float3 c) {
+  float3x3 d;
+  d.x = a, d.y = b, d.z = c;
+  return d;
+}
+
+// Helper function to create a chr chromaticities object
+__DEVICE__ chr make_chr(float2 r, float2 g, float2 b, float2 w) {
+  chr c;
+  c.r = r, c.g = g, c.b = b, c.w = w;
+  return c;
+}
+
+// Return 3x3 matrix filled with zeros
+__DEVICE__ float3x3 zeros() {
+  return make_float3x3(make_float3(0.0f, 0.0f, 0.0f), make_float3(0.0f, 0.0f, 0.0f), make_float3(0.0f, 0.0f, 0.0f));
+}
+
+// set diagonal row of 3x3 matrix m to float3 v
+__DEVICE__ float3x3 diag(float3x3 m, float3 v) {
+  m.x.x = v.x;
+  m.y.y = v.y;
+  m.z.z = v.z;
+  return m;
+}
+
+// Return identity 3x3 matrix
+__DEVICE__ float3x3 identity() {
+  return diag(zeros(), make_float3(1.0f, 1.0f, 1.0f));
+}
+
+// Multiply 3x3 matrix m and float3 vector v
+__DEVICE__ float3 vdot(float3x3 m, float3 v) {
+  return make_float3(m.x.x*v.x + m.x.y*v.y + m.x.z*v.z, m.y.x*v.x + m.y.y*v.y + m.y.z*v.z, m.z.x*v.x + m.z.y*v.y + m.z.z*v.z);
+}
+
+// transpose 3x3 matrix m by swapping rows and columns
+__DEVICE__ float3x3 transpose(float3x3 a) {
+  float3x3 m = zeros();
+  m.x = make_float3(a.x.x, a.y.x, a.z.x);
+  m.y = make_float3(a.x.y, a.y.y, a.z.y);
+  m.z = make_float3(a.x.z, a.y.z, a.z.z);
+  return m;
+}
+
+// Multiply 3x3 matrix a with 3x3 matrix b
+__DEVICE__ float3x3 matmul(float3x3 a, float3x3 b) {
+  float3x3 c = zeros();
+  c.x.x = a.x.x*b.x.x + a.x.y*b.y.x + a.x.z*b.z.x;
+  c.x.y = a.x.x*b.x.y + a.x.y*b.y.y + a.x.z*b.z.y;
+  c.x.z = a.x.x*b.x.z + a.x.y*b.y.z + a.x.z*b.z.z;
+  c.y.x = a.y.x*b.x.x + a.y.y*b.y.x + a.y.z*b.z.x;
+  c.y.y = a.y.x*b.x.y + a.y.y*b.y.y + a.y.z*b.z.y;
+  c.y.z = a.y.x*b.x.z + a.y.y*b.y.z + a.y.z*b.z.z;
+  c.z.x = a.z.x*b.x.x + a.z.y*b.y.x + a.z.z*b.z.x;
+  c.z.y = a.z.x*b.x.y + a.z.y*b.y.y + a.z.z*b.z.y;
+  c.z.z = a.z.x*b.x.z + a.z.y*b.y.z + a.z.z*b.z.z;
+  return c;
+}
+
+// Calculate inverse of 3x3 matrix: https://stackoverflow.com/questions/983999/simple-3x3-matrix-inverse-code-c
+__DEVICE__ float3x3 inv(float3x3 m) {
+  float3x3 c = identity();
+  float d = m.x.x*(m.y.y*m.z.z - m.z.y*m.y.z) -
+            m.x.y*(m.y.x*m.z.z - m.y.z*m.z.x) +
+            m.x.z*(m.y.x*m.z.y - m.y.y*m.z.x);
+  if (d == 0.0f) return c; // No Inverse
+  float id = 1.0f/d;
+  c.x.x = id*(m.y.y*m.z.z - m.z.y*m.y.z);
+  c.x.y = id*(m.x.z*m.z.y - m.x.y*m.z.z);
+  c.x.z = id*(m.x.y*m.y.z - m.x.z*m.y.y);
+  c.y.x = id*(m.y.z*m.z.x - m.y.x*m.z.z);
+  c.y.y = id*(m.x.x*m.z.z - m.x.z*m.z.x);
+  c.y.z = id*(m.y.x*m.x.z - m.x.x*m.y.z);
+  c.z.x = id*(m.y.x*m.z.y - m.z.x*m.y.y);
+  c.z.y = id*(m.z.x*m.x.y - m.x.x*m.z.y);
+  c.z.z = id*(m.x.x*m.y.y - m.y.x*m.x.y);
+  return c;
+}
+
+/* Calculate the Normalized Primaries Matrix for the specified chromaticities
+      Adapted from RP 177:1993 
+      SMPTE Recommended Practice - Derivation of Basic Television Color Equations
+      http://doi.org/10.5594/S9781614821915
+      https://mega.nz/file/frAnCIYK#CNRW5Q99G-w_QZtv5ey_0AkRWNrQVh7bM70kVwv42NQ
+*/
+__DEVICE__ float3x3 npm(chr p) {
+  float3x3 P = zeros();
+  P.x = make_float3(p.r.x, p.r.y, 1.0f - p.r.x - p.r.y);
+  P.y = make_float3(p.g.x, p.g.y, 1.0f - p.g.x - p.g.y);
+  P.z = make_float3(p.b.x, p.b.y, 1.0f - p.b.x - p.b.y);
+  P = transpose(P);
+  float3 W = make_float3(p.w.x, p.w.y, 1.0f - p.w.x - p.w.y);
+  W = make_float3(W.x / W.y, 1.0f, W.z / W.y);
+  float3 C = vdot(inv(P), W);
+  float3x3 M = diag(zeros(), C);
+  return matmul(P, M);
+}
+
+// Convert xy chromaticity coordinate to XYZ tristimulus with Y=1.0
+__DEVICE__ float3 xy_to_XYZ(float2 xy) {
+  return make_float3(xy.x/xy.y, 1.0f, (1.0f - xy.x - xy.y)/xy.y);
+}
+
+/* Calculate a von Kries style chromatic adaptation matrix
+    given xy chromaticities for source white (ws) and destination white (wd)
+      Source: Mark D. Fairchild - 2013 - Color Appearance Models Third Edition p. 181-186
+      Source: Bruce Lindbloom - Chromatic Adaptation - http://www.brucelindbloom.com/index.html?Eqn_ChromAdapt.html
+*/
+__DEVICE__ float3x3 cat(float2 ws, float2 wd, int method) {
+  if (ws.x == wd.x && ws.y == wd.y) return identity(); // Whitepoints are equal, nothing to do
+  float3x3 mcat = identity();
+  if (method == 0) { // CAT02
+    mcat = make_float3x3(make_float3(0.7328f, 0.4296f, -0.1624f), make_float3(-0.7036f, 1.6975f, 0.0061f), make_float3(0.003f, 0.0136f, 0.9834f));
+  } else if (method == 1) { // Bradford
+    mcat = make_float3x3(make_float3(0.8951f, 0.2664f, -0.1614f), make_float3(-0.7502f, 1.7135f, 0.0367f), make_float3(0.0389f, -0.0685f, 1.0296f));
+  }
+
+  float3 sXYZ = xy_to_XYZ(ws); // source normalized XYZ
+  float3 dXYZ = xy_to_XYZ(wd); // destination normalized XYZ
+
+  float3 sm = vdot(mcat, sXYZ); // source mult
+  float3 dm = vdot(mcat, dXYZ); // destination mult
+
+  float3x3 smat = diag(zeros(), make_float3(dm.x/sm.x, dm.y/sm.y, dm.z/sm.z));
+  float3x3 nmat = matmul(inv(mcat), smat);
+  return matmul(nmat, mcat);
+}
+
+// Calculate 3x3 matrix to convert from source rgb gamut to destination rgb gamut
+// Include CAT if whitepoints are different.
+__DEVICE__ float3x3 rgb_to_rgb(chr ch0, chr ch1) {
+  float3x3 rgb0_to_xyz = npm(ch0);
+  float3x3 rgb1_to_xyz = npm(ch1);
+  float3x3 xyz_to_cat = cat(ch0.w, ch1.w, 0);
+  float3x3 rgb0_to_cat = matmul(xyz_to_cat, rgb0_to_xyz);
+  float3x3 rgb0_to_rgb1 = matmul(inv(rgb1_to_xyz), rgb0_to_cat);
+  return rgb0_to_rgb1;
+}
+
+// Calculate 3x3 matrix to convert from source rgb gamut ch to XYZ with CAT
+__DEVICE__ float3x3 rgb_to_XYZ_cat(chr ch, float2 wd) {
+  float3x3 rgb_to_xyz = npm(ch);
+  if (ch.w.x == wd.x && ch.w.y == wd.y) return rgb_to_xyz; // No CAT needed.
+  float3x3 cat_mtx = cat(ch.w, wd, 0);
+  return matmul(cat_mtx, rgb_to_xyz);
+}
+
 
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
 {
+  // Chromaticity coordinates for various whitepoints
+  float2 wp_ACES = make_float2(0.32168f, 0.33767f);
+  float2 wp_D60  = make_float2(0.321626f, 0.337737f);
+  float2 wp_D65  = make_float2(0.3127f, 0.329f);
+  float2 wp_DCI  = make_float2(0.314f, 0.351f);
+  float2 wp_E  = make_float2(0.333333f, 0.333333f);
 
+  // Chromaticity coordinates for various gamuts
+  chr ap0         = make_chr(make_float2(0.7347f, 0.2653f), make_float2(0.0f, 1.0f), make_float2(0.0001f, -0.077f), wp_ACES);
+  chr ap1         = make_chr(make_float2(0.713f, 0.293f), make_float2(0.165f, 0.83f), make_float2(0.128f, 0.044f), wp_ACES);
+  chr bdgamut     = make_chr(make_float2(0.8150f, 0.3167f), make_float2(0.2036f, 0.8500f), make_float2(0.0517f, -0.1026f), wp_D65);
+  chr egamut      = make_chr(make_float2(0.8f, 0.3177f), make_float2(0.18f, 0.9f), make_float2(0.065f, -0.0805f), wp_D65);
+  chr davinciwg   = make_chr(make_float2(0.8f, 0.313f), make_float2(0.1682f, 0.9877f), make_float2(0.079f, -0.1155f), wp_D65);
+  chr rec709      = make_chr(make_float2(0.64f, 0.33f), make_float2(0.3f, 0.6f), make_float2(0.15f, 0.06f), wp_D65);
+  chr rec2020     = make_chr(make_float2(0.708f, 0.292f), make_float2(0.17f, 0.797f), make_float2(0.131f, 0.046f), wp_D65);
+  chr p3d60       = make_chr(make_float2(0.68f, 0.32f), make_float2(0.265f, 0.69f), make_float2(0.15f, 0.06f), wp_D60);
+  chr p3d65       = make_chr(make_float2(0.68f, 0.32f), make_float2(0.265f, 0.69f), make_float2(0.15f, 0.06f), wp_D65);
+  chr p3dci       = make_chr(make_float2(0.68f, 0.32f), make_float2(0.265f, 0.69f), make_float2(0.15f, 0.06f), wp_DCI);
+  chr awg3        = make_chr(make_float2(0.684f, 0.313f), make_float2(0.221f, 0.848f), make_float2(0.0861f, -0.102f), wp_D65);
+  chr awg4        = make_chr(make_float2(0.7347f, 0.2653f), make_float2(0.1424f, 0.8576f), make_float2(0.0991f, -0.0308f), wp_D65);
+  chr rwg         = make_chr(make_float2(0.780308f, 0.304253f), make_float2(0.121595f, 1.493994f), make_float2(0.095612f, -0.084589f), wp_D65);
+  chr protune     = make_chr(make_float2(0.69848046f, 0.19302645f), make_float2(0.32955538f, 1.02459662f), make_float2(0.10844263f, -0.03467857f), wp_D65);
+  chr cgamut      = make_chr(make_float2(0.74f, 0.27f), make_float2(0.17f, 1.14f), make_float2(0.08f, -0.1f), wp_D65);
+  chr sgamut3     = make_chr(make_float2(0.73f, 0.28f), make_float2(0.14f, 0.855f), make_float2(0.1f, -0.05f), wp_D65);
+  chr sgamut3cine = make_chr(make_float2(0.766f, 0.275f), make_float2(0.225f, 0.8f), make_float2(0.089f, -0.087f), wp_D65);
+  chr vgamut      = make_chr(make_float2(0.73f, 0.28f), make_float2(0.165f, 0.84f), make_float2(0.1f, -0.03f), wp_D65);
+  chr dgamut      = make_chr(make_float2(0.71f, 0.31f), make_float2(0.21f, 0.88f), make_float2(0.09f, -0.08f), wp_D65);
+  chr bmdwg       = make_chr(make_float2(0.7177215f, 0.3171181f), make_float2(0.228041f, 0.861569f), make_float2(0.1005841f, -0.0820452f), wp_D65);
+  chr adobergb    = make_chr(make_float2(0.64f, 0.33f), make_float2(0.21f, 0.71f), make_float2(0.15f, 0.06f), wp_D65);
+
+
+  chr ichr; // input chromaticities
+  // Match in-gamut to the right chromaticities
+  if (ig == i_ap0) ichr = ap0;
+  else if (ig == i_ap1) ichr = ap1;
+  else if (ig == i_p3d65) ichr = p3d65;
+  else if (ig == i_rec2020) ichr = rec2020;
+  else if (ig == i_rec709) ichr = rec709;
+  else if (ig == i_awg3) ichr = awg3;
+  else if (ig == i_awg4) ichr = awg4;
+  else if (ig == i_rwg) ichr = rwg;
+  else if (ig == i_sgamut3) ichr = sgamut3;
+  else if (ig == i_sgamut3cine) ichr = sgamut3cine;
+  else if (ig == i_bmdwg) ichr = bmdwg;
+  else if (ig == i_egamut) ichr = egamut;
+  else if (ig == i_davinciwg) ichr = davinciwg;
+
+  chr ochr; // output chromaticities
+  // Match out-gamut to the right chromaticities
+  if (og == o_ap0) ochr = ap0;
+  else if (og == o_ap1) ochr = ap1;
+  else if (og == o_p3d65) ochr = p3d65;
+  else if (og == o_rec2020) ochr = rec2020;
+  else if (og == o_rec709) ochr = rec709;
+  else if (og == o_awg3) ochr = awg3;
+  else if (og == o_awg4) ochr = awg4;
+  else if (og == o_rwg) ochr = rwg;
+  else if (og == o_sgamut3) ochr = sgamut3;
+  else if (og == o_sgamut3cine) ochr = sgamut3cine;
+  else if (og == o_bmdwg) ochr = bmdwg;
+  else if (og == o_egamut) ochr = egamut;
+  else if (og == o_davinciwg) ochr = davinciwg;
+
+
+  // Get the input RGB and calculate the matrix.
   float3 rgb = make_float3(p_R, p_G, p_B);
+
+  float3x3 mtx = identity();
+
+  mtx = npm(ichr);
   
-  float3x3 in_to_xyz;
-  if (in_gamut == ap0)                in_to_xyz = matrix_ap0_to_xyz;
-  else if (in_gamut == ap1)           in_to_xyz = matrix_ap1_to_xyz;
-  else if (in_gamut == p3d65)         in_to_xyz = matrix_p3d65_to_xyz;
-  else if (in_gamut == rec2020)       in_to_xyz = matrix_rec2020_to_xyz;
-  else if (in_gamut == rec709)        in_to_xyz = matrix_rec709_to_xyz;
-  else if (in_gamut == awg)           in_to_xyz = matrix_arriwg_to_xyz;
-  else if (in_gamut == rwg)           in_to_xyz = matrix_redwg_to_xyz;
-  else if (in_gamut == sgamut3)       in_to_xyz = matrix_sonysgamut3;
-  else if (in_gamut == blackmagicwg)  in_to_xyz = matrix_blackmagicwg_to_xyz;
-  else if (in_gamut == egamut)        in_to_xyz = matrix_egamut_to_xyz;
-  else if (in_gamut == davinciwg)     in_to_xyz = matrix_davinciwg_to_xyz;
+  // If in gamut equals out gamut, do nothing
+  if (ig == og) return rgb;
+  
+  // If in-gamut is XYZ: mtx is inverse of out-gamut to XYZ. (No chromatic adaptation transform!)
+  // If out-gamut is XYZ: mtx is in-gamut to XYZ.
+  // Otherwise, calculate a full rgb to rgb conversion matrix.
+  if (ig == i_xyz) mtx = inv(npm(ochr));
+  else if (ig == i_xyz_d65) mtx = inv(rgb_to_XYZ_cat(ochr, wp_D65));
+  else if (og == o_xyz) mtx = npm(ichr);
+  else if (og == o_xyz_d65) mtx = rgb_to_XYZ_cat(ichr, wp_D65);
+  else mtx = rgb_to_rgb(ichr, ochr);
 
-  float3x3 xyz_to_out;
-  if (out_gamut == ap0)                xyz_to_out = inv_f33(matrix_ap0_to_xyz);
-  else if (out_gamut == ap1)           xyz_to_out = inv_f33(matrix_ap1_to_xyz);
-  else if (out_gamut == p3d65)         xyz_to_out = inv_f33(matrix_p3d65_to_xyz);
-  else if (out_gamut == rec2020)       xyz_to_out = inv_f33(matrix_rec2020_to_xyz);
-  else if (out_gamut == rec709)        xyz_to_out = inv_f33(matrix_rec709_to_xyz);
-  else if (out_gamut == awg)           xyz_to_out = inv_f33(matrix_arriwg_to_xyz);
-  else if (out_gamut == rwg)           xyz_to_out = inv_f33(matrix_redwg_to_xyz);
-  else if (out_gamut == sgamut3)       xyz_to_out = inv_f33(matrix_sonysgamut3);
-  else if (out_gamut == blackmagicwg)  xyz_to_out = inv_f33(matrix_blackmagicwg_to_xyz);
-  else if (out_gamut == egamut)        xyz_to_out = inv_f33(matrix_egamut_to_xyz);
-  else if (out_gamut == davinciwg)     xyz_to_out = inv_f33(matrix_davinciwg_to_xyz);
+  if (invert == 1) mtx = inv(mtx);
 
-
-  if (invert == 1) {
-    rgb = mult_f3_f33(rgb, inv_f33(xyz_to_out));
-    rgb = mult_f3_f33(rgb, inv_f33(in_to_xyz));
-  } else {
-    rgb = mult_f3_f33(rgb, in_to_xyz);
-    rgb = mult_f3_f33(rgb, xyz_to_out);
-  }
+  // Apply the matrix to RGB with a vector dot-product.
+  rgb = vdot(mtx, rgb);
 
   return rgb;
-  
 }
