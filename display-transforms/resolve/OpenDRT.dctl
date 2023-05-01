@@ -1,302 +1,454 @@
-/*  OpenDRT 
-    -------------------------------------------------
-      v0.1.3
+/*  OpenDRT -------------------------------------------------/
+      v0.2.0
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
-*/
 
-DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 1, {ap0, ap1, p3d65, rec2020, rec709, awg, rwg, sgamut3, blackmagicwg, egamut, davinciwg}, {ACES AP0, ACES AP1, P3D65, Rec.2020, Rec.709, Alexa Wide Gamut, Red Wide Gamut RGB, Sony SGamut3, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
-DEFINE_UI_PARAMS(in_curve, input curve, DCTLUI_COMBO_BOX, 0, {linear, acescct, arri_logc, red_log3g10, sony_slog3, blackmagic_film_gen5, filmlight_tlog, davinci_intermediate}, {Linear, ACEScct, Arri V3LogC, Red Log3G10, Sony SLog3, Blackmagic Film Gen5, Filmlight TLog, DaVinci Intermediate})
-DEFINE_UI_PARAMS(preset, preset, DCTLUI_COMBO_BOX, 0, {sdr_rec1886, sdr_srgb, sdr_applep3, sdr_rec2020, hdr_rec2020_pq_100nit, hdr_rec2020_pq_600nit, hdr_rec2020_pq_1000nit, hdr_rec2020_hlg_1000nit, hdr_rec2020_pq_2000nit, hdr_rec2020_pq_4000nit, hdr_p3d65_pq_100nit, hdr_p3d65_pq_600nit, hdr_p3d65_pq_1000nit, hdr_p3d65_pq_2000nit, hdr_p3d65_pq_4000nit, dci_p3d60, dci_p3d65, dci_p3dci, dci_dcdm}, {Rec.1886: 2.4 Power | Rec.709, sRGB Display: 2.2 Power | Rec.709, Apple Display P3: 2.2 Power | P3D65, Rec.2020: 2.4 Power | Rec.2020, Rec.2100: ST 2084 PQ | Rec.2020 | 100 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 600 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 1000 nit, Rec.2100: HLG | Rec.2020 | 1000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 2000 nit, Rec.2100: ST 2084 PQ | Rec.2020 | 4000 nit, Dolby: ST 2084 PQ | P3D65 | 100 nit, Dolby: ST 2084 PQ | P3D65 | 600 nit, Dolby: ST 2084 PQ | P3D65 | 1000 nit, Dolby: ST 2084 PQ | P3D65 | 2000 nit, Dolby: ST 2084 PQ | P3D65 | 4000 nit, DCI: 2.6 Power | P3 D60, DCI: 2.6 Power | P3 D65, DCI: 2.6 Power | P3 DCI, DCI: 2.6 Power | DCDM XYZ})
-DEFINE_UI_PARAMS(wp, whitepoint, DCTLUI_COMBO_BOX, 3, {D50, D55, D60, D65, D75, D93}, {D50, D55, D60, D65, D75, D93})
-DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+      License: GPL v3
+-------------------------------------------------*/
 
-#include "libDRT.h"
+DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 12, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 10.0)
+DEFINE_UI_PARAMS(gb, grey exposure boost, DCTLUI_SLIDER_FLOAT, 0.12, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(c, contrast, DCTLUI_SLIDER_FLOAT, 1.1, 1.0, 1.3, 0.0)
+DEFINE_UI_PARAMS(fl, flare, DCTLUI_SLIDER_FLOAT, 0.01, 0.0, 0.02, 0.001)
+DEFINE_UI_PARAMS(rw, red weight, DCTLUI_SLIDER_FLOAT, 0.2, 0.05, 0.6, 0.0)
+DEFINE_UI_PARAMS(bw, blue weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.05, 0.6, 0.0)
+DEFINE_UI_PARAMS(dch, dechroma, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch_toe, toe dechroma, DCTLUI_SLIDER_FLOAT, 0.005, 0.0, 0.01, 0.0)
+DEFINE_UI_PARAMS(dch_r, red dechroma, DCTLUI_SLIDER_FLOAT, -0.5, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch_g, green dechroma, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch_b, blue dechroma, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch_c, cyan dechroma, DCTLUI_SLIDER_FLOAT, -0.34, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch_m, magenta dechroma, DCTLUI_SLIDER_FLOAT, -0.34, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch_y, yellow dechroma, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_r, hue shift red, DCTLUI_SLIDER_FLOAT, 0.4, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_g, hue shift green, DCTLUI_SLIDER_FLOAT, -0.1, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_b, hue shift blue, DCTLUI_SLIDER_FLOAT, -0.55, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(v_r, red value, DCTLUI_SLIDER_FLOAT, 0.8, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(v_g, green value, DCTLUI_SLIDER_FLOAT, 0.66, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(v_b, blue value, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(v_c, cyan value, DCTLUI_SLIDER_FLOAT, 0.66, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(v_m, magenta value, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(v_y, yellow value, DCTLUI_SLIDER_FLOAT, 0.33, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3 D65, Rec.2020})
+DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
 
-// Whitepoint normalization factors for each possible output display gamut
-__CONSTANT__ wpnorm wnd50 = {1.09063f, 1.1408f, 1.09928f, 1.2469f, 1.17646f, 1.0f};
-__CONSTANT__ wpnorm wnd55 = {1.05337f, 1.08334f, 1.04391f, 1.18409f, 1.10416f, 1.0f};
-__CONSTANT__ wpnorm wnd60 = {1.02355f, 1.037f, 1.00028f, 1.13345f, 1.0461f, 1.0f};
-__CONSTANT__ wpnorm wnd65 = {1.0f, 1.0f, 1.08307f, 1.15054f, 1.0f, 1.0f};
-__CONSTANT__ wpnorm wnd75 = {1.12915f, 1.13116f, 1.22512f, 1.30144f, 1.14486f, 1.0f};
-__CONSTANT__ wpnorm wnd93 = {1.30631f, 1.31116f, 1.42007f, 1.50853f, 1.34374f, 1.0f};
+// Gamut Conversion Matrices
+#define matrix_ap0_to_xyz make_float3x3(make_float3(0.93863094875f, -0.00574192055f, 0.017566898852f), make_float3(0.338093594922f, 0.727213902811f, -0.065307497733f), make_float3(0.000723121511f, 0.000818441849f, 1.0875161874f))
+#define matrix_ap1_to_xyz make_float3x3(make_float3(0.652418717672f, 0.127179925538f, 0.170857283842f), make_float3(0.268064059194f, 0.672464478993f, 0.059471461813f), make_float3(-0.00546992851f, 0.005182799977f, 1.08934487929f))
+#define matrix_rec709_to_xyz make_float3x3(make_float3(0.412390917540f, 0.357584357262f, 0.180480793118f), make_float3(0.212639078498f, 0.715168714523f, 0.072192311287f), make_float3(0.019330825657f, 0.119194783270f, 0.950532138348f))
+#define matrix_p3d65_to_xyz make_float3x3(make_float3(0.486571133137f, 0.265667706728f, 0.198217317462f), make_float3(0.228974640369f, 0.691738605499f, 0.079286918044f), make_float3(-0.000000000000f, 0.045113388449, 1.043944478035f))
+#define matrix_rec2020_to_xyz make_float3x3(make_float3(0.636958122253f, 0.144616916776f, 0.168880969286f), make_float3(0.262700229883f, 0.677998125553f, 0.059301715344f), make_float3(0.000000000000f, 0.028072696179, 1.060985088348f))
+#define matrix_arriwg3_to_xyz make_float3x3(make_float3(0.638007619284f, 0.214703856337f, 0.097744451431f), make_float3(0.291953779f, 0.823841041511f, -0.11579482051f), make_float3(0.002798279032f, -0.067034235689f, 1.15329370742f))
+#define matrix_arriwg4_to_xyz make_float3x3(make_float3(0.704858320407f, 0.12976029517f, 0.115837311474f), make_float3(0.254524176404f, 0.781477732712f, -0.036001909116f), make_float3(0.0f, 0.0f, 1.08905775076f))
+#define matrix_redwg_to_xyz make_float3x3(make_float3(0.735275208950f, 0.068609409034f, 0.146571278572f), make_float3(0.286694079638f, 0.842979073524f, -0.129673242569f), make_float3(-0.079680845141f, -0.347343206406, 1.516081929207f))
+#define matrix_sonysgamut3_to_xyz make_float3x3(make_float3(0.706482713192f, 0.128801049791f, 0.115172164069f), make_float3(0.270979670813f, 0.786606411221f, -0.057586082034f), make_float3(-0.009677845386f, 0.004600037493f, 1.09413555865f))
+#define matrix_sonysgamut3cine_to_xyz make_float3x3(make_float3(0.599083920758f, 0.248925516115f, 0.102446490178f), make_float3(0.215075820116f, 0.885068501744f, -0.100144321859f), make_float3(-0.032065849545f, -0.027658390679f, 1.14878199098f))
+#define matrix_bmdwg_to_xyz make_float3x3(make_float3(0.606538414955f, 0.220412746072f, 0.123504832387f), make_float3(0.267992943525f, 0.832748472691f, -0.100741356611f), make_float3(-0.029442556202f, -0.086612440646, 1.205112814903f))
+#define matrix_egamut_to_xyz make_float3x3(make_float3(0.705396831036f, 0.164041340351f, 0.081017754972f), make_float3(0.280130714178f, 0.820206701756f, -0.100337378681f), make_float3(-0.103781513870f, -0.072907261550, 1.265746593475f))
+#define matrix_davinciwg_to_xyz make_float3x3(make_float3(0.700622320175f, 0.148774802685f, 0.101058728993f), make_float3(0.274118483067f, 0.873631775379f, -0.147750422359f), make_float3(-0.098962903023f, -0.137895315886, 1.325916051865f))
+
+#define matrix_xyz_to_rec709 make_float3x3(make_float3(3.2409699419f, -1.53738317757f, -0.498610760293f), make_float3(-0.969243636281f, 1.87596750151f, 0.041555057407f), make_float3(0.055630079697f, -0.203976958889f, 1.05697151424f))
+#define matrix_xyz_to_p3d65 make_float3x3(make_float3(2.49349691194f, -0.931383617919f, -0.402710784451f), make_float3(-0.829488969562f, 1.76266406032f, 0.023624685842f), make_float3(0.035845830244f, -0.076172389268f, 0.956884524008f))
+#define matrix_xyz_to_rec2020 make_float3x3(make_float3(1.71665118797f, -0.355670783776f, -0.253366281374f), make_float3(-0.666684351832f, 1.61648123664f, 0.015768545814f), make_float3(0.017639857445f, -0.042770613258f, 0.942103121235f))
+
+/* Math helper functions ----------------------------*/
+
+typedef struct {
+  float3 x, y, z;
+} float3x3;
+
+// Helper function to create a float3x3
+__DEVICE__ float3x3 make_float3x3(float3 a, float3 b, float3 c) {
+  float3x3 d;
+  d.x = a, d.y = b, d.z = c;
+  return d;
+}
+
+// Return identity 3x3 matrix
+__DEVICE__ float3x3 identity() {
+  return make_float3x3(make_float3(1.0f, 0.0f, 0.0f), make_float3(0.0f, 1.0f, 0.0f), make_float3(0.0f, 0.0f, 1.0f));
+}
+
+// Multiply 3x3 matrix m and float3 vector v
+__DEVICE__ float3 vdot(float3x3 m, float3 v) {
+  return make_float3(m.x.x*v.x + m.x.y*v.y + m.x.z*v.z, m.y.x*v.x + m.y.y*v.y + m.y.z*v.z, m.z.x*v.x + m.z.y*v.y + m.z.z*v.z);
+}
+
+// Safe division of float a by float b
+__DEVICE__ float sdivf(float a, float b) {
+  if (_fabs(b) < 1e-4f) return 0.0f;
+  else return a/b;
+}
+// Safe division of float3 a by float b
+__DEVICE__ float3 sdivf3f(float3 a, float b) {
+  return make_float3(sdivf(a.x, b), sdivf(a.y, b), sdivf(a.z, b));
+}
+// Safe division of float3 a by float3 b
+__DEVICE__ float3 sdivf3f3(float3 a, float3 b) {
+  return make_float3(sdivf(a.x, b.x), sdivf(a.y, b.y), sdivf(a.z, b.z));
+}
+
+// Safe power function raising float a to power float b
+__DEVICE__ float spowf(float a, float b) {
+  if (a <= 0.0f) return a;
+  else return _powf(a, b);
+}
+// Safe power function raising float3 a to power float b
+__DEVICE__ float3 spowf3(float3 a, float b) {
+  return make_float3(_powf(a.x, b), _powf(a.y, b), _powf(a.z, b));
+}
+
+// Clamp each component of float3 a to be between float mn and float mx
+__DEVICE__ float3 clampf3(float3 a, float mn, float mx) { 
+  return make_float3(_fminf(_fmaxf(a.x, mn), mx), _fminf(_fmaxf(a.y, mn), mx), _fminf(_fmaxf(a.z, mn), mx));
+}
+
+
+__DEVICE__ float3 eotf_hlg(float3 rgb, int inverse) {
+  // Aply the HLG Forward or Inverse EOTF. Implements the full ambient surround illumination model
+  // ITU-R Rec BT.2100-2 https://www.itu.int/rec/R-REC-BT.2100
+  // ITU-R Rep BT.2390-8: https://www.itu.int/pub/R-REP-BT.2390
+  // Perceptual Quantiser (PQ) to Hybrid Log-Gamma (HLG) Transcoding: https://www.bbc.co.uk/rd/sites/50335ff370b5c262af000004/assets/592eea8006d63e5e5200f90d/BBC_HDRTV_PQ_HLG_Transcode_v2.pdf
+
+  const float HLG_Lw = 1000.0f;
+  // const float HLG_Lb = 0.0f;
+  const float HLG_Ls = 5.0f;
+  const float h_a = 0.17883277f;
+  const float h_b = 1.0f - 4.0f*0.17883277f;
+  const float h_c = 0.5f - h_a*_logf(4.0f*h_a);
+  const float h_g = 1.2f*_powf(1.111f, _log2f(HLG_Lw/1000.0f))*_powf(0.98f, _log2f(_fmaxf(1e-6f, HLG_Ls)/5.0f));
+  if (inverse == 1) {
+    float Yd = 0.2627f*rgb.x + 0.6780f*rgb.y + 0.0593f*rgb.z;
+    // HLG Inverse OOTF
+    rgb = rgb*_powf(Yd, (1.0f - h_g)/h_g);
+    // HLG OETF
+    rgb.x = rgb.x <= 1.0f/12.0f ? _sqrtf(3.0f*rgb.x) : h_a*_logf(12.0f*rgb.x - h_b) + h_c;
+    rgb.y = rgb.y <= 1.0f/12.0f ? _sqrtf(3.0f*rgb.y) : h_a*_logf(12.0f*rgb.y - h_b) + h_c;
+    rgb.z = rgb.z <= 1.0f/12.0f ? _sqrtf(3.0f*rgb.z) : h_a*_logf(12.0f*rgb.z - h_b) + h_c;
+  } else {
+    // HLG Inverse OETF
+    rgb.x = rgb.x <= 0.5f ? rgb.x*rgb.x/3.0f : (_expf((rgb.x - h_c)/h_a) + h_b)/12.0f;
+    rgb.y = rgb.y <= 0.5f ? rgb.y*rgb.y/3.0f : (_expf((rgb.y - h_c)/h_a) + h_b)/12.0f;
+    rgb.z = rgb.z <= 0.5f ? rgb.z*rgb.z/3.0f : (_expf((rgb.z - h_c)/h_a) + h_b)/12.0f;
+    // HLG OOTF
+    float Ys = 0.2627f*rgb.x + 0.6780f*rgb.y + 0.0593f*rgb.z;
+    rgb = rgb*_powf(Ys, h_g - 1.0f);
+  }
+  return rgb;
+}
+
+
+__DEVICE__ float3 eotf_pq(float3 rgb, int inverse) {
+  // Apply the ST-2084 PQ Forward or Inverse EOTF
+  // Normalized such that input display linear light code value 1.0 equals 10,000 nits
+  // ITU-R Rec BT.2100-2 https://www.itu.int/rec/R-REC-BT.2100
+  // ITU-R Rep BT.2390-9 https://www.itu.int/pub/R-REP-BT.2390
+  
+  // Note: in the spec there is a normalization for peak display luminance. 
+  // For this function we assume the input is already normalized such that 1.0 = 10,000 nits
+  const float Lp = 1.0f;
+
+  const float m1 = 2610.0f/16384.0f;
+  const float m2 = 2523.0f/32.0f;
+  const float c1 = 107.0f/128.0f;
+  const float c2 = 2413.0f/128.0f;
+  const float c3 = 2392.0f/128.0f;
+
+  if (inverse == 1) {
+    rgb /= Lp;
+    rgb = spowf3(rgb, m1);
+    rgb.x = spowf((c1 + c2*rgb.x)/(1.0f + c3*rgb.x), m2);
+    rgb.y = spowf((c1 + c2*rgb.y)/(1.0f + c3*rgb.y), m2);
+    rgb.z = spowf((c1 + c2*rgb.z)/(1.0f + c3*rgb.z), m2);
+  } else {
+    rgb = spowf3(rgb, 1.0f/m2);
+    rgb.x = spowf((rgb.x - c1)/(c2 - c3*rgb.x), 1.0f/m1)*Lp;
+    rgb.y = spowf((rgb.y - c1)/(c2 - c3*rgb.y), 1.0f/m1)*Lp;
+    rgb.z = spowf((rgb.z - c1)/(c2 - c3*rgb.z), 1.0f/m1)*Lp;
+  }
+  return rgb;
+}
+
+
+__DEVICE__ float3 narrow_hue_angles(float3 v) {
+  return make_float3(
+    _fminf(2.0f, _fmaxf(0.0f, v.x - (v.y + v.z))),
+    _fminf(2.0f, _fmaxf(0.0f, v.y - (v.x + v.z))),
+    _fminf(2.0f, _fmaxf(0.0f, v.z - (v.x + v.y))));
+}
+
+__DEVICE__ float tonescale(float x, float m, float s, float c, int invert) {
+  if (invert == 0) {
+    return spowf(m*x/(x + s), c);
+  } else {
+    float ip = 1.0f/c;
+    return spowf(s*x, ip)/(m - spowf(x, ip));
+  }
+}
+
+__DEVICE__ float flare(float x, float fl, int invert) {
+  if (invert == 0) {
+    return spowf(x, 2.0f)/(x+fl);
+  } else {
+    return (x + _sqrtf(x*(4.0f*fl + x)))/2.0f;
+  }
+}
+
 
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
 {
+  // **************************************************
+  // Parameter Setup
+  // --------------------------------------------------
 
-  /* Parameters and Setup 
-     ----------------------------------------------------------- */
-
-  // Input gamut conversion to D65 aligned XYZ (CAT: xyz scaling)
+  // Input gamut conversion matrix (CAT02 chromatic adaptation to D65)
   float3x3 in_to_xyz;
-  if (in_gamut == ap0)                in_to_xyz = matrix_ap0_to_xyz;
-  else if (in_gamut == ap1)           in_to_xyz = matrix_ap1_to_xyz;
-  else if (in_gamut == p3d65)         in_to_xyz = matrix_p3d65_to_xyz;
-  else if (in_gamut == rec2020)       in_to_xyz = matrix_rec2020_to_xyz;
-  else if (in_gamut == rec709)        in_to_xyz = matrix_rec709_to_xyz;
-  else if (in_gamut == awg)           in_to_xyz = matrix_arriwg_to_xyz;
-  else if (in_gamut == rwg)           in_to_xyz = matrix_redwg_to_xyz;
-  else if (in_gamut == sgamut3)       in_to_xyz = matrix_sonysgamut3;
-  else if (in_gamut == blackmagicwg)  in_to_xyz = matrix_blackmagicwg_to_xyz;
-  else if (in_gamut == egamut)        in_to_xyz = matrix_egamut_to_xyz;
-  else if (in_gamut == davinciwg)     in_to_xyz = matrix_davinciwg_to_xyz;
+  if (in_gamut == i_xyz) in_to_xyz = identity();
+  else if (in_gamut == i_ap0) in_to_xyz = matrix_ap0_to_xyz;
+  else if (in_gamut == i_ap1) in_to_xyz = matrix_ap1_to_xyz;
+  else if (in_gamut == i_p3d65) in_to_xyz = matrix_p3d65_to_xyz;
+  else if (in_gamut == i_rec2020) in_to_xyz = matrix_rec2020_to_xyz;
+  else if (in_gamut == i_rec709) in_to_xyz = matrix_rec709_to_xyz;
+  else if (in_gamut == i_awg3) in_to_xyz = matrix_arriwg3_to_xyz;
+  else if (in_gamut == i_awg4) in_to_xyz = matrix_arriwg4_to_xyz;
+  else if (in_gamut == i_rwg) in_to_xyz = matrix_redwg_to_xyz;
+  else if (in_gamut == i_sgamut3) in_to_xyz = matrix_sonysgamut3_to_xyz;
+  else if (in_gamut == i_sgamut3cine) in_to_xyz = matrix_sonysgamut3cine_to_xyz;
+  else if (in_gamut == i_bmdwg) in_to_xyz = matrix_bmdwg_to_xyz;
+  else if (in_gamut == i_egamut) in_to_xyz = matrix_egamut_to_xyz;
+  else if (in_gamut == i_davinciwg) in_to_xyz = matrix_davinciwg_to_xyz;
 
-  /*    Convert input colorspace into CIE 1931 XYZ with D65 whitepoint, 
-        using XYZ Scaling as the chromatic adaptation method.
-        We convert XYZ into Truelight LMS colorspace, then normalize 
-        so that D65 white is equal energy. This is our reference point.
-        After display rendering we scale to output whitepoint in LMS.
-    */
-      
-  const float3x3 xyz_to_in = inv_f33(in_to_xyz);
-
-  // Transfer function for linearizing input
-  int tf;
-  if (in_curve == linear)                     tf = 0;
-  else if (in_curve == acescct)               tf = 1;
-  else if (in_curve == arri_logc)             tf = 2;
-  else if (in_curve == red_log3g10)           tf = 3;
-  else if (in_curve == sony_slog3)            tf = 4;
-  else if (in_curve == filmlight_tlog)        tf = 5;
-  else if (in_curve == davinci_intermediate)  tf = 6;
-  else if (in_curve == blackmagic_film_gen5)  tf = 7;
-
-  /* Whitepoint handling */
-
-  // CAT scale factor for creative output whitepoint
-  float3 cats;
-
-  // Normalization factor to scale display light, compensating for peak white shift
-  // due to chromatic adaptation to target creative whitepoint.
-  wpnorm wn;
-  
-  // Set up whitepoint based on user parameters
-  if (wp == D50)         cats = catd50, wn = wnd50;
-  else if (wp == D55)    cats = catd55, wn = wnd55;
-  else if (wp == D60)    cats = catd60, wn = wnd60;
-  else if (wp == D65)    cats = catd65, wn = wnd65;
-  else if (wp == D75)    cats = catd75, wn = wnd75;
-  else if (wp == D93)    cats = catd93, wn = wnd93;
-
-  // forward and inverse Truelight LMS matrix
-  const float3x3 xyz_to_tlms = matrix_xyz_to_truelightlms;
-  const float3x3 tlms_to_xyz = inv_f33(matrix_xyz_to_truelightlms);
-  
-
-  // highlight dechroma 
-  const float dch = 0.5f;
-
-  /* Set up presets
-     ----------------------- */
-  int eotf;
-  float Lp, su, w_n;
   float3x3 xyz_to_display;
+  if (display_gamut == Rec709) xyz_to_display = matrix_xyz_to_rec709;
+  else if (display_gamut == P3D65) xyz_to_display = matrix_xyz_to_p3d65;
+  else if (display_gamut == Rec2020) xyz_to_display = matrix_xyz_to_rec2020;
 
-  if (preset == sdr_rec1886) Lp = 100.0f, su = 0.95f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 2;
-  else if (preset == sdr_srgb) Lp = 100.0f, su = 0.9f, xyz_to_display = inv_f33(matrix_rec709_to_xyz), w_n = wn.rec709, eotf = 1;
-  else if (preset == sdr_applep3) Lp = 100.0f, su = 0.9f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 1;
-  else if (preset == sdr_rec2020) Lp = 100.0f, su = 0.95f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 2;
-  else if (preset == dci_p3d60) Lp = 100.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d60_to_xyz), w_n = wn.p3d60, eotf = 3;
-  else if (preset == dci_p3d65) Lp = 100.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 3;
-  else if (preset == dci_p3dci) Lp = 100.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3dci_to_xyz), w_n = wn.p3dci, eotf = 3;
-  else if (preset == dci_dcdm) Lp = 100.0f,  52.37f / 48.0f, su = 1.0f, xyz_to_display = identity_mtx, w_n = wn.dcdm, eotf = 3;
-  else if (preset == hdr_rec2020_pq_100nit) Lp = 100.0f, su = 0.95f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_pq_600nit) Lp = 600.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_pq_1000nit) Lp = 1000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_hlg_1000nit) Lp = 1000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 5;
-  else if (preset == hdr_rec2020_pq_2000nit) Lp = 2000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_rec2020_pq_4000nit) Lp = 4000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_rec2020_to_xyz), w_n = wn.rec2020, eotf = 4;
-  else if (preset == hdr_p3d65_pq_100nit) Lp = 100.0f, su = 0.95f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_600nit) Lp = 600.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_1000nit) Lp = 1000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_2000nit) Lp = 2000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
-  else if (preset == hdr_p3d65_pq_4000nit) Lp = 4000.0f, su = 1.0f, xyz_to_display = inv_f33(matrix_p3d65_to_xyz), w_n = wn.p3d65, eotf = 4;
+  int eotf;
+  if (EOTF == lin)          eotf = 0;
+  else if (EOTF == srgb)    eotf = 1;
+  else if (EOTF == rec1886) eotf = 2;
+  else if (EOTF == dci)     eotf = 3;
+  else if (EOTF == pq)      eotf = 4;
+  else if (EOTF == hlg)     eotf = 5;
+  
+  /* Display Scale ---------------*
+      Remap peak white in display linear depending on the selected inverse EOTF.
+      In our tonescale model, 1.0 is 100 nits, and as we scale up peak display luminance (Lp),
+      we multiply up by the same amount. So if Lp=1,000, peak output of the tonescale model
+      will be 10.0.
 
-  const float3x3 display_to_xyz = inv_f33(xyz_to_display);
+      So in ST2084 PQ, 1.0 is 10,000 nits, so we need to divide by 100 to fit out output into the 
+      container.
 
-  /* Tone Scale
-      OpenDRT uses a 3-stage tonescale model. 
-      - Stage 1 is a hyperbolic compression function based on the Michaelis-Menten equation. 
-      - Stage 2 is a power function applied after the hyperbolic compression to adjust contrast.
-      - Stage 3 is a parabolic toe compression function used for flare compensation.
+      Similarly in HLG, 1.0 is 1,000 nits, so we need to divide by 10.
 
-      More details with math (see the "Michaelis-Menten Spring with Varying Power model")
-      https://colab.research.google.com/drive/1aEjQDPlPveWPvhNoEfK4vGH5Tet8y1EB
-      https://colab.research.google.com/drive/10C3HvDuoAhYad1qOG2r0v8fGR-5VdpO5
-
-      This implementation is inspired by Daniele Siragusano's post:
-      https://community.acescentral.com/t/output-transform-tone-scale/3498/14
-
-      The parameter space are all const floats specified by user parameters.
-      The constants are used in the rendering code to apply the tonescale.
+      If we are in an SDR mode, instead we just scale the peak so it hits display 1.0.
   */
-  
-  
-  // Calculate tonescale parameters
-  const float sat = _fmaxf(1.0f, 1.125f - 0.00025f*Lp);
-  
-  // flare
-  const float fl = 0.01f;
-  
-  // contrast
-  const float c = 26.5f*_powf(Lp, -1.1f)+1.18f; // post-tonemap contrast
-  const float p = c*su; // surround compensation, unconstrained
-  
-  // boost peak to clip : ~32@100nits, ~75~1000nits, ~100@4000nits
-  const float w1 = _powf(0.44f*Lp/10000.0f, 0.8534f) + 1.033f;
-  const float s1 = w1*Lp/100.0f; // scale y: 1@100nits, 40@4000nits
-
-  // middle grey position / exposure: ~10nits at 100nits SDR, ~16.3nits at 4000nits HDR
-  const float e0 = 0.0153f*_powf(Lp, 0.5224f) + 1.1656f;
-  const float s0 = s1/e0;
-  
-  // Display scale: remap peak white depending on output inverse EOTF
-  const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : preset == dci_dcdm ? 48.0f / 52.37f :100.0f/Lp;
-  
-  // Display maximum for display-linear clamp.
-  const float clamp_max = preset == dci_dcdm ? 1.0f : ds*Lp/100.0f;
-  
-
-  // R G B weights for vector length norm. Affects luminance and chroma of output color.
-  const float3 vw = make_float3(0.24f, 0.1f, 0.1f);
-
-  // Normalization for weighted vector length norm so that achromatic values are not scaled
-  const float vwn = _sqrtf(vw.x*vw.x + vw.y*vw.y + vw.z*vw.z);
+  const float ds = eotf == 4 ? 0.01f : eotf == 5 ? 0.1f : 100.0f/Lp;
+  const float clamp_max = ds*Lp/100.0f;
 
   
+  /* Tonescale Parameters 
+      ----------------------
+    For the tonescale compression function, we use one inspired by the wisdom shared by Daniele Siragusano
+    on the tonescale thread on acescentral: https://community.acescentral.com/t/output-transform-tone-scale/3498/224
 
-  /* Forward Display Rendering 
-     ----------------------------------------------------------- */
+    This is a variation which puts the power function _after_ the display-linear scale, which allows a simpler and exact
+    solution for the intersection constraints. The resulting function is pretty much identical.
+    Here is a desmos graph with the math. https://www.desmos.com/calculator/pmf3qc47v0
+
+    And for more info on the derivation, see the "Michaelis-Menten Constrained" Tonescale Function here:
+    https://colab.research.google.com/drive/1aEjQDPlPveWPvhNoEfK4vGH5Tet8y1EB#scrollTo=Fb_8dwycyhlQ
+
+    For the user parameter space, we include the following creative controls:
+    - Lp: display peak luminance. This sets the display device peak luminance and allows rendering for HDR.
+    - contrast: This is a pivoted power function applied after the hyperbolic compress function, 
+        which keeps middle grey and peak white the same but increases contrast in between.
+    - flare: Applies a parabolic toe compression function after the hyperbolic compression function. 
+        This compresses values near zero without clipping. Used for flare or glare compensation.
+    - gb: Grey Boost. This parameter controls how many stops to boost middle grey per stop of peak luminance increase.
+
+    Notes on the other non user-facing parameters:
+    - (px, py): This is the peak luminance intersection constraint for the compression function.
+        px is the input scene-linear x-intersection constraint. That is, the scene-linear input value 
+        which is mapped to py through the compression function. By default this is set to 64 at Lp=100, and 128 at Lp=1000.
+        Here is the regression calculation using a logarithmic function to match: https://www.desmos.com/calculator/d0jcaa8xzt
+    - (gx, gy): This is the middle grey intersection constraint for the compression function.
+        Scene-linear input value gx is mapped to display-linear output gy through the function.
+        Why is gy set to 0.11696 at Lp=100? This matches the position of middle grey through in the Rec709 system. 
+        We use this value for consistency with the Arri and TCAM Rec.1886 display rendering transforms.
+  */
+
+  // input scene-linear peak x intercept
+  float px = 128.0*_logf(Lp)/_logf(100.0) - 64.0f;
+  // output display-linear peak y intercept
+  float py = Lp/100.0f;
+  // input scene-linear middle grey x intercept
+  float gx = 0.18f;
+  // output display-linear middle grey y intercept
+  float gy = 11.696f/100.0f*(1.0f + gb*_logf(py)/_logf(2.0f));
+  // s0 and s are input x scale for middle grey intersection constraint
+  // m0 and m are output y scale for peak white intersection constraint
+  float s0 = flare(gy, fl, 1);
+  float m0 = flare(py, fl, 1);
+  float ip = 1.0f/c;
+  float s = (px*gx*(_powf(m0, ip) - _powf(s0, ip)))/(px*_powf(s0, ip) - gx*_powf(m0, ip));
+  float m = _powf(m0, ip)*(s + px)/px;
+
+
+
+  /* Rendering Code ------------------------------------------ */
 
   float3 rgb = make_float3(p_R, p_G, p_B);
 
-
-  if (invert == 0) {
-    // Linearize input
-    rgb = log2lin(rgb, tf);
-
-    // Input gamut to xyz d65 cat: xyz scaling
-    rgb = mult_f3_f33(rgb, in_to_xyz);
-
-    // XYZ to Truelight LMS
-    float3 lms = mult_f3_f33(rgb, xyz_to_tlms);
-
-    // Normalize D65 white to equal energy
-    lms /= catd65;
-
-    // Weighted vector length norm
-    lms = maxf3(1e-12f, lms);
-    float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
-
-    // RGB Ratios
-    lms /= n;
-
-    // Tonescale and flare compensation
-    float ts = s1*_powf(n/(n + s0), p);
-    ts = ts*ts/(ts + fl);
-
-    // Chroma compression factor
-    float ccf = _powf(s0/(n + s0), dch)*sat;
-    
-     // Compress chroma: chromaticity-linear desaturation by ccf (lerp towards 1.0 in rgb ratios)
-    lms = (1.0f - ccf) + lms*ccf;
-
-    // Display-referred LMS
-    lms *= ts;
-    
-    // Apply output creative output whitepoint scale to both scene lms and display lms
-    // Also normalize by w_n so that channels are not pushed above display peak luminance. 
-    // For example if using a D55 whitepoint, without normalization the R channel would be > 1
-    lms *= cats / w_n;
-    
-    // Convert from Truelight LMS to XYZ
-    float3 xyz = mult_f3_f33(lms, tlms_to_xyz);
-
-    // Convert XYZ to display gamut
-    rgb = mult_f3_f33(xyz, xyz_to_display);
-
-    // Scale for display device
-    rgb *= ds;
-
-    // Clamp
-    rgb = clampf3(rgb, 0.0f, clamp_max);
-
-    // Inverse EOTF
-    float eotf_p = 2.0f + eotf * 0.2f; 
-    if ((eotf > 0) && (eotf < 4)) { // Power Function
-      rgb = powf3(rgb, 1.0f / eotf_p);
-    } else if (eotf == 4) { // ST2084 PQ
-      rgb = eotf_pq(rgb, 1, 0);
-    } else if (eotf == 5) { // HLG
-      rgb = eotf_hlg(rgb, 1);
-    }
-  } else {
-    
-    /* Inverse Display Rendering
-       -------------------------
-        Inverse will not be an exact match, due to multiple factors:
-        - Limitations of display gamut volume
-        - Mis-matches in more saturated colors due to weighted vector length norm
-    */
-    
-    rgb = clampf3(rgb, 0.0f, 1.0f);
-
-    // Forward EOTF
-    float eotf_p = 2.0f + eotf * 0.2f;
-    if ((eotf > 0) && (eotf < 4)) { // Power Function
-      rgb = powf3(rgb, eotf_p);
-    } else if (eotf == 4) { // ST2084 PQ
-      rgb = eotf_pq(rgb, 0, 0);
-    } else if (eotf == 5) { // HLG
-      rgb = eotf_hlg(rgb, 0);
-    }
+  // Convert into display gamut
+  rgb = vdot(in_to_xyz, rgb);
+  rgb = vdot(xyz_to_display, rgb);
 
 
-    // Inverse output scale
-    rgb /= ds;
+  // Take the min and the max of rgb. These are used to calculate hue angle, chrominance, and rgb ratios
+  float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  float mn = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
+  
+  /* Calculate RGB CMY hue angles from the input RGB.
+    The classical way of calculating hue angle from RGB is something like this
+    mx = max(r,g,b)
+    mn = min(r,g,b)
+    c = mx - mn
+    hue = (c==0?0:r==mx?((g-b)/c+6)%6:g==mx?(b-r)/c+2:b==mx?(r-g)/c+4:0)
+    With normalized chroma (distance from achromatic), being calculated like this
+    chroma = (mx - mn)/mx
+    chroma can also be calculated as 1 - mn/mx
 
-    // display gamut to XYZ
-    rgb = maxf3(0.0f, rgb);
-    float3 xyz = mult_f3_f33(rgb, display_to_xyz);
+    Here we split apart the calculation for hue and chroma so that we have access to RGB CMY
+    individually without having to linear step extract the result again.
 
-    // XYZ to LMS
-    float3 lms = mult_f3_f33(xyz, xyz_to_tlms);
+    To do this, we first calculate the "wide" hue angle: 
+      wide hue RGB = (RGB - mn)/mx
+      wide hue CMY = (mx - RGB)/mx
+    and then "narrow down" the hue angle for each with channel subtraction (see narrow_hue_angles() function).
+  */
+  float3 h_rgb = sdivf3f(rgb - mn, mx);
+  h_rgb = narrow_hue_angles(h_rgb);
+  float3 h_cmy = sdivf3f(mx - rgb, mx);
+  h_cmy = narrow_hue_angles(h_cmy);
 
-    // Inverse output creative output whitepoint scale
-    lms /= cats;
+  // chroma here does not refer to any perceptual metric. It is merely the normalized distance from achromatic 
+  float ch = 1.0f - sdivf(mn, mx);
 
-    // Weighted vector length norm
-    float n = _sqrtf(_powf(vw.x * lms.x, 2.0f) + _powf(vw.y * lms.y, 2.0f) + _powf(vw.z * lms.z, 2.0f)) / vwn;
 
-    // RGB Ratios
-    lms /= n;
+  /* Take the "Luminance" of RGB. 
+      This is not classical luminance, but rather a weighted sum of RGB,
+      with the weights creatively controlled by the user. The user specifies the Red and Blue weights, 
+      the Green weight is automatically calculated so that the total sums to 1.0.
+  */ 
+  const float gw = 1.0f - (rw + bw);
+  float lum = _fmaxf(1e-5f, rgb.x*rw + rgb.y*gw + rgb.z*bw);
 
-    // Inverse tone scale 
-    float ts = (n + _sqrtf(n*(4.0f*fl + n)))/2.0f;
-    ts = s0/(_powf(s1/ts, 1.0f/p) - 1.0f);
-    
-    // Chroma compression factor
-    float ccf = _powf(s0 / (ts + s0), dch) * sat;
+  // RGB Ratios using luminance as the vector norm
+  float3 rats = sdivf3f(rgb, lum);
 
-    // Inverse chroma compression
-    lms = ((ccf - 1.0f) + lms)/ccf;
+  // Apply tonescale function to lum
+  float ts;
+  ts = tonescale(lum, m, s, c, 0);
+  ts = flare(ts, fl, 0);
 
-    // Scene-referred LMS
-    lms *= ts;
+  // // Unused inverse direction
+  // ts = flare(ts, fl, 1);
+  // ts = tonescale(lum, m, s, c, 1);
 
-    // Inverse D65 Normalization
-    lms *= catd65;
 
-    // LMS to XYZ
-    xyz = mult_f3_f33(lms, tlms_to_xyz);
+  /* Chroma Compression ------------------------------------------ *
+      Here we set up the chroma compression function. For additional control, we use a different function
+      than the tonescale for chroma compression: https://www.desmos.com/calculator/opsapnysjk
+      It's the same type of hyperbolic compression, but with only a single scale, and processed in the inverse direction.
+      if s0 is the scale, in the forward direction it would be y = s0*x/(s0*x+1)
+      In the inverse direction it would be y = 1 - s0*x/(s0*x+1) = 1/(s0*x+1)
+      
+      We also do not use a constant for s0. Instead we calculate a value of s0 per pixel from the RGBCMY Dechroma weights.
+      This gives us control over the chroma compression per hue angle.
 
-    // XYZ to input gamut.
-    rgb = mult_f3_f33(xyz, xyz_to_in);
-    
-    // Return to working space
-    rgb = lin2log(rgb, tf);
+      dch is the global dechroma user parameter. We also adjust dch by the tonescale scene-linear input scale parameter (s), 
+      so that we compress chroma less when peak luminance is higher.
+  */
+  float dch_s = dch/s;
+  // Unpremult hue rgb and hue cmy by chroma
+  float3 ha_rgb = sdivf3f(h_rgb, ch);
+  float3 ha_cmy = sdivf3f(h_cmy, ch);
+
+  // The final dechroma weight to use in the chroma compression function
+  float dch_w = dch_s*(dch_r*ha_rgb.x + 1.0f)*(dch_g*ha_rgb.y + 1.0f)*(dch_b*ha_rgb.z + 1.0f)*(dch_c*ha_cmy.x + 1.0f)*(dch_m*ha_cmy.y + 1.0f)*(dch_y*ha_cmy.z + 1.0f);
+
+  // Chroma compression factor, used to lerp towards 1 in rgb ratios, compressing chroma
+  float ccf = sdivf(1.0f, lum*dch_w + 1.0f);
+
+  /* Shadow Chroma Compression
+    We compress chroma in the toe as well, to avoid rainbow shadow grain and over-saturated shadows.
+    Adjusted by the dch_toe user parameter. Uses the same function as the flare compensation,
+    but constrained at (1, 1): https://www.desmos.com/calculator/igma4xoqlx
+    Here the full function would be y = x*x/(x + dch_toe)/x 
+    The last /x gives us the change of the function so that we can multiply this into our existing ccf.
+    To simplify, we remove the duplicate multiplications: y = x/(x+dch_toe)
+  */
+  float toe_ccf = (dch_toe + 1.0f)*sdivf(lum, lum + dch_toe)*ccf;
+
+
+  /* Chroma Value Compression ------------------------------------------ *
+      Unlike using max(r,g,b), using a weighted sum of RGB as our norm will result in RGB ratios that are greater than 1.0.
+      We compress chroma of the input, but this can still result in colors that are greater than 1.0 in the output,
+      which will clip and skew towards secondaries. Some amount of clip and skew is fine. But this can also result in colors
+      that are brighter than desired. Some colors might even exceed the Evans g0 boundary take on appearance of emissive objects,
+      which is obviously undesired. To combat this, and to add more control over the rendered image, we add user parameters
+      to adjust the value of rendered color. We use this as a factor to normalize the RGB ratios so their max is tamed down towards 1.
+  */
+  float val_w = (1.0f - h_rgb.x*v_r)*(1.0f - h_rgb.y*v_g)*(1.0f - h_rgb.z*v_b)*(1.0f - h_cmy.x*v_c)*(1.0f - h_cmy.y*v_m)*(1.0f - h_cmy.z*v_y);
+
+  /* Chroma Compression Hue Shift ------------------------------------------ *
+      Since we compress chroma by lerping in a straight line towards 1.0 in rgb ratios, this can result in perceptual hue shifts
+      due to the Abney effect. For example, pure blue compressed in a straight line towards achromatic appears to shift in hue towards purple.
+
+      To combat this, and to add another import user control for image appearance, we add controls to curve the hue paths 
+      as they move towards achromatic. We include only controls for primary colors: RGB. In my testing, it was of limited use to 
+      control hue paths for secondary colors.
+
+      To accomplish this, we use the inverse of the chroma compression factor multiplied by the RGB hue angles as a factor
+      for a lerp between the various rgb components.
+
+      We don't include the toe chroma compression for this hue shift. It is mostly important for highlights.
+  */
+  float3 hs_w = (1.0f - ccf)*h_rgb;
+
+  
+  // Apply hue shift to RGB Ratios
+  rats = make_float3(rats.x + hs_w.z*hs_b - hs_w.y*hs_g, rats.y + hs_w.x*hs_r - hs_w.z*hs_b, rats.z + hs_w.y*hs_g - hs_w.x*hs_r);
+
+  // Apply chroma compression to RGB Ratios
+  rats = 1.0f - toe_ccf + rats * toe_ccf;
+
+  // Apply chroma value normalization to RGB Ratios
+  float rats_mx = _fmaxf(rats.x, _fmaxf(rats.y, rats.z));
+  // Normalized rgb ratios
+  float3 rats_n = sdivf3f(rats, rats_mx);
+  // Mix based on chroma value weights factor
+  rats = rats_n*(1.0f - val_w) + rats*val_w;
+
+  // Multiply tonescale by final RGB Ratios
+  rgb = rats*ts;
+
+  rgb *= ds;
+  rgb = clampf3(rgb, 0.0f, clamp_max);
+
+  // Apply inverse Display EOTF
+  float eotf_p = 2.0f + eotf * 0.2f;
+  if ((eotf > 0) && (eotf < 4)) {
+    rgb = spowf3(rgb, 1.0f/eotf_p);
+  } else if (eotf == 4) {
+    rgb = eotf_pq(rgb, 1);
+  } else if (eotf == 5) {
+    rgb = eotf_hlg(rgb, 1);
   }
-
+  
   return rgb;
 }
