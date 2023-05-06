@@ -140,15 +140,14 @@ __DEVICE__ float3 eotf_hlg(float3 rgb, int inverse) {
 
 
 __DEVICE__ float3 eotf_pq(float3 rgb, int inverse) {
-  // Apply the ST-2084 PQ Forward or Inverse EOTF
-  // Normalized such that input display linear light code value 1.0 equals 10,000 nits
-  // ITU-R Rec BT.2100-2 https://www.itu.int/rec/R-REC-BT.2100
-  // ITU-R Rep BT.2390-9 https://www.itu.int/pub/R-REP-BT.2390
+  /* Apply the ST-2084 PQ Forward or Inverse EOTF
+      ITU-R Rec BT.2100-2 https://www.itu.int/rec/R-REC-BT.2100
+      ITU-R Rep BT.2390-9 https://www.itu.int/pub/R-REP-BT.2390
+      Note: in the spec there is a normalization for peak display luminance. 
+      For this function we assume the input is already normalized such that 1.0 = 10,000 nits
+  */
   
-  // Note: in the spec there is a normalization for peak display luminance. 
-  // For this function we assume the input is already normalized such that 1.0 = 10,000 nits
-  const float Lp = 1.0f;
-
+  // const float Lp = 1.0f;
   const float m1 = 2610.0f/16384.0f;
   const float m2 = 2523.0f/32.0f;
   const float c1 = 107.0f/128.0f;
@@ -156,16 +155,13 @@ __DEVICE__ float3 eotf_pq(float3 rgb, int inverse) {
   const float c3 = 2392.0f/128.0f;
 
   if (inverse == 1) {
-    rgb /= Lp;
+    // rgb /= Lp;
     rgb = spowf3(rgb, m1);
-    rgb.x = spowf((c1 + c2*rgb.x)/(1.0f + c3*rgb.x), m2);
-    rgb.y = spowf((c1 + c2*rgb.y)/(1.0f + c3*rgb.y), m2);
-    rgb.z = spowf((c1 + c2*rgb.z)/(1.0f + c3*rgb.z), m2);
+    rgb = spowf3((c1 + c2*rgb)/(1.0f + c3*rgb), m2);
   } else {
     rgb = spowf3(rgb, 1.0f/m2);
-    rgb.x = spowf((rgb.x - c1)/(c2 - c3*rgb.x), 1.0f/m1)*Lp;
-    rgb.y = spowf((rgb.y - c1)/(c2 - c3*rgb.y), 1.0f/m1)*Lp;
-    rgb.z = spowf((rgb.z - c1)/(c2 - c3*rgb.z), 1.0f/m1)*Lp;
+    rgb = spowf3((rgb - c1)/(c2 - c3*rgb), 1.0f/m1);
+    // rgb *= Lp;
   }
   return rgb;
 }
