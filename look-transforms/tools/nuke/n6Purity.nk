@@ -1,0 +1,232 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name n6Purity2
+ tile_color 0x536177ff
+ addUserKnob {20 Params_tab l Params}
+ addUserKnob {20 color_grp l "" +STARTLINE n -2}
+ addUserKnob {20 rgb_tab l RGB}
+ addUserKnob {41 rp l "<font color=#a11515>red</font> purity" T CubicChromaCurveRGB.rp}
+ addUserKnob {41 rs l "<font color=#a11515>red</font> strength" T CubicChromaCurveRGB.rs}
+ addUserKnob {41 gp l "<font color=#15a115>green</font> purity" T CubicChromaCurveRGB.gp}
+ addUserKnob {41 gs l "<font color=#15a115>green</font> strength" T CubicChromaCurveRGB.gs}
+ addUserKnob {41 bp l "<font color=#204abd>blue</font> purity" T CubicChromaCurveRGB.bp}
+ addUserKnob {41 bs l "<font color=#204abd>blue</font> strength" T CubicChromaCurveRGB.bs}
+ addUserKnob {20 cmy_tab l CMY}
+ addUserKnob {41 cp l "<font color=#1ea5bd>cyan</font> purity" T CubicChromaCurveCMY.cp}
+ addUserKnob {41 cs l "<font color=#1ea5bd>cyan</font> strength" T CubicChromaCurveCMY.cs}
+ addUserKnob {41 mp l "<font color=#a112a1>magenta</font> purity" T CubicChromaCurveCMY.mp}
+ addUserKnob {41 ms l "<font color=#a112a1>magenta</font> strength" T CubicChromaCurveCMY.ms}
+ addUserKnob {41 yp l "<font color=#d8db1f>yellow</font> purity" T CubicChromaCurveCMY.yp}
+ addUserKnob {41 ys l "<font color=#d8db1f>yellow</font> strength" T CubicChromaCurveCMY.ys}
+ addUserKnob {20 endGroup n -3}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 840
+  ypos 566
+ }
+ Dot {
+  name Dot425
+  xpos 874
+  ypos 642
+ }
+set Na1917fc0 [stack 0]
+ Dot {
+  name Dot421
+  xpos 544
+  ypos 642
+ }
+ Expression {
+  temp_name0 M
+  temp_expr0 max(r,g,b)
+  temp_name1 C
+  temp_expr1 M-min(r,g,b)
+  channel0 {rgba.red rgba.green rgba.blue none}
+  expr0 (C==0?0:r==M?((g-b)/C+6)%6:g==M?(b-r)/C+2:b==M?(r-g)/C+4:0)
+  expr3 M==0?0:C/M
+  name HueChroma
+  xpos 510
+  ypos 662
+ }
+set Ndf684b40 [stack 0]
+ Expression {
+  temp_name0 h0
+  temp_expr0 (r+4)%6
+  temp_name1 h1
+  temp_expr1 (r+2)%6
+  temp_name2 h2
+  temp_expr2 (r)%6
+  expr0 (h0>x1?0:h0>c.0?(1-((h0-c.0)/(x1-c.0))**p0)**p1:h0>x0?(1-((c.0-h0)/(c.0-x0))**p0)**p1:0)
+  expr1 (h1>x1?0:h1>c.1?(1-((h1-c.1)/(x1-c.1))**p0)**p1:h1>x0?(1-((c.1-h1)/(c.1-x0))**p0)**p1:0)
+  expr2 (h2>x1?0:h2>c.2?(1-((h2-c.2)/(x1-c.2))**p0)**p1:h2>x0?(1-((c.2-h2)/(c.2-x0))**p0)**p1:0)
+  name PowerWindowCMY
+  xpos 620
+  ypos 710
+  addUserKnob {20 Params}
+  addUserKnob {78 c n 3}
+  c {1 1 1}
+  addUserKnob {7 p0 R 1 2}
+  p0 2
+  addUserKnob {7 p1 R 1 2}
+  p1 2
+  addUserKnob {7 x0 R 0 2}
+  addUserKnob {7 x1 R 0 2}
+  x1 2
+ }
+ Expression {
+  temp_name0 cr
+  temp_expr0 a==0?a:(m.0<0?a>1?a:a<0?c0.0*a:a*(a**p.0*(a0.0*a+b0.0)+c0.0):a<0?a:a>1?c0.0*(a-1)+1:(1-(1-a)*((1-a)**p.0*(a0.0*(1-a)+b0.0)+c0.0)))/a
+  temp_name1 cg
+  temp_expr1 a==0?a:(m.1<0?a>1?a:a<0?c0.1*a:a*(a**p.1*(a0.1*a+b0.1)+c0.1):a<0?a:a>1?c0.1*(a-1)+1:(1-(1-a)*((1-a)**p.1*(a0.1*(1-a)+b0.1)+c0.1)))/a
+  temp_name2 cb
+  temp_expr2 a==0?a:(m.2<0?a>1?a:a<0?c0.2*a:a*(a**p.2*(a0.2*a+b0.2)+c0.2):a<0?a:a>1?c0.2*(a-1)+1:(1-(1-a)*((1-a)**p.2*(a0.2*(1-a)+b0.2)+c0.2)))/a
+  channel0 rgb
+  expr0 r*cr+g*cg+b*cb+(1-(r+g+b))
+  name CubicChromaCurveCMY
+  xpos 620
+  ypos 758
+  addUserKnob {20 Params}
+  addUserKnob {7 cp l "<font color=#1ea5bd>cyan</font> purity" t "adjust mid-range chrominance" R -1 1}
+  addUserKnob {7 cs l "<font color=#1ea5bd>cyan</font> strength" t "strength of the adjustment" R 0 4}
+  cs 2
+  addUserKnob {7 mp l "<font color=#a112a1>magenta</font> purity" t "adjust mid-range chrominance" R -1 1}
+  addUserKnob {7 ms l "<font color=#a112a1>magenta</font> strength" t "strength of the adjustment" R 0 4}
+  ms 2
+  addUserKnob {7 yp l "<font color=#d8db1f>yellow</font> purity" t "adjust mid-range chrominance" R -1 1}
+  addUserKnob {7 ys l "<font color=#d8db1f>yellow</font> strength" t "strength of the adjustment" R 0 4}
+  ys 2
+  addUserKnob {78 m R -1 1 n 3}
+  m {{cp} {mp} {yp}}
+  addUserKnob {78 s R 0 10 n 3}
+  s {{cs} {ms} {ys}}
+  addUserKnob {78 p R 0 10 n 3}
+  p {{m<0?s:2*s} {m<0?s:2*s} {m<0?s:2*s}}
+  addUserKnob {78 c0 R 0 10 n 3}
+  c0 {{1-fabs(m)} {1-fabs(m)} {1-fabs(m)}}
+  addUserKnob {78 a0 R -10 10 n 3}
+  a0 {{p*(c0-1)} {p*(c0-1)} {p*(c0-1)}}
+  addUserKnob {78 b0 R -10 10 n 3}
+  b0 {{(1-c0)*(p+1)} {(1-c0)*(p+1)} {(1-c0)*(p+1)}}
+ }
+push $Ndf684b40
+ Expression {
+  temp_name0 h0
+  temp_expr0 (r+1)%6
+  temp_name1 h1
+  temp_expr1 (r+5)%6
+  temp_name2 h2
+  temp_expr2 (r+3)%6
+  expr0 (h0>x1?0:h0>c.0?(1-((h0-c.0)/(x1-c.0))**p0)**p1:h0>x0?(1-((c.0-h0)/(c.0-x0))**p0)**p1:0)
+  expr1 (h1>x1?0:h1>c.1?(1-((h1-c.1)/(x1-c.1))**p0)**p1:h1>x0?(1-((c.1-h1)/(c.1-x0))**p0)**p1:0)
+  expr2 (h2>x1?0:h2>c.2?(1-((h2-c.2)/(x1-c.2))**p0)**p1:h2>x0?(1-((c.2-h2)/(c.2-x0))**p0)**p1:0)
+  name PowerWindowRGB
+  label https://www.desmos.com/calculator/8tqz4rs0wm
+  xpos 510
+  ypos 710
+  addUserKnob {20 Params}
+  addUserKnob {78 c n 3}
+  c {1 1 1}
+  addUserKnob {7 p0 R 1 2}
+  p0 2
+  addUserKnob {7 p1 R 1 2}
+  p1 2
+  addUserKnob {7 x0 R 0 2}
+  addUserKnob {7 x1 R 0 2}
+  x1 2
+ }
+ Expression {
+  temp_name0 cr
+  temp_expr0 a==0?a:(m.0<0?a>1?a:a<0?c0.0*a:a*(a**p.0*(a0.0*a+b0.0)+c0.0):a<0?a:a>1?c0.0*(a-1)+1:(1-(1-a)*((1-a)**p.0*(a0.0*(1-a)+b0.0)+c0.0)))/a
+  temp_name1 cg
+  temp_expr1 a==0?a:(m.1<0?a>1?a:a<0?c0.1*a:a*(a**p.1*(a0.1*a+b0.1)+c0.1):a<0?a:a>1?c0.1*(a-1)+1:(1-(1-a)*((1-a)**p.1*(a0.1*(1-a)+b0.1)+c0.1)))/a
+  temp_name2 cb
+  temp_expr2 a==0?a:(m.2<0?a>1?a:a<0?c0.2*a:a*(a**p.2*(a0.2*a+b0.2)+c0.2):a<0?a:a>1?c0.2*(a-1)+1:(1-(1-a)*((1-a)**p.2*(a0.2*(1-a)+b0.2)+c0.2)))/a
+  channel0 rgb
+  expr0 r*cr+g*cg+b*cb+(1-(r+g+b))
+  name CubicChromaCurveRGB
+  label https://www.desmos.com/calculator/4qnakiivnj
+  xpos 510
+  ypos 758
+  addUserKnob {20 Params}
+  addUserKnob {7 rp l "<font color=#a11515>red</font> purity" t "adjust mid-range chrominance" R -1 1}
+  addUserKnob {7 rs l "<font color=#a11515>red</font> strength" t "strength of the adjustment" R 0 4}
+  rs 2
+  addUserKnob {7 gp l "<font color=#15a115>green</font> purity" t "adjust mid-range chrominance" R -1 1}
+  addUserKnob {7 gs l "<font color=#15a115>green</font> strength" t "strength of the adjustment" R 0 4}
+  gs 2
+  addUserKnob {7 bp l "<font color=#204abd>blue</font> purity" t "adjust mid-range chrominance" R -1 1}
+  addUserKnob {7 bs l "<font color=#204abd>blue</font> strength" t "strength of the adjustment" R 0 4}
+  bs 2
+  addUserKnob {78 m R -1 1 n 3}
+  m {{rp} {gp} {bp}}
+  addUserKnob {78 s R 0 10 n 3}
+  s {{rs} {gs} {bs}}
+  addUserKnob {78 p R 0 10 n 3}
+  p {{m<0?s:2*s} {m<0?s:2*s} {m<0?s:2*s}}
+  addUserKnob {78 c0 R 0 10 n 3}
+  c0 {{1-fabs(m)} {1-fabs(m)} {1-fabs(m)}}
+  addUserKnob {78 a0 R -10 10 n 3}
+  a0 {{p*(c0-1)} {p*(c0-1)} {p*(c0-1)}}
+  addUserKnob {78 b0 R -10 10 n 3}
+  b0 {{(1-c0)*(p+1)} {(1-c0)*(p+1)} {(1-c0)*(p+1)}}
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  bbox B
+  name Merge162
+  xpos 510
+  ypos 806
+ }
+push $Na1917fc0
+ Dot {
+  name Dot299
+  xpos 874
+  ypos 738
+ }
+set N751f0c90 [stack 0]
+ Expression {
+  channel0 rgba
+  expr0 r*rw+g*gw+b*bw
+  name Weights32
+  label "Weighted Sum"
+  xpos 730
+  ypos 728
+  addUserKnob {20 User}
+  addUserKnob {7 rw R 0.05 0.6}
+  rw 0.3
+  addUserKnob {7 gw}
+  gw {{1-(rw+bw)}}
+  addUserKnob {7 bw R 0.05 0.6}
+  bw 0.1
+ }
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 rgba.alpha
+  name Copy16
+  xpos 730
+  ypos 800
+ }
+push $N751f0c90
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 Aa
+  temp_name1 L
+  temp_expr1 Ar
+  expr0 L*(1-f)+r*f
+  expr1 L*(1-f)+g*f
+  expr2 L*(1-f)+b*f
+  name ChromaLerp
+  xpos 840
+  ypos 806
+ }
+ Output {
+  name Output
+  xpos 840
+  ypos 878
+ }
+end_group
