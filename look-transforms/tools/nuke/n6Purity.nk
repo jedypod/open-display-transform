@@ -1,7 +1,8 @@
 set cut_paste_input [stack 0]
 push $cut_paste_input
 Group {
- name n6Purity2
+ name n6Purity
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>n6Purity</b> created by Jed Smith\n<br>v0.0.1 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look-transforms>documentation</a><br>"}
  tile_color 0x536177ff
  addUserKnob {20 Params_tab l Params}
  addUserKnob {20 color_grp l "" +STARTLINE n -2}

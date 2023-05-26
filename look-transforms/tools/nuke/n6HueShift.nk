@@ -4,7 +4,7 @@ Group {
  name N6HueShift
  tile_color 0x53617700
  addUserKnob {20 HueShift_tab l HueShift}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Notorious Six HueShift</b> created by Jed Smith\n<br>v0.0.4 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look>documentation</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Notorious Six HueShift</b> created by Jed Smith\n<br>v0.0.4 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look-transforms>documentation</a><br>"}
  addUserKnob {26 ""}
  addUserKnob {7 sy l yellow R -1 1}
  addUserKnob {7 sr l red R -1 1}
