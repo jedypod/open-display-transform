@@ -1,0 +1,123 @@
+/* n6CrossTalk - v0.0.1
+  -------------------------
+  Another tool for distorting hues in an intentional way.
+  Similar to n6HueShift, but with more flexibility and control.
+  Uses different methods for distorting hue for primaries and secondaries.
+  Includes power adjustment for each hue angle to adjust the strength: How much 
+  to distort chrominance near achromatic.
+
+  Also includes a scale for each hue angle. This control scales the vector
+  up and distorts towards the hue angle a bit. Effectively brightening or 
+  darkening the color while introducing small hue shifts towards or away
+  from the hue angle in question.
+
+  CMY hue angles also include control for offsetting the "center" of the hue angle.
+  This can be useful for yellows for example, where you might want to place the 
+  center point slightly more towards orange-red than purely on the yellow secondary.
+
+  The same control is not included for RGB because in my testing it was not needed.
+  
+  ---    
+  Written by Jed Smith
+  github.com/jedypod/open-display-transform
+*/
+
+DEFINE_UI_PARAMS(rp, red power, DCTLUI_SLIDER_FLOAT, 1, 0.0f, 1, 0)
+DEFINE_UI_PARAMS(r0, red shift 0: Y->M, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(r1, red shift 1: Y->M, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(rs, red scale, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(gp, green power, DCTLUI_SLIDER_FLOAT, 1, 0.0f, 1, 0)
+DEFINE_UI_PARAMS(g0, green shift 0: C->Y, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(g1, green shift 1: C->Y, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(gs, green scale, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(bp, blue power, DCTLUI_SLIDER_FLOAT, 1, 0.0f, 1, 0)
+DEFINE_UI_PARAMS(b0, blue shift 0: M->C, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(b1, blue shift 1: M->C, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(bs, blue scale, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(cp, cyan power, DCTLUI_SLIDER_FLOAT, 1, 0.0f, 1, 0)
+DEFINE_UI_PARAMS(c0, cyan shift 0: G->B, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(c1, cyan shift 1: G->B, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(cs, cyan scale, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(mp, magenta power, DCTLUI_SLIDER_FLOAT, 1, 0.0f, 1, 0)
+DEFINE_UI_PARAMS(m0, magenta shift 0: R->B, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(m1, magenta shift 1: R->B, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(ms, magenta scale, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(yp, yellow power, DCTLUI_SLIDER_FLOAT, 1, 0.0f, 1, 0)
+DEFINE_UI_PARAMS(y0, yellow shift 0: G->R, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(y1, yellow shift 1: G->R, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(ys, yellow scale, DCTLUI_SLIDER_FLOAT, 0.0f, -1, 1, 0)
+DEFINE_UI_PARAMS(cc, cyan center, DCTLUI_SLIDER_FLOAT, 0.25f, -0.8, 0.8, 0)
+DEFINE_UI_PARAMS(mc, magenta center, DCTLUI_SLIDER_FLOAT, 0.0f, -0.8, 0.8, 0)
+DEFINE_UI_PARAMS(yc, yellow center, DCTLUI_SLIDER_FLOAT, -0.25f, -0.8, 0.8, 0)
+
+
+// Safe division of float a by float b
+__DEVICE__ float sdivf(float a, float b) {
+  if (_fabs(b) < 0.0001f) return 0.0f;
+  else return a / b;
+}
+// Safe division of float3 a by float b
+__DEVICE__ float3 sdivf3f(float3 a, float b) {
+  return make_float3(sdivf(a.x, b), sdivf(a.y, b), sdivf(a.z, b));
+}
+// Safe power function raising float a to power float b
+__DEVICE__ float spowf(float a, float b) {
+  if (a <= 0.0f) return a;
+  else return _powf(a, b);
+}
+// Take the max of each component of float3 a and float b
+__DEVICE__ float3 maxf3(float3 a, float b) {
+  return make_float3(_fmaxf(a.x, b), _fmaxf(a.y, b), _fmaxf(a.z, b));
+}
+
+// https://www.desmos.com/calculator/8tqz4rs0wm
+__DEVICE__ float power_window(float x, float c, float p0, float p1, float x0, float x1) {
+  return x > x1 ? 0.0f : x > c ? _powf(1.0f - _powf((x - c)/(x1 - c), p0), p1) : x > x0 ? _powf(1.0f - _powf((c - x)/(c - x0), p0), p1) : 0.0f;
+}
+
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
+{
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  // Calculate hue and "chroma"
+  float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  float mn = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
+  float ch = mx - mn;
+  float h;
+  if (ch == 0.0f) h = 0.0f;
+  else if (mx == rgb.x) h = _fmod((rgb.y - rgb.z) / ch + 6.0f, 6.0f);
+  else if (mx == rgb.y) h = (rgb.z - rgb.x) / ch + 2.0f;
+  else if (mx == rgb.z) h = (rgb.x - rgb.y) / ch + 4.0f;
+  ch = sdivf(ch, mx);
+  // Clamp 0-4
+  ch = _fmaxf(0.0f, _fminf(4.0f, ch));
+
+  // "Half-Chroma" Norm: halfway between min and max of rgb
+  float hch = mn*0.5f + mx*0.5f;
+
+  // RGB Ratios
+  rgb = sdivf3f(rgb, hch);
+  rgb = maxf3(rgb, -2.0f);
+
+  // Extract hue angles
+  float hr = power_window(_fmod(h + 1.0f, 6.0f), 1.0f, 1.5f, 1.5f, 0.0f, 2.0f)*spowf(ch, 1.0f/_fmaxf(1e-5, rp));
+  float hg = power_window(_fmod(h + 5.0f, 6.0f), 1.0f, 1.5f, 1.5f, 0.0f, 2.0f)*spowf(ch, 1.0f/_fmaxf(1e-5, gp));
+  float hb = power_window(_fmod(h + 3.0f, 6.0f), 1.0f, 1.5f, 1.5f, 0.0f, 2.0f)*spowf(ch, 1.0f/_fmaxf(1e-5, bp));
+  float hc = power_window(_fmod(h + 4.0f, 6.0f), 1.0f+cc, 1.5f, 1.5f, 0.0f, 2.0f)*spowf(ch, 1.0f/_fmaxf(1e-5, cp));
+  float hm = power_window(_fmod(h + 2.0f, 6.0f), 1.0f+mc, 1.5f, 1.5f, 0.0f, 2.0f)*spowf(ch, 1.0f/_fmaxf(1e-5, mp));
+  float hy = power_window(_fmod(h + 0.0f, 6.0f), 1.0f+yc, 1.5f, 1.5f, 0.0f, 2.0f)*spowf(ch, 1.0f/_fmaxf(1e-5, yp));
+
+  // Distort CMY hue angles
+  rgb.x = (ms+1.0f)*(rgb.x-_fmaxf(0.0f,m0)-_fminf(0.0f,m1))*hm+(ys+1.0f)*(rgb.x+_fminf(0.0f,y0)+_fmaxf(0.0f,y1))*hy+rgb.x*(1.0f-(hm+hy));
+  rgb.y = (cs+1.0f)*(rgb.y-_fmaxf(0.0f,c0)-_fminf(0.0f,c1))*hc+(ys+1.0f)*(rgb.y-_fmaxf(0.0f,y0)-_fminf(0.0f,y1))*hy+rgb.y*(1.0f-(hc+hy));
+  rgb.z = (cs+1.0f)*(rgb.z+_fminf(0.0f,c0)+_fmaxf(0.0f,c1))*hc+(ms+1.0f)*(rgb.z+_fminf(0.0f,c1)+_fmaxf(0.0f,m1))*hm+rgb.z*(1.0f-(hc+hm));
+
+  // Distort RGB hue angles
+  rgb.x = (rs+1.0f)*rgb.x*hr+rgb.x*(1.0f+_fminf(0.0f,g0))*(1.0f+_fmaxf(0.0f,b1))*hg+rgb.x*(1.0f-_fmaxf(0.0f,b0))*(1.0f-_fminf(0.0f,b1))*hb+rgb.x*(1.0f-(hr+hg+hb));
+  rgb.y = (gs+1.0f)*rgb.y*hg+rgb.y*(1.0f-_fmaxf(0.0f,r0))*(1.0f-_fminf(0.0f,r1))*hr+rgb.y*(1.0f+_fminf(0.0f,b0))*(1.0f+_fmaxf(0.0f,b1))*hb+rgb.y*(1.0f-(hr+hg+hb));
+  rgb.z = (bs+1.0f)*rgb.z*hb+rgb.z*(1.0f+_fminf(0.0f,r0))*(1.0f+_fmaxf(0.0f,r1))*hr+rgb.z*(1.0f-_fmaxf(0.0f,g0))*(1.0f-_fminf(0.0f,g1))*hg+rgb.z*(1.0f-(hr+hg+hb));
+
+  rgb *= hch;
+  return rgb;
+}

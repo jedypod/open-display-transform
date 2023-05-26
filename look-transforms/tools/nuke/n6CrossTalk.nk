@@ -1,0 +1,236 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name n6CrossTalk
+ addUserKnob {20 n6CrossTalk_tab l n6CrossTalk}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>n6CrossTalk</b> created by Jed Smith\n<br>v0.0.1 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look-transforms>documentation</a><br>"}
+ addUserKnob {20 color_grp l "" +STARTLINE n -2}
+ addUserKnob {20 rgb_tab l RGB}
+ addUserKnob {7 rc l "<font color=#a11515>R</font> center" R -1 1}
+ addUserKnob {7 gc l "<font color=#15a115>G</font> center" R -1 1}
+ addUserKnob {7 bc l "<font color=#204abd>B</font> center" R -1 1}
+ addUserKnob {26 ""}
+ addUserKnob {7 rp l "<font color=#a11515>red</font> power"}
+ rp 1
+ addUserKnob {41 r0 l "<font color=#a11515>red 0:</font> <font color=#d8db1f>Y</font>-><font color=#a112a1>M</font>" T ShiftRGB.r0}
+ addUserKnob {41 r1 l "<font color=#a11515>red 1:</font> <font color=#d8db1f>Y</font>-><font color=#a112a1>M</font>" T ShiftRGB.rb0}
+ addUserKnob {41 rs l "<font color=#a11515>red</font> scale" T ShiftRGB.s0}
+ addUserKnob {7 gp l "<font color=#15a115>green</font> power"}
+ gp 1
+ addUserKnob {41 g0 l "<font color=#15a115>green 0:</font> <font color=#1ea5bd>C</font>-><font color=#d8db1f>Y</font>" T ShiftRGB.r1}
+ addUserKnob {41 g1 l "<font color=#15a115>green 1:</font> <font color=#1ea5bd>C</font>-><font color=#d8db1f>Y</font>" T ShiftRGB.rb1}
+ addUserKnob {41 gs l "<font color=#15a115>green</font> scale" T ShiftRGB.s1}
+ addUserKnob {7 bp l "<font color=#204abd>blue</font> power"}
+ bp 1
+ addUserKnob {41 b0 l "<font color=#204abd>blue 0:</font> <font color=#a112a1>M</font>-><font color=#1ea5bd>C</font>" T ShiftRGB.r2}
+ addUserKnob {41 b1 l "<font color=#204abd>blue 1:</font> <font color=#a112a1>M</font>-><font color=#1ea5bd>C</font>" T ShiftRGB.rb2}
+ addUserKnob {41 bs l "<font color=#204abd>blue</font> scale" T ShiftRGB.s2}
+ addUserKnob {20 cmy_tab l CMY}
+ addUserKnob {7 cc l "<font color=#1ea5bd>C</font> center" R -1 1}
+ cc 0.25
+ addUserKnob {7 mc l "<font color=#a112a1>M</font> center" R -1 1}
+ addUserKnob {7 yc l "<font color=#d8db1f>Y</font> center" R -1 1}
+ yc -0.25
+ addUserKnob {26 ""}
+ addUserKnob {7 cp l "<font color=#1ea5bd>cyan</font> power"}
+ cp 1
+ addUserKnob {41 c0 l "<font color=#1ea5bd>cyan 0:</font> <font color=#15a115>G</font>-><font color=#204abd>B</font>" T ShiftCMY.r0}
+ addUserKnob {41 c1 l "<font color=#1ea5bd>cyan 1:</font> <font color=#15a115>G</font>-><font color=#204abd>B</font>" T ShiftCMY.rb0}
+ addUserKnob {41 cs l "<font color=#1ea5bd>cyan</font> scale" T ShiftCMY.s0}
+ addUserKnob {7 mp l "<font color=#a112a1>magenta</font> power"}
+ mp 1
+ addUserKnob {41 m0 l "<font color=#a112a1>magenta 0:</font> <font color=#a11515>R</font>-><font color=#204abd>B</font>" T ShiftCMY.r1}
+ addUserKnob {41 m1 l "<font color=#a112a1>magenta 1:</font> <font color=#a11515>R</font>-><font color=#204abd>B</font>" T ShiftCMY.rb1}
+ addUserKnob {41 ms l "<font color=#a112a1>magenta</font> scale" T ShiftCMY.s1}
+ addUserKnob {7 yp l "<font color=#d8db1f>yellow</font> power"}
+ yp 1
+ addUserKnob {41 y0 l "<font color=#d8db1f>yellow 0:</font> <font color=#15a115>G</font>-><font color=#a11515>R</font>" T ShiftCMY.r2}
+ addUserKnob {41 y1 l "<font color=#d8db1f>yellow 1:</font> <font color=#15a115>G</font>-><font color=#a11515>R</font>" T ShiftCMY.rb2}
+ addUserKnob {41 ys l "<font color=#d8db1f>yellow</font> scale" T ShiftCMY.s2}
+ addUserKnob {20 endGroup n -3}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 1060
+  ypos 566
+ }
+ Dot {
+  name Dot407
+  xpos 1094
+  ypos 618
+ }
+set N7f8ced00 [stack 0]
+ Expression {
+  channel0 rgba
+  expr0 min(r,g,b)*(1-f)+max(r,g,b)*f
+  name HCH
+  xpos 1170
+  ypos 614
+  addUserKnob {20 Params}
+  addUserKnob {7 f}
+  f 0.5
+ }
+ Dot {
+  name Dot410
+  xpos 1204
+  ypos 642
+ }
+set N5b75d910 [stack 0]
+ Dot {
+  name Dot409
+  xpos 1204
+  ypos 834
+ }
+push $N7f8ced00
+ Expression {
+  temp_name0 M
+  temp_expr0 max(r,g,b)
+  temp_name1 C
+  temp_expr1 M-min(r,g,b)
+  channel0 {rgba.red rgba.green rgba.blue none}
+  expr0 (C==0?0:r==M?((g-b)/C+6)%6:g==M?(b-r)/C+2:b==M?(r-g)/C+4:0)
+  expr3 M==0?0:C/M
+  name HueChroma
+  xpos 950
+  ypos 614
+ }
+ Clamp {
+  channels alpha
+  maximum 4
+  name Clamp1
+  xpos 950
+  ypos 640
+ }
+set N633c55e0 [stack 0]
+ Expression {
+  temp_name0 h0
+  temp_expr0 (r+1)%6
+  temp_name1 h1
+  temp_expr1 (r+5)%6
+  temp_name2 h2
+  temp_expr2 (r+3)%6
+  expr0 (h0>x1?0:h0>c.0?(1-((h0-c.0)/(x1-c.0))**p0)**p1:h0>x0?(1-((c.0-h0)/(c.0-x0))**p0)**p1:0)*a**(1/p.0)
+  expr1 (h1>x1?0:h1>c.1?(1-((h1-c.1)/(x1-c.1))**p0)**p1:h1>x0?(1-((c.1-h1)/(c.1-x0))**p0)**p1:0)*a**(1/p.1)
+  expr2 (h2>x1?0:h2>c.2?(1-((h2-c.2)/(x1-c.2))**p0)**p1:h2>x0?(1-((c.2-h2)/(c.2-x0))**p0)**p1:0)*a**(1/p.2)
+  name PowerWindowRGB
+  xpos 840
+  ypos 686
+  addUserKnob {20 Params}
+  addUserKnob {78 c n 3}
+  c {{1+rc} {1+gc} {1+bc}}
+  addUserKnob {7 p0 R 1 2}
+  p0 1.5
+  addUserKnob {7 p1 R 1 2}
+  p1 {{p0}}
+  addUserKnob {7 x0 R 0 2}
+  addUserKnob {7 x1 R 0 2}
+  x1 2
+  addUserKnob {26 ""}
+  addUserKnob {78 p n 3}
+  p {{rp} {gp} {bp}}
+ }
+ Dot {
+  name Dot2
+  xpos 874
+  ypos 762
+ }
+push $N633c55e0
+ Expression {
+  temp_name0 h0
+  temp_expr0 (r+4)%6
+  temp_name1 h1
+  temp_expr1 (r+2)%6
+  temp_name2 h2
+  temp_expr2 (r)%6
+  expr0 (h0>x1?0:h0>c.0?(1-((h0-c.0)/(x1-c.0))**p0)**p1:h0>x0?(1-((c.0-h0)/(c.0-x0))**p0)**p1:0)*a**(1/p.0)
+  expr1 (h1>x1?0:h1>c.1?(1-((h1-c.1)/(x1-c.1))**p0)**p1:h1>x0?(1-((c.1-h1)/(c.1-x0))**p0)**p1:0)*a**(1/p.1)
+  expr2 (h2>x1?0:h2>c.2?(1-((h2-c.2)/(x1-c.2))**p0)**p1:h2>x0?(1-((c.2-h2)/(c.2-x0))**p0)**p1:0)*a**(1/p.2)
+  name PowerWindowCMY
+  xpos 950
+  ypos 686
+  addUserKnob {20 Params}
+  addUserKnob {78 c n 3}
+  c {{1+cc} {1+mc} {1+yc}}
+  addUserKnob {7 p0 R 1 2}
+  p0 1.5
+  addUserKnob {7 p1 R 1 2}
+  p1 {{p0}}
+  addUserKnob {7 x0 R 0 2}
+  addUserKnob {7 x1 R 0 2}
+  x1 2
+  addUserKnob {26 ""}
+  addUserKnob {78 p n 3}
+  p {{cp} {mp} {yp}}
+ }
+ Dot {
+  name Dot1
+  xpos 984
+  ypos 714
+ }
+push $N5b75d910
+push $N7f8ced00
+ MergeExpression {
+  inputs 2
+  expr0 Ar==0?0:max(-2,Br/Ar)
+  expr1 Ag==0?0:max(-2,Bg/Ag)
+  expr2 Ab==0?0:max(-2,Bb/Ab)
+  name MergeDivideReverse
+  xpos 1060
+  ypos 638
+ }
+ MergeExpression {
+  inputs 2
+  expr0 (s1+1)*(r-max(0,r1)-min(0,rb1))*Ag+(s2+1)*(r+min(0,r2)+max(0,rb2))*Ab+r*(1-(Ag+Ab))
+  expr1 (s0+1)*(g-max(0,r0)-min(0,rb0))*Ar+(s2+1)*(g-max(0,r2)-min(0,rb2))*Ab+g*(1-(Ar+Ab))
+  expr2 (s0+1)*(b+min(0,r0)+max(0,rb0))*Ar+(s1+1)*(b+min(0,r1)+max(0,rb1))*Ag+b*(1-(Ar+Ag))
+  name ShiftCMY
+  xpos 1060
+  ypos 710
+  addUserKnob {20 Params}
+  addUserKnob {7 r0 R -1 1}
+  addUserKnob {7 r1 R -1 1}
+  addUserKnob {7 r2 R -1 1}
+  addUserKnob {7 rb0 R -1 1}
+  addUserKnob {7 rb1 R -1 1}
+  addUserKnob {7 rb2 R -1 1}
+  addUserKnob {26 ""}
+  addUserKnob {7 s0 R -1 1}
+  addUserKnob {7 s1 R -1 1}
+  addUserKnob {7 s2 R -1 1}
+ }
+ MergeExpression {
+  inputs 2
+  expr0 (s0+1)*r*Ar+r*(1+min(0,r1))*(1+max(0,rb1))*Ag+r*(1-max(0,r2))*(1-min(0,rb2))*Ab+r*(1-(Ar+Ag+Ab))
+  expr1 (s1+1)*g*Ag+g*(1-max(0,r0))*(1-min(0,rb0))*Ar+g*(1+min(0,r2))*(1+max(0,rb2))*Ab+g*(1-(Ar+Ag+Ab))
+  expr2 (s2+1)*b*Ab+b*(1+min(0,r0))*(1+max(0,rb0))*Ar+b*(1-max(0,r1))*(1-min(0,rb1))*Ag+b*(1-(Ar+Ag+Ab))
+  name ShiftRGB
+  xpos 1060
+  ypos 758
+  addUserKnob {20 Params}
+  addUserKnob {7 r0 R -1 1}
+  r0 -1
+  addUserKnob {7 r1 R -1 1}
+  addUserKnob {7 r2 R -1 1}
+  addUserKnob {7 rb0 R -1 1}
+  addUserKnob {7 rb1 R -1 1}
+  addUserKnob {7 rb2 R -1 1}
+  addUserKnob {26 ""}
+  addUserKnob {7 s0 R -1 1}
+  addUserKnob {7 s1 R -1 1}
+  addUserKnob {7 s2 R -1 1}
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  bbox B
+  name MergeMultiply
+  xpos 1060
+  ypos 830
+ }
+ Output {
+  name Output
+  xpos 1060
+  ypos 902
+ }
+end_group
