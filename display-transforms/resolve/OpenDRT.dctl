@@ -1,5 +1,5 @@
 /*  OpenDRT -------------------------------------------------/
-      v0.2.0
+      v0.2.1
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -8,28 +8,19 @@
 
 DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 12, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 10.0)
-DEFINE_UI_PARAMS(gb, grey exposure boost, DCTLUI_SLIDER_FLOAT, 0.12, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(gb, Lp exp boost, DCTLUI_SLIDER_FLOAT, 0.12, 0.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(c, contrast, DCTLUI_SLIDER_FLOAT, 1.1, 1.0, 1.3, 0.0)
 DEFINE_UI_PARAMS(fl, flare, DCTLUI_SLIDER_FLOAT, 0.01, 0.0, 0.02, 0.001)
-DEFINE_UI_PARAMS(rw, red weight, DCTLUI_SLIDER_FLOAT, 0.2, 0.05, 0.6, 0.0)
-DEFINE_UI_PARAMS(bw, blue weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.05, 0.6, 0.0)
-DEFINE_UI_PARAMS(dch, dechroma, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(dch_toe, toe dechroma, DCTLUI_SLIDER_FLOAT, 0.005, 0.0, 0.01, 0.0)
-DEFINE_UI_PARAMS(dch_r, red dechroma, DCTLUI_SLIDER_FLOAT, -0.5, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(dch_g, green dechroma, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(dch_b, blue dechroma, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(dch_c, cyan dechroma, DCTLUI_SLIDER_FLOAT, -0.34, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(dch_m, magenta dechroma, DCTLUI_SLIDER_FLOAT, -0.34, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(dch_y, yellow dechroma, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(rw, red weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.05, 1.0, 0.0)
+DEFINE_UI_PARAMS(bw, blue weight, DCTLUI_SLIDER_FLOAT, 0.35, 0.05, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch, dechroma, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch_rgb, RGB dechroma, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch_cmy, CMY dechroma, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(dch_toe, toe dechroma, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 0.01, 0.0)
 DEFINE_UI_PARAMS(hs_r, hue shift red, DCTLUI_SLIDER_FLOAT, 0.4, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hs_g, hue shift green, DCTLUI_SLIDER_FLOAT, -0.1, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hs_b, hue shift blue, DCTLUI_SLIDER_FLOAT, -0.55, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(v_r, red value, DCTLUI_SLIDER_FLOAT, 0.8, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(v_g, green value, DCTLUI_SLIDER_FLOAT, 0.66, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(v_b, blue value, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(v_c, cyan value, DCTLUI_SLIDER_FLOAT, 0.66, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(v_m, magenta value, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(v_y, yellow value, DCTLUI_SLIDER_FLOAT, 0.33, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(v_p, chroma value, DCTLUI_SLIDER_FLOAT, 0.66, 0.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3 D65, Rec.2020})
 DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
 
@@ -99,10 +90,11 @@ __DEVICE__ float3 spowf3(float3 a, float b) {
   return make_float3(_powf(a.x, b), _powf(a.y, b), _powf(a.z, b));
 }
 
-// Clamp each component of float3 a to be between float mn and float mx
-__DEVICE__ float3 clampf3(float3 a, float mn, float mx) { 
-  return make_float3(_fminf(_fmaxf(a.x, mn), mx), _fminf(_fmaxf(a.y, mn), mx), _fminf(_fmaxf(a.z, mn), mx));
-}
+// Return max of float3 a and float mn
+__DEVICE__ float3 maxf3(float mn, float3 a) { return make_float3(_fmaxf(a.x, mn), _fmaxf(a.y, mn), _fmaxf(a.z, mn)); }
+
+// Return min of float3 a and float mx
+__DEVICE__ float3 minf3(float mx, float3 a) { return make_float3(_fminf(a.x, mx), _fminf(a.y, mx), _fminf(a.z, mx)); }
 
 
 __DEVICE__ float3 eotf_hlg(float3 rgb, int inverse) {
@@ -335,26 +327,29 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float ch = 1.0f - sdivf(mn, mx);
 
 
-  /* Take the "Luminance" of RGB. 
-      This is not classical luminance, but rather a weighted sum of RGB,
-      with the weights creatively controlled by the user. The user specifies the Red and Blue weights, 
-      the Green weight is automatically calculated so that the total sums to 1.0.
+  /* Take the hypot of the weighted sum of RGB.
+      We use this as a vector norm for separating color and intensity.
+      The R and B weights are creatively controlled by the user. 
+      They specify the "vibrancy" of the colors. The green weight is 
+      automatically calculated so that achromatic peak does not change.
   */ 
-  const float gw = 1.0f - (rw + bw);
-  float lum = _fmaxf(1e-5f, rgb.x*rw + rgb.y*gw + rgb.z*bw);
+  const float gw = _sqrtf(3.0f) - (rw + bw);
+  float lum = _sqrtf(spowf(_fmaxf(1e-5f, rgb.x*rw), 2.0f) + spowf(_fmaxf(1e-5f, rgb.y*gw), 2.0f) + spowf(_fmaxf(1e-5f, rgb.z*bw), 2.0f));
 
-  // RGB Ratios using luminance as the vector norm
+  // RGB Ratios
   float3 rats = sdivf3f(rgb, lum);
 
   // Apply tonescale function to lum
   float ts;
   ts = tonescale(lum, m, s, c, 0);
   ts = flare(ts, fl, 0);
-
+  
   // // Unused inverse direction
   // ts = flare(ts, fl, 1);
   // ts = tonescale(lum, m, s, c, 1);
 
+  // Apply display scale
+  ts *= ds;
 
   /* Chroma Compression ------------------------------------------ *
       Here we set up the chroma compression function. For additional control, we use a different function
@@ -363,19 +358,21 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       if s0 is the scale, in the forward direction it would be y = s0*x/(s0*x+1)
       In the inverse direction it would be y = 1 - s0*x/(s0*x+1) = 1/(s0*x+1)
       
-      We also do not use a constant for s0. Instead we calculate a value of s0 per pixel from the RGBCMY Dechroma weights.
-      This gives us control over the chroma compression per hue angle.
+      We also do not use a constant for s0. Instead we calculate a value of s0 per pixel from the RGB & CMY Dechroma weights.
+      This gives us control over the chroma compression per hue angle for primaries and secondaries. Previously we had
+      6 controls for dechroma amount for each hue angle, but in practice this seemed excessive. Now there are 2, one
+      for primaries (RGB) and one for secondaries (CMY).
 
       dch is the global dechroma user parameter. We also adjust dch by the tonescale scene-linear input scale parameter (s), 
       so that we compress chroma less when peak luminance is higher.
   */
   float dch_s = dch/s;
   // Unpremult hue rgb and hue cmy by chroma
-  float3 ha_rgb = sdivf3f(h_rgb, ch);
-  float3 ha_cmy = sdivf3f(h_cmy, ch);
+  float chp = sdivf(h_rgb.x + h_rgb.y +h_rgb.z, ch);
+  float chs = sdivf(h_cmy.x + h_cmy.y + h_cmy.z, ch);
 
   // The final dechroma weight to use in the chroma compression function
-  float dch_w = dch_s*(dch_r*ha_rgb.x + 1.0f)*(dch_g*ha_rgb.y + 1.0f)*(dch_b*ha_rgb.z + 1.0f)*(dch_c*ha_cmy.x + 1.0f)*(dch_m*ha_cmy.y + 1.0f)*(dch_y*ha_cmy.z + 1.0f);
+  float dch_w = dch_s*(dch_rgb*chp + 1.0f)*(dch_cmy*chs + 1.0f);
 
   // Chroma compression factor, used to lerp towards 1 in rgb ratios, compressing chroma
   float ccf = sdivf(1.0f, lum*dch_w + 1.0f);
@@ -389,17 +386,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     To simplify, we remove the duplicate multiplications: y = x/(x+dch_toe)
   */
   float toe_ccf = (dch_toe + 1.0f)*sdivf(lum, lum + dch_toe)*ccf;
-
-
-  /* Chroma Value Compression ------------------------------------------ *
-      Unlike using max(r,g,b), using a weighted sum of RGB as our norm will result in RGB ratios that are greater than 1.0.
-      We compress chroma of the input, but this can still result in colors that are greater than 1.0 in the output,
-      which will clip and skew towards secondaries. Some amount of clip and skew is fine. But this can also result in colors
-      that are brighter than desired. Some colors might even exceed the Evans g0 boundary take on appearance of emissive objects,
-      which is obviously undesired. To combat this, and to add more control over the rendered image, we add user parameters
-      to adjust the value of rendered color. We use this as a factor to normalize the RGB ratios so their max is tamed down towards 1.
-  */
-  float val_w = (1.0f - h_rgb.x*v_r)*(1.0f - h_rgb.y*v_g)*(1.0f - h_rgb.z*v_b)*(1.0f - h_cmy.x*v_c)*(1.0f - h_cmy.y*v_m)*(1.0f - h_cmy.z*v_y);
 
   /* Chroma Compression Hue Shift ------------------------------------------ *
       Since we compress chroma by lerping in a straight line towards 1.0 in rgb ratios, this can result in perceptual hue shifts
@@ -415,7 +401,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       We don't include the toe chroma compression for this hue shift. It is mostly important for highlights.
   */
   float3 hs_w = (1.0f - ccf)*h_rgb;
-
   
   // Apply hue shift to RGB Ratios
   rats = make_float3(rats.x + hs_w.z*hs_b - hs_w.y*hs_g, rats.y + hs_w.x*hs_r - hs_w.z*hs_b, rats.z + hs_w.y*hs_g - hs_w.x*hs_r);
@@ -423,18 +408,41 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Apply chroma compression to RGB Ratios
   rats = 1.0f - toe_ccf + rats * toe_ccf;
 
-  // Apply chroma value normalization to RGB Ratios
+  // Clamp negative pixels
+  rats = maxf3(0.0f, rats);
+
+  /* Chroma Value Compression ------------------------------------------ *
+      Using a weighted sum of RGB for our norm results in RGB ratios that are greater than 1.0.
+      We compress chroma of the input towards peak achromatic, but there can still be values which extend beyond the display cube.
+      These extensions can cause ugly halos and abrupt gradient changes, which are visually undesirable. To combat this, we 
+      add a post-chroma compression normalization, which reduces the intensity of of saturated lights.
+
+      To achieve this, we first normalize the RGB ratios so that the max value is 1.0. We do this by taking the max of rgb, 
+      then dividing the rgb ratios by it. Using this directly would result in midtones being way too dark, so we mix by 
+      the tonescale, biased by a user-controlled power function (v_p) to adjust the intensity.
+  */
+
+  // Post-chroma compression min and max
   float rats_mx = _fmaxf(rats.x, _fmaxf(rats.y, rats.z));
+  float rats_mn = _fminf(rats.x, _fminf(rats.y, rats.z));
+  
+  // Chroma (normalized distance from achromatic) of post chroma compression RGB Ratios
+  float rats_ch = sdivf(rats_mx - rats_mn, rats_mx);
+  
+  // Normalization mix factor based on lum, with user adjustable strength (v_p)
+  float chf = rats_ch*spowf(ts, v_p);
+
   // Normalized rgb ratios
   float3 rats_n = sdivf3f(rats, rats_mx);
-  // Mix based on chroma value weights factor
-  rats = rats_n*(1.0f - val_w) + rats*val_w;
 
-  // Multiply tonescale by final RGB Ratios
+  // Mix based on chf
+  rats = rats_n*chf + rats*(1.0f - chf);
+
+  // Apply tonescale to RGB Ratios
   rgb = rats*ts;
 
-  rgb *= ds;
-  rgb = clampf3(rgb, 0.0f, clamp_max);
+  // Clamp to appropriate maximum
+  rgb = minf3(clamp_max, rgb);
 
   // Apply inverse Display EOTF
   float eotf_p = 2.0f + eotf * 0.2f;
