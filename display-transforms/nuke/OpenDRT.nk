@@ -639,7 +639,7 @@ push $N36adedf0
   temp_name2 C
   temp_expr2 (M-m)/M
   temp_name3 f
-  temp_expr3 C*Ar**p
+  temp_expr3 (C*Ar)**p
   channel0 {rgba.red -rgba.green -rgba.blue none}
   expr0 r/M*f+r*(1-f)
   expr1 g/M*f+g*(1-f)
@@ -651,7 +651,7 @@ push $N36adedf0
   disable {{!parent.chn_enable}}
   addUserKnob {20 Params}
   addUserKnob {7 p}
-  p 0.66
+  p 0.5
  }
  Merge2 {
   inputs 2

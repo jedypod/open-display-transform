@@ -20,7 +20,7 @@ DEFINE_UI_PARAMS(dch_toe, toe dechroma, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 0.01, 0.0
 DEFINE_UI_PARAMS(hs_r, hue shift red, DCTLUI_SLIDER_FLOAT, 0.4, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hs_g, hue shift green, DCTLUI_SLIDER_FLOAT, -0.1, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hs_b, hue shift blue, DCTLUI_SLIDER_FLOAT, -0.55, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(v_p, chroma value, DCTLUI_SLIDER_FLOAT, 0.66, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(v_p, chroma value, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3 D65, Rec.2020})
 DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
 
@@ -424,7 +424,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
       To achieve this, we first normalize the RGB ratios so that the max value is 1.0. We do this by taking the max of rgb, 
       then dividing the rgb ratios by it. Using this directly would result in midtones being way too dark, so we mix by 
-      the tonescale, biased by a user-controlled power function (v_p) to adjust the intensity.
+      the tonescale * chroma, biased by a user-controlled power function (v_p) to adjust the intensity.
   */
 
   // Post-chroma compression min and max
@@ -435,7 +435,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float rats_ch = sdivf(rats_mx - rats_mn, rats_mx);
   
   // Normalization mix factor based on lum, with user adjustable strength (v_p)
-  float chf = rats_ch*spowf(ts, v_p);
+  float chf = spowf(rats_ch*ts, v_p);
 
   // Normalized rgb ratios
   float3 rats_n = sdivf3f(rats, rats_mx);
