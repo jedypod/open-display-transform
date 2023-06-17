@@ -369,15 +369,15 @@ set N771511b0 [stack 0]
  }
  Expression {
   channel0 rgba
-  expr0 sqrt((r*rw)**2+(g*gw)**2+(b*bw)**2)
+  expr0 sqrt(((r*rw)**2+(g*gw)**2+(b*bw)**2)/(rw**2+gw**2+bw**2))
   name WeightedEuclideanNorm
   xpos -370
   ypos -441
   addUserKnob {20 Params}
   addUserKnob {7 rw R 0.05 1}
   rw 0.25
-  addUserKnob {7 gw R 0 2}
-  gw {{sqrt(3)-(rw+bw)}}
+  addUserKnob {7 gw R 0.05 1}
+  gw 1
   addUserKnob {7 bw R 0.05 1}
   bw 0.35
  }

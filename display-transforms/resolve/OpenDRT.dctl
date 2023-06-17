@@ -96,6 +96,8 @@ __DEVICE__ float3 maxf3(float mn, float3 a) { return make_float3(_fmaxf(a.x, mn)
 // Return min of float3 a and float mx
 __DEVICE__ float3 minf3(float mx, float3 a) { return make_float3(_fminf(a.x, mx), _fminf(a.y, mx), _fminf(a.z, mx)); }
 
+// Return the hypot or length of float3 a
+__DEVICE__ float hypotf3(float3 a) { return  _sqrtf(spowf(a.x, 2.0f) + spowf(a.y, 2.0f) + spowf(a.z, 2.0f)); }
 
 __DEVICE__ float3 eotf_hlg(float3 rgb, int inverse) {
   // Aply the HLG Forward or Inverse EOTF. Implements the full ambient surround illumination model
@@ -327,14 +329,17 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float ch = 1.0f - sdivf(mn, mx);
 
 
-  /* Take the hypot of the weighted sum of RGB.
+  /* Take the hypot (length) of the weighted sum of RGB.
       We use this as a vector norm for separating color and intensity.
       The R and B weights are creatively controlled by the user. 
-      They specify the "vibrancy" of the colors. The green weight is 
-      automatically calculated so that achromatic peak does not change.
+      They specify the "vibrancy" of the colors. The weights are normalized
+      so that achromatic peak does not change. Green weight is kept at 1.
   */ 
-  const float gw = _sqrtf(3.0f) - (rw + bw);
-  float lum = _sqrtf(spowf(_fmaxf(1e-5f, rgb.x*rw), 2.0f) + spowf(_fmaxf(1e-5f, rgb.y*gw), 2.0f) + spowf(_fmaxf(1e-5f, rgb.z*bw), 2.0f));
+  float3 w = make_float3(rw, 1.0f, bw);
+  w /= hypotf3(w); // normalize weights. these could be pre-calculated
+  w *= maxf3(1e-5f, rgb); // multiply rgb by weights
+  float lum = hypotf3(w); // take the norm
+
 
   // RGB Ratios
   float3 rats = sdivf3f(rgb, lum);
