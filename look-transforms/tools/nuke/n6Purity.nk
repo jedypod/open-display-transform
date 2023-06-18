@@ -2,9 +2,9 @@ set cut_paste_input [stack 0]
 push $cut_paste_input
 Group {
  name n6Purity
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>n6Purity</b> created by Jed Smith\n<br>v0.0.1 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look-transforms>documentation</a><br>"}
  tile_color 0x536177ff
  addUserKnob {20 Params_tab l Params}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>n6Purity</b> created by Jed Smith\n<br>v0.0.2 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look-transforms>documentation</a><br>"}
  addUserKnob {20 color_grp l "" +STARTLINE n -2}
  addUserKnob {20 rgb_tab l RGB}
  addUserKnob {41 rp l "<font color=#a11515>red</font> purity" T CubicChromaCurveRGB.rp}
@@ -33,7 +33,7 @@ Group {
   xpos 874
   ypos 642
  }
-set Na1917fc0 [stack 0]
+set N63c749a0 [stack 0]
  Dot {
   name Dot421
   xpos 544
@@ -51,7 +51,67 @@ set Na1917fc0 [stack 0]
   xpos 510
   ypos 662
  }
-set Ndf684b40 [stack 0]
+set N6afa7290 [stack 0]
+ Expression {
+  temp_name0 h0
+  temp_expr0 (r+1)%6
+  temp_name1 h1
+  temp_expr1 (r+5)%6
+  temp_name2 h2
+  temp_expr2 (r+3)%6
+  expr0 (h0>x1?0:h0>c.0?(1-((h0-c.0)/(x1-c.0))**p0)**p1:h0>x0?(1-((c.0-h0)/(c.0-x0))**p0)**p1:0)
+  expr1 (h1>x1?0:h1>c.1?(1-((h1-c.1)/(x1-c.1))**p0)**p1:h1>x0?(1-((c.1-h1)/(c.1-x0))**p0)**p1:0)
+  expr2 (h2>x1?0:h2>c.2?(1-((h2-c.2)/(x1-c.2))**p0)**p1:h2>x0?(1-((c.2-h2)/(c.2-x0))**p0)**p1:0)
+  name PowerWindowRGB
+  label https://www.desmos.com/calculator/8tqz4rs0wm
+  xpos 510
+  ypos 712
+  addUserKnob {20 Params}
+  addUserKnob {78 c n 3}
+  c {1 1 1}
+  addUserKnob {7 p0 R 1 2}
+  p0 2
+  addUserKnob {7 p1 R 1 2}
+  p1 2
+  addUserKnob {7 x0 R 0 2}
+  addUserKnob {7 x1 R 0 2}
+  x1 2
+ }
+ Expression {
+  temp_name0 c
+  temp_expr0 1-a
+  temp_name1 cr
+  temp_expr1 a==0?a:(rp<0?a>1?a:a<0?m.0*a:a*(a**p.0*(a0.0*a+b0.0)+m.0):a<0?a:a>1?m.0*(a-1)+1:(1-c*(c**p.0*(a0.0*c+b0.0)+m.0)))/a
+  temp_name2 cg
+  temp_expr2 a==0?a:(gp<0?a>1?a:a<0?m.1*a:a*(a**p.1*(a0.1*a+b0.1)+m.1):a<0?a:a>1?m.1*(a-1)+1:(1-c*(c**p.1*(a0.1*c+b0.1)+m.1)))/a
+  temp_name3 cb
+  temp_expr3 a==0?a:(bp<0?a>1?a:a<0?m.2*a:a*(a**p.2*(a0.2*a+b0.2)+m.2):a<0?a:a>1?m.2*(a-1)+1:(1-c*(c**p.2*(a0.2*c+b0.2)+m.2)))/a
+  channel0 rgb
+  expr0 r*cr+g*cg+b*cb+(1-(r+g+b))
+  name CubicChromaCurveRGB
+  label https://www.desmos.com/calculator/bdbstdsvvv
+  xpos 510
+  ypos 762
+  addUserKnob {20 Params}
+  addUserKnob {7 rp l "<font color=#a11515>red</font> purity" t "adjust mid-range chrominance" R -1 1}
+  addUserKnob {7 rs l "<font color=#a11515>red</font> strength" t "strength of the adjustment" R 0 4}
+  rs 2
+  addUserKnob {7 gp l "<font color=#15a115>green</font> purity" t "adjust mid-range chrominance" R -1 1}
+  addUserKnob {7 gs l "<font color=#15a115>green</font> strength" t "strength of the adjustment" R 0 4}
+  gs 2
+  addUserKnob {7 bp l "<font color=#204abd>blue</font> purity" t "adjust mid-range chrominance" R -1 1}
+  addUserKnob {7 bs l "<font color=#204abd>blue</font> strength" t "strength of the adjustment" R 0 4}
+  bs 2
+  addUserKnob {78 m R -1 1 n 3}
+  m {{1-fabs(rp)} {1-fabs(gp)} {1-fabs(bp)}}
+  addUserKnob {78 p R 0 10 n 3}
+  p {{rs} {gs} {bs}}
+  addUserKnob {78 a0 R -10 10 n 3}
+  a0 {{p*(m-1)} {p*(m-1)} {p*(m-1)}}
+  addUserKnob {78 b0 R -10 10 n 3}
+  b0 {{(1-m)*(p+1)} {(1-m)*(p+1)} {(1-m)*(p+1)}}
+ }
+push $N6afa7290
  Expression {
   temp_name0 h0
   temp_expr0 (r+4)%6
@@ -77,17 +137,19 @@ set Ndf684b40 [stack 0]
   x1 2
  }
  Expression {
-  temp_name0 cr
-  temp_expr0 a==0?a:(m.0<0?a>1?a:a<0?c0.0*a:a*(a**p.0*(a0.0*a+b0.0)+c0.0):a<0?a:a>1?c0.0*(a-1)+1:(1-(1-a)*((1-a)**p.0*(a0.0*(1-a)+b0.0)+c0.0)))/a
-  temp_name1 cg
-  temp_expr1 a==0?a:(m.1<0?a>1?a:a<0?c0.1*a:a*(a**p.1*(a0.1*a+b0.1)+c0.1):a<0?a:a>1?c0.1*(a-1)+1:(1-(1-a)*((1-a)**p.1*(a0.1*(1-a)+b0.1)+c0.1)))/a
-  temp_name2 cb
-  temp_expr2 a==0?a:(m.2<0?a>1?a:a<0?c0.2*a:a*(a**p.2*(a0.2*a+b0.2)+c0.2):a<0?a:a>1?c0.2*(a-1)+1:(1-(1-a)*((1-a)**p.2*(a0.2*(1-a)+b0.2)+c0.2)))/a
+  temp_name0 c
+  temp_expr0 1-a
+  temp_name1 cr
+  temp_expr1 a==0?a:(cp<0?a>1?a:a<0?m.0*a:a*(a**p.0*(a0.0*a+b0.0)+m.0):a<0?a:a>1?m.0*(a-1)+1:(1-c*(c**p.0*(a0.0*c+b0.0)+m.0)))/a
+  temp_name2 cg
+  temp_expr2 a==0?a:(mp<0?a>1?a:a<0?m.1*a:a*(a**p.1*(a0.1*a+b0.1)+m.1):a<0?a:a>1?m.1*(a-1)+1:(1-c*(c**p.1*(a0.1*c+b0.1)+m.1)))/a
+  temp_name3 cb
+  temp_expr3 a==0?a:(yp<0?a>1?a:a<0?m.2*a:a*(a**p.2*(a0.2*a+b0.2)+m.2):a<0?a:a>1?m.2*(a-1)+1:(1-c*(c**p.2*(a0.2*c+b0.2)+m.2)))/a
   channel0 rgb
   expr0 r*cr+g*cg+b*cb+(1-(r+g+b))
   name CubicChromaCurveCMY
   xpos 620
-  ypos 758
+  ypos 748
   addUserKnob {20 Params}
   addUserKnob {7 cp l "<font color=#1ea5bd>cyan</font> purity" t "adjust mid-range chrominance" R -1 1}
   addUserKnob {7 cs l "<font color=#1ea5bd>cyan</font> strength" t "strength of the adjustment" R 0 4}
@@ -99,79 +161,13 @@ set Ndf684b40 [stack 0]
   addUserKnob {7 ys l "<font color=#d8db1f>yellow</font> strength" t "strength of the adjustment" R 0 4}
   ys 2
   addUserKnob {78 m R -1 1 n 3}
-  m {{cp} {mp} {yp}}
-  addUserKnob {78 s R 0 10 n 3}
-  s {{cs} {ms} {ys}}
+  m {{1-fabs(cp)} {1-fabs(mp)} {1-fabs(yp)}}
   addUserKnob {78 p R 0 10 n 3}
-  p {{m<0?s:2*s} {m<0?s:2*s} {m<0?s:2*s}}
-  addUserKnob {78 c0 R 0 10 n 3}
-  c0 {{1-fabs(m)} {1-fabs(m)} {1-fabs(m)}}
+  p {{rs} {gs} {bs}}
   addUserKnob {78 a0 R -10 10 n 3}
-  a0 {{p*(c0-1)} {p*(c0-1)} {p*(c0-1)}}
+  a0 {{p*(m-1)} {p*(m-1)} {p*(m-1)}}
   addUserKnob {78 b0 R -10 10 n 3}
-  b0 {{(1-c0)*(p+1)} {(1-c0)*(p+1)} {(1-c0)*(p+1)}}
- }
-push $Ndf684b40
- Expression {
-  temp_name0 h0
-  temp_expr0 (r+1)%6
-  temp_name1 h1
-  temp_expr1 (r+5)%6
-  temp_name2 h2
-  temp_expr2 (r+3)%6
-  expr0 (h0>x1?0:h0>c.0?(1-((h0-c.0)/(x1-c.0))**p0)**p1:h0>x0?(1-((c.0-h0)/(c.0-x0))**p0)**p1:0)
-  expr1 (h1>x1?0:h1>c.1?(1-((h1-c.1)/(x1-c.1))**p0)**p1:h1>x0?(1-((c.1-h1)/(c.1-x0))**p0)**p1:0)
-  expr2 (h2>x1?0:h2>c.2?(1-((h2-c.2)/(x1-c.2))**p0)**p1:h2>x0?(1-((c.2-h2)/(c.2-x0))**p0)**p1:0)
-  name PowerWindowRGB
-  label https://www.desmos.com/calculator/8tqz4rs0wm
-  xpos 510
-  ypos 710
-  addUserKnob {20 Params}
-  addUserKnob {78 c n 3}
-  c {1 1 1}
-  addUserKnob {7 p0 R 1 2}
-  p0 2
-  addUserKnob {7 p1 R 1 2}
-  p1 2
-  addUserKnob {7 x0 R 0 2}
-  addUserKnob {7 x1 R 0 2}
-  x1 2
- }
- Expression {
-  temp_name0 cr
-  temp_expr0 a==0?a:(m.0<0?a>1?a:a<0?c0.0*a:a*(a**p.0*(a0.0*a+b0.0)+c0.0):a<0?a:a>1?c0.0*(a-1)+1:(1-(1-a)*((1-a)**p.0*(a0.0*(1-a)+b0.0)+c0.0)))/a
-  temp_name1 cg
-  temp_expr1 a==0?a:(m.1<0?a>1?a:a<0?c0.1*a:a*(a**p.1*(a0.1*a+b0.1)+c0.1):a<0?a:a>1?c0.1*(a-1)+1:(1-(1-a)*((1-a)**p.1*(a0.1*(1-a)+b0.1)+c0.1)))/a
-  temp_name2 cb
-  temp_expr2 a==0?a:(m.2<0?a>1?a:a<0?c0.2*a:a*(a**p.2*(a0.2*a+b0.2)+c0.2):a<0?a:a>1?c0.2*(a-1)+1:(1-(1-a)*((1-a)**p.2*(a0.2*(1-a)+b0.2)+c0.2)))/a
-  channel0 rgb
-  expr0 r*cr+g*cg+b*cb+(1-(r+g+b))
-  name CubicChromaCurveRGB
-  label https://www.desmos.com/calculator/4qnakiivnj
-  xpos 510
-  ypos 758
-  addUserKnob {20 Params}
-  addUserKnob {7 rp l "<font color=#a11515>red</font> purity" t "adjust mid-range chrominance" R -1 1}
-  addUserKnob {7 rs l "<font color=#a11515>red</font> strength" t "strength of the adjustment" R 0 4}
-  rs 2
-  addUserKnob {7 gp l "<font color=#15a115>green</font> purity" t "adjust mid-range chrominance" R -1 1}
-  addUserKnob {7 gs l "<font color=#15a115>green</font> strength" t "strength of the adjustment" R 0 4}
-  gs 2
-  addUserKnob {7 bp l "<font color=#204abd>blue</font> purity" t "adjust mid-range chrominance" R -1 1}
-  addUserKnob {7 bs l "<font color=#204abd>blue</font> strength" t "strength of the adjustment" R 0 4}
-  bs 2
-  addUserKnob {78 m R -1 1 n 3}
-  m {{rp} {gp} {bp}}
-  addUserKnob {78 s R 0 10 n 3}
-  s {{rs} {gs} {bs}}
-  addUserKnob {78 p R 0 10 n 3}
-  p {{m<0?s:2*s} {m<0?s:2*s} {m<0?s:2*s}}
-  addUserKnob {78 c0 R 0 10 n 3}
-  c0 {{1-fabs(m)} {1-fabs(m)} {1-fabs(m)}}
-  addUserKnob {78 a0 R -10 10 n 3}
-  a0 {{p*(c0-1)} {p*(c0-1)} {p*(c0-1)}}
-  addUserKnob {78 b0 R -10 10 n 3}
-  b0 {{(1-c0)*(p+1)} {(1-c0)*(p+1)} {(1-c0)*(p+1)}}
+  b0 {{(1-m)*(p+1)} {(1-m)*(p+1)} {(1-m)*(p+1)}}
  }
  Merge2 {
   inputs 2
@@ -181,17 +177,17 @@ push $Ndf684b40
   xpos 510
   ypos 806
  }
-push $Na1917fc0
+push $N63c749a0
  Dot {
   name Dot299
   xpos 874
   ypos 738
  }
-set N751f0c90 [stack 0]
+set N67b039a0 [stack 0]
  Expression {
   channel0 rgba
   expr0 r*rw+g*gw+b*bw
-  name Weights32
+  name Weights
   label "Weighted Sum"
   xpos 730
   ypos 728
@@ -211,7 +207,7 @@ set N751f0c90 [stack 0]
   xpos 730
   ypos 800
  }
-push $N751f0c90
+push $N67b039a0
  MergeExpression {
   inputs 2
   temp_name0 f

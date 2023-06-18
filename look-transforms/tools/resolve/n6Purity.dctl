@@ -1,4 +1,4 @@
-/* n6Purity - v0.0.1
+/* n6Purity - v0.0.2
 	-------------------------
 	Another tool on the theme of "Vibrance". 
 	n6Purity adjusts the saturation of "mid-range" chroma values.
@@ -34,16 +34,12 @@ __DEVICE__ float power_window(float x, float c, float p0, float p1, float x0, fl
 	return x > x1 ? 0.0f : x > c ? _powf(1.0f - _powf((x - c)/(x1 - c), p0), p1) : x > x0 ? _powf(1.0f - _powf((c - x)/(c - x0), p0), p1) : 0.0f;
 }
 
-// https://www.desmos.com/calculator/4qnakiivnj
-__DEVICE__ float cubic_chroma(float x, float m, float s) {
-	float p = m < 0.0f ? s : 2.0f*s;
-	float c0 = 1.0f - _fabs(m);
-	float a0 = p*(c0 - 1.0f);
-	float b0 = (1.0f - c0)*(p + 1.0f);
-	if (m > 0.0f) 
-		return x > 1.0f ? c0*(x - 1.0f) + 1.0f : x < 0.0f ? x : 1.0f - (1.0f - x)*(_powf(1.0f - x, p)*(a0*(1.0f - x) + b0) + c0);
-	else 
-		return x < 0.0f ? c0*x : x > 1.0f ? x : x*(_powf(x, p)*(a0*x + b0) + c0);
+// https://www.desmos.com/calculator/bdbstdsvvv
+__DEVICE__ float pivoted_power_cubic(float x, float m, float p) {
+	m = 1.0f - _fabs(m);
+	float a0 = p*(m - 1.0f);
+	float b0 = (1.0f - m)*(p + 1.0f);
+	return x <= 0.0f ? m*x : x > 1.0f ? x : x*(_powf(x, p)*(a0*x + b0) + m);
 }
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
@@ -70,12 +66,13 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 	float hy = power_window(_fmod(h + 0.0f, 6.0f), 1.0f, 1.5f, 1.5f, 0.0f, 2.0f);
 
 	// Cubic chroma compression curve
-	float cr = sdivf(cubic_chroma(ch, rp, rs), ch);
-	float cg = sdivf(cubic_chroma(ch, gp, gs), ch);
-	float cb = sdivf(cubic_chroma(ch, bp, bs), ch);
-	float cc = sdivf(cubic_chroma(ch, cp, cs), ch);
-	float cm = sdivf(cubic_chroma(ch, mp, ms), ch);
-	float cy = sdivf(cubic_chroma(ch, yp, ys), ch);
+	float cr = sdivf(rp < 0.0f ? pivoted_power_cubic(ch, rp, rs) : 1.0f - pivoted_power_cubic(1.0f - ch, rp, rs), ch);
+	float cg = sdivf(gp < 0.0f ? pivoted_power_cubic(ch, gp, gs) : 1.0f - pivoted_power_cubic(1.0f - ch, gp, gs), ch);
+	float cb = sdivf(bp < 0.0f ? pivoted_power_cubic(ch, bp, bs) : 1.0f - pivoted_power_cubic(1.0f - ch, bp, bs), ch);
+	float cc = sdivf(cp < 0.0f ? pivoted_power_cubic(ch, cp, cs) : 1.0f - pivoted_power_cubic(1.0f - ch, cp, cs), ch);
+	float cm = sdivf(mp < 0.0f ? pivoted_power_cubic(ch, mp, ms) : 1.0f - pivoted_power_cubic(1.0f - ch, mp, ms), ch);
+	float cy = sdivf(yp < 0.0f ? pivoted_power_cubic(ch, yp, ys) : 1.0f - pivoted_power_cubic(1.0f - ch, yp, ys), ch);
+
 
 	// Combine all hue angles to single chroma compression factor
 	float chf = (hr*cr + hg*cg + hb*cb + (1.0f - (hr + hg + hb)))*(hc*cc + hm*cm + hy*cy + (1.0f - (hc + hm + hy)));
