@@ -1,0 +1,64 @@
+/* Purity - v0.0.1
+	-------------------------
+	Simpler weighted-sum based version of n6Purity. Probably more robust through variations in hue.
+	
+	---    
+	Written by Jed Smith
+	github.com/jedypod/open-display-transform
+*/
+
+DEFINE_UI_PARAMS(purity, purity, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(strength, strength, DCTLUI_SLIDER_FLOAT, 2, 0, 4, 0)
+DEFINE_UI_PARAMS(rw, red weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.05, 1, 0)
+DEFINE_UI_PARAMS(bw, blue weight, DCTLUI_SLIDER_FLOAT, 0.1, 0.05, 1, 0)
+
+
+// Safe division of float a by float b
+__DEVICE__ float sdivf(float a, float b) { return _fabs(b) < 1e-3f ? 0.0f : a/b; }
+
+// Safe division of float3 a by float b
+__DEVICE__ float3 sdivf3f(float3 a, float b) { return make_float3(sdivf(a.x, b), sdivf(a.y, b), sdivf(a.z, b)); }
+
+// Safe power function raising float a to power float b
+__DEVICE__ float spowf(float a, float b) { return a <= 0.0f ? a : _powf(a, b); }
+
+// https://www.desmos.com/calculator/bdbstdsvvv
+__DEVICE__ float pivoted_power_cubic(float x, float m, float p) {
+	m = 1.0f - _fabs(m);
+	float a0 = p*(m - 1.0f);
+	float b0 = (1.0f - m)*(p + 1.0f);
+	return x <= 0.0f ? m*x : x > 1.0f ? x : x*(_powf(x, p)*(a0*x + b0) + m);
+}
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) {
+	float3 rgb = make_float3(p_R, p_G, p_B);
+
+	float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+	float3 rats = sdivf3f(rgb, mx); // rgb ratios
+	float3 rats_c = 1.0f - rats; // complement of rgb ratios
+
+	float gw = 1.0f - (rw + bw); // green weight sums weights to 1
+
+	float w = rats_c.x*rw + rats_c.y*gw + rats_c.z*bw; // "luminance" weights complement
+	float c = _fmaxf(rats_c.x, _fmaxf(rats_c.y, rats_c.z)); // chroma
+
+	float L = 1.0f - w; // "luminance" weights inside normalized rgb ratios
+	w = sdivf(w, c); // chroma-normalized weights
+
+	float f0 = sdivf(pivoted_power_cubic(c, purity, strength), c);
+	float f1 = sdivf(1.0f - pivoted_power_cubic(1.0f - c, purity, strength), c);
+
+	// Lerp factor for nonlinear "purity"/saturation adjustment.
+	// decrease uses luminance weights (yellow highest, blue lowest)
+	// increase uses chrominance weights (complement of luminance: yellow lowest, blue highest)
+	float f = purity > 0.0f ? (w*f1 + (1.0f - w)) : ((1.0f - w)*f0 + w);
+	
+	// negatives could cause nan/inf in shadow grain.
+	f = _fmaxf(0.0f, f);
+
+	rats = L*(1.0f - f) + rats*f;
+
+	rgb = rats * mx;
+
+	return rgb;
+}

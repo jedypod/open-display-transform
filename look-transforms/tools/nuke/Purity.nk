@@ -1,0 +1,136 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name Purity
+ tile_color 0x536177ff
+ addUserKnob {20 Params_tab l Params}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Purity</b> created by Jed Smith\n<br>v0.0.1 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look-transforms>documentation</a><br>"}
+ addUserKnob {41 purity T PivotedPowerCubic.purity}
+ addUserKnob {41 p l strength T PivotedPowerCubic.p}
+ addUserKnob {26 ""}
+ addUserKnob {41 rw l "red weight" T Weights.rw}
+ addUserKnob {41 bw l "blue weight" T Weights.bw}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 840
+  ypos 518
+ }
+ Dot {
+  name Dot3
+  xpos 874
+  ypos 570
+ }
+set N905fd3b0 [stack 0]
+ Expression {
+  channel0 rgba
+  expr0 max(r,g,b)
+  name MaxRGB
+  xpos 950
+  ypos 566
+ }
+set N8a410980 [stack 0]
+ Dot {
+  name Dot4
+  xpos 984
+  ypos 738
+ }
+push $N8a410980
+push $N905fd3b0
+ MergeExpression {
+  inputs 2
+  expr0 Ar==0?0:max(-2,Br/Ar)
+  expr1 Ag==0?0:max(-2,Bg/Ag)
+  expr2 Ab==0?0:max(-2,Bb/Ab)
+  name MergeDivideReverse
+  xpos 840
+  ypos 590
+ }
+set N49773530 [stack 0]
+ Expression {
+  expr0 1-r
+  expr1 1-g
+  expr2 1-b
+  expr3 1-a
+  name invert
+  xpos 730
+  ypos 590
+ }
+ Expression {
+  temp_name2 L
+  temp_expr2 (r*rw+g*gw+b*bw)
+  temp_name3 c
+  temp_expr3 max(r,g,b)
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 c==0?L:L/c
+  expr1 max(0,1-L)
+  expr3 c
+  name Weights
+  label "\n"
+  xpos 730
+  ypos 614
+  addUserKnob {20 Params}
+  addUserKnob {7 rw R 0.05 0.6}
+  rw 0.25
+  addUserKnob {7 gw}
+  gw {{1-(rw+bw)}}
+  addUserKnob {7 bw R 0.05 0.6}
+  bw 0.1
+ }
+ Expression {
+  temp_name0 c
+  temp_expr0 a
+  temp_name1 cc
+  temp_expr1 1-c
+  temp_name2 f0
+  temp_expr2 c**p*(a0*c+b0)+m
+  temp_name3 f1
+  temp_expr3 c<=0?1:(1-cc*(cc**p*(a0*cc+b0)+m))/c
+  channel0 rgb
+  expr3 max(0,purity>0?(r*f1+(1-r)):((1-r)*f0+r))
+  name PivotedPowerCubic
+  label https://www.desmos.com/calculator/bdbstdsvvv
+  xpos 730
+  ypos 656
+  addUserKnob {20 Params}
+  addUserKnob {7 purity R -1 1}
+  addUserKnob {7 p l power R 0 4}
+  p 2
+  addUserKnob {7 m}
+  m {{1-fabs(purity)}}
+  addUserKnob {26 ""}
+  addUserKnob {7 a0 R -10 10}
+  a0 {{p*(m-1)}}
+  addUserKnob {7 b0 R -10 10}
+  b0 {{(1-m)*(p+1)}}
+ }
+push $N49773530
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 Aa
+  temp_name1 L
+  temp_expr1 Ag
+  expr0 L*(1-f)+r*f
+  expr1 L*(1-f)+g*f
+  expr2 L*(1-f)+b*f
+  name ChromaLerp
+  xpos 840
+  ypos 686
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  bbox B
+  output rgb
+  name MergeMultiply
+  xpos 840
+  ypos 734
+ }
+ Output {
+  name Output
+  xpos 840
+  ypos 782
+ }
+end_group
