@@ -3,7 +3,7 @@ push $cut_paste_input
 Group {
  name OpenDRT
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.2.1 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.2.2 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
  addUserKnob {41 gamut l "in gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer l " " T ""}
  addUserKnob {26 _div l "" +STARTLINE T " "}
@@ -21,9 +21,7 @@ Group {
  addUserKnob {20 chroma_tab l chrominance}
  addUserKnob {6 dch_enable l "&nbsp;&nbsp;<b>chroma compression" +STARTLINE}
  dch_enable true
- addUserKnob {41 dch l dechroma T ChromaCompressWeights.dch}
- addUserKnob {41 dch_rgb l "dechroma <font color=#a11515>r</font><font color=#15a115>g</font><font color=#204abd>b</font>" T ChromaCompressWeights.dch_rgb}
- addUserKnob {41 dch_cmy l "dechroma <font color=#1ea5bd>c</font><font color=#a112a1>m</font><font color=#d8db1f>y</font>" T ChromaCompressWeights.dch_cmy}
+ addUserKnob {41 dch l dechroma T ChromaCompress_Hyperbolic.dch}
  addUserKnob {41 dch_t l "dechroma toe" T ToeCompressPivoted2.dch_t}
  addUserKnob {6 hs_enable l "&nbsp;&nbsp;<b>hue shift" +STARTLINE}
  hs_enable true
@@ -67,7 +65,7 @@ Group {
    xpos 324
    ypos -546
   }
-set Nb42275c0 [stack 0]
+set N2dfda170 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -83,14 +81,14 @@ set Nb42275c0 [stack 0]
    xpos 290
    ypos -250
   }
-push $Nb42275c0
+push $N2dfda170
   Dot {
    name Dot391
    label " *RGB to XYZ D65 CAT: XYZ Scaling"
    xpos 434
    ypos -546
   }
-set N35e071a0 [stack 0]
+set Nbaef3710 [stack 0]
   ColorMatrix {
    matrix {
        {0.7006223202 0.1487748027 0.101058729}
@@ -102,7 +100,7 @@ set N35e071a0 [stack 0]
    xpos 1390
    ypos -466
   }
-push $N35e071a0
+push $Nbaef3710
   ColorMatrix {
    matrix {
        {0.705396831 0.1640413404 0.08101775497}
@@ -114,7 +112,7 @@ push $N35e071a0
    xpos 1280
    ypos -466
   }
-push $N35e071a0
+push $Nbaef3710
   ColorMatrix {
    matrix {
        {0.5990839005 0.2489254922 0.1024464965}
@@ -126,7 +124,7 @@ push $N35e071a0
    xpos 1170
    ypos -465
   }
-push $N35e071a0
+push $Nbaef3710
   ColorMatrix {
    matrix {
        {0.735275209 0.06860940903 0.1465712786}
@@ -138,7 +136,7 @@ push $N35e071a0
    xpos 1060
    ypos -466
   }
-push $N35e071a0
+push $Nbaef3710
   ColorMatrix {
    matrix {
        {0.6380076408 0.2147038132 0.09774445742}
@@ -150,7 +148,7 @@ push $N35e071a0
    xpos 950
    ypos -466
   }
-push $N35e071a0
+push $Nbaef3710
   ColorMatrix {
    matrix {
        {0.4123909175 0.3575843573 0.1804807931}
@@ -162,7 +160,7 @@ push $N35e071a0
    xpos 840
    ypos -466
   }
-push $N35e071a0
+push $Nbaef3710
   ColorMatrix {
    matrix {
        {0.6369581223 0.1446169168 0.1688809693}
@@ -174,7 +172,7 @@ push $N35e071a0
    xpos 730
    ypos -466
   }
-push $N35e071a0
+push $Nbaef3710
   ColorMatrix {
    matrix {
        {0.4865711331 0.2656677067 0.1982173175}
@@ -186,7 +184,7 @@ push $N35e071a0
    xpos 620
    ypos -466
   }
-push $N35e071a0
+push $Nbaef3710
   ColorMatrix {
    matrix {
        {0.6609312296 0.1336961389 0.1558285803}
@@ -198,7 +196,7 @@ push $N35e071a0
    xpos 510
    ypos -466
   }
-push $N35e071a0
+push $Nbaef3710
   ColorMatrix {
    matrix {
        {0.9503623843 0 9.346324805e-05}
@@ -241,7 +239,7 @@ push $N35e071a0
    xpos 324
    ypos -516
   }
-set N3594ddb0 [stack 0]
+set N941e6d00 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -257,14 +255,14 @@ set N3594ddb0 [stack 0]
    xpos 290
    ypos -310
   }
-push $N3594ddb0
+push $N941e6d00
   Dot {
    name Dot1
    label " XYZ D65 to *RGB CAT: XYZ Scaling"
    xpos 434
    ypos -516
   }
-set N66f2a680 [stack 0]
+set N9e0fe130 [stack 0]
   ColorMatrix {
    matrix {
        {1 0 0}
@@ -276,7 +274,7 @@ set N66f2a680 [stack 0]
    xpos 950
    ypos -465
   }
-push $N66f2a680
+push $N9e0fe130
   ColorMatrix {
    matrix {
        {3.240968943 -1.537382722 -0.4986106157}
@@ -288,7 +286,7 @@ push $N66f2a680
    xpos 840
    ypos -465
   }
-push $N66f2a680
+push $N9e0fe130
   ColorMatrix {
    matrix {
        {2.72539258 -1.01800251 -0.4401629865}
@@ -300,7 +298,7 @@ push $N66f2a680
    xpos 730
    ypos -465
   }
-push $N66f2a680
+push $N9e0fe130
   ColorMatrix {
    matrix {
        {2.40274024 -0.8974836469 -0.3880532086}
@@ -312,7 +310,7 @@ push $N66f2a680
    xpos 620
    ypos -465
   }
-push $N66f2a680
+push $N9e0fe130
   ColorMatrix {
    matrix {
        {2.493495464 -0.9313831329 -0.4027105868}
@@ -324,7 +322,7 @@ push $N66f2a680
    xpos 510
    ypos -465
   }
-push $N66f2a680
+push $N9e0fe130
   ColorMatrix {
    matrix {
        {1.716650844 -0.3556707203 -0.2533662021}
@@ -349,30 +347,24 @@ push $N66f2a680
   xpos 214
   ypos -486
  }
-set N36adedf0 [stack 0]
+set Na6bc9140 [stack 0]
  Dot {
   name Dot14
-  xpos -6
+  xpos 104
   ypos -486
  }
-set N1cb14330 [stack 0]
- Dot {
-  name Dot4
-  xpos -116
-  ypos -486
- }
-set N771511b0 [stack 0]
+set Nb5569240 [stack 0]
  Dot {
   name Dot2
-  xpos -336
+  xpos -116
   ypos -486
  }
  Expression {
   channel0 rgba
   expr0 sqrt(((r*rw)**2+(g*gw)**2+(b*bw)**2)/(rw**2+gw**2+bw**2))
   name WeightedEuclideanNorm
-  xpos -370
-  ypos -441
+  xpos -150
+  ypos -442
   addUserKnob {20 Params}
   addUserKnob {7 rw R 0.05 1}
   rw 0.25
@@ -381,7 +373,7 @@ set N771511b0 [stack 0]
   addUserKnob {7 bw R 0.05 1}
   bw 0.35
  }
-set N5ddb35c0 [stack 0]
+set Nf5097080 [stack 0]
  Expression {
   temp_name0 ts0
   temp_expr0 invert?(r+sqrt(r*(4*fl+r)))/2:(m*r/(r+s))**c
@@ -392,7 +384,7 @@ set N5ddb35c0 [stack 0]
   expr2 b*ts
   name ConstrainedTonescale
   label https://www.desmos.com/calculator/pmf3qc47v0
-  xpos -370
+  xpos -150
   ypos -400
   addUserKnob {20 Params}
   addUserKnob {7 Lp R 100 1000}
@@ -432,7 +424,7 @@ set N5ddb35c0 [stack 0]
   expr1 parent.clamp?max(0,min(mx,g*_s)):g*_s
   expr2 parent.clamp?max(0,min(mx,b*_s)):b*_s
   name DisplayScale
-  xpos -370
+  xpos -150
   ypos -346
   addUserKnob {20 Params}
   addUserKnob {6 pq +STARTLINE}
@@ -446,13 +438,13 @@ set N5ddb35c0 [stack 0]
  }
  Dot {
   name Dot13
-  xpos -336
+  xpos -116
   ypos -246
  }
-set Nebc5930 [stack 0]
+set Nb810c990 [stack 0]
  Dot {
   name Dot3
-  xpos -336
+  xpos -116
   ypos -102
  }
  Dot {
@@ -460,10 +452,55 @@ set Nebc5930 [stack 0]
   xpos 104
   ypos -102
  }
-set Nf0acbe80 [stack 0]
-push $Nf0acbe80
-push $Nebc5930
-push $N1cb14330
+set Nd1a76420 [stack 0]
+push $Nd1a76420
+push $Nb810c990
+push $Nf5097080
+ Dot {
+  name Dot5
+  xpos -6
+  ypos -438
+ }
+set Ne0c44060 [stack 0]
+ Expression {
+  channel0 rgba
+  expr0 1/(s*r+1)
+  expr3 1
+  name ChromaCompress_Hyperbolic
+  xpos -40
+  ypos -394
+  addUserKnob {20 Params}
+  addUserKnob {7 dch}
+  dch 0.35
+  addUserKnob {7 s R 0 4}
+  s {{dch/parent.ConstrainedTonescale.s}}
+ }
+ Dot {
+  name Dot11
+  xpos -6
+  ypos -294
+ }
+set N862fbea0 [stack 0]
+ MergeExpression {
+  inputs 2
+  temp_name1 s
+  temp_expr1 (dch_t+1)*Ar/(Ar+dch_t)
+  channel0 rgba
+  expr0 r*s
+  name ToeCompressPivoted2
+  label https://www.desmos.com/calculator/igma4xoqlx
+  xpos -40
+  ypos -256
+  addUserKnob {20 Params}
+  addUserKnob {7 dch_t R 0 0.01}
+ }
+ Dot {
+  name Dot226
+  xpos -6
+  ypos -198
+ }
+push $N862fbea0
+push $Nb5569240
  Expression {
   temp_name0 mx
   temp_expr0 max(r,g,b)
@@ -474,103 +511,17 @@ push $N1cb14330
   expr2 mx==0?0:(b-mn)/mx
   expr3 mx==0?0:1-mn/mx
   name HueChromaRGB
-  xpos -40
-  ypos -466
+  xpos 70
+  ypos -394
  }
  Expression {
   expr0 min(2,max(0,r-(g+b)))
   expr1 min(2,max(0,g-(r+b)))
   expr2 min(2,max(0,b-(r+g)))
   name RGB
-  xpos -40
-  ypos -418
- }
-set Ndbaa7e0 [stack 0]
-push $N771511b0
- Expression {
-  temp_name0 mx
-  temp_expr0 max(r,g,b)
-  temp_name1 mn
-  temp_expr1 min(r,g,b)
-  expr0 mx==0?0:(mx-r)/mx
-  expr1 mx==0?0:(mx-g)/mx
-  expr2 mx==0?0:(mx-b)/mx
-  expr3 mx==0?0:1-mn/mx
-  name HueChromaCMY
-  xpos -150
-  ypos -466
- }
- Expression {
-  expr0 min(2,max(0,r-(g+b)))
-  expr1 min(2,max(0,g-(r+b)))
-  expr2 min(2,max(0,b-(r+g)))
-  name CMY
-  xpos -150
-  ypos -418
- }
- MergeExpression {
-  inputs 2
-  temp_name0 chp
-  temp_expr0 a==0?0:(Ar+Ag+Ab)/a
-  temp_name1 chs
-  temp_expr1 a==0?0:(r+g+b)/a
-  channel0 rgba
-  expr0 s0*(dch_rgb*chp+1)*(dch_cmy*chs+1)
-  name ChromaCompressWeights
-  xpos -150
-  ypos -346
-  addUserKnob {20 Params}
-  addUserKnob {7 dch}
-  dch 0.35
-  addUserKnob {7 dch_rgb R -1 1}
-  addUserKnob {7 dch_cmy R -1 1}
-  addUserKnob {7 s0 R 0 4}
-  s0 {{dch/parent.ConstrainedTonescale.s}}
- }
-push $N5ddb35c0
- Dot {
-  name Dot5
-  xpos -226
-  ypos -438
- }
-set N302f03a0 [stack 0]
- MergeExpression {
-  inputs 2
-  temp_name0 s
-  temp_expr0 Ar
-  channel0 rgba
-  expr0 1/(s*r+1)
-  expr3 1
-  name ChromaCompress_Hyperbolic4
-  xpos -260
+  xpos 70
   ypos -346
  }
- Dot {
-  name Dot11
-  xpos -226
-  ypos -294
- }
-set N36e42aa0 [stack 0]
- MergeExpression {
-  inputs 2
-  temp_name1 s
-  temp_expr1 (dch_t+1)*Ar/(Ar+dch_t)
-  channel0 rgba
-  expr0 r*s
-  name ToeCompressPivoted2
-  label https://www.desmos.com/calculator/igma4xoqlx
-  xpos -260
-  ypos -256
-  addUserKnob {20 Params}
-  addUserKnob {7 dch_t R 0 0.01}
- }
- Dot {
-  name Dot226
-  xpos -226
-  ypos -198
- }
-push $N36e42aa0
-push $Ndbaa7e0
  MergeExpression {
   inputs 2
   temp_name0 s
@@ -579,11 +530,11 @@ push $Ndbaa7e0
   expr1 g*s
   expr2 b*s
   name ComplementMultiply
-  xpos -40
+  xpos 70
   ypos -298
  }
-push $N302f03a0
-push $N36adedf0
+push $Ne0c44060
+push $Na6bc9140
  MergeExpression {
   inputs 2
   expr0 Ar==0?0:max(-2,Br/Ar)
@@ -618,9 +569,10 @@ push $N36adedf0
   expr1 (1-f)+g*f
   expr2 (1-f)+b*f
   name ChromaCompression
+  selected true
   xpos 180
   ypos -202
-  disable {{!dch_enable}}
+  disable {{!dch_enable x1045 1}}
  }
  Clamp {
   channels rgba
@@ -676,7 +628,7 @@ push $N36adedf0
    xpos 400
    ypos -129
   }
-set Ne6acc10 [stack 0]
+set Nf78f4c80 [stack 0]
   Expression {
    temp_name0 Yd
    temp_expr0 0.2627*r+0.6780*g+0.0593*b
@@ -709,7 +661,7 @@ set Ne6acc10 [stack 0]
    addUserKnob {7 _c}
    _c {{0.5-_a*log(4*_a)}}
   }
-push $Ne6acc10
+push $Nf78f4c80
   Expression {
    temp_name0 rp
    temp_expr0 pow(r,m_1)
@@ -735,7 +687,7 @@ push $Ne6acc10
    addUserKnob {7 c_3}
    c_3 {{2392/128}}
   }
-push $Ne6acc10
+push $Nf78f4c80
   Expression {
    expr0 sign(r)*pow(fabs(r),1/p)
    expr1 sign(g)*pow(fabs(g),1/p)

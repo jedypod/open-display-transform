@@ -1,5 +1,5 @@
 /*  OpenDRT -------------------------------------------------/
-      v0.2.1
+      v0.2.2
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -14,8 +14,6 @@ DEFINE_UI_PARAMS(fl, flare, DCTLUI_SLIDER_FLOAT, 0.01, 0.0, 0.02, 0.001)
 DEFINE_UI_PARAMS(rw, red weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.05, 1.0, 0.0)
 DEFINE_UI_PARAMS(bw, blue weight, DCTLUI_SLIDER_FLOAT, 0.35, 0.05, 1.0, 0.0)
 DEFINE_UI_PARAMS(dch, dechroma, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(dch_rgb, RGB dechroma, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(dch_cmy, CMY dechroma, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(dch_toe, toe dechroma, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 0.01, 0.0)
 DEFINE_UI_PARAMS(hs_r, hue shift red, DCTLUI_SLIDER_FLOAT, 0.4, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hs_g, hue shift green, DCTLUI_SLIDER_FLOAT, -0.1, -1.0, 1.0, 0.0)
@@ -372,15 +370,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       so that we compress chroma less when peak luminance is higher.
   */
   float dch_s = dch/s;
-  // Unpremult hue rgb and hue cmy by chroma
-  float chp = sdivf(h_rgb.x + h_rgb.y +h_rgb.z, ch);
-  float chs = sdivf(h_cmy.x + h_cmy.y + h_cmy.z, ch);
-
-  // The final dechroma weight to use in the chroma compression function
-  float dch_w = dch_s*(dch_rgb*chp + 1.0f)*(dch_cmy*chs + 1.0f);
 
   // Chroma compression factor, used to lerp towards 1 in rgb ratios, compressing chroma
-  float ccf = sdivf(1.0f, lum*dch_w + 1.0f);
+  float ccf = sdivf(1.0f, lum*dch_s + 1.0f);
 
   /* Shadow Chroma Compression
     We compress chroma in the toe as well, to avoid rainbow shadow grain and over-saturated shadows.
