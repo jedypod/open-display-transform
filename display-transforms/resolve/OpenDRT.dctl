@@ -1,5 +1,6 @@
+#line 1 // Fix line numbers in resolve/logs/rollinglog.txt
 /*  OpenDRT -------------------------------------------------/
-      v0.2.4
+      v0.2.5
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -178,9 +179,16 @@ __DEVICE__ float flare(float x, float fl, int invert) {
 
 // https://www.desmos.com/calculator/gfubm2kvlu
 __DEVICE__ float powerp(float x, float p, float m) {
-  float y = x <= 0.0f ? x : x*spowf(spowf(x/m, p) + 1.0f, -1.0f/p);
+  float y = x <= 0.0f ? x : x*spowf(spowf(x/m, 1.0f/p) + 1.0f, -p);
   return y;
 }
+
+// https://www.desmos.com/calculator/jrff9lrztn
+__DEVICE__ float powerptoe(float x, float p, float m, float t0) {
+  float y = x > t0 ? x : (x-t0)*spowf(spowf((t0-x)/(t0-m), 1.0f/p) + 1.0f, -p) + t0;
+  return y;
+}
+
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
 {
@@ -189,10 +197,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // --------------------------------------------------
 
   // Weights: controls the "vibrancy" of each channel, and influences all other aspects of the display-rendering.
-  float3 weights = make_float3(0.3f, 0.33f, 0.36f);
+  float3 weights = make_float3(0.3f, 0.4f, 0.3f);
 
   // Hue Shift RGB controls
-  float3 hs = make_float3(0.35f, -0.1f, -0.5f);
+  float3 hs = make_float3(0.3f, -0.1f, -0.4f);
 
   // Input gamut conversion matrix (CAT02 chromatic adaptation to D65)
   float3x3 in_to_xyz;
@@ -296,7 +304,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   rgb = vdot(in_to_xyz, rgb);
   rgb = vdot(xyz_to_display, rgb);
 
-  /* Take the hypot (length) of the weighted sum of RGB. The weights
+  /* Take the the weighted sum of RGB. The weights
       scale the vector of each color channel, controlling the "vibrancy".
       We use this as a vector norm for separating color and intensity.
       The weights could be normalized using w /= hypotf3(w)
@@ -305,7 +313,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       compress to display peak luminance as chromatic intensity increases.
   */ 
   weights *= maxf3(1e-5f, rgb); // multiply rgb by weights
-  float lum = hypotf3(weights); // take the norm
+  float lum = weights.x + weights.y + weights.z; // take the norm
 
   // RGB Ratios
   float3 rats = sdivf3f(rgb, lum);
@@ -321,17 +329,18 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Clamp ts to display peak
   ts = _fminf(1.0f, ts);
 
-  /* Chroma Compression ------------------------------------------ *
-      Here we set up the chroma compression factor, used to lerp towards 1.0
-      in RGB Ratios, thereby compressing color towards display peak.
-      This factor is driven by ts, biased by a power function to control chroma compression amount `dch`.
+  /* Gamut Compress ------------------------------------------ *
+    Most of our data is now inside of the display gamut cube, but there may still be some gradient disruptions
+    due to highly chromatic colors going outside of the display cube on the lower end and then being clipped
+    whether implicitly or explicitly. To combat this, our last step is to do a soft clip or gamut compression.
+    In RGB Ratios, 0,0,0 is the gamut boundary, and anything outside of gamut will have one or more negative 
+    components. So to compress the gamut we use lift these negative values and compress them into a small range
+    near 0. We use the "PowerP" hyperbolic compression function but it could just as well be anything.
   */
-  float ccf = _powf(ts, 1.0f/dch);
-  // return make_float3(ccf, ccf, ccf);
+  rats.x = powerptoe(rats.x, 0.05f, -0.1f, 1.0f);
+  rats.y = powerptoe(rats.y, 0.05f, -0.1f, 1.0f);
+  rats.z = powerptoe(rats.z, 0.05f, -0.1f, 1.0f);
 
-  // Apply chroma compression to RGB Ratios
-  rats = rats*(1.0f - ccf) + ccf;
-  
   /* Calculate RGB CMY hue angles from the input RGB.
     The classical way of calculating hue angle from RGB is something like this
     mx = max(r,g,b)
@@ -360,6 +369,41 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Calculate "Chroma" (the normalized distance from achromatic).
   float rats_ch = 1.0f - sdivf(mn, mx);
 
+
+  /* Chroma Value Compression ------------------------------------------ *
+      RGB ratios may be greater than 1.0, which can result in discontinuities in highlight gradients.
+      We compensate for this by normalizing the RGB Ratios so that max(r,g,b) does not exceed 1, and then mix
+      the result. The factor for the mix is derived from tonescale * chroma, then taking only the top end of
+      this with a compression function, so that we normalize only bright and saturated pixels.
+  */
+
+  // Normalization mix factor based on ccf*ch
+  float chf = rats_ch*ts;
+  // 1-pow(pow(a/m,1/p)+1,-p)
+  // chf = powerp(chf, 0.5f, 0.3f);
+  chf = 1.0f - spowf(spowf(chf/0.3f, 1.0f/0.5f)+1.0f, -0.5f);
+
+  // Max of rgb ratios
+  float rats_mx = _fmaxf(rats.x, _fmaxf(rats.y, rats.z));
+
+  // Normalized rgb ratios
+  float3 rats_n = sdivf3f(rats, rats_mx);
+
+  // Mix based on chf
+  rats = rats_n*chf + rats*(1.0f - chf);
+
+
+  /* Chroma Compression ------------------------------------------ *
+      Here we set up the chroma compression factor, used to lerp towards 1.0
+      in RGB Ratios, thereby compressing color towards display peak.
+      This factor is driven by ts, biased by a power function to control chroma compression amount `dch`.
+  */
+  float ccf = 1.0f - _powf(ts, 1.0f/dch);
+
+  // Apply chroma compression to RGB Ratios
+  rats = rats*ccf + 1.0f - ccf;
+
+
   /* Chroma Compression Hue Shift ------------------------------------------ *
       Since we compress chroma by lerping in a straight line towards 1.0 in rgb ratios, this can result in perceptual hue shifts
       due to the Abney effect. For example, pure blue compressed in a straight line towards achromatic appears to shift in hue towards purple.
@@ -376,50 +420,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float3 hsf = ccf*rats_h;
   
   // Apply hue shift to RGB Ratios
-  rats = make_float3(rats.x + hsf.z*hs.z - hsf.y*hs.y, rats.y + hsf.x*hs.x - hsf.z*hs.z, rats.z + hsf.y*hs.y - hsf.x*hs.x);
+  float3 rats_hs = make_float3(rats.x + hsf.z*hs.z - hsf.y*hs.y, rats.y + hsf.x*hs.x - hsf.z*hs.z, rats.z + hsf.y*hs.y - hsf.x*hs.x);
 
-
-  /* Chroma Value Compression ------------------------------------------ *
-      Using a weighted sum -> hypot for our norm results in RGB ratios that are greater than 1.0.
-      We compress chroma of the input towards peak achromatic, but there can still be values which extend beyond
-      the display cube for highly chromatic colors. These extrusions can cause ugly halos and 
-      abrupt gradient changes, which are visually undesirable. To combat this, we add a post-chroma compression
-      normalization, which reduces the intensity, essentially scaling down the vector so that more data will fit inside
-      the display gamut cube.
-
-      To achieve this, we first normalize the RGB ratios so that the max value is 1.0. We do this by taking the max of rgb, 
-      then dividing the rgb ratios by it. Using this directly would result in mid-range chroma and tonality being
-      scaled down way too much, so instead we mix by the chroma compression factor * chroma, biased by the user-controlled
-      chroma compression factor `dch`. This way as chroma compression is reduced, the vector is scaled down more.
-
-      When using chroma, secondaries are scaled down so they are about even with primaries brightness.
-      If "filling the whole cube" is desired, one could instead lerp from chroma to (rats_h.x+rats_h.y+rats_h.z),
-      so that only primaries are normalized.
-  */
-
-  // Normalization mix factor based on ccf*ch
-  float chf = spowf(ccf*rats_ch, dch);
-
-  // Post-chroma compression max of rgb ratios
-  float rats_mx = _fmaxf(rats.x, _fmaxf(rats.y, rats.z));
-
-  // Normalized rgb ratios
-  float3 rats_n = sdivf3f(rats, rats_mx);
-
-  // Mix based on chf
-  rats = rats_n*chf + rats*(1.0f - chf);
-
-  /* Gamut Compress ------------------------------------------ *
-      Most of our data is now inside of the display gamut cube, but there may still be some gradient disruptions
-      due to highly chromatic colors going outside of the display cube on the lower end and then being clipped
-      whether implicitly or explicitly. To combat this, our last step is to do a soft clip or gamut compression.
-      In RGB Ratios, 0,0,0 is the gamut boundary, and anything outside of gamut will have one or more negative 
-      components. So to compress the gamut we use lift these negative values and compress them into a small range
-      near 0. We use the "PowerP" hyperbolic compression function but it could just as well be anything.
-  */
-  rats.x = 1.0f - powerp(1.0f - rats.x, 10.0f, 1.02f);
-  rats.y = 1.0f - powerp(1.0f - rats.y, 10.0f, 1.02f);
-  rats.z = 1.0f - powerp(1.0f - rats.z, 10.0f, 1.02f);
+  // Mix hue shifted RGB ratios by chroma compression factor, so that we only shift 
+  // where highlights were chroma compressed.
+  rats = rats_hs*(1.0f - ccf) + rats*ccf;
 
   // Apply tonescale to RGB Ratios
   rgb = rats*ts;
