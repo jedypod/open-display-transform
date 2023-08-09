@@ -3,7 +3,7 @@ push $cut_paste_input
 Group {
  name OpenDRT
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.2.5 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.2.6 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
  addUserKnob {41 gamut l "in gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer01 l "" +STARTLINE}
  addUserKnob {26 tonescale_label l " " T <b>tonescale</b>}
@@ -351,7 +351,7 @@ set N5adc5600 [stack 0]
   ypos -513
   addUserKnob {20 Params}
   addUserKnob {7 rw R 0.05 0.6}
-  rw 0.3
+  rw 0.25
   addUserKnob {7 gw R 0.05 0.66}
   gw {{1-(rw+bw)}}
   addUserKnob {7 bw R 0.05 0.6}
@@ -419,13 +419,13 @@ push $Nfd0a3200
 set Nfd0a2400 [stack 0]
  Expression {
   channel0 rgba
-  expr0 r**(1/dch)
+  expr0 r**(1/dch)*(1-r)+r*r
   name Power
   xpos -150
   ypos -299
   addUserKnob {20 Params}
   addUserKnob {7 dch R 0.25 1.25}
-  dch 0.5
+  dch 0.4
  }
  Expression {
   channel0 rgba
@@ -474,7 +474,7 @@ push $N5adc5600
   addUserKnob {7 p}
   p 0.05
   addUserKnob {7 m R -1 0}
-  m -0.1
+  m -0.05
   addUserKnob {7 t0}
   t0 1
  }
@@ -538,9 +538,9 @@ push $Nfd0a2400
   ypos -309
   addUserKnob {20 Params}
   addUserKnob {7 m}
-  m 0.3
+  m 0.25
   addUserKnob {7 p}
-  p 0.5
+  p 0.65
  }
 push $N3838ab00
  MergeExpression {
@@ -589,7 +589,7 @@ push $N3838ab00
   addUserKnob {7 s1 R -1 1}
   s1 -0.1
   addUserKnob {7 s2 R -1 1}
-  s2 -0.4
+  s2 -0.5
  }
  Merge2 {
   inputs 2
