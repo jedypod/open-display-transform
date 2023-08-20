@@ -3,7 +3,7 @@ push $cut_paste_input
 Group {
  name OpenDRT
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.2.6 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> created by Jed Smith\n<br>v0.2.7 | <a href=https://github.com/jedypod/open-display-transform>documentation</a><br>"}
  addUserKnob {41 gamut l "in gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer01 l "" +STARTLINE}
  addUserKnob {26 tonescale_label l " " T <b>tonescale</b>}
@@ -15,6 +15,7 @@ Group {
  addUserKnob {6 dch_enable l "&nbsp;&nbsp;<b>chroma compression" +STARTLINE}
  dch_enable true
  addUserKnob {41 dch l dechroma T Power.dch}
+ addUserKnob {41 chc l "chroma contrast" T PowerPvLerp.p}
  addUserKnob {6 hs_enable l "&nbsp;&nbsp;<b>hue shift" +STARTLINE}
  hs_enable true
  addUserKnob {41 hs_r l "<font color=#a11515>red<font> shift" T ShiftRGB.s0}
@@ -40,7 +41,7 @@ Group {
   ypos -634
   addUserKnob {20 InputGamut_to_XYZ_tab l InputGamut_to_XYZ}
   addUserKnob {4 gamut l "in gamut" M {ACES ACEScg P3D65 Rec.2020 Rec.709 "Alexa WideGamut" "Red WideGamutRGB" "Sony SGamut3" "Filmlight E-Gamut" "DaVinci Wide Gamut" "" "" ""}}
-  gamut Rec.709
+  gamut "Filmlight E-Gamut"
   addUserKnob {41 matrix T ColorMatrix.matrix}
   addUserKnob {41 invert -STARTLINE T ColorMatrix.invert}
  }
@@ -55,7 +56,7 @@ Group {
    xpos 324
    ypos -546
   }
-set N4add9d00 [stack 0]
+set N155b900 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -71,14 +72,14 @@ set N4add9d00 [stack 0]
    xpos 290
    ypos -250
   }
-push $N4add9d00
+push $N155b900
   Dot {
    name Dot391
    label " *RGB to XYZ D65 CAT: XYZ Scaling"
    xpos 434
    ypos -546
   }
-set N4add8800 [stack 0]
+set N155a400 [stack 0]
   ColorMatrix {
    matrix {
        {0.7006223202 0.1487748027 0.101058729}
@@ -90,7 +91,7 @@ set N4add8800 [stack 0]
    xpos 1390
    ypos -466
   }
-push $N4add8800
+push $N155a400
   ColorMatrix {
    matrix {
        {0.705396831 0.1640413404 0.08101775497}
@@ -102,7 +103,7 @@ push $N4add8800
    xpos 1280
    ypos -466
   }
-push $N4add8800
+push $N155a400
   ColorMatrix {
    matrix {
        {0.5990839005 0.2489254922 0.1024464965}
@@ -114,7 +115,7 @@ push $N4add8800
    xpos 1170
    ypos -465
   }
-push $N4add8800
+push $N155a400
   ColorMatrix {
    matrix {
        {0.735275209 0.06860940903 0.1465712786}
@@ -126,7 +127,7 @@ push $N4add8800
    xpos 1060
    ypos -466
   }
-push $N4add8800
+push $N155a400
   ColorMatrix {
    matrix {
        {0.6380076408 0.2147038132 0.09774445742}
@@ -138,7 +139,7 @@ push $N4add8800
    xpos 950
    ypos -466
   }
-push $N4add8800
+push $N155a400
   ColorMatrix {
    matrix {
        {0.4123909175 0.3575843573 0.1804807931}
@@ -150,7 +151,7 @@ push $N4add8800
    xpos 840
    ypos -466
   }
-push $N4add8800
+push $N155a400
   ColorMatrix {
    matrix {
        {0.6369581223 0.1446169168 0.1688809693}
@@ -162,7 +163,7 @@ push $N4add8800
    xpos 730
    ypos -466
   }
-push $N4add8800
+push $N155a400
   ColorMatrix {
    matrix {
        {0.4865711331 0.2656677067 0.1982173175}
@@ -174,7 +175,7 @@ push $N4add8800
    xpos 620
    ypos -466
   }
-push $N4add8800
+push $N155a400
   ColorMatrix {
    matrix {
        {0.6609312296 0.1336961389 0.1558285803}
@@ -186,7 +187,7 @@ push $N4add8800
    xpos 510
    ypos -466
   }
-push $N4add8800
+push $N155a400
   ColorMatrix {
    matrix {
        {0.9503623843 0 9.346324805e-05}
@@ -229,7 +230,7 @@ push $N4add8800
    xpos 324
    ypos -516
   }
-set N14dda400 [stack 0]
+set Nc8f88100 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -245,14 +246,14 @@ set N14dda400 [stack 0]
    xpos 290
    ypos -310
   }
-push $N14dda400
+push $Nc8f88100
   Dot {
    name Dot1
    label " XYZ D65 to *RGB CAT: XYZ Scaling"
    xpos 434
    ypos -516
   }
-set N14dd8f00 [stack 0]
+set Nc4766b00 [stack 0]
   ColorMatrix {
    matrix {
        {1 0 0}
@@ -264,7 +265,7 @@ set N14dd8f00 [stack 0]
    xpos 950
    ypos -465
   }
-push $N14dd8f00
+push $Nc4766b00
   ColorMatrix {
    matrix {
        {3.240968943 -1.537382722 -0.4986106157}
@@ -276,7 +277,7 @@ push $N14dd8f00
    xpos 840
    ypos -465
   }
-push $N14dd8f00
+push $Nc4766b00
   ColorMatrix {
    matrix {
        {2.72539258 -1.01800251 -0.4401629865}
@@ -288,7 +289,7 @@ push $N14dd8f00
    xpos 730
    ypos -465
   }
-push $N14dd8f00
+push $Nc4766b00
   ColorMatrix {
    matrix {
        {2.40274024 -0.8974836469 -0.3880532086}
@@ -300,7 +301,7 @@ push $N14dd8f00
    xpos 620
    ypos -465
   }
-push $N14dd8f00
+push $Nc4766b00
   ColorMatrix {
    matrix {
        {2.493495464 -0.9313831329 -0.4027105868}
@@ -312,7 +313,7 @@ push $N14dd8f00
    xpos 510
    ypos -465
   }
-push $N14dd8f00
+push $Nc4766b00
   ColorMatrix {
    matrix {
        {1.716650844 -0.3556707203 -0.2533662021}
@@ -337,7 +338,7 @@ push $N14dd8f00
   xpos 214
   ypos -558
  }
-set N5adc5600 [stack 0]
+set Nc1213200 [stack 0]
  Dot {
   name Dot2
   xpos -226
@@ -357,7 +358,7 @@ set N5adc5600 [stack 0]
   addUserKnob {7 bw R 0.05 0.6}
   bw 0.3
  }
-set N5adc4800 [stack 0]
+set Nc1212400 [stack 0]
  Expression {
   temp_name0 ts0
   temp_expr0 invert?(r+sqrt(r*(4*fl+r)))/2:(m*r/(r+s))**c
@@ -404,55 +405,20 @@ set N5adc4800 [stack 0]
   xpos -226
   ypos -342
  }
-set Nfd0a3200 [stack 0]
+set Nc1211600 [stack 0]
+ Dot {
+  name Dot9
+  xpos -226
+  ypos -126
+ }
+set N47a46400 [stack 0]
  Dot {
   name Dot3
   xpos -226
-  ypos -54
+  ypos 13
  }
-push $Nfd0a3200
- Dot {
-  name Dot6
-  xpos -116
-  ypos -342
- }
-set Nfd0a2400 [stack 0]
- Expression {
-  channel0 rgba
-  expr0 r**(1/dch)*(1-r)+r*r
-  name Power
-  xpos -150
-  ypos -299
-  addUserKnob {20 Params}
-  addUserKnob {7 dch R 0.25 1.25}
-  dch 0.4
- }
- Expression {
-  channel0 rgba
-  expr0 1-r
-  name complement
-  xpos -150
-  ypos -273
- }
- Dot {
-  name Dot8
-  xpos -116
-  ypos -222
- }
- Dot {
-  name Dot4
-  xpos -6
-  ypos -222
- }
-set Nfd0a0800 [stack 0]
- Dot {
-  name Dot9
-  xpos -6
-  ypos -126
- }
-push $Nfd0a0800
-push $N5adc4800
-push $N5adc5600
+push $Nc1212400
+push $Nc1213200
  MergeExpression {
   inputs 2
   expr0 Ar==0?0:max(-2,Br/Ar)
@@ -483,7 +449,7 @@ push $N5adc5600
   xpos 214
   ypos -414
  }
-set N3838ab00 [stack 0]
+set N47a44f00 [stack 0]
  Expression {
   temp_name0 mx
   temp_expr0 max(r,g,b)
@@ -510,18 +476,84 @@ set N3838ab00 [stack 0]
   xpos 104
   ypos -342
  }
-set N38389600 [stack 0]
+set N46123900 [stack 0]
+ Dot {
+  name Dot10
+  xpos 104
+  ypos -246
+ }
+set N109bab00 [stack 0]
+push $N47a46400
+ Dot {
+  name Dot11
+  xpos -6
+  ypos -126
+ }
+set N109ba400 [stack 0]
+ MergeExpression {
+  inputs 2
+  temp_name0 f
+  temp_expr0 (4*Aa*(1-Aa))
+  channel0 rgba
+  expr0 min(2,r/(m*pow(r/m,p)*f+r*(1-f)))
+  expr3 f
+  name PowerPvLerp
+  xpos -40
+  ypos -57
+  addUserKnob {20 Params}
+  addUserKnob {7 p R 1 2}
+  p 1.2
+  addUserKnob {7 m}
+  m 0.3
+ }
+push $N109ba400
+push $Nc1211600
+ Dot {
+  name Dot6
+  xpos -116
+  ypos -342
+ }
+set Nc1210800 [stack 0]
+ Expression {
+  channel0 rgba
+  expr0 r**(1/dch)*(1-r)+r*r
+  name Power
+  xpos -150
+  ypos -299
+  addUserKnob {20 Params}
+  addUserKnob {7 dch R 0.25 1.25}
+  dch 0.4
+ }
+ Expression {
+  channel0 rgba
+  expr0 1-r
+  name complement
+  xpos -150
+  ypos -273
+ }
+ Dot {
+  name Dot8
+  xpos -116
+  ypos -222
+ }
+ Dot {
+  name Dot4
+  xpos -6
+  ypos -222
+ }
+set N47a46b00 [stack 0]
+push $N109bab00
  Merge2 {
   inputs 2
   operation multiply
   bbox B
   name Merge349
   xpos 70
-  ypos -177
+  ypos -184
  }
-push $Nfd0a0800
-push $N38389600
-push $Nfd0a2400
+push $N47a46b00
+push $N46123900
+push $Nc1210800
  MergeExpression {
   inputs 2
   channel0 rgba
@@ -542,7 +574,7 @@ push $Nfd0a2400
   addUserKnob {7 p}
   p 0.65
  }
-push $N3838ab00
+push $N47a44f00
  MergeExpression {
   inputs 2
   temp_name0 mx
@@ -578,7 +610,6 @@ push $N3838ab00
   expr1 g+Ar*s0-Ab*s2
   expr2 b+Ag*s1-Ar*s0
   maskChannelMask rgba.red
-  invert_mask true
   name ShiftRGB
   xpos 180
   ypos -130
@@ -591,6 +622,26 @@ push $N3838ab00
   addUserKnob {7 s2 R -1 1}
   s2 -0.5
  }
+ MergeExpression {
+  inputs 2
+  temp_name2 f
+  temp_expr2 Ar
+  temp_name3 L
+  temp_expr3 r*rw+g*gw+b*bw
+  expr0 L*(1-f)+r*f
+  expr1 L*(1-f)+g*f
+  expr2 L*(1-f)+b*f
+  name Saturation
+  xpos 180
+  ypos -58
+  addUserKnob {20 Params}
+  addUserKnob {7 rw R 0.05 0.6}
+  rw 0.23
+  addUserKnob {7 gw R 0.05 0.66}
+  gw {{1-(rw+bw)}}
+  addUserKnob {7 bw R 0.05 0.6}
+  bw 0.08
+ }
  Merge2 {
   inputs 2
   operation multiply
@@ -598,7 +649,7 @@ push $N3838ab00
   output rgb
   name Merge2
   xpos 180
-  ypos -58
+  ypos 9
  }
  Expression {
   temp_name0 mx
@@ -609,7 +660,7 @@ push $N3838ab00
   expr2 max(0,min(mx,b*s))
   name DisplayScale
   xpos 180
-  ypos -12
+  ypos 55
   addUserKnob {20 Params}
   addUserKnob {6 pq +STARTLINE}
   pq {{eotf==4}}
@@ -623,7 +674,7 @@ push $N3838ab00
  Group {
   name InverseEOTF
   xpos 180
-  ypos 14
+  ypos 81
   addUserKnob {20 EOTF_tab l EOTF}
   addUserKnob {4 eotf t "Choose the inverse EOTF to apply for the target display device." M {None "sRGB Display" BT.1886 "Gamma 2.6" PQ HLG "" "" ""}}
   eotf BT.1886
@@ -634,7 +685,7 @@ push $N3838ab00
    xpos 400
    ypos -129
   }
-set N2093d600 [stack 0]
+set Nc648b200 [stack 0]
   Expression {
    temp_name0 Yd
    temp_expr0 0.2627*r+0.6780*g+0.0593*b
@@ -667,7 +718,7 @@ set N2093d600 [stack 0]
    addUserKnob {7 _c}
    _c {{0.5-_a*log(4*_a)}}
   }
-push $N2093d600
+push $Nc648b200
   Expression {
    temp_name0 rp
    temp_expr0 pow(r,m_1)
@@ -693,7 +744,7 @@ push $N2093d600
    addUserKnob {7 c_3}
    c_3 {{2392/128}}
   }
-push $N2093d600
+push $Nc648b200
   Expression {
    expr0 sign(r)*pow(fabs(r),1/p)
    expr1 sign(g)*pow(fabs(g),1/p)
@@ -721,6 +772,6 @@ push $N2093d600
  Output {
   name Output
   xpos 180
-  ypos 62
+  ypos 129
  }
 end_group

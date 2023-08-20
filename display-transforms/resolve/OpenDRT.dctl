@@ -1,6 +1,6 @@
 #line 1 // Fix line numbers in resolve/logs/rollinglog.txt
 /*  OpenDRT -------------------------------------------------/
-      v0.2.6
+      v0.2.7
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -197,6 +197,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Dechroma
   float dch = 0.4f;
+
+  // Chroma contrast
+  float chc_p = 1.2f; // amount of contrast
+  float chc_m = 0.3f; // pivot of contrast curve
 
   // Weights: controls the "vibrancy" of each channel, and influences all other aspects of the display-rendering.
   float3 weights = make_float3(0.25f, 0.45f, 0.3f);
@@ -426,9 +430,28 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Apply hue shift to RGB Ratios
   float3 rats_hs = make_float3(rats.x + hsf.z*hs.z - hsf.y*hs.y, rats.y + hsf.x*hs.x - hsf.z*hs.z, rats.z + hsf.y*hs.y - hsf.x*hs.x);
 
-  // Mix hue shifted RGB ratios by chroma compression factor, so that we only shift 
-  // where highlights were chroma compressed.
-  rats = rats_hs*(1.0f - ccf) + rats*ccf;
+  // Mix hue shifted RGB ratios by ts, so that we shift where highlights were chroma compressed plus a bit.
+  rats = rats_hs*ts + rats*(1.0f - ts);
+
+
+  /* Chroma Contrast
+      Without this step, mid-range chroma in shadows and midtones looks too grey and dead.
+      This is common with chromaticity-linear view transforms.
+      In order to improve skin-tone rendering and overal "vibrance" of the image, which we
+      are used to seeing with per-channel style view transforms, we boost mid-range chroma
+      in shadows and midtones using a "chroma contrast" setup.
+      
+      Basically we take classical chroma (distance from achromatic), we take the compressed tonescale curve, 
+      and we apply a contrast to the tonescale curve mixed by a parabolic center extraction of chroma, 
+      so that we do not boost saturation at grey (increases noise), nor do we boost saturation of highly
+      saturated colors which might already be near the edge of the gamut volume.
+  */
+  float chc_f = 4.0f*rats_ch*(1.0f - rats_ch);
+  float chc_sa = _fminf(2.0f, sdivf(ts, chc_m*spowf(sdivf(ts, chc_m), chc_p)*chc_f + ts*(1.0f - chc_f)));
+  float chc_L = 0.23f*rats.x + 0.69f*rats.y + 0.08f*rats.z; // Roughly P3 weights, doesn't matter
+  
+  // Apply mid-range chroma contrast saturation boost
+  rats = chc_L*(1.0f - chc_sa) + rats*chc_sa;
 
   // Apply tonescale to RGB Ratios
   rgb = rats*ts;
