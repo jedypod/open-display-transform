@@ -1,19 +1,17 @@
 #line 1 // Fix line numbers in resolve/logs/rollinglog.txt
 /*  OpenDRT -------------------------------------------------/
-      v0.2.7
+      v0.2.8
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
       License: GPL v3
 -------------------------------------------------*/
 
-DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 11, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 10.0)
-DEFINE_UI_PARAMS(gb, Lp exp boost, DCTLUI_SLIDER_FLOAT, 0.12, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(c, contrast, DCTLUI_SLIDER_FLOAT, 1.1, 1.0, 1.3, 0.0)
-DEFINE_UI_PARAMS(fl, flare, DCTLUI_SLIDER_FLOAT, 0.01, 0.0, 0.02, 0.001)
+DEFINE_UI_PARAMS(gb, grey boost, DCTLUI_SLIDER_FLOAT, 0.12, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 11, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3 D65, Rec.2020})
-DEFINE_UI_PARAMS(EOTF, inverse eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
+DEFINE_UI_PARAMS(EOTF, display eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
 
 // Gamut Conversion Matrices
 #define matrix_ap0_to_xyz make_float3x3(make_float3(0.93863094875f, -0.00574192055f, 0.017566898852f), make_float3(0.338093594922f, 0.727213902811f, -0.065307497733f), make_float3(0.000723121511f, 0.000818441849f, 1.0875161874f))
@@ -59,13 +57,15 @@ __DEVICE__ float3 vdot(float3x3 m, float3 v) {
 
 // Safe division of float a by float b
 __DEVICE__ float sdivf(float a, float b) {
-  if (_fabs(b) < 1e-4f) return 0.0f;
+  if (b == 0.0f) return 0.0f;
   else return a/b;
 }
+
 // Safe division of float3 a by float b
 __DEVICE__ float3 sdivf3f(float3 a, float b) {
   return make_float3(sdivf(a.x, b), sdivf(a.y, b), sdivf(a.z, b));
 }
+
 // Safe division of float3 a by float3 b
 __DEVICE__ float3 sdivf3f3(float3 a, float3 b) {
   return make_float3(sdivf(a.x, b.x), sdivf(a.y, b.y), sdivf(a.z, b.z));
@@ -76,6 +76,7 @@ __DEVICE__ float spowf(float a, float b) {
   if (a <= 0.0f) return a;
   else return _powf(a, b);
 }
+
 // Safe power function raising float3 a to power float b
 __DEVICE__ float3 spowf3(float3 a, float b) {
   return make_float3(_powf(a.x, b), _powf(a.y, b), _powf(a.z, b));
@@ -200,7 +201,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Chroma contrast
   float chc_p = 1.2f; // amount of contrast
-  float chc_m = 0.3f; // pivot of contrast curve
+  float chc_m = 0.5f; // pivot of contrast curve
+
+  // Tonescale parameters
+  float c = 1.1f; // contrast
+  float fl = 0.01f; // flare/glare compensation
 
   // Weights: controls the "vibrancy" of each channel, and influences all other aspects of the display-rendering.
   float3 weights = make_float3(0.25f, 0.45f, 0.3f);
@@ -313,13 +318,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   /* Take the the weighted sum of RGB. The weights
       scale the vector of each color channel, controlling the "vibrancy".
       We use this as a vector norm for separating color and intensity.
-      The weights could be normalized using w /= hypotf3(w)
-      so that achromatic peak does not change. However instead of doing this
-      we set the weights as we please, and rely on the chroma compression to 
-      compress to display peak luminance as chromatic intensity increases.
   */ 
-  weights *= maxf3(1e-5f, rgb); // multiply rgb by weights
-  float lum = weights.x + weights.y + weights.z; // take the norm
+  weights *= rgb; // multiply rgb by weights
+  float lum = _fmaxf(1e-8f, weights.x + weights.y + weights.z); // take the norm
 
   // RGB Ratios
   float3 rats = sdivf3f(rgb, lum);
@@ -383,8 +384,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       this with a compression function, so that we normalize only bright and saturated pixels.
   */
 
-  // Normalization mix factor based on ccf*ch
-  float chf = rats_ch*ts;
+  // Normalization mix factor based on ccf * rgb chroma, smoothing transitions between r->g hue gradients
+  float chf = ts*_fmaxf(spowf(rats_h.x, 2.0f), _fmaxf(spowf(rats_h.y, 2.0f), spowf(rats_h.z, 2.0f)));
   
   float chf_m = 0.25f;
   float chf_p = 0.65f;
@@ -447,7 +448,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       saturated colors which might already be near the edge of the gamut volume.
   */
   float chc_f = 4.0f*rats_ch*(1.0f - rats_ch);
-  float chc_sa = _fminf(2.0f, sdivf(ts, chc_m*spowf(sdivf(ts, chc_m), chc_p)*chc_f + ts*(1.0f - chc_f)));
+  float chc_sa = _fminf(2.0f, sdivf(lum, chc_m*spowf(sdivf(lum, chc_m), chc_p)*chc_f + lum*(1.0f - chc_f)));
   float chc_L = 0.23f*rats.x + 0.69f*rats.y + 0.08f*rats.z; // Roughly P3 weights, doesn't matter
   
   // Apply mid-range chroma contrast saturation boost
