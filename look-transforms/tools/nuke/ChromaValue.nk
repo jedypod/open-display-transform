@@ -4,7 +4,7 @@ Group {
  name ChromaValue
  tile_color 0x536177ff
  addUserKnob {20 ChromaValue_tab l ChromaValue}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Chroma Value</b> created by Jed Smith\n<br>v0.1.0 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look-transforms>documentation</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Chroma Value</b> created by Jed Smith\n<br>v0.1.1 | <a href=https://github.com/jedypod/open-display-transform/tree/main/look-transforms>documentation</a><br>"}
  addUserKnob {41 ex l exposure T Multiply.ex}
  addUserKnob {26 ""}
  addUserKnob {32 sr l "<font color=#e00><b>R" T "knobs this \{o 2\}" +STARTLINE}
@@ -89,7 +89,7 @@ push $Nc5615a90
   temp_expr3 (H+o)%6
   channel0 {rgba.red rgba.green rgba.blue none}
   expr0 h<cn?clamp((h-e0)/(cn-e0)):clamp((h-e1)/(cn-e1))
-  expr3 C/M
+  expr3 M==0?0:C/M
   name HueAngle
   xpos -260
   ypos -682
