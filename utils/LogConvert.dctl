@@ -4,7 +4,7 @@
 
 */
 
-DEFINE_UI_PARAMS(curve, curve, DCTLUI_COMBO_BOX, 0, {acescc, acescct, arri_logc3, arri_logc4, blackmagic_filmgen5, canon_clog2, canon_clog3, dji_dlog, fujifilm_flog, gopro_protune, leica_llog, nikon_nlog, panasonic_vlog, red_log3g10, sony_slog2, sony_slog3, davinci_intermediate, filmlight_tlog, kodak_cineon}, {ACEScc, ACEScct, Arri LogC3, Arri LogC4, Blackmagic Film Gen5, Canon CLog2, Canon CLog3, DJI DLog, Fujifilm FLog, GoPro ProTune, Leica LLog, Nikon NLog, Panasonic VLog, Red Log3G10, Sony SLog2, Sony SLog3, DaVinci Intermediate, Filmlight TLog, Kodak Cineon})
+DEFINE_UI_PARAMS(curve, curve, DCTLUI_COMBO_BOX, 0, {acescc, acescct, arri_logc3, arri_logc4, blackmagic_filmgen5, canon_clog2, canon_clog3, dji_dlog, fujifilm_flog, fujifilm_flog2, gopro_protune, leica_llog, nikon_nlog, panasonic_vlog, red_log3g10, sony_slog2, sony_slog3, davinci_intermediate, filmlight_tlog, kodak_cineon}, {ACEScc, ACEScct, Arri LogC3, Arri LogC4, Blackmagic Film Gen5, Canon CLog2, Canon CLog3, DJI DLog, Fujifilm FLog, Fujifilm FLog2, GoPro ProTune, Leica LLog, Nikon NLog, Panasonic VLog, Red Log3G10, Sony SLog2, Sony SLog3, DaVinci Intermediate, Filmlight TLog, Kodak Cineon})
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
 
 
@@ -179,6 +179,26 @@ __DEVICE__ float oetf_fujifilm_flog(float x, int inv) {
   const float f = 0.092864f;
   const float cut1 = 0.00089f;
   const float cut2 = 0.1005377752f;
+
+  if (inv == 1) {
+    return x < cut2 ? (x-f)/e : (_exp10f(((x - d)/c))/a - b/a);
+  } else {
+    return x < cut1 ? e*x+f : c*_log10f(a*x + b) + d;
+  }
+}
+
+__DEVICE__ float oetf_fujifilm_flog2(float x, int inv) {
+  /* Fujifilm F-Log2
+      https://dl.fujifilm-x.com/support/lut/F-Log2_DataSheet_E_Ver.1.0.pdf
+  */
+  const float a = 5.555556f;
+  const float b = 0.064829f;
+  const float c = 0.245281f;
+  const float d = 0.384316f;
+  const float e = 8.799461f;
+  const float f = 0.092864f;
+  const float cut1 = 0.000889f;
+  const float cut2 = 0.100686685370811f;
 
   if (inv == 1) {
     return x < cut2 ? (x-f)/e : (_exp10f(((x - d)/c))/a - b/a);
@@ -422,6 +442,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb.x = oetf_fujifilm_flog(rgb.x, invert);
     rgb.y = oetf_fujifilm_flog(rgb.y, invert);
     rgb.z = oetf_fujifilm_flog(rgb.z, invert);
+  } else if (curve == fujifilm_flog2) {
+    rgb.x = oetf_fujifilm_flog2(rgb.x, invert);
+    rgb.y = oetf_fujifilm_flog2(rgb.y, invert);
+    rgb.z = oetf_fujifilm_flog2(rgb.z, invert);
   } else if (curve == gopro_protune) {
     rgb.x = oetf_gopro_protune(rgb.x, invert);
     rgb.y = oetf_gopro_protune(rgb.y, invert);
