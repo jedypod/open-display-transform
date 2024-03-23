@@ -1,0 +1,107 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name MidtoneContrast
+ addUserKnob {20 MidtoneContrast}
+ addUserKnob {41 con l contrast T ContrastLinearToeShoulder.con}
+ addUserKnob {41 pv l pivot T ContrastLinearToeShoulder.pv}
+ addUserKnob {41 sh l shoulder T ContrastLinearToeShoulder.sh}
+ addUserKnob {41 toe T ContrastLinearToeShoulder.toe}
+ addUserKnob {41 rp l "preserve ratios" T MergeExpression1.rp}
+ addUserKnob {41 invert T ContrastLinearToeShoulder.invert}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {41 maskChannelMask l mask -STARTLINE T NodeWrapper1.maskChannelMask}
+ addUserKnob {41 invert_mask l invert -STARTLINE T NodeWrapper1.invert_mask}
+ addUserKnob {41 mix T NodeWrapper1.mix}
+}
+ Input {
+  inputs 0
+  name Inputmask
+  xpos 180
+  ypos 855
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos 70
+  ypos 710
+ }
+set N70523290 [stack 0]
+ Expression {
+  temp_name0 mx
+  temp_expr0 min(r,g,b)
+  expr0 invert?r<tly?r/(s1*m0):r/s1<tuy?pow((r/s1-o)/s0,1/p):(r/s1-tuy)/m1+tux:s1*(r<tlx?m0*r:r<tux?s0*r**p+o:m1*(r-tux)+tuy)
+  expr1 invert?g<tly?g/(s1*m0):g/s1<tuy?pow((g/s1-o)/s0,1/p):(g/s1-tuy)/m1+tux:s1*(g<tlx?m0*g:g<tux?s0*g**p+o:m1*(g-tux)+tuy)
+  expr2 invert?b<tly?b/(s1*m0):b/s1<tuy?pow((b/s1-o)/s0,1/p):(b/s1-tuy)/m1+tux:s1*(b<tlx?m0*b:b<tux?s0*b**p+o:m1*(b-tux)+tuy)
+  expr3 mx==0?0:(invert?mx<tly?mx/(s1*m0):mx/s1<tuy?pow((mx/s1-o)/s0,1/p):(mx/s1-tuy)/m1+tux:s1*(mx<tlx?m0*mx:mx<tux?s0*mx**p+o:m1*(mx-tux)+tuy))/mx
+  name ContrastLinearToeShoulder
+  label https://www.desmos.com/calculator/mqvhho1mf9
+  xpos -40
+  ypos 752
+  addUserKnob {20 Params}
+  addUserKnob {7 con l contrast t "contrast" R -3 2}
+  addUserKnob {7 pv l pivot t "pivot in stops from middle grey" R -4 4}
+  addUserKnob {7 sh l shoulder t "linear splice point for shoulder in stops above pivot" R 0 4}
+  addUserKnob {7 toe t "linear splice point for toe ranging from 0 to pivot."}
+  toe 0.2
+  addUserKnob {7 p R 1 4}
+  p {{2**con}}
+  addUserKnob {7 t0}
+  t0 {{0.18*2**pv}}
+  addUserKnob {7 tux R 0.2 1}
+  tux {{t0*2**sh}}
+  addUserKnob {7 tlx R 0 0.2}
+  tlx {{toe*t0}}
+  addUserKnob {7 x0}
+  x0 {{t0}}
+  addUserKnob {7 y0}
+  y0 {{t0}}
+  addUserKnob {7 s0 R 0 4}
+  s0 {{y0*x0**-p}}
+  addUserKnob {7 tly R 0 0.2}
+  tly {{s1*m0*tlx}}
+  addUserKnob {7 tuy R 0.2 1}
+  tuy {{s0*tux**p+o}}
+  addUserKnob {7 m0 R 0 4}
+  m0 {{p*s0*(tlx==0?0:tlx**(p-1))}}
+  addUserKnob {7 m1 R 0 4}
+  m1 {{p*s0*pow(tux,p-1)}}
+  addUserKnob {7 o}
+  o {{m0*tlx-s0*tlx**p}}
+  addUserKnob {7 y1}
+  y1 {{s0*x0**p+o}}
+  addUserKnob {7 s1 R 0 4}
+  s1 {{y0/y1}}
+  addUserKnob {6 invert +STARTLINE}
+ }
+push $N70523290
+ MergeExpression {
+  inputs 2
+  temp_name0 s
+  temp_expr0 Aa
+  expr0 r*s*rp+Ar*(1-rp)
+  expr1 g*s*rp+Ag*(1-rp)
+  expr2 b*s*rp+Ab*(1-rp)
+  expr3 a
+  name MergeExpression1
+  xpos 70
+  ypos 807
+  addUserKnob {20 Params}
+  addUserKnob {7 rp l "preserve ratios" t "mix between per-channel at 0 and preserving rgb ratios using maxrgb norm at 1"}
+ }
+push $N70523290
+ NodeWrapper {
+  inputs 2+1
+  channels rgb
+  maskChannelInput -rgba.alpha
+  name NodeWrapper1
+  xpos 20
+  ypos 849
+ }
+ Output {
+  name Output
+  xpos 70
+  ypos 898
+ }
+end_group

@@ -1,0 +1,76 @@
+/* Midtone Contrast
+    A more sophisticated contrast operator with linear toe and shoulder sections.
+    https://www.desmos.com/calculator/mqvhho1mf9
+*/
+
+DEFINE_UI_PARAMS(con, contrast, DCTLUI_SLIDER_FLOAT, 0.0, -3.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(pv, pivot, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(sh, shoulder, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(toe, toe, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(rp, preserve ratios, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+
+
+__DEVICE__ float spowf(float x, float p) { return x <= 0.0f ? x : _powf(x, p); }
+__DEVICE__ float sdivf(float a, float b) { return _fabs(b) < 1e-6f ? 0.0f : a/b; }
+
+__DEVICE__ float contrast(float x, float s0, float s1, float p, float o, float m0, float m1, float tlx, float tly, float tux, float tuy, int inv) {
+  if (inv == 0) {
+    return s1*(x<tlx?m0*x:x<tux?s0*spowf(x, p) + o:m1*(x - tux) + tuy);
+  } else {
+    return x<tly?x/(s1*m0):x/s1<tuy?spowf((x/s1-o)/s0, 1.0f/p):(x/s1-tuy)/m1+tux;
+  }
+}
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
+{
+  /* Parameter Space */
+  // contrast 
+  const float p = spowf(2.0f, con);
+  // pivot in stops from middle grey
+  const float t0 = 0.18f*spowf(2.0f, pv);
+  // linear splice point for shoulder in stops above pivot
+  const float tux = t0*spowf(2.0f, sh);
+  // linear splice point for toe ranging from 0 to pivot
+  const float tlx = toe*t0;
+  
+  /* Pre-Calculations */
+  // The math supports intersection constraint at (x0, y0) for input x scale, but we only expose t0 as the pivot
+  const float x0 = t0;
+  const float y0 = t0;
+  // intersection constraint for (x0, y0) without offset
+  const float s0 = spowf(y0*x0, -p);
+  // get slope at x coordinate p0 using d/dx
+  const float m0 = p*s0*spowf(tlx, p-1.0f);
+  // calculate offset amount by diff of p1 and m*p0
+  const float o = m0*tlx - s0*spowf(tlx, p);
+  // slope at (x0, y0) for upper linear extension
+  const float m1 = p*s0*spowf(tux, p-1.0f);
+  // y coordinate of upper intersection 
+  const float tuy = s0*spowf(tux, p) + o;
+  // y coordinate of constraint point after offset
+  const float y1 = s0*spowf(x0, p) + o;
+  // scale to enforce intersection constraint at (x0, y0)
+  const float s1 = y0/y1;
+  // get y coordinate on f(x) at p0 normalized by s (for inverse of linear toe section)
+  const float tly = s1*m0*tlx;
+  
+
+  /* Shader Code */
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  // preserve rgb ratios using min(rgb) norm
+  float mx = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
+  float s = contrast(mx, s0, s1, p, o, m0, m1, tlx, tly, tux, tuy, invert);
+  s = sdivf(s, mx);
+  float3 rgb_rp = rgb*s;
+
+  rgb.x = contrast(rgb.x, s0, s1, p, o, m0, m1, tlx, tly, tux, tuy, invert);
+  rgb.y = contrast(rgb.y, s0, s1, p, o, m0, m1, tlx, tly, tux, tuy, invert);
+  rgb.z = contrast(rgb.z, s0, s1, p, o, m0, m1, tlx, tly, tux, tuy, invert);
+  
+  // mix between per-channel at rp=0 and preserving rgb ratios at 1
+  // NOTE: invert will not work 100% if rp is not 0 or 1
+  rgb = rgb_rp*rp + rgb*(1.0f - rp);
+  return rgb;
+}
