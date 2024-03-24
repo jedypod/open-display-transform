@@ -209,7 +209,6 @@ push $N7f8ced00
   ypos 758
   addUserKnob {20 Params}
   addUserKnob {7 r0 R -1 1}
-  r0 -1
   addUserKnob {7 r1 R -1 1}
   addUserKnob {7 r2 R -1 1}
   addUserKnob {7 rb0 R -1 1}
