@@ -1,0 +1,89 @@
+#line 1 // Fix line numbers in resolve/logs/rollinglog.txt
+/*  Primary Focus -------------------------------------------------/
+      v0.0.1
+      A tool to compress hues towards the primary color vectors. Pretty similar to n6HueShift
+      but parameterized to compress or expand on both sides of a primary hue vector instead.
+
+      Written by Jed Smith
+      https://github.com/jedypod/open-display-transform
+
+      License: GPL v3
+-------------------------------------------------*/
+
+
+DEFINE_UI_PARAMS(p_fr, focus -  R, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(p_fg,          G, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(p_fb,          B, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(p_sr, strength -  R, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
+DEFINE_UI_PARAMS(p_sg,             G, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
+DEFINE_UI_PARAMS(p_sb,             B, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
+DEFINE_UI_PARAMS(p_wr, width -  R, DCTLUI_SLIDER_FLOAT, 1.0, 0, 1, 0)
+DEFINE_UI_PARAMS(p_wg,          G, DCTLUI_SLIDER_FLOAT, 1.0, 0, 1, 0)
+DEFINE_UI_PARAMS(p_wb,          B, DCTLUI_SLIDER_FLOAT, 1.0, 0, 1, 0)
+
+DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -6, 6, 0)
+DEFINE_UI_PARAMS(zone, zone, DCTLUI_COMBO_BOX, 0, {low, high}, {low, high})
+
+
+
+//----------------------------------------------------------------------------//
+
+
+// Safe power function raising float a to power float b
+__DEVICE__ float spowf(float a, float b) {
+  if (a <= 0.0f) return a;
+  else return _powf(a, b);
+}
+
+// Safe division of float a by float b
+__DEVICE__ float sdivf(float a, float b) {
+  if (b == 0.0f) return 0.0f;
+  else return a/b;
+}
+
+// Safe division of float3 a by float b
+__DEVICE__ float3 sdivf3f(float3 a, float b) {
+  return make_float3(sdivf(a.x, b), sdivf(a.y, b), sdivf(a.z, b));
+}
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
+{
+  // Parameter Setup
+  float3 f = make_float3(1.0f - p_fr, 1.0f - p_fg, 1.0f - p_fb);
+
+  float3 in = make_float3(p_R, p_G, p_B);
+
+  // RGB Ratios
+  float mx = _fmaxf(in.x, _fmaxf(in.y, in.z));
+  mx = fabsf(mx) < 1e-4f ? 0.0f : mx;
+  float3 rgb = sdivf3f(in, mx);
+  float mn = _fmaxf(0.0f, _fminf(rgb.x, _fminf(rgb.y, rgb.z)));
+  
+  // Remove achromatic from RGB Ratios
+  rgb = rgb - mn;
+
+  // Mix between wide and narrow hue angles
+  rgb = make_float3( _fminf(1.0f, _fmaxf(0.0f, rgb.x - (rgb.y + rgb.z)*(1.0f - p_wr))),
+                              _fminf(1.0f, _fmaxf(0.0f, rgb.y - (rgb.x + rgb.z)*(1.0f - p_wg))),
+                              _fminf(1.0f, _fmaxf(0.0f, rgb.z - (rgb.x + rgb.y)*(1.0f - p_wb))));
+  
+  // Apply power function to chroma to adjust strength
+  rgb = make_float3(spowf(rgb.x, 1.0f/p_sr), spowf(rgb.y, 1.0f/p_sg), spowf(rgb.z, 1.0f/p_sb));
+  
+  // Do the hue distortion / compression / "focus", basically a 3-way lerp
+  rgb = make_float3(
+    in.x*f.y*rgb.y + in.x*f.z*rgb.z + in.x*(1.0f - (rgb.y + rgb.z)),
+    in.y*f.x*rgb.x + in.y*f.z*rgb.z + in.y*(1.0f - (rgb.x + rgb.z)),
+    in.z*f.x*rgb.x + in.z*f.y*rgb.y + in.z*(1.0f - (rgb.x + rgb.y)));
+
+
+  if (ze == 1) {
+    // Mix based on zone extraction using a hyperbolic extraction of input linear signal
+    float zr_f = sdivf(mx, _fmaxf(1e-6f, mx + spowf(2.0f, zp-1.0f)));
+    if (zone == low) zr_f = 1.0f - zr_f;
+    rgb = in*(1.0f - zr_f) + rgb*zr_f;
+  }
+
+  return rgb;
+}
