@@ -3,6 +3,7 @@ push $cut_paste_input
 Group {
  name MidtoneContrast
  addUserKnob {20 MidtoneContrast}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>MidtoneContrast</b> v0.0.1<br> | Part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a>"}
  addUserKnob {41 con l contrast T ContrastLinearToeShoulder.con}
  addUserKnob {41 pv l pivot T ContrastLinearToeShoulder.pv}
  addUserKnob {41 sh l shoulder T ContrastLinearToeShoulder.sh}

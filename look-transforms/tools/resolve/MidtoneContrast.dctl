@@ -1,6 +1,12 @@
 /* Midtone Contrast
+    v0.0.1
     A more sophisticated contrast operator with linear toe and shoulder sections.
     https://www.desmos.com/calculator/mqvhho1mf9
+
+    Written by Jed Smith
+    https://github.com/jedypod/open-display-transform
+
+    License: GPL v3
 */
 
 DEFINE_UI_PARAMS(con, contrast, DCTLUI_SLIDER_FLOAT, 0.0, -3.0, 2.0, 0.0)
