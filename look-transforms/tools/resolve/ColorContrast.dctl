@@ -1,6 +1,6 @@
 #line 1 // Fix line numbers in resolve/logs/rollinglog.txt
-/*  Primary Focus -------------------------------------------------/
-      v0.0.1
+/*  Color Contrast -------------------------------------------------
+      v0.0.2
       A tool to compress hues towards the primary color vectors. Pretty similar to n6HueShift
       but parameterized to compress or expand on both sides of a primary hue vector instead.
 
@@ -11,19 +11,21 @@
 -------------------------------------------------*/
 
 
-DEFINE_UI_PARAMS(p_fr, focus -  R, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(p_fg,          G, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
-DEFINE_UI_PARAMS(p_fb,          B, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(m0r, focus -  R low, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(m1r,          R high, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(m0g,          G low, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(m1g,          G high, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(m0b,          B low, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
+DEFINE_UI_PARAMS(m1b,          B high, DCTLUI_SLIDER_FLOAT, 0, -1, 1, 0)
 DEFINE_UI_PARAMS(p_sr, strength -  R, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
 DEFINE_UI_PARAMS(p_sg,             G, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
 DEFINE_UI_PARAMS(p_sb,             B, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
-DEFINE_UI_PARAMS(p_wr, width -  R, DCTLUI_SLIDER_FLOAT, 1.0, 0, 1, 0)
-DEFINE_UI_PARAMS(p_wg,          G, DCTLUI_SLIDER_FLOAT, 1.0, 0, 1, 0)
-DEFINE_UI_PARAMS(p_wb,          B, DCTLUI_SLIDER_FLOAT, 1.0, 0, 1, 0)
+DEFINE_UI_PARAMS(p_wr, width -  R, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
+DEFINE_UI_PARAMS(p_wg,          G, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
+DEFINE_UI_PARAMS(p_wb,          B, DCTLUI_SLIDER_FLOAT, 0.5, 0, 1, 0)
 
-DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 1)
-DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -6, 6, 0)
-DEFINE_UI_PARAMS(zone, zone, DCTLUI_COMBO_BOX, 0, {low, high}, {low, high})
+DEFINE_UI_PARAMS(bias, bias, DCTLUI_SLIDER_FLOAT, 0.0, -2, 2, 0)
+
 
 
 
@@ -50,8 +52,9 @@ __DEVICE__ float3 sdivf3f(float3 a, float b) {
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
 {
   // Parameter Setup
-  float3 f = make_float3(1.0f - p_fr, 1.0f - p_fg, 1.0f - p_fb);
-
+  float3 m0 = make_float3(1.0f - m0r, 1.0f - m0g, 1.0f - m0b);
+  float3 m1 = make_float3(1.0f - m1r, 1.0f - m1g, 1.0f - m1b);
+  
   float3 in = make_float3(p_R, p_G, p_B);
 
   // RGB Ratios
@@ -71,19 +74,21 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Apply power function to chroma to adjust strength
   rgb = make_float3(spowf(rgb.x, 1.0f/p_sr), spowf(rgb.y, 1.0f/p_sg), spowf(rgb.z, 1.0f/p_sb));
   
+
+  // We make the hue distortion bidirectional by using a lerp factor based on a generic hyperbolic 
+  // "tonescale" curve, biased by a power function. We use a Lift/Multiply linear function 
+  // ( https://www.desmos.com/calculator/eaxwxrhrev ) to remap the input to the 0-2 range expected 
+  // by the lerp (1.0 is no distortion, 2.0 is distorted towards the primary, 0.0 is distorted towards the secondary).
+  float zr_f = sdivf(mx, _fmaxf(1e-6f, mx + 0.66f));
+  zr_f = spowf(zr_f, spowf(2.0f, bias));
+
+  float3 f = make_float3(zr_f*(m1.x-m0.x)+m0.x, zr_f*(m1.y-m0.y)+m0.y, zr_f*(m1.z-m0.z)+m0.z);
+
   // Do the hue distortion / compression / "focus", basically a 3-way lerp
   rgb = make_float3(
     in.x*f.y*rgb.y + in.x*f.z*rgb.z + in.x*(1.0f - (rgb.y + rgb.z)),
     in.y*f.x*rgb.x + in.y*f.z*rgb.z + in.y*(1.0f - (rgb.x + rgb.z)),
     in.z*f.x*rgb.x + in.z*f.y*rgb.y + in.z*(1.0f - (rgb.x + rgb.y)));
-
-
-  if (ze == 1) {
-    // Mix based on zone extraction using a hyperbolic extraction of input linear signal
-    float zr_f = sdivf(mx, _fmaxf(1e-6f, mx + spowf(2.0f, zp-1.0f)));
-    if (zone == low) zr_f = 1.0f - zr_f;
-    rgb = in*(1.0f - zr_f) + rgb*zr_f;
-  }
 
   return rgb;
 }

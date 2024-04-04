@@ -3,20 +3,21 @@ push $cut_paste_input
 Group {
  name PrimaryFocus
  addUserKnob {20 PrimaryFocus}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>PrimaryFocus</b> v0.0.1<br> | Part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>PrimaryFocus</b> v0.0.2<br> | Part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a>"}
  addUserKnob {26 ""}
- addUserKnob {41 fr T Focus.fr}
- addUserKnob {41 fg T Focus.fg}
- addUserKnob {41 fb T Focus.fb}
+ addUserKnob {41 m0r l "R low" T Focus.m0r}
+ addUserKnob {41 m1r l "R high" T Focus.m1r}
+ addUserKnob {41 m0g l "G low" T Focus.m0g}
+ addUserKnob {41 m1g l "G high" T Focus.m1g}
+ addUserKnob {41 m0b l "B low" T Focus.m0b}
+ addUserKnob {41 m1b l "B high" T Focus.m1b}
  addUserKnob {41 sr l "strength r" T Power.sr}
  addUserKnob {41 sg l "strength g" T Power.sg}
  addUserKnob {41 sb l "strength b" T Power.sb}
  addUserKnob {41 wr l "width r" T NarrowRGB.wr}
  addUserKnob {41 wg l "width g" T NarrowRGB.wg}
  addUserKnob {41 wb l "width b" T NarrowRGB.wb}
- addUserKnob {41 ze l zoned T Extract.ze}
- addUserKnob {41 zr l "" -STARTLINE T Extract.zr}
- addUserKnob {41 ex l range T Extract.ex}
+ addUserKnob {41 ex l bias T Bias.ex}
  addUserKnob {26 ""}
  addUserKnob {41 maskChannelMask l mask -STARTLINE T NodeWrapper1.maskChannelMask}
  addUserKnob {41 invert_mask l invert -STARTLINE T NodeWrapper1.invert_mask}
@@ -26,7 +27,7 @@ Group {
   inputs 0
   name Inputmask
   xpos 180
-  ypos 831
+  ypos 902
   number 1
  }
  Input {
@@ -35,13 +36,12 @@ Group {
   xpos 70
   ypos 614
  }
-set N7834dde0 [stack 0]
  Dot {
   name Dot259
   xpos 104
   ypos 666
  }
-set Nc2eb4480 [stack 0]
+set N8be81860 [stack 0]
  Dot {
   name Dot263
   xpos 214
@@ -50,27 +50,17 @@ set Nc2eb4480 [stack 0]
  Expression {
   temp_name0 n
   temp_expr0 max(1e-12,max(r,g,b))
-  temp_name1 fhi
-  temp_expr1 n/(n+s)
-  temp_name2 flow
-  temp_expr2 1-fhi
-  channel0 {rgba.red -rgba.green -rgba.blue none}
-  expr0 r
-  expr1 g
-  expr2 b
-  expr3 ze?zr?fhi:flow:1
-  name Extract
+  channel0 rgba
+  expr0 (n/(n+0.66))**p
+  name Bias
   xpos 180
-  ypos 758
+  ypos 806
   addUserKnob {20 Params}
-  addUserKnob {6 ze l zoned t "enable zone limiting." +STARTLINE}
-  ze true
-  addUserKnob {83 zr l "" t "extract low range or high range." -STARTLINE M {low high}}
-  addUserKnob {7 ex l range t "bias to the extraction range" R -6 6}
-  addUserKnob {7 s R 0 4}
-  s {{2**(ex-1)}}
+  addUserKnob {7 ex l bias t "bias to the extraction range" R -2 2}
+  addUserKnob {7 p R 0 4}
+  p {{2**ex}}
  }
-push $Nc2eb4480
+push $N8be81860
  Expression {
   temp_name0 mx
   temp_expr0 max(r,g,b)
@@ -89,7 +79,7 @@ push $Nc2eb4480
   expr2 b-mn
   name HueChromaRGB
   xpos -40
-  ypos 688
+  ypos 686
  }
  Expression {
   expr0 r-(g+b)*w.0
@@ -97,14 +87,14 @@ push $Nc2eb4480
   expr2 b-(r+g)*w.2
   name NarrowRGB
   xpos -40
-  ypos 709
+  ypos 710
   addUserKnob {20 Params}
   addUserKnob {7 wr l "width r"}
-  wr 1
+  wr 0.5
   addUserKnob {7 wg l "width g"}
-  wg 1
+  wg 0.5
   addUserKnob {7 wb l "width b"}
-  wb 1
+  wb 0.5
   addUserKnob {78 w n 3}
   w {{1-wr} {1-wg} {1-wb}}
  }
@@ -114,7 +104,7 @@ push $Nc2eb4480
   expr2 b<=0?b:b**(1/sb)
   name Power
   xpos -40
-  ypos 735
+  ypos 734
   addUserKnob {20 Params}
   addUserKnob {7 sr l "strength r"}
   sr 0.5
@@ -127,46 +117,57 @@ push $Nc2eb4480
   channels rgba
   name Clamp
   xpos -40
-  ypos 759
+  ypos 758
  }
-push $Nc2eb4480
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy16
+  note_font Helvetica
+  xpos -40
+  ypos 801
+ }
+push $N8be81860
  MergeExpression {
   inputs 2
-  expr0 r*f.1*Ag+r*f.2*Ab+r*(1-(Ag+Ab))
-  expr1 g*f.0*Ar+g*f.2*Ab+g*(1-(Ar+Ab))
-  expr2 b*f.0*Ar+b*f.1*Ag+b*(1-(Ar+Ag))
+  temp_name0 f0
+  temp_expr0 Aa*(m1.0-m0.0)+m0.0
+  temp_name1 f1
+  temp_expr1 Aa*(m1.1-m0.1)+m0.1
+  temp_name2 f2
+  temp_expr2 Aa*(m1.2-m0.2)+m0.2
+  expr0 r*f1*Ag+r*f2*Ab+r*(1-(Ag+Ab))
+  expr1 g*f0*Ar+g*f2*Ab+g*(1-(Ar+Ab))
+  expr2 b*f0*Ar+b*f1*Ag+b*(1-(Ar+Ag))
+  expr3 f0
+  maskChannelMask rgba.red
   name Focus
   xpos 70
-  ypos 758
+  ypos 851
   addUserKnob {20 Params}
-  addUserKnob {7 fr R -1 1}
-  addUserKnob {7 fg R -1 1}
-  addUserKnob {7 fb R -1 1}
-  addUserKnob {78 f n 3}
-  f {{1-fr} {1-fg} {1-fb}}
+  addUserKnob {7 m0r l "R low" R -1 1}
+  addUserKnob {7 m1r l "R high" R -1 1}
+  addUserKnob {7 m0g l "G low" R -1 1}
+  addUserKnob {7 m1g l "G high" R -1 1}
+  addUserKnob {7 m0b l "B low" R -1 1}
+  addUserKnob {7 m1b l "B high" R -1 1}
+  addUserKnob {78 m0 n 3}
+  m0 {{1-m0r} {1-m0g} {1-m0b}}
+  addUserKnob {78 m1 n 3}
+  m1 {{1-m1r} {1-m1g} {1-m1b}}
  }
- MergeExpression {
-  inputs 2
-  temp_name0 f
-  temp_expr0 Aa
-  expr0 Ar*(1-f)+Br*f
-  expr1 Ag*(1-f)+Bg*f
-  expr2 Ab*(1-f)+Bb*f
-  name Mix
-  xpos 70
-  ypos 782
- }
-push $N7834dde0
+push $N8be81860
  NodeWrapper {
   inputs 2+1
   channels rgb
   name NodeWrapper1
   xpos 70
-  ypos 831
+  ypos 902
  }
  Output {
   name Output
   xpos 70
-  ypos 878
+  ypos 950
  }
 end_group
