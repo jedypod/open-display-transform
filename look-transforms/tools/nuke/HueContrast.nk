@@ -3,7 +3,7 @@ push $cut_paste_input
 Group {
  name PrimaryFocus
  addUserKnob {20 PrimaryFocus}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>PrimaryFocus</b> v0.0.2<br> | Part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>PrimaryFocus</b> v0.0.3<br> | Part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a>"}
  addUserKnob {26 ""}
  addUserKnob {41 m0r l "R low" T Focus.m0r}
  addUserKnob {41 m1r l "R high" T Focus.m1r}
@@ -50,16 +50,20 @@ set N8be81860 [stack 0]
  Expression {
   temp_name0 n
   temp_expr0 max(1e-12,max(r,g,b))
+  temp_name1 n0
+  temp_expr1 n<0.18?s0*n**p:p*(n-0.18)+0.18
   channel0 rgba
-  expr0 (n/(n+0.66))**p
+  expr0 (n0/(n0+0.66))
   name Bias
   xpos 180
   ypos 806
   addUserKnob {20 Params}
-  addUserKnob {7 ex l bias t "bias to the extraction range" R -2 2}
+  addUserKnob {7 ex l bias t "bias to the extraction range" R -3 3}
   addUserKnob {7 p R 0 4}
   p {{2**ex}}
- }
+  addUserKnob {7 s0 R 0 4}
+  s0 {{pow(0.18,1-p)}}
+}
 push $N8be81860
  Expression {
   temp_name0 mx
