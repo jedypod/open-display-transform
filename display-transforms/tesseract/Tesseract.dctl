@@ -1,7 +1,7 @@
 #line 1 // Fix line numbers in resolve/logs/rollinglog.txt
 /*------------------------------------------------
     Tesseract View Transform
-    v0.0.2
+    v0.0.3
     
     Written by Jed Smith
     https://github.com/jedypod/open-display-transform
@@ -21,7 +21,7 @@ DEFINE_UI_PARAMS(con, contrast, DCTLUI_SLIDER_FLOAT, 1.6, 1.0, 2.0, 0.0)
 
 // Color options
 DEFINE_UI_PARAMS(pb, purity, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hl_r, hue low r, DCTLUI_SLIDER_FLOAT, 0.5, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hl_r, hue low r, DCTLUI_SLIDER_FLOAT, 0.3, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hl_g, hue low g, DCTLUI_SLIDER_FLOAT, 0.2, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hl_b, hue low b, DCTLUI_SLIDER_FLOAT, 0.2, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hh_r, hue high r, DCTLUI_SLIDER_FLOAT, 0.5, -1.0, 1.0, 0.0)
@@ -29,7 +29,7 @@ DEFINE_UI_PARAMS(hh_g, hue high g, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hh_b, hue high b, DCTLUI_SLIDER_FLOAT, -0.5, -1.0, 1.0, 0.0)
 
 // Output options
-DEFINE_UI_PARAMS(clamp, clamp, DCTLUI_CHECK_BOX, 0);
+DEFINE_UI_PARAMS(clamp, clamp, DCTLUI_CHECK_BOX, 1);
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3 D65, Rec.2020})
 DEFINE_UI_PARAMS(EOTF, display eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power - sRGB Display, 2.4 Power - Rec .1886, 2.6 Power - DCI, ST 2084 PQ, HLG})
 
@@ -253,7 +253,7 @@ __DEVICE__ float tonescale(float x, float Lp, float Lg, float off, float p, int 
   const float o0 = s0*spowf(x0, p);
   const float m0 = x0==0.0f ? 0.0f : p*o0/x0;
 
-  const float w0 = 128.0f;
+  const float w0 = 256.0*_logf(Lp)/_logf(100.0) - 128.0f;
   const float w1 = 1.0f; // Lp/100.0f would normalize 1.0 to 100 nits and 10.0 to 1000 nits
   const float m = (w1*(m0*w0-y0))/(m0*w0-w1);
   const float s = m - y0;
@@ -347,7 +347,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   pc_rats_mn *= mx;
   
   // the factor to mix back to maxrgb
-  float3 pc_s = make_float3(0.03f, 0.13f, 0.06f);
+  float3 pc_s = make_float3(0.03f, 0.16f, 0.06f);
   float pc_f = pc_s.x*pc_rats.x + pc_s.y*pc_rats.y + pc_s.z*pc_rats.z;
   
   // minrgb mix to maxrgb by pc_f
@@ -378,7 +378,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   
   
   // Apply HueContrast Opposing
-  // float3 ha_rgb_hl = spowf3(ha_rgb, 2.0f); // only for hue contrast not hue shift
+  float3 ha_rgb_hl = spowf3(ha_rgb, 2.0f); // only for hue contrast not hue shift
   float3 hc_m0 = make_float3(1.0f - hl_r, 1.0f - hl_g, 1.0f - hl_b);
   float3 hc_m1 = make_float3(1.0f + hl_r, 1.0f + hl_g, 1.0f + hl_b);
 
@@ -387,9 +387,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Apply hue contrast
   rgb = make_float3(
-    rgb.x*f.y*ha_rgb.y + rgb.x*f.z*ha_rgb.z + rgb.x*(1.0f - (ha_rgb.y + ha_rgb.z)),
-    rgb.y*f.x*ha_rgb.x + rgb.y*f.z*ha_rgb.z + rgb.y*(1.0f - (ha_rgb.x + ha_rgb.z)),
-    rgb.z*f.x*ha_rgb.x + rgb.z*f.y*ha_rgb.y + rgb.z*(1.0f - (ha_rgb.x + ha_rgb.y)));
+    rgb.x*f.y*ha_rgb_hl.y + rgb.x*f.z*ha_rgb_hl.z + rgb.x*(1.0f - (ha_rgb_hl.y + ha_rgb_hl.z)),
+    rgb.y*f.x*ha_rgb_hl.x + rgb.y*f.z*ha_rgb_hl.z + rgb.y*(1.0f - (ha_rgb_hl.x + ha_rgb_hl.z)),
+    rgb.z*f.x*ha_rgb_hl.x + rgb.z*f.y*ha_rgb_hl.y + rgb.z*(1.0f - (ha_rgb_hl.x + ha_rgb_hl.y)));
 
   // Apply hue shift to RGB Ratios mixed by mn
   rgb = rgb*(1.0f - mn) + make_float3(

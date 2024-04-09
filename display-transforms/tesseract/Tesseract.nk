@@ -3,16 +3,16 @@ push $cut_paste_input
 Group {
  name Tesseract
  addUserKnob {20 Params}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Tesseract</b> <br>v0.0.2 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>Tesseract</b> <br>v0.0.3 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
  addUserKnob {41 gamut l "in gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 ""}
- addUserKnob {26 tone_lbl l " " T "<b>Tone"}
+ addUserKnob {26 tone_lbl l " " T <b>Tone}
  addUserKnob {41 Lp T MMToneScaleContrast.Lp}
  addUserKnob {41 Lg T MMToneScaleContrast.Lg}
  addUserKnob {41 Lgb l "Lg boost" T MMToneScaleContrast.Lgb}
  addUserKnob {41 o l offset T MMToneScaleContrast.o}
  addUserKnob {41 p l contrast T MMToneScaleContrast.p}
- addUserKnob {26 color_lbl l " " T "<b>Color"}
+ addUserKnob {26 color_lbl l " " T <b>Color}
  addUserKnob {41 pb l purity T PurityBoost.pb}
  addUserKnob {41 mr l "hue low r" T HueContrast.mr}
  addUserKnob {41 mg l "hue low g" T HueContrast.mg}
@@ -23,6 +23,8 @@ Group {
  addUserKnob {26 ""}
  addUserKnob {41 eotf T InverseEOTF.eotf}
  addUserKnob {41 display_gamut l "display gamut" -STARTLINE T XYZ_to_DisplayGamut.gamut}
+ addUserKnob {6 clamp +STARTLINE}
+ clamp true
 }
  Input {
   inputs 0
@@ -52,7 +54,7 @@ Group {
    xpos 324
    ypos -546
   }
-set N1d4537e0 [stack 0]
+set N754ad100 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -68,14 +70,14 @@ set N1d4537e0 [stack 0]
    xpos 290
    ypos -250
   }
-push $N1d4537e0
+push $N754ad100
   Dot {
    name Dot391
    label " *RGB to XYZ D65 CAT: XYZ Scaling"
    xpos 434
    ypos -546
   }
-set N7f7067c0 [stack 0]
+set N754c5f00 [stack 0]
   ColorMatrix {
    matrix {
        {0.7006223202 0.1487748027 0.101058729}
@@ -87,7 +89,7 @@ set N7f7067c0 [stack 0]
    xpos 1390
    ypos -466
   }
-push $N7f7067c0
+push $N754c5f00
   ColorMatrix {
    matrix {
        {0.705396831 0.1640413404 0.08101775497}
@@ -99,7 +101,7 @@ push $N7f7067c0
    xpos 1280
    ypos -466
   }
-push $N7f7067c0
+push $N754c5f00
   ColorMatrix {
    matrix {
        {0.5990839005 0.2489254922 0.1024464965}
@@ -111,7 +113,7 @@ push $N7f7067c0
    xpos 1170
    ypos -465
   }
-push $N7f7067c0
+push $N754c5f00
   ColorMatrix {
    matrix {
        {0.735275209 0.06860940903 0.1465712786}
@@ -123,7 +125,7 @@ push $N7f7067c0
    xpos 1060
    ypos -466
   }
-push $N7f7067c0
+push $N754c5f00
   ColorMatrix {
    matrix {
        {0.6380076408 0.2147038132 0.09774445742}
@@ -135,7 +137,7 @@ push $N7f7067c0
    xpos 950
    ypos -466
   }
-push $N7f7067c0
+push $N754c5f00
   ColorMatrix {
    matrix {
        {0.4123909175 0.3575843573 0.1804807931}
@@ -147,7 +149,7 @@ push $N7f7067c0
    xpos 840
    ypos -466
   }
-push $N7f7067c0
+push $N754c5f00
   ColorMatrix {
    matrix {
        {0.6369581223 0.1446169168 0.1688809693}
@@ -159,7 +161,7 @@ push $N7f7067c0
    xpos 730
    ypos -466
   }
-push $N7f7067c0
+push $N754c5f00
   ColorMatrix {
    matrix {
        {0.4865711331 0.2656677067 0.1982173175}
@@ -171,7 +173,7 @@ push $N7f7067c0
    xpos 620
    ypos -466
   }
-push $N7f7067c0
+push $N754c5f00
   ColorMatrix {
    matrix {
        {0.6609312296 0.1336961389 0.1558285803}
@@ -183,7 +185,7 @@ push $N7f7067c0
    xpos 510
    ypos -466
   }
-push $N7f7067c0
+push $N754c5f00
   ColorMatrix {
    matrix {
        {0.9503623843 0 9.346324805e-05}
@@ -226,7 +228,7 @@ push $N7f7067c0
    xpos 324
    ypos -516
   }
-set Ne1284bb0 [stack 0]
+set N75568d00 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -242,14 +244,14 @@ set Ne1284bb0 [stack 0]
    xpos 290
    ypos -310
   }
-push $Ne1284bb0
+push $N75568d00
   Dot {
    name Dot1
    label " XYZ D65 to *RGB CAT: XYZ Scaling"
    xpos 434
    ypos -516
   }
-set N1e4fcb30 [stack 0]
+set N75582ee0 [stack 0]
   ColorMatrix {
    matrix {
        {3.240968943 -1.537382722 -0.4986106157}
@@ -261,7 +263,7 @@ set N1e4fcb30 [stack 0]
    xpos 619
    ypos -468
   }
-push $N1e4fcb30
+push $N75582ee0
   ColorMatrix {
    matrix {
        {2.493495464 -0.9313831329 -0.4027105868}
@@ -273,7 +275,7 @@ push $N1e4fcb30
    xpos 510
    ypos -465
   }
-push $N1e4fcb30
+push $N75582ee0
   ColorMatrix {
    matrix {
        {1.716650844 -0.3556707203 -0.2533662021}
@@ -307,18 +309,17 @@ push $N1e4fcb30
  }
  Dot {
   name Dot766
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
   xpos -1436
   ypos 1122
  }
-set N1e4f8f20 [stack 0]
+set N755c9390 [stack 0]
+ Dot {
+  name Dot1
+  xpos -1655
+  ypos 1122
+ }
  Dot {
   name Dot767
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
   xpos -1876
   ypos 1122
  }
@@ -331,23 +332,17 @@ set N1e4f8f20 [stack 0]
  }
  Dot {
   name Dot768
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
   xpos -1876
   ypos 1170
  }
-set N6c949f60 [stack 0]
+set N755f82a0 [stack 0]
  Dot {
   name Dot769
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
   xpos -1656
   ypos 1170
  }
-set Na055f320 [stack 0]
-push $N1e4f8f20
+set N755fdd10 [stack 0]
+push $N755c9390
  MergeExpression {
   inputs 2
   expr0 Ar==0?0:Br/Ar
@@ -365,7 +360,7 @@ push $N1e4f8f20
   xpos -1470
   ypos 1214
  }
-set N4f918230 [stack 0]
+set N756129e0 [stack 0]
  Expression {
   expr0 r>t0.r?r:invert?o0.r-s0.r**2*(o1.r-r)**2:o1.r+sqrt(o0.r-r)/s0.r
   expr1 g>t0.g?g:invert?o0.g-s0.g**2*(o1.g-g)**2:o1.g+sqrt(o0.g-g)/s0.g
@@ -404,7 +399,7 @@ set N4f918230 [stack 0]
   xpos -1580
   ypos 1238
  }
-push $Na055f320
+push $N755fdd10
  MergeExpression {
   inputs 2
   temp_name0 mx
@@ -419,16 +414,16 @@ push $Na055f320
   maskChannelMask rgba.red
   name MixToMax
   xpos -1690
-  ypos 1239
+  ypos 1238
   addUserKnob {20 User}
   addUserKnob {7 fr}
   fr 0.03
   addUserKnob {7 fg}
-  fg 0.13
+  fg 0.16
   addUserKnob {7 fb}
   fb 0.06
  }
-push $N6c949f60
+push $N755f82a0
  Copy {
   inputs 2
   from0 rgba.red
@@ -468,7 +463,7 @@ push $N6c949f60
   addUserKnob {7 y0}
   y0 {{Lg/Lp*(1+Lgb*log(Lp/100)/log(2))}}
   addUserKnob {7 w0 l "high clip" R 16 256}
-  w0 128
+  w0 {{256*log(Lp)/log(100)-128}}
   addUserKnob {7 w1 R 1 10}
   w1 1
   addUserKnob {7 o0 R 0 4}
@@ -486,42 +481,36 @@ push $N6c949f60
  }
  Dot {
   name Dot770
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
   xpos -1876
-  ypos 1314
+  ypos 1338
  }
-set N1f086680 [stack 0]
+set N75666bc0 [stack 0]
  Dot {
   name Dot771
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
   xpos -1876
-  ypos 1578
+  ypos 1626
  }
-push $N1f086680
+push $N75666bc0
  Dot {
   name Dot772
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
-  xpos -1656
-  ypos 1314
+  xpos -1766
+  ypos 1338
  }
-set N67696260 [stack 0]
+set N756885d0 [stack 0]
  Dot {
   name Dot773
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
-  xpos -1656
-  ypos 1458
+  xpos -1766
+  ypos 1482
  }
-push $N67696260
-push $N67696260
-push $N4f918230
+push $N756885d0
+ Dot {
+  name Dot2
+  xpos -1546
+  ypos 1338
+ }
+set Ne81bd7b0 [stack 0]
+push $Ne81bd7b0
+push $N756129e0
  MergeExpression {
   inputs 2
   temp_name0 mn
@@ -535,7 +524,7 @@ push $N4f918230
   maskChannelMask rgba.red
   name PurityBoost
   xpos -1470
-  ypos 1310
+  ypos 1334
   addUserKnob {20 User}
   addUserKnob {7 pb l purity}
   pb 0.6
@@ -555,17 +544,14 @@ push $N4f918230
   invert_mask true
   name PurityCompress
   xpos -1470
-  ypos 1334
+  ypos 1358
  }
  Dot {
   name Dot774
-  note_font "Helvetica Bold"
-  note_font_size 24
-  note_font_color 0xff
   xpos -1436
-  ypos 1386
+  ypos 1410
  }
-set N234fb0b0 [stack 0]
+set N756b27b0 [stack 0]
  Expression {
   temp_name0 mn
   temp_expr0 min(r,g,b)
@@ -574,28 +560,41 @@ set N234fb0b0 [stack 0]
   expr2 b-mn
   expr3 mn
   name HC_RGB3
-  xpos -1580
-  ypos 1382
+  xpos -1690
+  ypos 1406
  }
  Expression {
   expr0 max(0,r-(g+b))
   expr1 max(0,g-(r+b))
   expr2 max(0,b-(r+g))
   name NarrowRGB
-  xpos -1580
-  ypos 1406
+  xpos -1690
+  ypos 1430
  }
  Copy {
   inputs 2
   from0 rgba.green
   to0 rgba.alpha
   name Copy31
-  xpos -1580
-  ypos 1449
+  xpos -1690
+  ypos 1472
  }
-set N3a3f3670 [stack 0]
-push $N3a3f3670
-push $N234fb0b0
+set N756d7dc0 [stack 0]
+push $N756d7dc0
+ Expression {
+  expr0 r**p
+  expr1 g**p
+  expr2 b**p
+  maskChannelMask rgba.green
+  name Power
+  label "\[value p]"
+  xpos -1580
+  ypos 1473
+  addUserKnob {20 Params}
+  addUserKnob {7 p R 0 4}
+  p 2
+ }
+push $N756b27b0
  MergeExpression {
   inputs 2
   temp_name0 f0
@@ -610,10 +609,10 @@ push $N234fb0b0
   maskChannelMask rgba.red
   name HueContrast
   xpos -1470
-  ypos 1454
+  ypos 1478
   addUserKnob {20 Params}
   addUserKnob {7 mr l "hue low r" R -1 1}
-  mr 0.5
+  mr 0.3
   addUserKnob {7 mg l "hue low g" R -1 1}
   mg 0.2
   addUserKnob {7 mb l "hue low b" R -1 1}
@@ -633,7 +632,7 @@ push $N234fb0b0
   maskChannelMask rgba.green
   name HueShift
   xpos -1470
-  ypos 1478
+  ypos 1526
   addUserKnob {20 Params}
   addUserKnob {7 s0 l "hue high r" R -1 1}
   s0 0.5
@@ -649,7 +648,7 @@ push $N234fb0b0
   name QuadraticCompressRGB1
   label "\n"
   xpos -1470
-  ypos 1526
+  ypos 1575
   addUserKnob {20 Params}
   addUserKnob {18 t0}
   t0 0.06
@@ -677,7 +676,14 @@ push $N234fb0b0
   expr2 m*b
   name Multiply
   xpos -1470
-  ypos 1575
+  ypos 1622
+ }
+ Clamp {
+  channels rgb
+  name Clamp1
+  xpos -1470
+  ypos 1670
+  disable {{!parent.clamp}}
  }
  Expression {
   temp_name0 mx
@@ -688,7 +694,7 @@ push $N234fb0b0
   expr2 max(0,min(mx,b*s))
   name DisplayScale
   xpos -1470
-  ypos 1646
+  ypos 1694
   addUserKnob {20 Params}
   addUserKnob {6 pq +STARTLINE}
   pq {{eotf==4}}
@@ -702,9 +708,10 @@ push $N234fb0b0
  Group {
   name InverseEOTF
   xpos -1470
-  ypos 1670
+  ypos 1720
   addUserKnob {20 EOTF_tab l EOTF}
   addUserKnob {4 eotf t "Choose the inverse EOTF to apply for the target display device." M {None "sRGB Display" BT.1886 "Gamma 2.6" PQ HLG "" "" ""}}
+  eotf BT.1886
  }
   Input {
    inputs 0
@@ -712,7 +719,7 @@ push $N234fb0b0
    xpos 400
    ypos -129
   }
-set N77df6340 [stack 0]
+set N75749500 [stack 0]
   Expression {
    temp_name0 Yd
    temp_expr0 0.2627*r+0.6780*g+0.0593*b
@@ -745,7 +752,7 @@ set N77df6340 [stack 0]
    addUserKnob {7 _c}
    _c {{0.5-_a*log(4*_a)}}
   }
-push $N77df6340
+push $N75749500
   Expression {
    temp_name0 rp
    temp_expr0 pow(r,m_1)
@@ -771,7 +778,7 @@ push $N77df6340
    addUserKnob {7 c_3}
    c_3 {{2392/128}}
   }
-push $N77df6340
+push $N75749500
   Expression {
    expr0 sign(r)*pow(fabs(r),1/p)
    expr1 sign(g)*pow(fabs(g),1/p)
@@ -799,6 +806,6 @@ push $N77df6340
  Output {
   name Output
   xpos -1470
-  ypos 1742
+  ypos 1790
  }
 end_group
