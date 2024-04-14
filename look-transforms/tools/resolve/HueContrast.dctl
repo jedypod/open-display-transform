@@ -1,5 +1,5 @@
 #line 1 // Fix line numbers in resolve/logs/rollinglog.txt
-/*  Color Contrast -------------------------------------------------
+/*  HueContrast -------------------------------------------------
       v0.0.3
       A tool to compress hues towards the primary color vectors. Pretty similar to n6HueShift
       but parameterized to compress or expand on both sides of a primary hue vector instead.
@@ -86,6 +86,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   const float s0 = spowf(0.18, 1.0f - p);
   const float t0 = 0.18f;
   float zr_f = mx < t0 ? s0*spowf(mx, p) : p*(mx - t0) + t0;
+ 
   // Generic hyperbolic compression, roughly aligning middle grey to typical display output value
   zr_f = sdivf(zr_f, zr_f + 0.66f);
 

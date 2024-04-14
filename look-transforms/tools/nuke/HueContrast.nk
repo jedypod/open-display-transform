@@ -1,9 +1,9 @@
 set cut_paste_input [stack 0]
 push $cut_paste_input
 Group {
- name PrimaryFocus
- addUserKnob {20 PrimaryFocus}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>PrimaryFocus</b> v0.0.3<br> | Part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a>"}
+ name HueContrast
+ addUserKnob {20 HueContrast}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>HueContrast</b> v0.0.3<br> | Part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a>"}
  addUserKnob {26 ""}
  addUserKnob {41 m0r l "R low" T Focus.m0r}
  addUserKnob {41 m1r l "R high" T Focus.m1r}
