@@ -1,6 +1,6 @@
-#line 1 // Fix line numbers in resolve/logs/rollinglog.txt
+#line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 /*  OpenDRT -------------------------------------------------
-      v0.3.0
+      v0.3.1
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -16,9 +16,9 @@ DEFINE_UI_PARAMS(toe, toe, DCTLUI_SLIDER_FLOAT, 0.001, 0.0, 0.02, 0.0)
 
 // Color Parameters
 DEFINE_UI_PARAMS(pb, purity, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_r, hueshift r, DCTLUI_SLIDER_FLOAT, 0.3, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_g, hueshift g, DCTLUI_SLIDER_FLOAT, -0.1, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_b, hueshift b, DCTLUI_SLIDER_FLOAT, -0.3, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_r, hueshift r, DCTLUI_SLIDER_FLOAT, 0.5, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_g, hueshift g, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_b, hueshift b, DCTLUI_SLIDER_FLOAT, -0.5, -1.0, 1.0, 0.0)
 
 // Encoding / IO
 DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 12, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
@@ -300,6 +300,19 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   const float ds = eotf == 4 ? Lp/10000.0f : eotf == 5 ? Lp/1000.0f : 1.0f;
 
 
+  
+  /* Parameters which _could_ be tweaked but are not exposed 
+      ------------------------------------------ */
+  // "Saturation" amount
+  const float sat_f = 0.35f;
+  // "Saturation" weights
+  const float3 sat_w = make_float3(0.2f, 0.5f, 0.3f);
+  // Density weights CMY
+  const float3 dn_w = make_float3(0.8f, 0.35f, 0.75f);
+  // Density bias
+  const float dn_p = 0.8f;
+  // Purity compression weight
+  const float pc_p = 0.3f;
 
 
   /* Rendering Code ------------------------------------------ */
@@ -308,34 +321,16 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Convert into display gamut
   rgb = vdot(in_to_xyz, rgb);
   rgb = vdot(xyz_to_display, rgb);
+  
+  //  "Desaturate" to control shape of color volume in the norm ratios (Desaturate in scare quotes because the weights are creative)
+  float sat_L = rgb.x*sat_w.x + rgb.y*sat_w.y + rgb.z*sat_w.z;
+  rgb = sat_L*(1.0f - sat_f) + rgb*sat_f;
+  
 
-  float norm = hypotf3(clampminf3(rgb, 0.0f))/_sqrtf(3.0f);
-
+  // Norm and RGB Ratios
+  float norm = _fmaxf(1e-6f, hypotf3(clampminf3(rgb, 0.0f))/_sqrtf(3.0f));
   rgb = sdivf3f(rgb, norm);
 
-  /* Purity Compression --------------------------------------- */
-  // rgb purity compression strength, tuned for common camera gamuts
-  float3 pc_rats = rgb;
-  
-  // minrgb with out of gamut values compressed
-  pc_rats.x = compress_powerptoe(pc_rats.x, 0.25f, 0.06f, 1.0f, 0);
-  pc_rats.y = compress_powerptoe(pc_rats.y, 0.25f, 0.2f, 1.0f, 0);
-  pc_rats.z = compress_powerptoe(pc_rats.z, 0.25f, 0.06f, 1.0f, 0);
-
-  // minrgb with out of gamut values compressed
-  float pc_rats_mn = fminf3(pc_rats);
-  
-  // remove achromatic
-  pc_rats = pc_rats - pc_rats_mn;
-  // restore full range for tonescale curve
-  pc_rats_mn = _fmaxf(pc_rats_mn, 0.0f)*norm;
-  
-  // the factor to mix back to maxrgb
-  float3 pc_s = make_float3(0.04f, 0.2f, 0.08f);
-  float pc_f = pc_s.x*pc_rats.x + pc_s.y*pc_rats.y + pc_s.z*pc_rats.z;
-  
-  // minrgb mix to maxrgb by pc_f
-  float ccf = _fmaxf(0.0f, pc_rats_mn*(1.0f - pc_f) + norm*pc_f);
 
   /* Tonescale Parameters 
       ----------------------
@@ -366,30 +361,53 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
         Scene-linear input value gx is mapped to display-linear output gy through the function.
         Why is gy set to 0.11696 at Lp=100? This matches the position of middle grey through the Rec709 system.
         We use this value for consistency with the Arri and TCAM Rec.1886 display rendering transforms.
+  !TODO: redesign tonescale to give back 0-1 and then scale after, so that ccf has no artifacts in bright highlights
   */
   
-  norm = tonescale(norm, Lp, Lg, Lgb, p, toe, 0);
-  ccf = tonescale(ccf, Lp, Lg, Lgb, p, toe, 0);
 
-  // Scale down color vectors
-  float3 rats_comp = clampminf3(1.0f - rgb, 0.0f);
-  float3 sc = make_float3(1.0f, 0.85f, 1.0f); // cyan, magenta, yellow scale factors
-  float sc_f = (sc.x*rats_comp.x + 1.0f - rats_comp.x)*(sc.y*rats_comp.y + 1.0f - rats_comp.y)*(sc.z*rats_comp.z + 1.0f - rats_comp.z);
-  float rats_mn = _fmaxf(0.0f, fminf3(rgb));
-  rgb = (rgb - rats_mn)*sc_f + rats_mn;
+  // input scene-linear peak x intercept
+  const float px = 256.0*_logf(Lp)/_logf(100.0) - 128.0f;
+  // output display-linear peak y intercept
+  const float py = Lp/100.0f;
+  // input scene-linear middle grey x intercept
+  const float gx = 0.18f;
+  // output display-linear middle grey y intercept
+  const float gy = Lg/100.0f*(1.0f + Lgb*_logf(py)/_logf(2.0f));
+  // s0 and s are input x scale for middle grey intersection constraint
+  // m0 and m are output y scale for peak white intersection constraint
+  const float s0 = quadratic_toe_compress(gy, toe, 1);
+  const float m0 = quadratic_toe_compress(py, toe, 1);
+  const float ip = 1.0f/p;
+  const float s = (px*gx*(_powf(m0, ip) - _powf(s0, ip)))/(px*_powf(s0, ip) - gx*_powf(m0, ip));
+  const float m = _powf(m0, ip)*(s + px)/px;
 
 
-  
+  // norm = tonescale(norm, Lp, Lg, Lgb, p, toe, 0);
+  norm = hyperbolic_compress(norm, m, s, p, 0);
+  norm = quadratic_toe_compress(norm, toe, 0)/py;
+
   // Apply purity boost
   float pb_m0 = 1.0f + pb;
   float pb_m1 = 2.0f - pb_m0;
   float pb_f = norm*(pb_m1 - pb_m0) + pb_m0;
-  float L = rgb.x*0.4f + rgb.y*0.5f + rgb.z*0.1f;
-  rats_mn = _fmaxf(0.0f, fminf3(rgb));
-  rgb = (rgb*pb_f + L*(1.0f - pb_f))*rats_mn + rgb*(1.0f - rats_mn);
+  // Lerp from weights on bottom end to 1.0 at top end of tonescale
+  float pb_L = (rgb.x*0.25f + rgb.y*0.7f + rgb.z*0.05f)*(1.0f - norm) + norm;
+  float rats_mn = _fmaxf(0.0f, fminf3(rgb));
+  rgb = (rgb*pb_f + pb_L*(1.0f - pb_f))*rats_mn + rgb*(1.0f - rats_mn);
 
+  /* Purity Compression --------------------------------------- */
   // Apply purity compress using ccf by lerping to 1.0 in rgb ratios (peak achromatic)
-  rgb = rgb*(1.0f - ccf) + ccf;
+  float ccf = spowf(1.0f - norm*0.99f, pc_p);
+  rgb = rgb*ccf + (1.0f - ccf);
+
+
+  // "Density" (scale down intensity of colors to better fit in display-referred gamut volume and reduce discontinuities)
+  float3 dn_r = clampminf3(1.0f - spowf3(rgb, dn_p), 0.0f);
+  norm = norm*(dn_w.x*dn_r.x + 1.0f - dn_r.x)*(dn_w.y*dn_r.y + 1.0f - dn_r.y)*(dn_w.z*dn_r.z + 1.0f - dn_r.z);
+
+  // "Re-Saturate" using an inverse lerp
+  sat_L = rgb.x*sat_w.x + rgb.y*sat_w.y + rgb.z*sat_w.z;
+  rgb = (sat_L*(sat_f - 1.0f) + rgb)/sat_f;
 
 
   /* Chroma Compression Hue Shift ------------------------------------------ *
@@ -403,13 +421,16 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       To accomplish this, we use the inverse of the chroma compression factor multiplied by the RGB hue angles as a factor
       for a lerp between the various rgb components.
   */
-  float3 hs_rgb = pc_rats*(1.0f - ccf);
+  float hs_mx = fmaxf3(rgb);
+  float3 hs_rgb = sdivf3f(rgb, hs_mx);
+  float hs_mn = fminf3(hs_rgb);
+  hs_rgb = hs_rgb - hs_mn;
   // Narrow hue angles
   hs_rgb = make_float3( _fminf(1.0f, _fmaxf(0.0f, hs_rgb.x - (hs_rgb.y + hs_rgb.z))),
                               _fminf(1.0f, _fmaxf(0.0f, hs_rgb.y - (hs_rgb.x + hs_rgb.z))),
                               _fminf(1.0f, _fmaxf(0.0f, hs_rgb.z - (hs_rgb.x + hs_rgb.y))));
+  hs_rgb = hs_rgb*(1.0f - ccf);
 
-  
   // Apply hue shift to RGB Ratios
   float3 rats_hs = make_float3(rgb.x + hs_rgb.z*hs.z - hs_rgb.y*hs.y, rgb.y + hs_rgb.x*hs.x - hs_rgb.z*hs.z, rgb.z + hs_rgb.y*hs.y - hs_rgb.x*hs.x);
 
@@ -417,9 +438,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   rgb = rgb*(1.0f - ccf) + rats_hs*ccf;
 
   // last gamut compress for bottom end
-  rgb.x = compress_powerptoe(rgb.x, 0.03f, 1.0f, 1.0f, 0);
-  rgb.y = compress_powerptoe(rgb.y, 0.03f, 1.0f, 1.0f, 0);
-  rgb.z = compress_powerptoe(rgb.z, 0.03f, 1.0f, 1.0f, 0);
+  rgb.x = compress_powerptoe(rgb.x, 0.04f, 1.0f, 1.0f, 0);
+  rgb.y = compress_powerptoe(rgb.y, 0.04f, 1.0f, 1.0f, 0);
+  rgb.z = compress_powerptoe(rgb.z, 0.04f, 1.0f, 1.0f, 0);
 
   // Apply tonescale to RGB Ratios
   rgb = rgb*norm;
