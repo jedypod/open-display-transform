@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 /*  OpenDRT -------------------------------------------------
-      v0.3.1
+      v0.3.2
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -15,10 +15,11 @@ DEFINE_UI_PARAMS(p, contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1.0, 2.0, 0.0)
 DEFINE_UI_PARAMS(toe, toe, DCTLUI_SLIDER_FLOAT, 0.001, 0.0, 0.02, 0.0)
 
 // Color Parameters
-DEFINE_UI_PARAMS(pb, purity, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_r, hueshift r, DCTLUI_SLIDER_FLOAT, 0.5, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(pc_p, purity compress, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(pb, purity boost, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_r, hueshift r, DCTLUI_SLIDER_FLOAT, 0.3, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hs_g, hueshift g, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_b, hueshift b, DCTLUI_SLIDER_FLOAT, -0.5, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_b, hueshift b, DCTLUI_SLIDER_FLOAT, -0.3, -1.0, 1.0, 0.0)
 
 // Encoding / IO
 DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 12, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
@@ -206,39 +207,13 @@ __DEVICE__ float hyperbolic_compress(float x, float m, float s, float p, int inv
 }
 
 __DEVICE__ float quadratic_toe_compress(float x, float toe, int inv) {
+  if (toe == 0.0f) return x;
   if (inv == 0) {
     return spowf(x, 2.0f)/(x + toe);
   } else {
     return (x + _sqrtf(x*(4.0f*toe + x)))/2.0f;
   }
 }
-
-__DEVICE__ float tonescale(float x, float Lp, float Lg, float Lgb, float p, float toe, int inv) {
-  // input scene-linear peak x intercept
-  const float px = 256.0*_logf(Lp)/_logf(100.0) - 128.0f;
-  // output display-linear peak y intercept
-  const float py = Lp/100.0f;
-  // input scene-linear middle grey x intercept
-  const float gx = 0.18f;
-  // output display-linear middle grey y intercept
-  const float gy = Lg/100.0f*(1.0f + Lgb*_logf(py)/_logf(2.0f));
-  // s0 and s are input x scale for middle grey intersection constraint
-  // m0 and m are output y scale for peak white intersection constraint
-  const float s0 = quadratic_toe_compress(gy, toe, 1);
-  const float m0 = quadratic_toe_compress(py, toe, 1);
-  const float ip = 1.0f/p;
-  const float s = (px*gx*(_powf(m0, ip) - _powf(s0, ip)))/(px*_powf(s0, ip) - gx*_powf(m0, ip));
-  const float m = _powf(m0, ip)*(s + px)/px;
-
-  if (inv == 0) {
-    x = hyperbolic_compress(x, m, s, p, 0);
-    return quadratic_toe_compress(x, toe, 0)/py;
-  } else {
-    x = quadratic_toe_compress(x*py, toe, 1);
-    return hyperbolic_compress(x, m, s, p, 1);
-  }
-}
-
 
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
@@ -304,15 +279,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   /* Parameters which _could_ be tweaked but are not exposed 
       ------------------------------------------ */
   // "Saturation" amount
-  const float sat_f = 0.35f;
+  const float sat_f = 0.4f;
   // "Saturation" weights
-  const float3 sat_w = make_float3(0.2f, 0.5f, 0.3f);
+  const float3 sat_w = make_float3(0.15f, 0.5f, 0.35f);
   // Density weights CMY
-  const float3 dn_w = make_float3(0.8f, 0.35f, 0.75f);
-  // Density bias
-  const float dn_p = 0.8f;
-  // Purity compression weight
-  const float pc_p = 0.3f;
+  const float3 dn_w = make_float3(0.7f, 0.6f, 0.8f);
 
 
   /* Rendering Code ------------------------------------------ */
@@ -328,8 +299,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   
 
   // Norm and RGB Ratios
-  float norm = _fmaxf(1e-6f, hypotf3(clampminf3(rgb, 0.0f))/_sqrtf(3.0f));
+  float norm = hypotf3(clampminf3(rgb, 0.0f))/_sqrtf(3.0f);
   rgb = sdivf3f(rgb, norm);
+  rgb = clampminf3(rgb, -2.0f); // Prevent bright pixels from crazy values in shadow grain
 
 
   /* Tonescale Parameters 
@@ -361,10 +333,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
         Scene-linear input value gx is mapped to display-linear output gy through the function.
         Why is gy set to 0.11696 at Lp=100? This matches the position of middle grey through the Rec709 system.
         We use this value for consistency with the Arri and TCAM Rec.1886 display rendering transforms.
-  !TODO: redesign tonescale to give back 0-1 and then scale after, so that ccf has no artifacts in bright highlights
   */
   
-
   // input scene-linear peak x intercept
   const float px = 256.0*_logf(Lp)/_logf(100.0) - 128.0f;
   // output display-linear peak y intercept
@@ -381,11 +351,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   const float s = (px*gx*(_powf(m0, ip) - _powf(s0, ip)))/(px*_powf(s0, ip) - gx*_powf(m0, ip));
   const float m = _powf(m0, ip)*(s + px)/px;
 
-
-  // norm = tonescale(norm, Lp, Lg, Lgb, p, toe, 0);
+  norm = _fmaxf(0.0f, norm);
   norm = hyperbolic_compress(norm, m, s, p, 0);
   norm = quadratic_toe_compress(norm, toe, 0)/py;
-
+  
   // Apply purity boost
   float pb_m0 = 1.0f + pb;
   float pb_m1 = 2.0f - pb_m0;
@@ -394,20 +363,17 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float pb_L = (rgb.x*0.25f + rgb.y*0.7f + rgb.z*0.05f)*(1.0f - norm) + norm;
   float rats_mn = _fmaxf(0.0f, fminf3(rgb));
   rgb = (rgb*pb_f + pb_L*(1.0f - pb_f))*rats_mn + rgb*(1.0f - rats_mn);
-
+  
   /* Purity Compression --------------------------------------- */
   // Apply purity compress using ccf by lerping to 1.0 in rgb ratios (peak achromatic)
-  float ccf = spowf(1.0f - norm*0.99f, pc_p);
+  float ccf = norm/(spowf(m, p)/py); // normalize to enforce 0-1
+  ccf = spowf(1.0f - ccf, pc_p);
   rgb = rgb*ccf + (1.0f - ccf);
 
-
-  // "Density" (scale down intensity of colors to better fit in display-referred gamut volume and reduce discontinuities)
-  float3 dn_r = clampminf3(1.0f - spowf3(rgb, dn_p), 0.0f);
-  norm = norm*(dn_w.x*dn_r.x + 1.0f - dn_r.x)*(dn_w.y*dn_r.y + 1.0f - dn_r.y)*(dn_w.z*dn_r.z + 1.0f - dn_r.z);
-
-  // "Re-Saturate" using an inverse lerp
-  sat_L = rgb.x*sat_w.x + rgb.y*sat_w.y + rgb.z*sat_w.z;
-  rgb = (sat_L*(sat_f - 1.0f) + rgb)/sat_f;
+  // "Density" - scale down intensity of colors to better fit in display-referred gamut volume 
+  // and reduce discontinuities in high intensity high purity tristimulus.
+  float3 dn_r = clampminf3(1.0f - rgb, 0.0f);
+  rgb = rgb*(dn_w.x*dn_r.x + 1.0f - dn_r.x)*(dn_w.y*dn_r.y + 1.0f - dn_r.y)*(dn_w.z*dn_r.z + 1.0f - dn_r.z);
 
 
   /* Chroma Compression Hue Shift ------------------------------------------ *
@@ -437,10 +403,14 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Mix hue shifted RGB ratios by ts, so that we shift where highlights were chroma compressed plus a bit.
   rgb = rgb*(1.0f - ccf) + rats_hs*ccf;
 
+  // "Re-Saturate" using an inverse lerp
+  sat_L = rgb.x*sat_w.x + rgb.y*sat_w.y + rgb.z*sat_w.z;
+  rgb = (sat_L*(sat_f - 1.0f) + rgb)/sat_f;
+
   // last gamut compress for bottom end
-  rgb.x = compress_powerptoe(rgb.x, 0.04f, 1.0f, 1.0f, 0);
-  rgb.y = compress_powerptoe(rgb.y, 0.04f, 1.0f, 1.0f, 0);
-  rgb.z = compress_powerptoe(rgb.z, 0.04f, 1.0f, 1.0f, 0);
+  rgb.x = compress_powerptoe(rgb.x, 0.05f, 1.0f, 1.0f, 0);
+  rgb.y = compress_powerptoe(rgb.y, 0.05f, 1.0f, 1.0f, 0);
+  rgb.z = compress_powerptoe(rgb.z, 0.05f, 1.0f, 1.0f, 0);
 
   // Apply tonescale to RGB Ratios
   rgb = rgb*norm;
