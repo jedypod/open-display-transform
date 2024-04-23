@@ -8,24 +8,24 @@
 -------------------------------------------------*/
 
 // Tonescale Parameters
-DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 0.0)
-DEFINE_UI_PARAMS(Lg, Lg, DCTLUI_SLIDER_FLOAT, 10.0, 3.0, 30.0, 0.0)
-DEFINE_UI_PARAMS(Lgb, Lg boost, DCTLUI_SLIDER_FLOAT, 0.12, 0.0, 0.5, 0.0)
-DEFINE_UI_PARAMS(p, contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1.0, 2.0, 0.0)
-DEFINE_UI_PARAMS(toe, toe, DCTLUI_SLIDER_FLOAT, 0.001, 0.0, 0.02, 0.0)
+DEFINE_UI_PARAMS(Lp, Max Output, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 0.0)
+DEFINE_UI_PARAMS(Lg, Middle Gray, DCTLUI_SLIDER_FLOAT, 10.0, 3.0, 30.0, 0.0)
+DEFINE_UI_PARAMS(Lgb, Middle Gray Boost, DCTLUI_SLIDER_FLOAT, 0.12, 0.0, 0.5, 0.0)
+DEFINE_UI_PARAMS(p, Contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(toe, Toe, DCTLUI_SLIDER_FLOAT, 0.001, 0.0, 0.02, 0.0)
 
 // Color Parameters
-DEFINE_UI_PARAMS(pc_p, purity compress, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(pb, purity boost, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_r, hueshift r, DCTLUI_SLIDER_FLOAT, 0.3, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_g, hueshift g, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_b, hueshift b, DCTLUI_SLIDER_FLOAT, -0.3, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(pc_p, Purity Compress, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(pb, Purity Boost, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_r, Hueshift Red, DCTLUI_SLIDER_FLOAT, 0.3, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_g, Hueshift Green, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(hs_b, Hueshift Blue, DCTLUI_SLIDER_FLOAT, -0.3, -1.0, 1.0, 0.0)
 
 // Encoding / IO
-DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 12, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_vgamut, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, DaVinci Wide Gamut})
-DEFINE_UI_PARAMS(in_oetf, in transfer function, DCTLUI_COMBO_BOX, 0, {ioetf_linear, ioetf_davinci_intermediate, ioetf_filmlight_tlog, ioetf_arri_logc3, ioetf_arri_logc4, ioetf_panasonic_vlog, ioetf_sony_slog3, ioetf_fuji_flog}, {Linear, Davinci Intermediate, Filmlight T-Log, Arri LogC3, Arri LogC4, Panasonic V-Log, Sony S-Log3, Fuji F-Log})
-DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3 D65, Rec.2020})
-DEFINE_UI_PARAMS(EOTF, display eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
+DEFINE_UI_PARAMS(in_gamut, Input Gamut, DCTLUI_COMBO_BOX, 12, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_vgamut, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(in_oetf, Input Transfer Function, DCTLUI_COMBO_BOX, 0, {ioetf_linear, ioetf_davinci_intermediate, ioetf_filmlight_tlog, ioetf_arri_logc3, ioetf_arri_logc4, ioetf_panasonic_vlog, ioetf_sony_slog3, ioetf_fuji_flog}, {Linear, Davinci Intermediate, Filmlight T-Log, Arri LogC3, Arri LogC4, Panasonic V-Log, Sony S-Log3, Fuji F-Log})
+DEFINE_UI_PARAMS(display_gamut, Output Gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3 D65, Rec.2020})
+DEFINE_UI_PARAMS(EOTF, Output Transfer Function, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
 
 
 
