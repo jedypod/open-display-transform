@@ -12,7 +12,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 13, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 // Tonescale options
 DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 10.0)
 DEFINE_UI_PARAMS(Lg, Lg, DCTLUI_SLIDER_FLOAT, 10.0, 4.0, 20.0, 0.0)
@@ -30,6 +29,8 @@ DEFINE_UI_PARAMS(hh_b, hue high b, DCTLUI_SLIDER_FLOAT, -0.5, -1.0, 1.0, 0.0)
 
 // Output options
 DEFINE_UI_PARAMS(clamp, clamp, DCTLUI_CHECK_BOX, 1);
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 13, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(in_oetf, in transfer function, DCTLUI_COMBO_BOX, 0, {ioetf_linear, ioetf_davinci_intermediate, ioetf_filmlight_tlog, ioetf_arri_logc3, ioetf_arri_logc4, ioetf_panasonic_vlog, ioetf_sony_slog3, ioetf_fuji_flog}, {Linear, Davinci Intermediate, Filmlight T-Log, Arri LogC3, Arri LogC4, Panasonic V-Log, Sony S-Log3, Fuji F-Log})
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3 D65, Rec.2020})
 DEFINE_UI_PARAMS(EOTF, display eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power - sRGB Display, 2.4 Power - Rec .1886, 2.6 Power - DCI, ST 2084 PQ, HLG})
 
@@ -132,6 +133,75 @@ __DEVICE__ float3 clampminf3(float3 a, float mn) { return make_float3(_fmaxf(a.x
 __DEVICE__ float3 clampf3(float3 a, float mn, float mx) { 
   return make_float3(_fminf(_fmaxf(a.x, mn), mx), _fminf(_fmaxf(a.y, mn), mx), _fminf(_fmaxf(a.z, mn), mx));
 }
+
+
+/* OETF Linearization Transfer Functions ---------------------------------------- */
+
+__DEVICE__ float oetf_davinci_intermediate(float x) {
+    return x <= 0.02740668f ? x/10.44426855f : _exp2f(x/0.07329248f - 7.0f) - 0.0075f;
+}
+
+__DEVICE__ float oetf_filmlight_tlog(float x) {
+  return x < 0.075f ? (x-0.075f)/16.184376489665897f : _expf((x - 0.5520126568606655f)/0.09232902596577353f) - 0.0057048244042473785f;
+}
+__DEVICE__ float oetf_arri_logc3(float x) {
+  return x < 5.367655f*0.010591f + 0.092809f ? (x - 0.092809f)/5.367655f : (_exp10f((x - 0.385537f)/0.247190f) - 0.052272f)/5.555556f;
+}
+
+__DEVICE__ float oetf_arri_logc4(float x) {
+  return x < -0.7774983977293537f ? x*0.3033266726886969f - 0.7774983977293537f : (_exp2f(14.0f*(x - 0.09286412512218964f)/0.9071358748778103f + 6.0f) - 64.0f)/2231.8263090676883f;
+}
+
+__DEVICE__ float oetf_panasonic_vlog(float x) {
+  return x < 0.181f ? (x - 0.125f)/5.6f : _exp10f((x - 0.598206f)/0.241514f) - 0.00873f;
+}
+
+__DEVICE__ float oetf_sony_slog3(float x) {
+  return x < 171.2102946929f/1023.0f ? (x*1023.0f - 95.0f)*0.01125f/(171.2102946929f - 95.0f) : (_exp10f(((x*1023.0f - 420.0f)/261.5f))*(0.18f + 0.01f) - 0.01f);
+}
+
+__DEVICE__ float oetf_fujifilm_flog(float x) {
+  return x < 0.1005377752f ? (x - 0.092864f)/8.735631f : (_exp10f(((x - 0.790453f)/0.344676f))/0.555556f - 0.009468f/0.555556f);
+}
+
+
+__DEVICE__ float3 linearize(float3 rgb, int tf) {
+  if (tf == 0) { // Linear
+    return rgb;
+  } else if (tf == 1) { // Davinci Intermediate
+    rgb.x = oetf_davinci_intermediate(rgb.x);
+    rgb.y = oetf_davinci_intermediate(rgb.y);
+    rgb.z = oetf_davinci_intermediate(rgb.z);
+  } else if (tf == 2) { // Filmlight T-Log
+    rgb.x = oetf_filmlight_tlog(rgb.x);
+    rgb.y = oetf_filmlight_tlog(rgb.y);
+    rgb.z = oetf_filmlight_tlog(rgb.z);
+  } else if (tf == 3) { // Arri LogC3
+    rgb.x = oetf_arri_logc3(rgb.x);
+    rgb.y = oetf_arri_logc3(rgb.y);
+    rgb.z = oetf_arri_logc3(rgb.z);
+  } else if (tf == 4) { // Arri LogC4
+    rgb.x = oetf_arri_logc4(rgb.x);
+    rgb.y = oetf_arri_logc4(rgb.y);
+    rgb.z = oetf_arri_logc4(rgb.z);
+  } else if (tf == 5) { // Panasonic V-Log
+    rgb.x = oetf_panasonic_vlog(rgb.x);
+    rgb.y = oetf_panasonic_vlog(rgb.y);
+    rgb.z = oetf_panasonic_vlog(rgb.z);
+  } else if (tf == 6) { // Sony S-Log3
+    rgb.x = oetf_sony_slog3(rgb.x);
+    rgb.y = oetf_sony_slog3(rgb.y);
+    rgb.z = oetf_sony_slog3(rgb.z);
+  } else if (tf == 7) { // Fuji F-Log
+    rgb.x = oetf_fujifilm_flog(rgb.x);
+    rgb.y = oetf_fujifilm_flog(rgb.y);
+    rgb.z = oetf_fujifilm_flog(rgb.z);
+  }
+  return rgb;
+}
+
+
+/* EOTF Transfer Functions ---------------------------------------- */
 
 
 __DEVICE__ float3 eotf_hlg(float3 rgb, int inverse) {
@@ -309,9 +379,22 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
 
   /* --------------------------- */
+  /* Forward Rendering Code ------------------------------------------ */
 
   float3 rgb = make_float3(p_R, p_G, p_B);
-  /* Forward Rendering Code ------------------------------------------ */
+  
+  // Linearize if a non-linear input oetf / transfer function is selected
+  int oetf;
+  if (in_oetf == ioetf_linear) oetf = 0;
+  if (in_oetf == ioetf_davinci_intermediate) oetf = 1;
+  if (in_oetf == ioetf_filmlight_tlog) oetf = 2;
+  if (in_oetf == ioetf_arri_logc3) oetf = 3;
+  if (in_oetf == ioetf_arri_logc4) oetf = 4;
+  if (in_oetf == ioetf_panasonic_vlog) oetf = 5;
+  if (in_oetf == ioetf_sony_slog3) oetf = 6;
+  if (in_oetf == ioetf_fuji_flog) oetf = 7;
+
+  rgb = linearize(rgb, oetf);
   
   // Convert into display gamut
   rgb = vdot(in_to_xyz, rgb);
@@ -330,7 +413,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   rgb = clampf3(rgb, -2.0f, 2.0f);
 
   /* Purity Compression --------------------------------------- */
-  // rgb purity compression strength, tuned for common camera gamuts
   float3 pc_rats = rgb;
   
   // minrgb with out of gamut values compressed
@@ -346,6 +428,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // restore full range for tonescale curve
   pc_rats_mn *= mx;
   
+  // rgb purity compression strength, tuned for common camera gamuts
   // the factor to mix back to maxrgb
   float3 pc_s = make_float3(0.03f, 0.16f, 0.06f);
   float pc_f = pc_s.x*pc_rats.x + pc_s.y*pc_rats.y + pc_s.z*pc_rats.z;
