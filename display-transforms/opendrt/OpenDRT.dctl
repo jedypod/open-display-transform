@@ -22,7 +22,7 @@ DEFINE_UI_PARAMS(hs_g, hueshift g, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(hs_b, hueshift b, DCTLUI_SLIDER_FLOAT, -0.3, -1.0, 1.0, 0.0)
 
 // Encoding / IO
-DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 12, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_vgamut, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 14, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_vgamut, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_oetf, in transfer function, DCTLUI_COMBO_BOX, 0, {ioetf_linear, ioetf_davinci_intermediate, ioetf_filmlight_tlog, ioetf_arri_logc3, ioetf_arri_logc4, ioetf_panasonic_vlog, ioetf_sony_slog3, ioetf_fuji_flog}, {Linear, Davinci Intermediate, Filmlight T-Log, Arri LogC3, Arri LogC4, Panasonic V-Log, Sony S-Log3, Fuji F-Log})
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3 D65, Rec.2020})
 DEFINE_UI_PARAMS(EOTF, display eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
@@ -296,9 +296,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Hue Shift RGB controls
   float3 hs = make_float3(hs_r, hs_g, hs_b);
-
-  // Weights: controls the "vibrancy" of each channel, and influences all other aspects of the display-rendering.
-  float3 weights = make_float3(0.25f, 0.45f, 0.3f);
 
   // Input gamut conversion matrix (CAT02 chromatic adaptation to D65)
   float3x3 in_to_xyz;
