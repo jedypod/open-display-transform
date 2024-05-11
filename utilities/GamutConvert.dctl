@@ -1,0 +1,87 @@
+#line 2
+/* GamutConvert
+    Applies a pre-calculated 3x3 matrix to convert from in gamut to out gamut.
+*/
+
+DEFINE_UI_PARAMS(ig, in gamut, DCTLUI_COMBO_BOX, 0, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_vgamut, i_bmdwg, i_egamut, i_egamut2, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, Filmlight E-Gamut2, DaVinci Wide Gamut})
+// DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(og, out gamut, DCTLUI_COMBO_BOX, 0, {o_xyz, o_ap0, o_ap1, o_p3d65, o_rec2020, o_rec709, o_awg3, o_awg4, o_rwg, o_sgamut3, o_sgamut3cine, o_vgamut, o_bmdwg, o_egamut, o_egamut2, o_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, Filmlight E-Gamut2, DaVinci Wide Gamut})
+
+
+// Struct for a 3x3 matrix
+typedef struct {
+  float3 x, y, z;
+} float3x3;
+
+// Helper function to create a float3x3
+__DEVICE__ float3x3 make_float3x3(float3 a, float3 b, float3 c) {
+  float3x3 d;
+  d.x = a, d.y = b, d.z = c;
+  return d;
+}
+
+// Multiply 3x3 matrix m and float3 vector v
+__DEVICE__ float3 vdot(float3x3 m, float3 v) {
+  return make_float3(m.x.x*v.x + m.x.y*v.y + m.x.z*v.z, m.y.x*v.x + m.y.y*v.y + m.y.z*v.z, m.z.x*v.x + m.z.y*v.y + m.z.z*v.z);
+}
+
+
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
+{
+  // Get the input RGB
+  float3 rgb = make_float3(p_R, p_G, p_B);
+  
+  // If in gamut equals out gamut, do nothing
+  if (ig == og) return rgb;
+
+
+  float3x3 imtx;
+  // Match in-gamut to the right matrix
+  if (ig == i_ap0) imtx = make_float3x3(make_float3(0.93863094875f, -0.00574192055f, 0.017566898852f), make_float3(0.338093594922f, 0.727213902811f, -0.065307497733f), make_float3(0.000723121511f, 0.000818441849f, 1.0875161874f));
+  else if (ig == i_ap1) imtx = make_float3x3(make_float3(0.652418717672f, 0.127179925538f, 0.170857283842f), make_float3(0.268064059194f, 0.672464478993f, 0.059471461813f), make_float3(-0.00546992851f, 0.005182799977f, 1.08934487929f));
+  else if (ig == i_p3d65) imtx = make_float3x3(make_float3(0.486570948648f, 0.265667693169f, 0.198217285234f), make_float3(0.22897456407f, 0.691738521837f, 0.079286914094f), make_float3(-0.0f, 0.045113381859f, 1.0439443689f));
+  else if (ig == i_rec2020) imtx = make_float3x3(make_float3(0.636958048301f, 0.144616903586f, 0.168880975164f), make_float3(0.262700212011f, 0.677998071519f, 0.05930171647f), make_float3(0.0f, 0.028072693049f, 1.06098505771f));
+  else if (ig == i_rec709) imtx = make_float3x3(make_float3(0.412390799266f, 0.357584339384f, 0.180480788402f), make_float3(0.212639005872f, 0.715168678768f, 0.072192315361f), make_float3(0.019330818716f, 0.119194779795f, 0.95053215225f));
+  else if (ig == i_awg3) imtx = make_float3x3(make_float3(0.638007619284f, 0.214703856337f, 0.097744451431f), make_float3(0.291953779f, 0.823841041511f, -0.11579482051f), make_float3(0.002798279032f, -0.067034235689f, 1.15329370742f));
+  else if (ig == i_awg4) imtx = make_float3x3(make_float3(0.704858320407f, 0.12976029517f, 0.115837311474f), make_float3(0.254524176404f, 0.781477732712f, -0.036001909116f), make_float3(0.0f, 0.0f, 1.08905775076f));
+  else if (ig == i_rwg) imtx = make_float3x3(make_float3(0.735275245906f, 0.068609410614f, 0.146571270532f), make_float3(0.2866940995f, 0.842979134017f, -0.129673233517f), make_float3(-0.079680856878f, -0.347343216994f, 1.51608182463f));
+  else if (ig == i_sgamut3) imtx = make_float3x3(make_float3(0.706482713192f, 0.128801049791f, 0.115172164069f), make_float3(0.270979670813f, 0.786606411221f, -0.057586082034f), make_float3(-0.009677845386f, 0.004600037493f, 1.09413555865f));
+  else if (ig == i_sgamut3cine) imtx = make_float3x3(make_float3(0.599083920758f, 0.248925516115f, 0.102446490178f), make_float3(0.215075820116f, 0.885068501744f, -0.100144321859f), make_float3(-0.032065849545f, -0.027658390679f, 1.14878199098f));
+  else if (ig == i_vgamut) imtx = make_float3x3(make_float3(0.679644469878f, 0.15221141244f, 0.118600044733f), make_float3(0.26068555009f, 0.77489446333f, -0.03558001342f), make_float3(-0.009310198218f, -0.004612467044f, 1.10298041602f));
+  else if (ig == i_bmdwg) imtx = make_float3x3(make_float3(0.606538368283f, 0.220412735329f, 0.12350482344f), make_float3(0.267992940057f, 0.832748409123f, -0.10074134918f), make_float3(-0.02944255416f, -0.086612430277f, 1.2051127352f));
+  else if (ig == i_egamut) imtx = make_float3x3(make_float3(0.705396850088f, 0.16404132831f, 0.081017748654f), make_float3(0.280130724091f, 0.82020664155f, -0.100337365641f), make_float3(-0.103781511569f, -0.072907257027f, 1.26574651936f));
+  else if (ig == i_egamut2) imtx = make_float3x3(make_float3(0.736477700184f, 0.130739651087f, 0.083238575781f), make_float3(0.275069984406f, 0.828017790216f, -0.103087774621f), make_float3(-0.124225154248f, -0.087159767391f, 1.3004426724f));
+  else if (ig == i_davinciwg) imtx = make_float3x3(make_float3(0.700622392094f, 0.148774815123f, 0.101058719835f), make_float3(0.274118510907f, 0.87363189594f, -0.147750406847f), make_float3(-0.098962912883f, -0.137895325076f, 1.32591598872f));
+
+  float3x3 omtx;
+  // Match out-gamut to the right matrix
+  if (og == o_ap0) omtx = make_float3x3(make_float3(1.06236610705f, 0.008406953654f, -0.016655789633f), make_float3(-0.493941371628f, 1.37110952521f, 0.090316586974f), make_float3(-0.000334668577f, -0.001037458272f, 0.919469647322f));
+  else if (og == o_ap1) omtx = make_float3x3(make_float3(1.65885430847f, -0.311856975397f, -0.243156007126f), make_float3(-0.662283287108f, 1.61219957087f, 0.015859126603f), make_float3(0.011480566457f, -0.009236324924f, 0.916686513449f));
+  else if (og == o_p3d65) omtx = make_float3x3(make_float3(2.49349691194f, -0.931383617919f, -0.402710784451f), make_float3(-0.829488969562f, 1.76266406032f, 0.023624685842f), make_float3(0.035845830244f, -0.076172389268f, 0.956884524008f));
+  else if (og == o_rec2020) omtx = make_float3x3(make_float3(1.71665118797f, -0.355670783776f, -0.253366281374f), make_float3(-0.666684351832f, 1.61648123664f, 0.015768545814f), make_float3(0.017639857445f, -0.042770613258f, 0.942103121235f));
+  else if (og == o_rec709) omtx = make_float3x3(make_float3(3.2409699419f, -1.53738317757f, -0.498610760293f), make_float3(-0.969243636281f, 1.87596750151f, 0.041555057407f), make_float3(0.055630079697f, -0.203976958889f, 1.05697151424f));
+  else if (og == o_awg3) omtx = make_float3x3(make_float3(1.78906555097f, -0.482533863771f, -0.200075792936f), make_float3(-0.639848659902f, 1.39639995686f, 0.194432291778f), make_float3(-0.041531545853f, 0.082335373554f, 0.878868480293f));
+  else if (og == o_awg4) omtx = make_float3x3(make_float3(1.50921547224f, -0.250597345204f, -0.168811475294f), make_float3(-0.491545451661f, 1.36124554593f, 0.097282942014f), make_float3(0.0f, 0.0f, 0.918224951158f));
+  else if (og == o_rwg) omtx = make_float3x3(make_float3(1.41280648037f, -0.17752320099f, -0.151770732029f), make_float3(-0.48620327686f, 1.2906964268f, 0.15740061473f), make_float3(-0.037139010853f, 0.286375999779f, 0.687679778862f));
+  else if (og == o_sgamut3) omtx = make_float3x3(make_float3(1.50739989906f, -0.245822137385f, -0.171611680816f), make_float3(-0.518151727083f, 1.3553912409f, 0.125878668162f), make_float3(0.015511698158f, -0.007872771427f, 0.911916365575f));
+  else if (og == o_sgamut3cine) omtx = make_float3x3(make_float3(1.84677896929f, -0.525986122969f, -0.210545211388f), make_float3(-0.444153262903f, 1.25944290281f, 0.149399972888f), make_float3(0.040855421196f, 0.01564088931f, 0.868207248699f));
+  else if (og == o_vgamut) omtx = make_float3x3(make_float3(1.58901177387f, -0.31320448446f, -0.180964851528f), make_float3(-0.534052910449f, 1.39601143335f, 0.102457671017f), make_float3(0.011179448843f, 0.003194128241f, 0.905535356281f));
+  else if (og == o_bmdwg) omtx = make_float3x3(make_float3(1.86635773561f, -0.518390508775f, -0.234606716542f), make_float3(-0.600329854462f, 1.37811995056f, 0.176728109838f), make_float3(0.002451481064f, 0.086381609339f, 0.836767715319f));
+  else if (og == o_egamut) omtx = make_float3x3(make_float3(1.52505277041f, -0.315913510935f, -0.122658264605f), make_float3(-0.509152559971f, 1.33332740873f, 0.138284365141f), make_float3(0.095715345314f, 0.050897443852f, 0.787955770285f));
+  else if (og == o_egamut2) omtx = make_float3x3(make_float3(1.42776075557f, -0.237033581941f, -0.110177895085f), make_float3(-0.461174449232f, 1.2944289444f, 0.13212985645f), make_float3(0.105477884785f, 0.064114008399f, 0.767299906963f));
+  else if (og == o_davinciwg) omtx = make_float3x3(make_float3(1.51667204202f, -0.281478047879f, -0.146963633237f), make_float3(-0.464917101233f, 1.25142377568f, 0.174884608865f), make_float3(0.064849047067f, 0.109139343711f, 0.76141462155f));
+
+
+  
+  if (ig != i_xyz) {
+    // Apply in gamut to XYZ conversion
+    rgb = vdot(imtx, rgb);
+  }
+  if (og != o_xyz) {
+    // Apply XYZ to out gamut conversion
+    rgb = vdot(omtx, rgb);
+  }
+  
+  return rgb;
+}
