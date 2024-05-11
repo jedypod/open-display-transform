@@ -1,3 +1,4 @@
+#line 2
 /* GamutConvert
     Calculate a 3x3 matrix to convert between two gamuts.
 
@@ -7,9 +8,9 @@
 
 */
 
-DEFINE_UI_PARAMS(ig, in gamut, DCTLUI_COMBO_BOX, 0, {i_xyz, i_xyz_d65, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, XYZ D65, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(ig, in gamut, DCTLUI_COMBO_BOX, 0, {i_xyz, i_xyz_d65, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_vgamut, i_bmdwg, i_egamut, i_egamut2, i_davinciwg}, {XYZ, XYZ D65, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, Filmlight E-Gamut2, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0);
-DEFINE_UI_PARAMS(og, out gamut, DCTLUI_COMBO_BOX, 0, {o_xyz, o_xyz_d65, o_ap0, o_ap1, o_p3d65, o_rec2020, o_rec709, o_awg3, o_awg4, o_rwg, o_sgamut3, o_sgamut3cine, o_bmdwg, o_egamut, o_davinciwg}, {XYZ, XYZ D65, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(og, out gamut, DCTLUI_COMBO_BOX, 0, {o_xyz, o_xyz_d65, o_ap0, o_ap1, o_p3d65, o_rec2020, o_rec709, o_awg3, o_awg4, o_rwg, o_sgamut3, o_sgamut3cine, o_vgamut, o_bmdwg, o_egamut, o_egamut2, o_davinciwg}, {XYZ, XYZ D65, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, Filmlight E-Gamut2, DaVinci Wide Gamut})
 
 // Struct for a 3x3 matrix
 typedef struct {
@@ -186,6 +187,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   chr ap1         = make_chr(make_float2(0.713f, 0.293f), make_float2(0.165f, 0.83f), make_float2(0.128f, 0.044f), wp_ACES);
   chr bdgamut     = make_chr(make_float2(0.8150f, 0.3167f), make_float2(0.2036f, 0.8500f), make_float2(0.0517f, -0.1026f), wp_D65);
   chr egamut      = make_chr(make_float2(0.8f, 0.3177f), make_float2(0.18f, 0.9f), make_float2(0.065f, -0.0805f), wp_D65);
+  chr egamut2     = make_chr(make_float2(0.83f, 0.31f), make_float2(0.15f, 0.95f), make_float2(0.065f, -0.0805f), wp_D65);
   chr davinciwg   = make_chr(make_float2(0.8f, 0.313f), make_float2(0.1682f, 0.9877f), make_float2(0.079f, -0.1155f), wp_D65);
   chr rec709      = make_chr(make_float2(0.64f, 0.33f), make_float2(0.3f, 0.6f), make_float2(0.15f, 0.06f), wp_D65);
   chr rec2020     = make_chr(make_float2(0.708f, 0.292f), make_float2(0.17f, 0.797f), make_float2(0.131f, 0.046f), wp_D65);
@@ -217,8 +219,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (ig == i_rwg) ichr = rwg;
   else if (ig == i_sgamut3) ichr = sgamut3;
   else if (ig == i_sgamut3cine) ichr = sgamut3cine;
+  else if (ig == i_vgamut) ichr = vgamut;
   else if (ig == i_bmdwg) ichr = bmdwg;
   else if (ig == i_egamut) ichr = egamut;
+  else if (ig == i_egamut2) ichr = egamut2;
   else if (ig == i_davinciwg) ichr = davinciwg;
 
   chr ochr; // output chromaticities
@@ -233,8 +237,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (og == o_rwg) ochr = rwg;
   else if (og == o_sgamut3) ochr = sgamut3;
   else if (og == o_sgamut3cine) ochr = sgamut3cine;
+  else if (og == o_vgamut) ochr = vgamut;
   else if (og == o_bmdwg) ochr = bmdwg;
   else if (og == o_egamut) ochr = egamut;
+  else if (og == o_egamut2) ochr = egamut2;
   else if (og == o_davinciwg) ochr = davinciwg;
 
 
