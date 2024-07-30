@@ -58,7 +58,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // RGB Ratios
   float mx = _fmaxf(in.x, _fmaxf(in.y, in.z));
-  mx = fabsf(mx) < 1e-4f ? 0.0f : mx;
+  mx = _fabs(mx) < 1e-4f ? 0.0f : mx;
   float3 rgb = sdivf3f(in, mx);
   float mn = _fmaxf(0.0f, _fminf(rgb.x, _fminf(rgb.y, rgb.z)));
   
