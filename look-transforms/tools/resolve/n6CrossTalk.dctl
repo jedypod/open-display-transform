@@ -111,10 +111,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Distort CMY hue angles
   rgb.x = (ms+1.0f)*(rgb.x-_fmaxf(0.0f,m0)-_fminf(0.0f,m1))*hm+(ys+1.0f)*(rgb.x+_fminf(0.0f,y0)+_fmaxf(0.0f,y1))*hy+rgb.x*(1.0f-(hm+hy));
   rgb.y = (cs+1.0f)*(rgb.y-_fmaxf(0.0f,c0)-_fminf(0.0f,c1))*hc+(ys+1.0f)*(rgb.y-_fmaxf(0.0f,y0)-_fminf(0.0f,y1))*hy+rgb.y*(1.0f-(hc+hy));
-  rgb.z = (cs+1.0f)*(rgb.z+_fminf(0.0f,c0)+_fmaxf(0.0f,c1))*hc+(ms+1.0f)*(rgb.z+_fminf(0.0f,c1)+_fmaxf(0.0f,m1))*hm+rgb.z*(1.0f-(hc+hm));
+  rgb.z = (cs+1.0f)*(rgb.z+_fminf(0.0f,c0)+_fmaxf(0.0f,c1))*hc+(ms+1.0f)*(rgb.z+_fminf(0.0f,m0)+_fmaxf(0.0f,m1))*hm+rgb.z*(1.0f-(hc+hm));
 
   // Distort RGB hue angles
-  rgb.x = (rs+1.0f)*rgb.x*hr+rgb.x*(1.0f+_fminf(0.0f,g0))*(1.0f+_fmaxf(0.0f,b1))*hg+rgb.x*(1.0f-_fmaxf(0.0f,b0))*(1.0f-_fminf(0.0f,b1))*hb+rgb.x*(1.0f-(hr+hg+hb));
+  rgb.x = (rs+1.0f)*rgb.x*hr+rgb.x*(1.0f+_fminf(0.0f,g0))*(1.0f+_fmaxf(0.0f,g1))*hg+rgb.x*(1.0f-_fmaxf(0.0f,b0))*(1.0f-_fminf(0.0f,b1))*hb+rgb.x*(1.0f-(hr+hg+hb));
   rgb.y = (gs+1.0f)*rgb.y*hg+rgb.y*(1.0f-_fmaxf(0.0f,r0))*(1.0f-_fminf(0.0f,r1))*hr+rgb.y*(1.0f+_fminf(0.0f,b0))*(1.0f+_fmaxf(0.0f,b1))*hb+rgb.y*(1.0f-(hr+hg+hb));
   rgb.z = (bs+1.0f)*rgb.z*hb+rgb.z*(1.0f+_fminf(0.0f,r0))*(1.0f+_fmaxf(0.0f,r1))*hr+rgb.z*(1.0f-_fmaxf(0.0f,g0))*(1.0f-_fminf(0.0f,g1))*hg+rgb.z*(1.0f-(hr+hg+hb));
 
