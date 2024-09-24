@@ -310,11 +310,11 @@ __DEVICE__ float3 eotf_hlg(float3 rgb, int inverse) {
   const float h_a = 0.17883277f;
   const float h_b = 1.0f - 4.0f * 0.17883277f;
   const float h_c = 0.5f - h_a * _logf(4.0f * h_a);
-  const float h_g = 1.2f * _powf(1.111f, _log2f(HLG_Lw / 1000.0f)) * _powf(0.98f, _log2f(_fmaxf(1e-6f, HLG_Ls) / 5.0f));
+  const float h_g = 1.2f * spowf(1.111f, _log2f(HLG_Lw / 1000.0f)) * spowf(0.98f, _log2f(_fmaxf(1e-6f, HLG_Ls) / 5.0f));
   if (inverse == 1) {
     float Yd = 0.2627f * rgb.x + 0.6780f * rgb.y + 0.0593f * rgb.z;
     // HLG Inverse OOTF
-    rgb = rgb * _powf(Yd, (1.0f - h_g) / h_g);
+    rgb = rgb * spowf(Yd, (1.0f - h_g) / h_g);
     // HLG OETF
     rgb.x = rgb.x <= 1.0f / 12.0f ? _sqrtf(3.0f * rgb.x) : h_a * _logf(12.0f * rgb.x - h_b) + h_c;
     rgb.y = rgb.y <= 1.0f / 12.0f ? _sqrtf(3.0f * rgb.y) : h_a * _logf(12.0f * rgb.y - h_b) + h_c;
@@ -326,7 +326,7 @@ __DEVICE__ float3 eotf_hlg(float3 rgb, int inverse) {
     rgb.z = rgb.z <= 0.5f ? rgb.z * rgb.z / 3.0f : (_expf((rgb.z - h_c) / h_a) + h_b) / 12.0f;
     // HLG OOTF
     float Ys = 0.2627f * rgb.x + 0.6780f * rgb.y + 0.0593f * rgb.z;
-    rgb = rgb * _powf(Ys, h_g - 1.0f);
+    rgb = rgb * spowf(Ys, h_g - 1.0f);
   }
   return rgb;
 }
