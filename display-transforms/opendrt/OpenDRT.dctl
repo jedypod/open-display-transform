@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 /*  OpenDRT -------------------------------------------------
-      v0.3.2
+      v0.3.3
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -385,7 +385,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Norm and RGB Ratios
   float norm = hypotf3(clampminf3(rgb, 0.0f))/_sqrtf(3.0f);
   rgb = sdivf3f(rgb, norm);
-  rgb = clampminf3(rgb, -2.0f); // Prevent bright pixels from crazy values in shadow grain
+  rgb = clampminf3(rgb, 0.0f); // Prevent bright pixels from crazy values in shadow grain
 
 
   /* Tonescale Parameters 

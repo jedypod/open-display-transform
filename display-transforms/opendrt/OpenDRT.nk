@@ -3,7 +3,7 @@ push $cut_paste_input
 Group {
  name OpenDRT
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> <br>v0.3.2 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> <br>v0.3.3 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
  addUserKnob {41 gamut l "in gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer01 l "" +STARTLINE}
  addUserKnob {26 tonescale_label l " " T <b>tone</b>}
@@ -429,9 +429,9 @@ push $N6039aac0
 push $Na9997580
  MergeExpression {
   inputs 2
-  expr0 Ar==0?0:max(-2,Br/Ar)
-  expr1 Ag==0?0:max(-2,Bg/Ag)
-  expr2 Ab==0?0:max(-2,Bb/Ab)
+  expr0 Ar==0?0:max(0,Br/Ar)
+  expr1 Ag==0?0:max(0,Bg/Ag)
+  expr2 Ab==0?0:max(0,Bb/Ab)
   name MergeDivideReverse
   xpos 290
   ypos -562
