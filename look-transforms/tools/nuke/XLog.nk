@@ -1,0 +1,35 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Expression {
+ expr0 invert?r<x1?k*r+y2:exp((r-o1)/s0)+o0:r<y1?(r-y2)/k:s0*log(r-o0)+o1
+ expr1 invert?g<x1?k*g+y2:exp((g-o1)/s0)+o0:g<y1?(g-y2)/k:s0*log(g-o0)+o1
+ expr2 invert?b<x1?k*b+y2:exp((b-o1)/s0)+o0:b<y1?(b-y2)/k:s0*log(b-o0)+o1
+ name LogConvert_XLog_SlopeLinExt
+ label "https://www.desmos.com/calculator/9pgjgo1gq4\nhttps://colab.research.google.com/drive/1NwjaD0NzNMzQeNQqZECj33PdcYGkeBM4\n"
+ addUserKnob {20 Params}
+ addUserKnob {35 presets l " " t "<b>xlog</b><br>\nClassic Cineon style log space for grading, similar to Filmlight's T-Log.\n<b>xloghalf</b><br>\nCineon style log space with less dynamic range up to 16. suitable for log grading in half float maybe?\n<b>xlogc</b><br>\nCamera encoding style log curve with an extended linear section in in the shadows.\n\n" M {presets/xlog "knobs this \{w0 128 w1 1 o 7.5 k 0.06 x0 0 y0 0.075\}" presets/xloghalf "knobs this \{w0 16 w1 1 o 6.7 k 0.05 x0 0 y0 0.092\}" presets/xlogc "knobs this \{w0 64 w1 1 o 7 k 0.18 x0 0.01 y0 0.15\}" ""}}
+ addUserKnob {7 w0 t "w0 defines the x intersection point at y=w1" R 10 256}
+ w0 16
+ addUserKnob {7 w1 R 0 2}
+ w1 1
+ addUserKnob {7 o R 0 12}
+ o 6.7
+ addUserKnob {7 k t "k = slope on log function at linear extension point (x1, y1)" R 0 0.2}
+ k 0.05
+ addUserKnob {7 x0 t "intersection constraint for lower x coordinate" R 0 0.5}
+ addUserKnob {7 y0 t "intersection constraint for lower y coordinate" R 0 0.5}
+ y0 0.092
+ addUserKnob {7 o0 t "x offset: the y asymptote of the log curve" R -0.1 0}
+ o0 {{-(2**-o)}}
+ addUserKnob {7 s0 t "s0 = scale factor to satisfy intersection constraint at (x0, y0)" R 0 4}
+ s0 {{(w1-y0)/log((w0-o0)/(x0-o0))}}
+ addUserKnob {7 o1 t "y offset to satisfy intersection constraint at (w0, w1)" R -1 1}
+ o1 {{w1-s0*log(w0-o0)}}
+ addUserKnob {7 x1 t "x1 is x coordinate of linear extension intercept (controlled by user-specified slope k)" R -1 1}
+ x1 {{s0*log(k*s0*exp(o1/s0))}}
+ addUserKnob {7 y1 t "y1 is y coordinate of linear extension intercept" R -1 1}
+ y1 {{exp((x1-o1)/s0)+o0}}
+ addUserKnob {7 y2 t "y (x=0) intercept of linear equation" R -1 1}
+ y2 {{y1-k*x1}}
+ addUserKnob {6 invert +STARTLINE}
+}

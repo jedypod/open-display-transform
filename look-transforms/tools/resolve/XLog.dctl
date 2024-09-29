@@ -1,0 +1,72 @@
+#line 2 // Fix line numbers in resolve/logs/rollinglog.txt
+/* XLog
+    v0.0.1
+    A flexible parameterized log function. This one has been floating around in my various tools for a while, 
+    but I figured it would be useful to have as a standalone. This is the variation that includes 
+    a linear extension at the specified slope value, instead of at a  specific x coordinate.
+
+    A couple of preset parameter values to start you off:
+    XLog: Classic Cineon style log space for grading, similar to Filmlight's T-Log.
+    w0 128 w1 1 o 7.5 k 0.06 x0 0 y0 0.075
+    
+    XLogHalf: Cineon style log space with less dynamic range up to 16. suitable for log grading in half float maybe?
+    w0 16 w1 1 o 6.7 k 0.05 x0 0 y0 0.092
+
+    XLogC: Camera encoding style log curve with an extended linear section in in the shadows, similar to Arri LogC3.
+    w0 64 w1 1 o 7 k 0.18 x0 0.01 y0 0.15
+
+
+    https://www.desmos.com/calculator/9pgjgo1gq4
+    
+    Google Colab Notebook with mathematical derivation and extra variations:
+    https://colab.research.google.com/drive/1NwjaD0NzNMzQeNQqZECj33PdcYGkeBM4
+
+
+    Written by Jed Smith
+    https://github.com/jedypod/open-display-transform
+
+    License: GPL v3
+*/
+
+DEFINE_UI_PARAMS(w0, high x intersect, DCTLUI_SLIDER_FLOAT, 16, 10, 256, 0.0)
+DEFINE_UI_PARAMS(o, slope, DCTLUI_SLIDER_FLOAT, 6.7, 0, 12, 0.0)
+DEFINE_UI_PARAMS(x0, low x intersect, DCTLUI_SLIDER_FLOAT, 0, 0, 0.5, 0.0)
+DEFINE_UI_PARAMS(y0, low y intersect, DCTLUI_SLIDER_FLOAT, 0.092, 0, 0.5, 0.0)
+DEFINE_UI_PARAMS(k, lin ext slope, DCTLUI_SLIDER_FLOAT, 0.05, 0, 0.2, 0.0)
+DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
+{
+
+  /* Pre-Calculations */
+  // high y intersect is always 1.0
+  const float w1 = 1.0f;
+  // x offset: the y asymptote of the log curve
+  const float o0 = -_powf(2.0f,-o);
+  // s0: scale factor to satisfy intersection constraint at (x0, y0)
+  const float s0 = (w1-y0)/_logf((w0-o0)/(x0-o0));
+  // o1: y offset to satisfy intersection constraint at (w0, w1)
+  const float o1 = w1-s0*_logf(w0-o0);
+  // x1: x coordinate of linear extension intercept (controlled by user-specified slope k)
+  const float x1 = s0*log(k*s0*_expf(o1/s0));
+  // y1: is y coordinate of linear extension intercept
+  const float y1 = _expf((x1-o1)/s0)+o0;
+  // y (x=0) intercept of linear equation
+  const float y2 = y1-k*x1;
+
+  /* Shader Code */
+  float3 rgb = make_float3(p_R, p_G, p_B);
+
+  if (invert) {
+    rgb.x = rgb.x < x1 ? k*rgb.x+y2 : _expf((rgb.x - o1)/s0) + o0;
+    rgb.y = rgb.y < x1 ? k*rgb.y+y2 : _expf((rgb.y - o1)/s0) + o0;
+    rgb.z = rgb.z < x1 ? k*rgb.z+y2 : _expf((rgb.z - o1)/s0) + o0;
+  } else {
+    rgb.x = rgb.x < y1 ? (rgb.x - y2)/k : s0*_logf(rgb.x - o0) + o1;
+    rgb.y = rgb.y < y1 ? (rgb.y - y2)/k : s0*_logf(rgb.y - o0) + o1;
+    rgb.z = rgb.z < y1 ? (rgb.z - y2)/k : s0*_logf(rgb.z - o0) + o1;
+  }
+
+  return rgb;
+}
