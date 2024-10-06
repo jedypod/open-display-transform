@@ -3,9 +3,9 @@
     The zones are defined by a hyperbolic extraction of input
 
     Input should be scene-linear.
-    Requires ./libDRT.h
+    
   ---------------------------------------------------
-    v0.0.1
+    v0.0.2
     Written by Jed Smith
     github.com/jedypod/open-display-transform
 */
@@ -25,8 +25,40 @@ DEFINE_UI_PARAMS(sg, sat green, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.0)
 DEFINE_UI_PARAMS(pch, perceptual, DCTLUI_CHECK_BOX, 0)
 DEFINE_UI_PARAMS(zha, zone hue angle, DCTLUI_COMBO_BOX, 1, {none, low, high}, {none, low, high})
 
-#include "libDRT.h"
 
+#define catd65 make_float3(1.07046f, 0.916817f, 0.594251f)
+// Gamut conversion Matrices
+#define identity_mtx make_float3x3(make_float3(1.0f, 0.0f, 0.0f), make_float3(0.0f, 1.0f, 0.0f), make_float3(0.0f, 0.0f, 1.0f))
+#define matrix_ap0_to_xyz make_float3x3(make_float3(0.950362384319f, 0.000000000000f, 0.000093463248f), make_float3(0.343966454268f, 0.728166162968f, -0.072132542729f), make_float3(0.000000000000f, 0.000000000000, 1.089057803154f))
+#define matrix_ap1_to_xyz make_float3x3(make_float3(0.660931229591f, 0.133696138859f, 0.155828580260f), make_float3(0.272228747606f, 0.674081742764f, 0.053689509630f), make_float3(-0.006018006243f, 0.004383686464, 1.090692043304f))
+#define matrix_p3d65_to_xyz make_float3x3(make_float3(0.486571133137f, 0.265667706728f, 0.198217317462f), make_float3(0.228974640369f, 0.691738605499f, 0.079286918044f), make_float3(-0.000000000000f, 0.045113388449, 1.043944478035f))
+#define matrix_p3d60_to_xyz make_float3x3(make_float3(0.504949748516f, 0.264681518078f, 0.183015048504f), make_float3(0.237623393536f, 0.689170777798f, 0.073206014931f), make_float3(-0.000000000000f, 0.044945921749f, 0.963879227638f))
+#define matrix_p3dci_to_xyz make_float3x3(make_float3(0.445170015097f, 0.277134418488f, 0.172282665968f), make_float3(0.209491759539f, 0.721595287323f, 0.068913064897f), make_float3(-0.000000000000f, 0.047060567886f, 0.907355427742f))
+#define matrix_rec2020_to_xyz make_float3x3(make_float3(0.636958122253f, 0.144616916776f, 0.168880969286f), make_float3(0.262700229883f, 0.677998125553f, 0.059301715344f), make_float3(0.000000000000f, 0.028072696179, 1.060985088348f))
+#define matrix_rec709_to_xyz make_float3x3(make_float3(0.412390917540f, 0.357584357262f, 0.180480793118f), make_float3(0.212639078498f, 0.715168714523f, 0.072192311287f), make_float3(0.019330825657f, 0.119194783270f, 0.950532138348f))
+#define matrix_arriwg_to_xyz make_float3x3(make_float3(0.638007640839f, 0.214703813195f, 0.097744457424f), make_float3(0.291953772306f, 0.823840856552f, -0.115794822574f), make_float3(0.002798279049f, -0.067034222186, 1.153293848038f))
+#define matrix_redwg_to_xyz make_float3x3(make_float3(0.735275208950f, 0.068609409034f, 0.146571278572f), make_float3(0.286694079638f, 0.842979073524f, -0.129673242569f), make_float3(-0.079680845141f, -0.347343206406, 1.516081929207f))
+#define matrix_sonysgamut3 make_float3x3(make_float3(0.599083900452f, 0.248925492167f, 0.102446496487f), make_float3(0.215075820684f, 0.885068416595f, -0.100144319236f), make_float3(-0.032065849751f, -0.027658388019, 1.148782014847f))
+#define matrix_egamut_to_xyz make_float3x3(make_float3(0.705396831036f, 0.164041340351f, 0.081017754972f), make_float3(0.280130714178f, 0.820206701756f, -0.100337378681f), make_float3(-0.103781513870f, -0.072907261550, 1.265746593475f))
+#define matrix_davinciwg_to_xyz make_float3x3(make_float3(0.700622320175f, 0.148774802685f, 0.101058728993f), make_float3(0.274118483067f, 0.873631775379f, -0.147750422359f), make_float3(-0.098962903023f, -0.137895315886, 1.325916051865f))
+#define matrix_blackmagicwg_to_xyz make_float3x3(make_float3(0.606538414955f, 0.220412746072f, 0.123504832387f), make_float3(0.267992943525f, 0.832748472691f, -0.100741356611f), make_float3(-0.029442556202f, -0.086612440646, 1.205112814903f))
+
+/* Matrix for conversion from CIE 1931 XYZ tristumulus to CIE 2006 LMS or "Truelight LMS", described in:
+    "Chromaticity Coordinates for Graphic Arts Based on CIE 2006 LMS with Even Spacing of Munsell Colours" by Richard Kirk
+    https://doi.org/10.2352/issn.2169-2629.2019.27.38
+*/
+#define matrix_xyz_to_truelightlms make_float3x3(make_float3(0.257085f, 0.859943f, -0.031061f), make_float3(-0.394427, 1.175800f, 0.106423f), make_float3(0.064856f, -0.07625f, 0.559067f))
+
+#define matrix_jzazbz_xyz_to_lms make_float3x3(make_float3(0.41479f, 0.579999f, 0.014648f), make_float3(-0.20151f, 1.12065f, 0.0531008f), make_float3(-0.0166008f, 0.2648f, 0.66848f))
+#define matrix_jzazbz_lms_p_to_izazbz make_float3x3(make_float3(0.5f, 0.5f, 0.0f), make_float3(3.524f, -4.06671f, 0.542708f), make_float3(0.199076f, 1.0968f, -1.29588f))
+
+
+
+
+// Custom 3x3 matrix struct float3x3
+typedef struct {
+  float3 x, y, z;
+} float3x3;
 
 __DEVICE__ float extract(float e0, float e1, float x) {
   // Extract a range from e0 to e1 from f, clamping values above or below.
@@ -39,13 +71,173 @@ __DEVICE__ float extract_window(float e0, float e1, float e2, float e3, float x)
   return x < e1 ? extract(e0, e1, x) : extract(e3, e2, x);
 }
 
-
 __DEVICE__ float extract_hue_angle(float h, float o, float w) {
   // Given hue, offset, width, and chroma, extract hue angle
   float hc = extract_window(2.0f - w, 2.0f, 2.0f, 2.0f + w, _fmod(h + o, 6.0f));
   hc = hc * hc * (3.0f - 2.0f * hc); // smoothstep
   return hc;
 }
+
+
+__DEVICE__ float _sign(float x) {
+  // Return the sign of float x
+  if (x > 0.0f) return 1.0f; 
+  if (x < 0.0f) return -1.0f; 
+  return 0.0f; 
+}
+__DEVICE__ float3 powf3(float3 a, float b) { 
+  // Raise each component of float3 a to power b
+  return make_float3(_powf(a.x, b), _powf(a.y, b), _powf(a.z, b));
+}
+
+__DEVICE__ float3 spowf3(float3 a, float b) {
+  // Compute "safe" power of float3 a, reflected over the origin
+  return make_float3(
+    _sign(a.x)*_powf(_fabs(a.x), b), 
+    _sign(a.y)*_powf(_fabs(a.y), b), 
+    _sign(a.z)*_powf(_fabs(a.z), b));
+}
+
+__DEVICE__ float3 cartesian_to_polar(float3 a) {
+  return make_float3(a.x, _hypotf(a.y, a.z), _atan2f(a.z, a.y));
+}
+
+__DEVICE__ float3 polar_to_cartesian(float3 a) {
+  return make_float3(a.x, a.y * _cosf(a.z), a.y * _sinf(a.z));
+}
+
+
+// Helper function to create a float3x3
+__DEVICE__ float3x3 make_float3x3(float3 a, float3 b, float3 c) {
+  float3x3 d;
+  d.x = a, d.y = b, d.z = c;
+  return d;
+}
+// Multiply float3 vector a and 3x3 matrix m
+__DEVICE__ float3 mult_f3_f33(float3 a, float3x3 m) {
+  return make_float3(
+    m.x.x * a.x + m.x.y * a.y + m.x.z * a.z,
+    m.y.x * a.x + m.y.y * a.y + m.y.z * a.z,
+    m.z.x * a.x + m.z.y * a.y + m.z.z * a.z);
+}
+// Calculate inverse of 3x3 matrix: https://stackoverflow.com/questions/983999/simple-3x3-matrix-inverse-code-c
+__DEVICE__ float3x3 inv_f33(float3x3 m) {
+  float d = m.x.x * (m.y.y * m.z.z - m.z.y * m.y.z) -
+            m.x.y * (m.y.x * m.z.z - m.y.z * m.z.x) +
+            m.x.z * (m.y.x * m.z.y - m.y.y * m.z.x);
+  float id = 1.0f / d;
+  float3x3 c = identity_mtx;
+  c.x.x = id * (m.y.y * m.z.z - m.z.y * m.y.z);
+  c.x.y = id * (m.x.z * m.z.y - m.x.y * m.z.z);
+  c.x.z = id * (m.x.y * m.y.z - m.x.z * m.y.y);
+  c.y.x = id * (m.y.z * m.z.x - m.y.x * m.z.z);
+  c.y.y = id * (m.x.x * m.z.z - m.x.z * m.z.x);
+  c.y.z = id * (m.y.x * m.x.z - m.x.x * m.y.z);
+  c.z.x = id * (m.y.x * m.z.y - m.z.x * m.y.y);
+  c.z.y = id * (m.z.x * m.x.y - m.x.x * m.z.y);
+  c.z.z = id * (m.x.x * m.y.y - m.y.x * m.x.y);
+  return c;
+}
+
+__DEVICE__ float hue(float3 rgb) {
+  // Calculate and return hue in degrees between 0 and 6
+  float mx = _fmaxf(rgb.x, _fmaxf(rgb.y, rgb.z));
+  float mn = _fminf(rgb.x, _fminf(rgb.y, rgb.z));
+  float ch = mx - mn;
+  float h;
+  if (ch == 0.0f) h = 0.0f;
+  else if (mx == rgb.x) h = _fmod((rgb.y - rgb.z) / ch + 6.0f, 6.0f);
+  else if (mx == rgb.y) h = (rgb.z - rgb.x) / ch + 2.0f;
+  else if (mx == rgb.z) h = (rgb.x - rgb.y) / ch + 4.0f;
+  return h;
+}
+
+
+__DEVICE__ float3 eotf_pq(float3 rgb, int inverse, int jz) {
+  // Apply the ST-2084 PQ Forward or Inverse EOTF
+  // Normalized such that input display linear light code value 1.0 equals 10,000 nits
+  // ITU-R Rec BT.2100-2 https://www.itu.int/rec/R-REC-BT.2100
+  // ITU-R Rep BT.2390-9 https://www.itu.int/pub/R-REP-BT.2390
+  
+  float Lp = 1.0f; // We normalize for hdr peak display luminance elsewhere.
+  const float m1 = 2610.0f / 16384.0f;
+  float m2 = 2523.0f / 32.0f;
+  const float c1 = 107.0f / 128.0f;
+  const float c2 = 2413.0f / 128.0f;
+  const float c3 = 2392.0f / 128.0f;
+
+  // Custom values for JzAzBz colorspace
+  if (jz == 1) {
+    m2 *= 1.7f;
+    Lp = 10000.0f;
+  }
+
+  if (inverse == 1) {
+    rgb /= Lp;
+    rgb = spowf3(rgb, m1);
+    // Prevent shitting of the bed when there are negatives, for JzAzBz conversion
+    rgb.x = _sign(rgb.x) * _powf((c1 + c2 * _fabs(rgb.x)) / (1.0f + c3 * _fabs(rgb.x)), m2);
+    rgb.y = _sign(rgb.y) * _powf((c1 + c2 * _fabs(rgb.y)) / (1.0f + c3 * _fabs(rgb.y)), m2);
+    rgb.z = _sign(rgb.z) * _powf((c1 + c2 * _fabs(rgb.z)) / (1.0f + c3 * _fabs(rgb.z)), m2);
+  } else {
+    rgb = spowf3(rgb, 1.0f / m2);
+    rgb.x = _sign(rgb.x) * _powf((_fabs(rgb.x) - c1) / (c2 - c3 * _fabs(rgb.x)), 1.0f / m1) * Lp;
+    rgb.y = _sign(rgb.y) * _powf((_fabs(rgb.y) - c1) / (c2 - c3 * _fabs(rgb.y)), 1.0f / m1) * Lp;
+    rgb.z = _sign(rgb.z) * _powf((_fabs(rgb.z) - c1) / (c2 - c3 * _fabs(rgb.z)), 1.0f / m1) * Lp;
+  }
+  return rgb;
+}
+__DEVICE__ float3 xyz_to_jzlms(float3 xyz) {
+  float3 lms;
+  lms = make_float3(1.15f * xyz.x - (1.15f - 1.0f) * xyz.z,
+        0.66f * xyz.y - (0.66f - 1.0f) * xyz.x,
+        xyz.z);
+  lms = mult_f3_f33(lms, matrix_jzazbz_xyz_to_lms);
+  return lms;
+}
+
+__DEVICE__ float3 jzlms_to_xyz(float3 lms) {
+  float3 xyz;
+  xyz = mult_f3_f33(lms, inv_f33(matrix_jzazbz_xyz_to_lms));
+  xyz = make_float3(
+    (xyz.x + (1.15f - 1.0f) * xyz.z) / 1.15f,
+    (xyz.y + (0.66f - 1.0f) * ((xyz.x + (1.15f - 1.0f) * xyz.z) / 1.15f)) / 0.66f, 
+    xyz.z);
+  return xyz;
+}
+
+__DEVICE__ float3 xyz_to_jzazbz(float3 xyz, int cyl) {
+  // Convert input XYZ D65 aligned tristimulus values into JzAzBz perceptual colorspace, 
+  // if cyl==1: output cylindrical JCh : J = luma, C = chroma, h = hue in radians
+  const float d = -0.56f;
+  const float d_0 = 1.6295499532821565e-11f;
+  float3 lms;
+  lms = xyz_to_jzlms(xyz);
+  lms = eotf_pq(lms, 1, 1);
+  lms = mult_f3_f33(lms, matrix_jzazbz_lms_p_to_izazbz);
+  lms.x = lms.x * (1.0f + d) / (1.0f + d * lms.x) - d_0;
+  
+  // Convert to cylindrical
+  if (cyl == 1) lms = cartesian_to_polar(lms);
+
+  return lms;
+}
+
+
+__DEVICE__ float3 jzazbz_to_xyz(float3 jz, int cyl) {
+  const float d = -0.56f;
+  const float d_0 = 1.6295499532821565e-11f;
+  // Convert to cartesian
+  if (cyl == 1) jz = polar_to_cartesian(jz);
+
+  jz.x = (jz.x + d_0) / (1.0f + d - d * (jz.x + d_0));
+  jz = mult_f3_f33(jz, inv_f33(matrix_jzazbz_lms_p_to_izazbz));
+  jz = eotf_pq(jz, 0, 1);
+  jz = jzlms_to_xyz(jz);
+  return jz;
+}
+
+
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
 {
