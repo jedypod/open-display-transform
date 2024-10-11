@@ -163,7 +163,7 @@ push $N6afa7290
   addUserKnob {78 m R -1 1 n 3}
   m {{1-fabs(cp)} {1-fabs(mp)} {1-fabs(yp)}}
   addUserKnob {78 p R 0 10 n 3}
-  p {{rs} {gs} {bs}}
+  p {{cs} {ms} {ys}}
   addUserKnob {78 a0 R -10 10 n 3}
   a0 {{p*(m-1)} {p*(m-1)} {p*(m-1)}}
   addUserKnob {78 b0 R -10 10 n 3}
