@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 /*  OpenDRT -------------------------------------------------
-      v0.3.3
+      v0.3.4
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -15,14 +15,13 @@ DEFINE_UI_PARAMS(p, contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1.0, 2.0, 0.0)
 DEFINE_UI_PARAMS(toe, toe, DCTLUI_SLIDER_FLOAT, 0.001, 0.0, 0.02, 0.0)
 
 // Color Parameters
-DEFINE_UI_PARAMS(pc_p, purity compress, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(pb, purity boost, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_r, hueshift r, DCTLUI_SLIDER_FLOAT, 0.3, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_g, hueshift g, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(hs_b, hueshift b, DCTLUI_SLIDER_FLOAT, -0.3, -1.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(pc_p0, purity compress low, DCTLUI_SLIDER_FLOAT, 0.4, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(pc_p1, purity compress high, DCTLUI_SLIDER_FLOAT, 0.8, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(pb_m0, purity low, DCTLUI_SLIDER_FLOAT, 1.3, 1.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(pb_m1, purity high, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 
 // Encoding / IO
-DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 14, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_vgamut, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(in_gamut, in gamut, DCTLUI_COMBO_BOX, 15, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_vgamut, i_bmdwg, i_egamut, i_egamut2, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, Filmlight E-Gamut2, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_oetf, in transfer function, DCTLUI_COMBO_BOX, 0, {ioetf_linear, ioetf_davinci_intermediate, ioetf_filmlight_tlog, ioetf_arri_logc3, ioetf_arri_logc4, ioetf_panasonic_vlog, ioetf_sony_slog3, ioetf_fuji_flog}, {Linear, Davinci Intermediate, Filmlight T-Log, Arri LogC3, Arri LogC4, Panasonic V-Log, Sony S-Log3, Fuji F-Log})
 DEFINE_UI_PARAMS(display_gamut, display gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3 D65, Rec.2020})
 DEFINE_UI_PARAMS(EOTF, display eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec .1886, 2.6 Power DCI, ST 2084 PQ, HLG})
@@ -33,8 +32,9 @@ DEFINE_UI_PARAMS(EOTF, display eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, d
 #define matrix_ap0_to_xyz make_float3x3(make_float3(0.93863094875f, -0.00574192055f, 0.017566898852f), make_float3(0.338093594922f, 0.727213902811f, -0.065307497733f), make_float3(0.000723121511f, 0.000818441849f, 1.0875161874f))
 #define matrix_ap1_to_xyz make_float3x3(make_float3(0.652418717672f, 0.127179925538f, 0.170857283842f), make_float3(0.268064059194f, 0.672464478993f, 0.059471461813f), make_float3(-0.00546992851f, 0.005182799977f, 1.08934487929f))
 #define matrix_rec709_to_xyz make_float3x3(make_float3(0.412390917540f, 0.357584357262f, 0.180480793118f), make_float3(0.212639078498f, 0.715168714523f, 0.072192311287f), make_float3(0.019330825657f, 0.119194783270f, 0.950532138348f))
-#define matrix_p3d65_to_xyz make_float3x3(make_float3(0.486571133137f, 0.265667706728f, 0.198217317462f), make_float3(0.228974640369f, 0.691738605499f, 0.079286918044f), make_float3(-0.000000000000f, 0.045113388449, 1.043944478035f))
-#define matrix_rec2020_to_xyz make_float3x3(make_float3(0.636958122253f, 0.144616916776f, 0.168880969286f), make_float3(0.262700229883f, 0.677998125553f, 0.059301715344f), make_float3(0.000000000000f, 0.028072696179, 1.060985088348f))
+#define matrix_p3d65_to_xyz make_float3x3(make_float3(0.486571133137f, 0.265667706728f, 0.198217317462f), make_float3(0.228974640369f, 0.691738605499f, 0.079286918044f), make_float3(0.0f, 0.045113388449, 1.043944478035f))
+#define matrix_xyz_to_p3d65 make_float3x3(make_float3(0.486570948648f, 0.265667693169f, 0.198217285234f), make_float3(0.22897456407f, 0.691738521837f, 0.079286914094f), make_float3(0.0f, 0.045113381859f, 1.0439443689f))
+#define matrix_rec2020_to_xyz make_float3x3(make_float3(0.636958122253f, 0.144616916776f, 0.168880969286f), make_float3(0.262700229883f, 0.677998125553f, 0.059301715344f), make_float3(0.0f, 0.028072696179, 1.060985088348f))
 #define matrix_arriwg3_to_xyz make_float3x3(make_float3(0.638007619284f, 0.214703856337f, 0.097744451431f), make_float3(0.291953779f, 0.823841041511f, -0.11579482051f), make_float3(0.002798279032f, -0.067034235689f, 1.15329370742f))
 #define matrix_arriwg4_to_xyz make_float3x3(make_float3(0.704858320407f, 0.12976029517f, 0.115837311474f), make_float3(0.254524176404f, 0.781477732712f, -0.036001909116f), make_float3(0.0f, 0.0f, 1.08905775076f))
 #define matrix_redwg_to_xyz make_float3x3(make_float3(0.735275208950f, 0.068609409034f, 0.146571278572f), make_float3(0.286694079638f, 0.842979073524f, -0.129673242569f), make_float3(-0.079680845141f, -0.347343206406, 1.516081929207f))
@@ -43,6 +43,7 @@ DEFINE_UI_PARAMS(EOTF, display eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, d
 #define matrix_vgamut_to_xyz make_float3x3(make_float3(0.679644469878f, 0.15221141244f, 0.118600044733), make_float3(0.26068555009f, 0.77489446333f, -0.03558001342), make_float3(-0.009310198218f, -0.004612467044f, 1.10298041602))
 #define matrix_bmdwg_to_xyz make_float3x3(make_float3(0.606538414955f, 0.220412746072f, 0.123504832387f), make_float3(0.267992943525f, 0.832748472691f, -0.100741356611f), make_float3(-0.029442556202f, -0.086612440646, 1.205112814903f))
 #define matrix_egamut_to_xyz make_float3x3(make_float3(0.705396831036f, 0.164041340351f, 0.081017754972f), make_float3(0.280130714178f, 0.820206701756f, -0.100337378681f), make_float3(-0.103781513870f, -0.072907261550, 1.265746593475f))
+#define matrix_egamut2_to_xyz make_float3x3(make_float3(0.736477700184f, 0.130739651087f, 0.083238575781f), make_float3(0.275069984406f, 0.828017790216f, -0.103087774621f), make_float3(-0.124225154248f, -0.087159767391f, 1.3004426724f))
 #define matrix_davinciwg_to_xyz make_float3x3(make_float3(0.700622320175f, 0.148774802685f, 0.101058728993f), make_float3(0.274118483067f, 0.873631775379f, -0.147750422359f), make_float3(-0.098962903023f, -0.137895315886, 1.325916051865f))
 
 #define matrix_xyz_to_rec709 make_float3x3(make_float3(3.2409699419f, -1.53738317757f, -0.498610760293f), make_float3(-0.969243636281f, 1.87596750151f, 0.041555057407f), make_float3(0.055630079697f, -0.203976958889f, 1.05697151424f))
@@ -294,8 +295,15 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Parameter Setup
   // --------------------------------------------------
 
-  // Hue Shift RGB controls
-  float3 hs = make_float3(hs_r, hs_g, hs_b);
+  /* Parameters which _could_ be tweaked but are not exposed 
+      ------------------------------------------ */
+  // Hue Shift RGB controls - Abney compensation in for purity compression
+  float3 hs = make_float3(0.2f, 0.0f, -0.5f);
+  // "Saturation" amount and weights for "rendering space"
+  const float sat_f = 0.5f;
+  const float3 sat_w = make_float3(0.15f, 0.5f, 0.35f);
+  // Density weights CMY
+  const float3 dn_w = make_float3(0.8f, 0.55f, 0.85f);
 
   // Input gamut conversion matrix (CAT02 chromatic adaptation to D65)
   float3x3 in_to_xyz;
@@ -313,12 +321,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (in_gamut == i_vgamut) in_to_xyz = matrix_vgamut_to_xyz;
   else if (in_gamut == i_bmdwg) in_to_xyz = matrix_bmdwg_to_xyz;
   else if (in_gamut == i_egamut) in_to_xyz = matrix_egamut_to_xyz;
+  else if (in_gamut == i_egamut2) in_to_xyz = matrix_egamut2_to_xyz;
   else if (in_gamut == i_davinciwg) in_to_xyz = matrix_davinciwg_to_xyz;
-
-  float3x3 xyz_to_display;
-  if (display_gamut == Rec709) xyz_to_display = matrix_xyz_to_rec709;
-  else if (display_gamut == P3D65) xyz_to_display = matrix_xyz_to_p3d65;
-  else if (display_gamut == Rec2020) xyz_to_display = matrix_xyz_to_rec2020;
 
   int eotf;
   if (EOTF == lin)          eotf = 0;
@@ -346,14 +350,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
 
   
-  /* Parameters which _could_ be tweaked but are not exposed 
-      ------------------------------------------ */
-  // "Saturation" amount
-  const float sat_f = 0.4f;
-  // "Saturation" weights
-  const float3 sat_w = make_float3(0.15f, 0.5f, 0.35f);
-  // Density weights CMY
-  const float3 dn_w = make_float3(0.7f, 0.6f, 0.8f);
 
 
   /* Rendering Code ------------------------------------------ */
@@ -373,9 +369,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   rgb = linearize(rgb, oetf);
 
-  // Convert into display gamut
+  // Convert into P3D65 gamut. The "Rendering space" is a lerp away from achromatic with custom sat_w weights 
   rgb = vdot(in_to_xyz, rgb);
-  rgb = vdot(xyz_to_display, rgb);
+  rgb = vdot(matrix_xyz_to_p3d65, rgb);
   
   //  "Desaturate" to control shape of color volume in the norm ratios (Desaturate in scare quotes because the weights are creative)
   float sat_L = rgb.x*sat_w.x + rgb.y*sat_w.y + rgb.z*sat_w.z;
@@ -440,8 +436,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   norm = quadratic_toe_compress(norm, toe, 0)/py;
   
   // Apply purity boost
-  float pb_m0 = 1.0f + pb;
-  float pb_m1 = 2.0f - pb_m0;
   float pb_f = norm*(pb_m1 - pb_m0) + pb_m0;
   // Lerp from weights on bottom end to 1.0 at top end of tonescale
   float pb_L = (rgb.x*0.25f + rgb.y*0.7f + rgb.z*0.05f)*(1.0f - norm) + norm;
@@ -449,10 +443,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   rgb = (rgb*pb_f + pb_L*(1.0f - pb_f))*rats_mn + rgb*(1.0f - rats_mn);
   
   /* Purity Compression --------------------------------------- */
-  // Apply purity compress using ccf by lerping to 1.0 in rgb ratios (peak achromatic)
-  float ccf = norm/(spowf(m, p)/py); // normalize to enforce 0-1
-  ccf = spowf(1.0f - ccf, pc_p);
-  rgb = rgb*ccf + (1.0f - ccf);
+  // Apply purity compress using pcf by lerping to 1.0 in rgb ratios (peak achromatic)
+  float pcf = norm/(spowf(m, p)/py); // normalize to enforce 0-1
+  pcf = spowf(1.0f - spowf(pcf, 1.0f/pc_p0), pc_p1);
+  rgb = rgb*pcf + (1.0f - pcf);
 
   // "Density" - scale down intensity of colors to better fit in display-referred gamut volume 
   // and reduce discontinuities in high intensity high purity tristimulus.
@@ -479,19 +473,29 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   hs_rgb = make_float3( _fminf(1.0f, _fmaxf(0.0f, hs_rgb.x - (hs_rgb.y + hs_rgb.z))),
                               _fminf(1.0f, _fmaxf(0.0f, hs_rgb.y - (hs_rgb.x + hs_rgb.z))),
                               _fminf(1.0f, _fmaxf(0.0f, hs_rgb.z - (hs_rgb.x + hs_rgb.y))));
-  hs_rgb = hs_rgb*(1.0f - ccf);
+  hs_rgb = hs_rgb*(1.0f - pcf);
 
   // Apply hue shift to RGB Ratios
   float3 rats_hs = make_float3(rgb.x + hs_rgb.z*hs.z - hs_rgb.y*hs.y, rgb.y + hs_rgb.x*hs.x - hs_rgb.z*hs.z, rgb.z + hs_rgb.y*hs.y - hs_rgb.x*hs.x);
 
-  // Mix hue shifted RGB ratios by ts, so that we shift where highlights were chroma compressed plus a bit.
-  rgb = rgb*(1.0f - ccf) + rats_hs*ccf;
+  // Mix hue shifted RGB ratios by ts, so that we shift where highlights were purity compressed plus a bit.
+  rgb = rgb*(1.0f - pcf) + rats_hs*pcf;
 
-  // "Re-Saturate" using an inverse lerp
+  // Inverse "rendering space" desaturation using an inverse lerp
   sat_L = rgb.x*sat_w.x + rgb.y*sat_w.y + rgb.z*sat_w.z;
   rgb = (sat_L*(sat_f - 1.0f) + rgb)/sat_f;
 
-  // last gamut compress for bottom end
+  // Convert to final display gamut
+  if (display_gamut == Rec709) {
+    rgb = vdot(matrix_p3d65_to_xyz, rgb);
+    rgb = vdot(matrix_xyz_to_rec709, rgb);
+  } else if (display_gamut == Rec2020) {
+    rgb = vdot(matrix_p3d65_to_xyz, rgb);
+    rgb = vdot(matrix_xyz_to_rec2020, rgb);
+  }
+
+  // Last gamut compress for bottom end. 
+  // Helps smooth discontinuities in high purity low intensity to high intensity gradients.
   rgb.x = compress_powerptoe(rgb.x, 0.05f, 1.0f, 1.0f, 0);
   rgb.y = compress_powerptoe(rgb.y, 0.05f, 1.0f, 1.0f, 0);
   rgb.z = compress_powerptoe(rgb.z, 0.05f, 1.0f, 1.0f, 0);
