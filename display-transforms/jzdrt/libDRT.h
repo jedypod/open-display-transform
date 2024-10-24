@@ -122,6 +122,12 @@ __DEVICE__ float _sign(float x) {
   return 0.0f; 
 }
 
+// Safe power function raising float a to power float b
+__DEVICE__ float spowf(float a, float b) {
+  if (a <= 0.0f) return a;
+  else return _powf(a, b);
+}
+
 __DEVICE__ float3 powf3(float3 a, float b) { 
   // Raise each component of float3 a to power b
   return make_float3(_powf(a.x, b), _powf(a.y, b), _powf(a.z, b));
