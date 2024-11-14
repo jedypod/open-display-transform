@@ -3,7 +3,7 @@ push $cut_paste_input
 Group {
  name OpenDRT
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> <br>v0.3.4 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> <br>v0.3.5 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
  addUserKnob {41 gamut l "in gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer01 l "" +STARTLINE}
  addUserKnob {26 tonescale_label l " " T <b>tone</b>}
@@ -53,7 +53,7 @@ Group {
    xpos 324
    ypos -534
   }
-set N70219400 [stack 0]
+set N3cf63120 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -69,14 +69,14 @@ set N70219400 [stack 0]
    xpos 290
    ypos -250
   }
-push $N70219400
+push $N3cf63120
   Dot {
    name Dot391
    label " *RGB to XYZ D65 CAT: XYZ Scaling"
    xpos 434
    ypos -534
   }
-set N70231bb0 [stack 0]
+set N2bbdf980 [stack 0]
   ColorMatrix {
    matrix {
        {0.7006223202 0.1487748027 0.101058729}
@@ -88,7 +88,7 @@ set N70231bb0 [stack 0]
    xpos 1610
    ypos -473
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.7364777002 0.1307396511 0.08323857578}
@@ -100,7 +100,7 @@ push $N70231bb0
    xpos 1500
    ypos -472
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.705396831 0.1640413404 0.08101775497}
@@ -112,7 +112,7 @@ push $N70231bb0
    xpos 1390
    ypos -472
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.5990839005 0.2489254922 0.1024464965}
@@ -124,7 +124,7 @@ push $N70231bb0
    xpos 1280
    ypos -472
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.735275209 0.06860940903 0.1465712786}
@@ -136,7 +136,7 @@ push $N70231bb0
    xpos 1170
    ypos -472
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.7048583204 0.1297602952 0.1158373115}
@@ -148,7 +148,7 @@ push $N70231bb0
    xpos 1060
    ypos -471
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.6380076408 0.2147038132 0.09774445742}
@@ -160,7 +160,7 @@ push $N70231bb0
    xpos 950
    ypos -472
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.4123909175 0.3575843573 0.1804807931}
@@ -172,7 +172,7 @@ push $N70231bb0
    xpos 840
    ypos -472
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.6369581223 0.1446169168 0.1688809693}
@@ -184,7 +184,7 @@ push $N70231bb0
    xpos 730
    ypos -472
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.4865711331 0.2656677067 0.1982173175}
@@ -196,7 +196,7 @@ push $N70231bb0
    xpos 620
    ypos -472
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.6609312296 0.1336961389 0.1558285803}
@@ -208,7 +208,7 @@ push $N70231bb0
    xpos 510
    ypos -472
   }
-push $N70231bb0
+push $N2bbdf980
   ColorMatrix {
    matrix {
        {0.9503623843 0 9.346324805e-05}
@@ -264,7 +264,7 @@ push $N70231bb0
   xpos 324
   ypos -582
  }
-set N3071d270 [stack 0]
+set N30fc92e0 [stack 0]
  Dot {
   name Dot433
   xpos -6
@@ -290,7 +290,7 @@ set N3071d270 [stack 0]
   xpos -6
   ypos -510
  }
-set N30747490 [stack 0]
+set Nb43f2db0 [stack 0]
  Expression {
   temp_name0 tr
   temp_expr0 invert?(r+sqrt(r*(4*toe+r)))/2:(m*r/(r+s))**c
@@ -340,38 +340,38 @@ set N30747490 [stack 0]
  Dot {
   name Dot1
   xpos -6
-  ypos -462
+  ypos -412
  }
-set N3074cdf0 [stack 0]
+set Nfcffb570 [stack 0]
  Dot {
   name Dot411
   xpos -6
   ypos -78
  }
-push $N3074cdf0
+push $Nfcffb570
  Multiply {
   channels rgb
   value {{1/parent.MichaelisMentenConstrainedRGB.mlm}}
   name Multiply
   xpos 70
-  ypos -466
+  ypos -416
  }
-set N3076e0c0 [stack 0]
+set Nf4b27390 [stack 0]
  Expression {
   channel0 rgba
   expr0 (1-r**(1/p0))**p1
   name PCF
   xpos 180
-  ypos -466
+  ypos -416
   addUserKnob {20 User}
   addUserKnob {7 p0 l "pcf low" t "Purity Compression Factor Low"}
   p0 0.4
   addUserKnob {7 p1 l "pcf high" t "Purity Compression Factor - High"}
   p1 0.8
  }
-set N3080aff0 [stack 0]
-push $N30747490
-push $N3071d270
+set N34f9b860 [stack 0]
+push $Nb43f2db0
+push $N30fc92e0
  MergeExpression {
   inputs 2
   expr0 Ar==0?0:max(0,Br/Ar)
@@ -380,6 +380,39 @@ push $N3071d270
   name MergeDivideReverse
   xpos 290
   ypos -514
+ }
+ Dot {
+  name Dot2
+  xpos 324
+  ypos -488
+ }
+set N62c40780 [stack 0]
+ Expression {
+  expr0 max(0,1-r)
+  expr1 max(0,1-g)
+  expr2 max(0,1-b)
+  name Complement1
+  xpos 400
+  ypos -492
+ }
+push $N62c40780
+ MergeExpression {
+  inputs 2
+  temp_name3 m
+  temp_expr3 (mc*Ar+1-Ar)*(mm*Ag+1-Ag)*(my*Ab+1-Ab)
+  expr0 r*m
+  expr1 g*m
+  expr2 b*m
+  name Density3
+  xpos 290
+  ypos -468
+  addUserKnob {20 Params}
+  addUserKnob {7 mc}
+  mc 0.8
+  addUserKnob {7 mm}
+  mm 0.55
+  addUserKnob {7 my}
+  my 0.85
  }
  MergeExpression {
   inputs 2
@@ -390,12 +423,12 @@ push $N3071d270
   expr2 b*f+1-f
   name PurityCompression
   xpos 290
-  ypos -466
+  ypos -416
  }
-set N30839530 [stack 0]
-push $N3080aff0
-push $N3076e0c0
-push $N30839530
+set N356ae970 [stack 0]
+push $N34f9b860
+push $Nf4b27390
+push $N356ae970
  MergeExpression {
   inputs 2
   temp_name0 mn
@@ -414,7 +447,7 @@ push $N30839530
   maskChannelMask rgba.red
   name Purity
   xpos 290
-  ypos -442
+  ypos -392
   addUserKnob {20 User}
   addUserKnob {7 m0 l "purity low" R 1 2}
   m0 1.3
@@ -428,44 +461,11 @@ push $N30839530
   bw 0.05
  }
  Dot {
-  name Dot2
-  xpos 324
-  ypos -414
- }
-set N3084a890 [stack 0]
- Expression {
-  expr0 max(0,1-r)
-  expr1 max(0,1-g)
-  expr2 max(0,1-b)
-  name Complement1
-  xpos 400
-  ypos -418
- }
-push $N3084a890
- MergeExpression {
-  inputs 2
-  temp_name3 m
-  temp_expr3 (mc*Ar+1-Ar)*(mm*Ag+1-Ag)*(my*Ab+1-Ab)
-  expr0 r*m
-  expr1 g*m
-  expr2 b*m
-  name Density3
-  xpos 290
-  ypos -394
-  addUserKnob {20 Params}
-  addUserKnob {7 mc}
-  mc 0.8
-  addUserKnob {7 mm}
-  mm 0.55
-  addUserKnob {7 my}
-  my 0.85
- }
- Dot {
   name Dot489
   xpos 324
   ypos -366
  }
-set N30870170 [stack 0]
+set N2c2004a0 [stack 0]
  Expression {
   temp_name0 mx
   temp_expr0 max(r,g,b)
@@ -507,7 +507,7 @@ set N30870170 [stack 0]
   xpos 180
   ypos -298
  }
-push $N30870170
+push $N2c2004a0
  MergeExpression {
   inputs 2
   temp_name0 f
@@ -569,7 +569,6 @@ push $N30870170
  Group {
   name XYZ_to_DisplayGamut
   tile_color 0x425440ff
-  selected true
   xpos 290
   ypos -178
   addUserKnob {20 XYZ_to_DisplayGamut_tab l XYZ_to_DisplayGamut}
@@ -589,7 +588,7 @@ push $N30870170
    xpos 324
    ypos -516
   }
-set Nd40d00f0 [stack 0]
+set N11ad4340 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -605,14 +604,14 @@ set Nd40d00f0 [stack 0]
    xpos 290
    ypos -310
   }
-push $Nd40d00f0
+push $N11ad4340
   Dot {
    name Dot1
    label " XYZ D65 to *RGB CAT: XYZ Scaling"
    xpos 434
    ypos -516
   }
-set Nd40ea0a0 [stack 0]
+set N34a9ea50 [stack 0]
   ColorMatrix {
    matrix {
        {1.716650844 -0.3556707203 -0.2533662021}
@@ -624,7 +623,7 @@ set Nd40ea0a0 [stack 0]
    xpos 620
    ypos -472
   }
-push $Nd40ea0a0
+push $N34a9ea50
   ColorMatrix {
    matrix {
        {2.493495464 -0.9313831329 -0.4027105868}
@@ -636,7 +635,7 @@ push $Nd40ea0a0
    xpos 510
    ypos -472
   }
-push $Nd40ea0a0
+push $N34a9ea50
   ColorMatrix {
    matrix {
        {3.240968943 -1.537382722 -0.4986106157}
@@ -726,7 +725,7 @@ push $Nd40ea0a0
    xpos 400
    ypos -129
   }
-set Ne8377da0 [stack 0]
+set Ncfed270 [stack 0]
   Expression {
    temp_name0 Yd
    temp_expr0 0.2627*r+0.6780*g+0.0593*b
@@ -759,7 +758,7 @@ set Ne8377da0 [stack 0]
    addUserKnob {7 _c}
    _c {{0.5-_a*log(4*_a)}}
   }
-push $Ne8377da0
+push $Ncfed270
   Expression {
    temp_name0 rp
    temp_expr0 pow(r,m_1)
@@ -785,7 +784,7 @@ push $Ne8377da0
    addUserKnob {7 c_3}
    c_3 {{2392/128}}
   }
-push $Ne8377da0
+push $Ncfed270
   Expression {
    expr0 sign(r)*pow(fabs(r),1/p)
    expr1 sign(g)*pow(fabs(g),1/p)

@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 /*  OpenDRT -------------------------------------------------
-      v0.3.4
+      v0.3.5
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -436,6 +436,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   norm = hyperbolic_compress(norm, m, s, p, 0);
   norm = quadratic_toe_compress(norm, toe, 0)/py;
   
+  // "Density" - scale down intensity to better fit in display-referred gamut volume 
+  // and reduce discontinuities in high intensity high purity values.
+  float3 dn_r = clampminf3(1.0f - rgb, 0.0f);
+  rgb = rgb*(dn_w.x*dn_r.x + 1.0f - dn_r.x)*(dn_w.y*dn_r.y + 1.0f - dn_r.y)*(dn_w.z*dn_r.z + 1.0f - dn_r.z);
   
   /* Purity Compression --------------------------------------- */
   // Apply purity compress using pcf by lerping to 1.0 in rgb ratios (peak achromatic)
@@ -444,18 +448,13 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   rgb = rgb*pcf + (1.0f - pcf);
 
   if (!base_look) {
+
     // Apply purity boost
     float pb_f = norm*(pb_m1 - pb_m0) + pb_m0;
     // Lerp from weights on bottom end to 1.0 at top end of tonescale
     float pb_L = (rgb.x*0.25f + rgb.y*0.7f + rgb.z*0.05f)*(1.0f - norm) + norm;
     float rats_mn = _fmaxf(0.0f, fminf3(rgb));
     rgb = (rgb*pb_f + pb_L*(1.0f - pb_f))*rats_mn + rgb*(1.0f - rats_mn);
-
-    // "Density" - scale down intensity of colors to better fit in display-referred gamut volume 
-    // and reduce discontinuities in high intensity high purity tristimulus.
-    float3 dn_r = clampminf3(1.0f - rgb, 0.0f);
-    rgb = rgb*(dn_w.x*dn_r.x + 1.0f - dn_r.x)*(dn_w.y*dn_r.y + 1.0f - dn_r.y)*(dn_w.z*dn_r.z + 1.0f - dn_r.z);
-
 
     /* Purity Compression Hue Shift ------------------------------------------ *
         Since we compress purity by lerping in a straight line towards 1.0 in rgb ratios, this can result in perceptual hue shifts
