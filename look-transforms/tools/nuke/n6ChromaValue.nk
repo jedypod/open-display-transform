@@ -87,7 +87,7 @@ push $N22c03760
   temp_expr1 M-min(r,g,b)
   channel0 {rgba.red rgba.green rgba.blue none}
   expr0 (C==0?0:r==M?((g-b)/C+6)%6:g==M?(b-r)/C+2:b==M?(r-g)/C+4:0)
-  expr3 M==0?0:C/M
+  expr3 M<=0?0:C/M
   name hue
   xpos -260
   ypos 350

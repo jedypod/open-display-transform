@@ -89,7 +89,7 @@ push $Nc5615a90
   temp_expr3 (H+o)%6
   channel0 {rgba.red rgba.green rgba.blue none}
   expr0 h<cn?clamp((h-e0)/(cn-e0)):clamp((h-e1)/(cn-e1))
-  expr3 M==0?0:C/M
+  expr3 M<=0?0:C/M
   name HueAngle
   xpos -260
   ypos -682
