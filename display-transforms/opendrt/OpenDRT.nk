@@ -1,18 +1,23 @@
 set cut_paste_input [stack 0]
+version 15.0 v4
 push $cut_paste_input
 Group {
- name OpenDRT
- label v1.0.0b28
+ name OpenDRT93
+ label v1.0.0b29
+ selected true
+ xpos -9500
+ ypos -1673
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> <br>v1.0.0b28 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> <br>v1.0.0b29 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
  addUserKnob {41 in_gamut l "in gamut" T InGamutn_to_XYZ.gamut}
  addUserKnob {26 spacer01 l "" +STARTLINE}
- addUserKnob {35 presets l "" +STARTLINE M {"look presets/base" "knobs this \{tn_Lp 100.0 tn_Lg 10.0 tn_gb 0.13 tn_con 1.4 tn_toe 0.001 tn_off 0.001 tn_mcon_enable 0 tn_mcon 0.0 tn_mcon_w 0.6 tn_mcon_rp 0.0 tn_cwp 0 pt_con 0.45 pt_rw 0.2 pt_bw 0.2 pt_cmp 0.3 pt_cmp_hdr 0.7 pt_cmp_r 0.25 pt_cmp_g 0.0 pt_cmp_b 0.5 pt_mid_enable 0 pt_mid_low 1.0 pt_mid_high 1.0 pt_softclip 1 dn_enable 1 dn_r -0.33 dn_g -0.3 dn_b -0.2 dn_c -0.15 dn_m -0.2 dn_y 0.2 dn_rng 0.75 dn_st 0.5 hs_rgb_enable 0 hs_r 0.0 hs_g 0.0 hs_b 0.0 hs_rng_r 0.0 hs_rng_g 0.0 hs_rng_b 0.0 hs_cmy_enable 0 hs_c 0.0 hs_m 0.0 hs_y 0.0 hs_rng_c 0.0 hs_rng_m 0.0 hs_rng_y 0.0 hs_st_c 0.6 hs_st_y 0.6 hf_enable 0 hf_low_r 0.0 hf_high_r 0.0 hf_low_g 0.0 hf_high_g 0.0 hf_low_b 0.0 hf_high_b 0.0 hf_st_r 0.0 hf_st_g 0.0 hf_st_b 0.0\}" "look presets/default-lowcon" "knobs this \{tn_Lp 100.0 tn_Lg 10.0 tn_gb 0.13 tn_con 1.4 tn_toe 0.001 tn_off 0.001 tn_mcon_enable 0 tn_mcon 0.0 tn_mcon_w 0.6 tn_mcon_rp 0.0 tn_cwp 0 pt_con 0.45 pt_rw 0.2 pt_bw 0.2 pt_cmp 0.3 pt_cmp_hdr 0.7 pt_cmp_r 0.25 pt_cmp_g 0.0 pt_cmp_b 0.5 pt_mid_enable 1 pt_mid_low 1.2 pt_mid_high 0.0 pt_softclip 1 dn_enable 1 dn_r -0.33 dn_g -0.3 dn_b -0.2 dn_c -0.15 dn_m -0.2 dn_y 0.2 dn_rng 0.75 dn_st 0.5 hs_rgb_enable 1 hs_r 0.25 hs_g 0.2 hs_b 0.2 hs_rng_r 0.5 hs_rng_g 2.0 hs_rng_b 0.5 hs_cmy_enable 0 hs_c 0.0 hs_m 0.0 hs_y 0.0 hs_rng_c 0.0 hs_rng_m 0.0 hs_rng_y 0.0 hs_st_c 0.6 hs_st_y 0.6 hf_enable 1 hf_low_r 0.25 hf_high_r -0.6 hf_low_g 0.1 hf_high_g -0.6 hf_low_b 0.2 hf_high_b -0.3 hf_st_r 1.0 hf_st_g 2.0 hf_st_b -1.0\}" "look presets/default-highcon" "knobs this \{tn_Lp 100.0 tn_Lg 10.0 tn_gb 0.13 tn_con 1.4 tn_toe 0.001 tn_off 0.001 tn_mcon_enable 1 tn_mcon 1.0 tn_mcon_w 0.6 tn_mcon_rp 0.0 tn_cwp 0 pt_con 0.45 pt_rw 0.2 pt_bw 0.2 pt_cmp 0.3 pt_cmp_hdr 0.7 pt_cmp_r 0.25 pt_cmp_g 0.0 pt_cmp_b 0.5 pt_mid_enable 1 pt_mid_low 1.2 pt_mid_high 0.0 pt_softclip 1 dn_enable 1 dn_r -0.33 dn_g -0.3 dn_b -0.2 dn_c -0.15 dn_m -0.2 dn_y 0.2 dn_rng 0.75 dn_st 0.5 hs_rgb_enable 1 hs_r 0.25 hs_g 0.2 hs_b 0.2 hs_rng_r 0.5 hs_rng_g 2.0 hs_rng_b 0.5 hs_cmy_enable 0 hs_c 0.0 hs_m 0.0 hs_y 0.0 hs_rng_c 0.0 hs_rng_m 0.0 hs_rng_y 0.0 hs_st_c 0.6 hs_st_y 0.6 hf_enable 1 hf_low_r 0.25 hf_high_r -0.6 hf_low_g 0.1 hf_high_g -0.6 hf_low_b 0.2 hf_high_b -0.3 hf_st_r 1.0 hf_st_g 2.0 hf_st_b -1.0\}" "look presets/filmish" "knobs this \{tn_Lp 100.0 tn_Lg 10.0 tn_gb 0.13 tn_con 1.4 tn_toe 0.001 tn_off 0.001 tn_mcon_enable 1 tn_mcon 1.0 tn_mcon_w 0.6 tn_mcon_rp 0.0 tn_cwp 2 pt_con 0.4 pt_rw 0.2 pt_bw 0.1 pt_cmp 0.3 pt_cmp_hdr 0.7 pt_cmp_r 0.0 pt_cmp_g 0.0 pt_cmp_b 0.5 pt_mid_enable 1 pt_mid_low 1.3 pt_mid_high 0.0 pt_softclip 1 dn_enable 1 dn_r -0.4 dn_g -0.35 dn_b -0.2 dn_c 0.0 dn_m -0.3 dn_y -0.1 dn_rng 0.9 dn_st 0.8 hs_rgb_enable 1 hs_r 0.4 hs_g 0.4 hs_b 0.3 hs_rng_r 0.8 hs_rng_g 1.5 hs_rng_b 0.8 hs_cmy_enable 1 hs_c 0.4 hs_m 0.4 hs_y 0.6 hs_rng_c 0.0 hs_rng_m 1.0 hs_rng_y -1.0 hs_st_c 0.6 hs_st_y 0.5 hf_enable 1 hf_low_r 0.25 hf_high_r -0.6 hf_low_g -0.3 hf_high_g -0.6 hf_low_b 0.2 hf_high_b -0.4 hf_st_r 1.0 hf_st_g 2.0 hf_st_b -1.0\}" "look presets/colorful" "knobs this \{tn_Lp 100.0 tn_Lg 10.0 tn_gb 0.13 tn_con 1.4 tn_toe 0.001 tn_off 0.001 tn_mcon_enable 1 tn_mcon 1.0 tn_mcon_w 0.6 tn_mcon_rp 0.0 tn_cwp 0 pt_con 0.6 pt_rw 0.3 pt_bw 0.3 pt_cmp 0.3 pt_cmp_hdr 0.7 pt_cmp_r -0.0 pt_cmp_g 0.0 pt_cmp_b 0.75 pt_mid_enable 1 pt_mid_low 1.5 pt_mid_high 0.3 pt_softclip 1 dn_enable 1 dn_r -0.5 dn_g -0.5 dn_b -0.25 dn_c -0.25 dn_m -0.25 dn_y 0.1 dn_rng 0.75 dn_st 0.5 hs_rgb_enable 1 hs_r 0.25 hs_g 0.2 hs_b 0.2 hs_rng_r 0.5 hs_rng_g 2.0 hs_rng_b 0.5 hs_cmy_enable 0 hs_c 0.0 hs_m 0.0 hs_y 0.0 hs_rng_c 0.0 hs_rng_m 0.0 hs_rng_y 0.0 hs_st_c 0.6 hs_st_y 0.6 hf_enable 1 hf_low_r 0.25 hf_high_r -0.6 hf_low_g 0.2 hf_high_g -0.6 hf_low_b 0.2 hf_high_b -0.3 hf_st_r 1.0 hf_st_g 2.0 hf_st_b -2.0\}" "" ""}}
- addUserKnob {22 add_preset l "Add Preset" t "Click to add current settings as a preset with a specified name." -STARTLINE T "def get_existing_presets(pk):\n  pdict = \{\}\n  for i in range(pk.numValues()):\n    pdict\[pk.itemName(i)] = pk.commands(i)\n  return pdict\n\n\ndef get_preset_cmd(n):\n  preset_knobs = \[\"tn_Lp\", \"tn_Lg\", \"tn_gb\", \"tn_con\", \"tn_toe\", \"tn_off\", \"tn_mcon_enable\", \"tn_mcon\", \"tn_mcon_w\", \"tn_mcon_rp\", \"tn_cwp\", \"pt_con\", \"pt_rw\", \"pt_bw\", \"pt_cmp\", \"pt_cmp_hdr\", \"pt_cmp_r\", \"pt_cmp_g\", \"pt_cmp_b\", \"pt_mid_enable\", \"pt_mid_low\", \"pt_mid_high\", \"pt_softclip\", \"dn_enable\", \"dn_r\", \"dn_g\", \"dn_b\", \"dn_c\", \"dn_m\", \"dn_y\", \"dn_rng\", \"dn_st\", \"hs_rgb_enable\", \"hs_r\", \"hs_g\", \"hs_b\", \"hs_rng_r\", \"hs_rng_g\", \"hs_rng_b\", \"hs_cmy_enable\", \"hs_c\", \"hs_m\", \"hs_y\", \"hs_rng_c\", \"hs_rng_m\", \"hs_rng_y\", \"hs_st_c\", \"hs_st_y\", \"hf_enable\", \"hf_low_r\", \"hf_high_r\", \"hf_low_g\", \"hf_high_g\", \"hf_low_b\", \"hf_high_b\", \"hf_st_r\", \"hf_st_g\", \"hf_st_b\"]\n\n\n  preset_cmd = 'knobs this \{'\n  for k_name in preset_knobs:\n    k = n\[k_name]\n    if isinstance(k, nuke.Enumeration_Knob) or isinstance(k, nuke.Boolean_Knob):\n      preset_cmd += (f'\{k_name\} \{int(k.getValue())\} ')\n    else:\n      preset_cmd += (f'\{k_name\} \{k.getValue()\} ')\n  preset_cmd = preset_cmd\[:-1]\n  preset_cmd += '\}'\n  return preset_cmd\n\n\nn = nuke.thisNode()\n\n\npreset_knob = n\['presets']\npreset_dict = get_existing_presets(preset_knob)\npreset_cmd = get_preset_cmd(n)\npreset_name = nuke.getInput('Enter Preset Name:')\npreset_name = f'look presets/\{preset_name\}'\nif preset_name:\n  if preset_name in preset_dict.keys():\n    if nuke.ask(f'Preset \"\{preset_name\}\" exists. Replace it?'):\n      preset_dict\[preset_name] = preset_cmd\n  else:\n    preset_dict\[preset_name] = preset_cmd\n\n\npreset_knob.setValues(preset_dict)"}
+ addUserKnob {35 presets l "" +STARTLINE M {"look presets/base" "knobs this \{tn_Lp 100.0 tn_Lg 10.0 tn_gb 0.13 tn_con 1.4 tn_toe 0.001 tn_off 0.001 tn_mcon_enable 0 tn_mcon 0.0 tn_mcon_w 0.6 tn_mcon_rp 0.0 cwp 0 rs_sa 0.45 rs_rw 0.2 rs_bw 0.2 pt_cmp 0.3 pt_cmp_hdr 0.7 pt_cmp_r 0.25 pt_cmp_g 0.0 pt_cmp_b 0.5 pt_mid_enable 0 pt_mid_low 1.0 pt_mid_high 1.0 pt_softclip 1 dn_enable 1 dn_r -0.33 dn_g -0.3 dn_b -0.2 dn_c -0.15 dn_m -0.2 dn_y 0.2 dn_rng 0.75 dn_st 0.5 hs_rgb_enable 0 hs_r 0.0 hs_g 0.0 hs_b 0.0 hs_rng_r 0.0 hs_rng_g 0.0 hs_rng_b 0.0 hs_cmy_enable 0 hs_c 0.0 hs_m 0.0 hs_y 0.0 hs_rng_c 0.0 hs_rng_m 0.0 hs_rng_y 0.0 hs_st_c 0.6 hs_st_y 0.6 hf_enable 0 hf_r0 0.0 hf_r1 0.0 hf_g0 0.0 hf_g1 0.0 hf_b0 0.0 hf_b1 0.0 hf_st_r 0.0 hf_st_g 0.0 hf_st_b 0.0\}" "look presets/default-lowcon" "knobs this \{tn_Lp 100.0 tn_Lg 10.0 tn_gb 0.13 tn_con 1.4 tn_toe 0.001 tn_off 0.001 tn_mcon_enable 0 tn_mcon 0.0 tn_mcon_w 0.6 tn_mcon_rp 0.0 cwp 0 rs_sa 0.45 rs_rw 0.2 rs_bw 0.2 pt_cmp 0.3 pt_cmp_hdr 0.7 pt_cmp_r 0.25 pt_cmp_g 0.0 pt_cmp_b 0.5 pt_mid_enable 1 pt_mid_low 1.2 pt_mid_high 0.0 pt_softclip 1 dn_enable 1 dn_r -0.33 dn_g -0.3 dn_b -0.2 dn_c -0.15 dn_m -0.2 dn_y 0.2 dn_rng 0.75 dn_st 0.5 hs_rgb_enable 1 hs_r 0.25 hs_g 0.2 hs_b 0.2 hs_rng_r 0.5 hs_rng_g 2.0 hs_rng_b 0.5 hs_cmy_enable 0 hs_c 0.0 hs_m 0.0 hs_y 0.0 hs_rng_c 0.0 hs_rng_m 0.0 hs_rng_y 0.0 hs_st_c 0.6 hs_st_y 0.6 hf_enable 1 hf_r0 0.25 hf_r1 -0.6 hf_g0 0.1 hf_g1 -0.6 hf_b0 0.2 hf_b1 -0.3 hf_st_r 1.0 hf_st_g 2.0 hf_st_b -1.0\}" "look presets/default-highcon" "knobs this \{tn_Lp 100.0 tn_Lg 10.0 tn_gb 0.13 tn_con 1.4 tn_toe 0.001 tn_off 0.001 tn_mcon_enable 1 tn_mcon 1.0 tn_mcon_w 0.6 tn_mcon_rp 0.0 cwp 0 rs_sa 0.45 rs_rw 0.2 rs_bw 0.2 pt_cmp 0.3 pt_cmp_hdr 0.7 pt_cmp_r 0.25 pt_cmp_g 0.0 pt_cmp_b 0.5 pt_mid_enable 1 pt_mid_low 1.2 pt_mid_high 0.0 pt_softclip 1 dn_enable 1 dn_r -0.33 dn_g -0.3 dn_b -0.2 dn_c -0.15 dn_m -0.2 dn_y 0.2 dn_rng 0.75 dn_st 0.5 hs_rgb_enable 1 hs_r 0.25 hs_g 0.2 hs_b 0.2 hs_rng_r 0.5 hs_rng_g 2.0 hs_rng_b 0.5 hs_cmy_enable 0 hs_c 0.0 hs_m 0.0 hs_y 0.0 hs_rng_c 0.0 hs_rng_m 0.0 hs_rng_y 0.0 hs_st_c 0.6 hs_st_y 0.6 hf_enable 1 hf_r0 0.25 hf_r1 -0.6 hf_g0 0.1 hf_g1 -0.6 hf_b0 0.2 hf_b1 -0.3 hf_st_r 1.0 hf_st_g 2.0 hf_st_b -1.0\}" "look presets/filmish" "knobs this \{tn_Lp 100.0 tn_Lg 10.0 tn_gb 0.13 tn_con 1.4 tn_toe 0.001 tn_off 0.001 tn_mcon_enable 1 tn_mcon 1.0 tn_mcon_w 0.6 tn_mcon_rp 0.0 cwp 2 rs_sa 0.4 rs_rw 0.2 rs_bw 0.1 pt_cmp 0.3 pt_cmp_hdr 0.7 pt_cmp_r 0.0 pt_cmp_g 0.0 pt_cmp_b 0.5 pt_mid_enable 1 pt_mid_low 1.3 pt_mid_high 0.0 pt_softclip 1 dn_enable 1 dn_r -0.4 dn_g -0.35 dn_b -0.2 dn_c 0.0 dn_m -0.3 dn_y -0.1 dn_rng 0.9 dn_st 0.8 hs_rgb_enable 1 hs_r 0.4 hs_g 0.4 hs_b 0.3 hs_rng_r 0.8 hs_rng_g 1.5 hs_rng_b 0.8 hs_cmy_enable 1 hs_c 0.4 hs_m 0.4 hs_y 0.6 hs_rng_c 0.0 hs_rng_m 1.0 hs_rng_y -1.0 hs_st_c 0.6 hs_st_y 0.5 hf_enable 1 hf_r0 0.25 hf_r1 -0.6 hf_g0 -0.3 hf_g1 -0.6 hf_b0 0.2 hf_b1 -0.4 hf_st_r 1.0 hf_st_g 2.0 hf_st_b -1.0\}" "look presets/colorful" "knobs this \{tn_Lp 100.0 tn_Lg 10.0 tn_gb 0.13 tn_con 1.4 tn_toe 0.001 tn_off 0.001 tn_mcon_enable 1 tn_mcon 1.0 tn_mcon_w 0.6 tn_mcon_rp 0.0 cwp 0 rs_sa 0.6 rs_rw 0.3 rs_bw 0.3 pt_cmp 0.3 pt_cmp_hdr 0.7 pt_cmp_r -0.0 pt_cmp_g 0.0 pt_cmp_b 0.75 pt_mid_enable 1 pt_mid_low 1.5 pt_mid_high 0.3 pt_softclip 1 dn_enable 1 dn_r -0.5 dn_g -0.5 dn_b -0.25 dn_c -0.25 dn_m -0.25 dn_y 0.1 dn_rng 0.75 dn_st 0.5 hs_rgb_enable 1 hs_r 0.25 hs_g 0.2 hs_b 0.2 hs_rng_r 0.5 hs_rng_g 2.0 hs_rng_b 0.5 hs_cmy_enable 0 hs_c 0.0 hs_m 0.0 hs_y 0.0 hs_rng_c 0.0 hs_rng_m 0.0 hs_rng_y 0.0 hs_st_c 0.6 hs_st_y 0.6 hf_enable 1 hf_r0 0.25 hf_r1 -0.6 hf_g0 0.2 hf_g1 -0.6 hf_b0 0.2 hf_b1 -0.3 hf_st_r 1.0 hf_st_g 2.0 hf_st_b -2.0\}" "" ""}}
+ addUserKnob {22 add_preset l "Add Preset" t "Click to add current settings as a preset with a specified name." -STARTLINE T "def get_existing_presets(pk):\n  pdict = \{\}\n  for i in range(pk.numValues()):\n    pdict\[pk.itemName(i)] = pk.commands(i)\n  return pdict\n\n\ndef get_preset_cmd(n):\n  preset_knobs = \[\"tn_Lp\", \"tn_Lg\", \"tn_gb\", \"tn_con\", \"tn_toe\", \"tn_off\", \"tn_mcon_enable\", \"tn_mcon\", \"tn_mcon_w\", \"tn_mcon_rp\", \"cwp\", \"rs_sa\", \"rs_rw\", \"rs_bw\", \"pt_cmp\", \"pt_cmp_hdr\", \"pt_cmp_r\", \"pt_cmp_g\", \"pt_cmp_b\", \"pt_mid_enable\", \"pt_mid_low\", \"pt_mid_high\", \"pt_softclip\", \"dn_enable\", \"dn_r\", \"dn_g\", \"dn_b\", \"dn_c\", \"dn_m\", \"dn_y\", \"dn_rng\", \"dn_st\", \"hs_rgb_enable\", \"hs_r\", \"hs_g\", \"hs_b\", \"hs_rng_r\", \"hs_rng_g\", \"hs_rng_b\", \"hs_cmy_enable\", \"hs_c\", \"hs_m\", \"hs_y\", \"hs_rng_c\", \"hs_rng_m\", \"hs_rng_y\", \"hs_st_c\", \"hs_st_y\", \"hf_enable\", \"hf_r0\", \"hf_r1\", \"hf_g0\", \"hf_g1\", \"hf_b0\", \"hf_b1\", \"hf_st_r\", \"hf_st_g\", \"hf_st_b\"]\n\n\n  preset_cmd = 'knobs this \{'\n  for k_name in preset_knobs:\n    k = n\[k_name]\n    if isinstance(k, nuke.Enumeration_Knob) or isinstance(k, nuke.Boolean_Knob):\n      preset_cmd += (f'\{k_name\} \{int(k.getValue())\} ')\n    else:\n      preset_cmd += (f'\{k_name\} \{k.getValue()\} ')\n  preset_cmd = preset_cmd\[:-1]\n  preset_cmd += '\}'\n  return preset_cmd\n\n\nn = nuke.thisNode()\n\n\npreset_knob = n\['presets']\npreset_dict = get_existing_presets(preset_knob)\npreset_cmd = get_preset_cmd(n)\npreset_name = nuke.getInput('Enter Preset Name:')\npreset_name = f'look presets/\{preset_name\}'\nif preset_name:\n  if preset_name in preset_dict.keys():\n    if nuke.ask(f'Preset \"\{preset_name\}\" exists. Replace it?'):\n      preset_dict\[preset_name] = preset_cmd\n  else:\n    preset_dict\[preset_name] = preset_cmd\n\n\npreset_knob.setValues(preset_dict)"}
  addUserKnob {22 remove_preset l "Remove Preset" t "Remove selected preset." -STARTLINE T "# Remove selected preset\nn = nuke.thisNode()\npk = n\['presets']\npdict = \{\}\nfor i in range(pk.numValues()):\n  pdict\[pk.itemName(i)] = pk.commands(i)\npreset_names = \[p.split('/')\[-1].replace(' ', '\\ ') for p in pdict.keys()]\np = nuke.Panel('Delete Preset')\np.addEnumerationPulldown('preset', ' '.join(preset_names))\nif p.show():\n  selected_preset = p.value('preset')\n  del pdict\[f'look presets/\{selected_preset\}']\n  pk.setValues(pdict)"}
+ addUserKnob {22 show_dctl l "Show DCTL for Preset" t "Show DCTL code for the current settings" -STARTLINE T "n = nuke.thisNode()\n\npreset_knobs = \[\"tn_con\", \"tn_toe\", \"tn_off\", \"tn_mcon_enable\", \"tn_mcon\", \"tn_mcon_w\", \"tn_mcon_rp\", \"rs_sa\", \"rs_rw\", \"rs_bw\", \"pt_cmp\", \"pt_cmp_hdr\", \"pt_cmp_r\", \"pt_cmp_g\", \"pt_cmp_b\", \"pt_mid_enable\", \"pt_mid_low\", \"pt_mid_high\", \"pt_softclip\", \"dn_enable\", \"dn_r\", \"dn_g\", \"dn_b\", \"dn_c\", \"dn_m\", \"dn_y\", \"dn_rng\", \"dn_st\", \"hs_rgb_enable\", \"hs_r\", \"hs_g\", \"hs_b\", \"hs_rng_r\", \"hs_rng_g\", \"hs_rng_b\", \"hs_cmy_enable\", \"hs_c\", \"hs_m\", \"hs_y\", \"hs_rng_c\", \"hs_rng_m\", \"hs_rng_y\", \"hs_st_c\", \"hs_st_y\", \"hf_enable\", \"hf_r0\", \"hf_r1\", \"hf_g0\", \"hf_g1\", \"hf_b0\", \"hf_b1\", \"hf_st_r\", \"hf_st_g\", \"hf_st_b\"]\n\ndctl_str = ''\nfor k_name in preset_knobs:\n    k = n\[k_name]\n    if isinstance(k, nuke.Enumeration_Knob) or isinstance(k, nuke.Boolean_Knob):\n        dctl_str += (f'\{k_name\} = \{int(k.getValue())\}, ')\n    else:\n        dctl_str += (f'\{k_name\} = \{k.getValue()\}f, ')\n\ndctl_str = f'\{dctl_str\[:-2]\};'\nnuke.message(dctl_str)"}
  addUserKnob {26 spacer02 l " " T " "}
  addUserKnob {20 grp_outer l "" +STARTLINE n -2}
- addUserKnob {20 grp_tone l Tone}
+ addUserKnob {20 grp_tonescale l Tonescale}
  addUserKnob {41 tn_Lp l "peak luminance" T TONESCALE_CTRL.tn_Lp}
  addUserKnob {41 tn_Lg l "grey luminance" T TONESCALE_CTRL.tn_Lg}
  addUserKnob {41 tn_gb l "grey boost" T TONESCALE_CTRL.tn_gb}
@@ -28,9 +33,9 @@ Group {
  addUserKnob {26 ""}
  addUserKnob {20 grp_color l Color}
  addUserKnob {26 lbl_rnd_space l " " T "<b>Rendering Space"}
- addUserKnob {41 pt_con l "color contrast" T SatW.s}
- addUserKnob {41 pt_rw l "weight R" T SatW.rw}
- addUserKnob {41 pt_bw l "weight B" T SatW.bw}
+ addUserKnob {41 rs_sa l saturation T SatW.s}
+ addUserKnob {41 rs_rw l "weight R" T SatW.rw}
+ addUserKnob {41 rs_bw l "weight B" T SatW.bw}
  addUserKnob {26 lbl_purity l " " T "<b>Purity Compress"}
  addUserKnob {41 pt_cmp l "purity compress global" T PurityCompress.p0}
  addUserKnob {41 pt_cmp_hdr l "purity compress global (HDR)" T PurityCompress.p1}
@@ -79,20 +84,20 @@ Group {
  addUserKnob {20 grp_huefocus l "Hue Focus"}
  addUserKnob {6 hf_enable l "<b>&nbsp;Hue Focus" +STARTLINE}
  hf_enable true
- addUserKnob {41 hf_low_r l "huefocus R low" T HueFocus.m0r}
- addUserKnob {41 hf_high_r l "huefocus R high" T HueFocus.m1r}
- addUserKnob {41 hf_low_g l "huefocus G low" T HueFocus.m0g}
- addUserKnob {41 hf_high_g l "huefocus G high" T HueFocus.m1g}
- addUserKnob {41 hf_low_b l "huefocus B low" T HueFocus.m0b}
- addUserKnob {41 hf_high_b l "huefocus B high" T HueFocus.m1b}
+ addUserKnob {41 hf_r0 l "huefocus R low" T HueFocus.m0r}
+ addUserKnob {41 hf_r1 l "huefocus R high" T HueFocus.m1r}
+ addUserKnob {41 hf_g0 l "huefocus G low" T HueFocus.m0g}
+ addUserKnob {41 hf_g1 l "huefocus G high" T HueFocus.m1g}
+ addUserKnob {41 hf_b0 l "huefocus B low" T HueFocus.m0b}
+ addUserKnob {41 hf_b1 l "huefocus B high" T HueFocus.m1b}
  addUserKnob {26 ""}
- addUserKnob {41 hf_st_r l "huefocus strength R" T HueFocusRange.p0}
- addUserKnob {41 hf_st_g l "huefocus strength G" T HueFocusRange.p1}
- addUserKnob {41 hf_st_b l "huefocus strength B" T HueFocusRange.p2}
+ addUserKnob {41 hf_st_r l "huefocus strength R" T HueFocusStrength.p0}
+ addUserKnob {41 hf_st_g l "huefocus strength G" T HueFocusStrength.p1}
+ addUserKnob {41 hf_st_b l "huefocus strength B" T HueFocusStrength.p2}
  addUserKnob {20 endGroup n -3}
  addUserKnob {26 spacer03 l "" +STARTLINE}
  addUserKnob {26 display_encoding_label l " " T "<b>display encoding</b>"}
- addUserKnob {41 tn_cwp l "creative white" T DisplayGamut.tn_cwp}
+ addUserKnob {41 cwp l "creative white" T DisplayGamut.cwp}
  addUserKnob {41 eotf T InverseEOTF.eotf}
  addUserKnob {41 display_gamut l gamut -STARTLINE T DisplayGamut.gamut}
  addUserKnob {6 clamp +STARTLINE}
@@ -125,7 +130,7 @@ Group {
    xpos 324
    ypos -534
   }
-set Na1c92170 [stack 0]
+set N505fb9e0 [stack 0]
   ColorMatrix {
    matrix {
        {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -141,14 +146,14 @@ set Na1c92170 [stack 0]
    xpos 290
    ypos -250
   }
-push $Na1c92170
+push $N505fb9e0
   Dot {
    name Dot391
    label " *RGB to XYZ D65 CAT: XYZ Scaling"
    xpos 434
    ypos -534
   }
-set N40836360 [stack 0]
+set N968bd870 [stack 0]
   ColorMatrix {
    matrix {
        {0.7006223202 0.1487748027 0.101058729}
@@ -160,7 +165,7 @@ set N40836360 [stack 0]
    xpos 1610
    ypos -473
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.7364777002 0.1307396511 0.08323857578}
@@ -172,7 +177,7 @@ push $N40836360
    xpos 1500
    ypos -472
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.705396831 0.1640413404 0.08101775497}
@@ -184,7 +189,7 @@ push $N40836360
    xpos 1390
    ypos -472
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.5990839005 0.2489254922 0.1024464965}
@@ -196,7 +201,7 @@ push $N40836360
    xpos 1280
    ypos -472
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.735275209 0.06860940903 0.1465712786}
@@ -208,7 +213,7 @@ push $N40836360
    xpos 1170
    ypos -472
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.7048583204 0.1297602952 0.1158373115}
@@ -220,7 +225,7 @@ push $N40836360
    xpos 1060
    ypos -471
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.6380076408 0.2147038132 0.09774445742}
@@ -232,7 +237,7 @@ push $N40836360
    xpos 950
    ypos -472
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.4123909175 0.3575843573 0.1804807931}
@@ -244,7 +249,7 @@ push $N40836360
    xpos 840
    ypos -472
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.6369581223 0.1446169168 0.1688809693}
@@ -256,7 +261,7 @@ push $N40836360
    xpos 730
    ypos -472
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.4865711331 0.2656677067 0.1982173175}
@@ -268,7 +273,7 @@ push $N40836360
    xpos 620
    ypos -472
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.6609312296 0.1336961389 0.1558285803}
@@ -280,7 +285,7 @@ push $N40836360
    xpos 510
    ypos -472
   }
-push $N40836360
+push $N968bd870
   ColorMatrix {
    matrix {
        {0.9503623843 0 9.346324805e-05}
@@ -309,7 +314,7 @@ push $N40836360
   name ColorMatrix167
   label "XYZ D65 to P3D65"
   xpos 290
-  ypos -880
+  ypos -884
  }
  Expression {
   temp_name3 L
@@ -319,7 +324,7 @@ push $N40836360
   expr2 L*s+b*(1-s)
   name SatW
   xpos 290
-  ypos -826
+  ypos -827
   addUserKnob {20 Params}
   addUserKnob {7 s l "color contrast" R 0 0.8}
   s 0.45
@@ -337,7 +342,7 @@ push $N40836360
   expr2 b+off
   name Offset
   xpos 290
-  ypos -778
+  ypos -801
   addUserKnob {20 Params}
   addUserKnob {7 off l offset R 0 0.01}
   off {{parent.TONESCALE_CTRL.tn_off}}
@@ -345,7 +350,7 @@ push $N40836360
  Group {
   name MidtoneContrast
   xpos 290
-  ypos -718
+  ypos -766
   disable {{!tn_mcon_enable}}
   addUserKnob {20 Params}
   addUserKnob {41 tn_mcon l "midtone contrast" T MidtonetrastRGB.tn_mcon}
@@ -414,13 +419,13 @@ push $N40836360
  Dot {
   name Dot423
   xpos 324
-  ypos -654
+  ypos -724
  }
-set Nd615b200 [stack 0]
+set N37076ee0 [stack 0]
  Dot {
   name Dot433
   xpos -336
-  ypos -654
+  ypos -724
  }
  Clamp {
   channels rgba
@@ -428,14 +433,14 @@ set Nd615b200 [stack 0]
   maximum_enable false
   name ClampMin
   xpos -370
-  ypos -634
+  ypos -704
  }
  Expression {
   channel0 rgba
   expr0 sqrt(r*r+g*g+b*b)/sqrt(3)
   name EuclideanNorm
   xpos -370
-  ypos -610
+  ypos -678
  }
  Dot {
   name TONESCALE_CTRL
@@ -444,7 +449,7 @@ set Nd615b200 [stack 0]
   note_font "Helvetica Bold"
   note_font_size 12
   xpos -336
-  ypos -582
+  ypos -652
   addUserKnob {20 Params}
   addUserKnob {7 tn_Lp l "peak luminance" R 100 1000}
   tn_Lp 100
@@ -477,14 +482,14 @@ set Nd615b200 [stack 0]
   addUserKnob {7 clamp_max l "clamp max"}
   clamp_max {{100/tn_Lp}}
  }
-set N2bb5eb50 [stack 0]
+set Ndbfeaa20 [stack 0]
  Expression {
   channel0 rgba
   expr0 pow(r/(r+s),p)
   name MMGreyPowerSigmoid
   label https://www.desmos.com/calculator/ofwtcmzc3w
   xpos -370
-  ypos -526
+  ypos -592
   addUserKnob {20 Params}
   addUserKnob {7 p R 1 4}
   p {{parent.TONESCALE_CTRL.tn_con}}
@@ -494,47 +499,18 @@ set N2bb5eb50 [stack 0]
  Dot {
   name Dot1
   xpos -336
-  ypos -462
+  ypos -510
  }
-set N681569a0 [stack 0]
- Expression {
-  channel0 rgb
-  expr0 r*m
-  name Scale
-  xpos -370
-  ypos -418
-  addUserKnob {20 Params}
-  addUserKnob {7 m R 0 4}
-  m {{parent.TONESCALE_CTRL.m}}
- }
- Expression {
-  channel0 rgba
-  expr0 r*r/(r+toe)
-  name ToeCompressQuadratic
-  label https://www.desmos.com/calculator/skk8ahmnws
-  xpos -370
-  ypos -371
-  addUserKnob {20 Params}
-  addUserKnob {7 toe R 0 0.01}
-  toe {{parent.TONESCALE_CTRL.tn_toe}}
- }
- Expression {
-  channel0 rgb
-  expr0 r*m
-  name Normalize
-  xpos -370
-  ypos -242
-  addUserKnob {20 Params}
-  addUserKnob {7 m R 0 4}
-  m {{parent.TONESCALE_CTRL.dsc}}
- }
+set N390ccfd0 [stack 0]
  Dot {
-  name Dot411
-  xpos -336
-  ypos -30
+  name Dot3
+  tile_color 0x666666ff
+  xpos -226
+  ypos -510
  }
-push $N2bb5eb50
-push $Nd615b200
+set N37084f00 [stack 0]
+push $Ndbfeaa20
+push $N37076ee0
  MergeExpression {
   inputs 2
   expr0 Ar==0?0:max(-2,Br/Ar)
@@ -542,20 +518,81 @@ push $Nd615b200
   expr2 Ab==0?0:max(-2,Bb/Ab)
   name MergeDivideReverse2
   xpos 290
-  ypos -586
+  ypos -656
  }
  Dot {
   name Dot2
   xpos 324
-  ypos -558
+  ypos -606
  }
-set N9b3465a0 [stack 0]
+set N96cbd420 [stack 0]
  Dot {
   name Dot8
   xpos 104
-  ypos -558
+  ypos -606
  }
-set N9b34bd00 [stack 0]
+set N5061e930 [stack 0]
+ Dot {
+  name Dot11
+  xpos -6
+  ypos -606
+ }
+ Expression {
+  expr0 max(0,1-r)
+  expr1 max(0,1-g)
+  expr2 max(0,1-b)
+  name Complement1
+  xpos -40
+  ypos -588
+ }
+ Expression {
+  expr0 max(0,r-(g+b))
+  expr1 max(0,g-(r+b))
+  expr2 max(0,b-(r+g))
+  name CMY
+  xpos -40
+  ypos -562
+ }
+set N515b81e0 [stack 0]
+ Expression {
+  expr0 r**(1/p0)
+  expr1 g**(1/p1)
+  expr2 b**(1/p2)
+  name Powers
+  xpos -40
+  ypos -490
+  addUserKnob {20 Params}
+  addUserKnob {7 p0}
+  p0 0.6
+  addUserKnob {7 p1}
+  p1 1
+  addUserKnob {7 p2}
+  p2 0.6
+ }
+ Dot {
+  name Dot4
+  tile_color 0x666666ff
+  xpos -6
+  ypos -414
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 ts
+  temp_expr0 1-Ar
+  expr0 r*ts**p.0
+  expr1 g*ts**p.1
+  expr2 b*ts**p.2
+  name HueShiftRangeCMY
+  xpos 180
+  ypos -418
+  addUserKnob {20 Params}
+  addUserKnob {7 p0 R -3 3}
+  addUserKnob {7 p1 R -3 3}
+  addUserKnob {7 p2 R -3 3}
+  addUserKnob {78 p n 3}
+  p {{2**-p0} {2**-p1} {2**-p2}}
+ }
+push $N5061e930
  Expression {
   temp_name0 mn
   temp_expr0 max(0,min(r,g,b))
@@ -565,7 +602,7 @@ set N9b34bd00 [stack 0]
   expr3 mn
   name HueChromaRGB
   xpos 70
-  ypos -540
+  ypos -588
  }
  Expression {
   expr0 max(0,r-(g+b))
@@ -573,45 +610,16 @@ set N9b34bd00 [stack 0]
   expr2 max(0,b-(r+g))
   name RGB
   xpos 70
-  ypos -514
+  ypos -562
  }
-set N9b361160 [stack 0]
  Dot {
   name Dot7
   tile_color 0x666666ff
   xpos 104
-  ypos -422
- }
-set N9b370c40 [stack 0]
-push $N681569a0
- Dot {
-  name Dot3
-  tile_color 0x666666ff
-  xpos -226
   ypos -462
  }
-set N17d77aa0 [stack 0]
- MergeExpression {
-  inputs 2
-  temp_name0 ts
-  temp_expr0 r*(m1-m0)+m0
-  temp_name1 mn
-  temp_expr1 Aa*Aa
-  channel0 rgb
-  expr0 ts*mn+1-mn
-  channel1 {-rgba.red rgba.green -rgba.blue none}
-  channel2 {-rgba.red -rgba.green rgba.blue none}
-  maskChannelMask rgba.red
-  name PurityFactor
-  xpos -150
-  ypos -298
-  addUserKnob {20 Params}
-  addUserKnob {7 m0 l "mid purity low" R 1 2}
-  m0 1.2
-  addUserKnob {7 m1 l "mid  purity high"}
- }
-push $N9b361160
-push $N17d77aa0
+set N503e30b0 [stack 0]
+push $N37084f00
  MergeExpression {
   inputs 2
   temp_name0 f
@@ -621,7 +629,7 @@ push $N17d77aa0
   expr3 bf
   name PurityCompress
   xpos -260
-  ypos -426
+  ypos -466
   addUserKnob {20 Params}
   addUserKnob {7 p0 l "purity compress"}
   p0 0.3
@@ -640,141 +648,10 @@ push $N17d77aa0
  Dot {
   name Dot9
   xpos -226
-  ypos -390
+  ypos -438
  }
-set N17da0220 [stack 0]
- Expression {
-  expr0 max(0,1-r)
-  expr1 max(0,1-g)
-  expr2 max(0,1-b)
-  name Complement
-  xpos -260
-  ypos -333
- }
- MergeExpression {
-  inputs 2
-  temp_name0 m
-  temp_expr0 Ar
-  expr0 m*r
-  expr1 m*g
-  expr2 m*b
-  name Multiply1
-  xpos -260
-  ypos -298
-  disable {{!pt_mid_enable}}
- }
- Dot {
-  name Dot5
-  xpos -226
-  ypos -222
- }
-push $N17d77aa0
-push $N9b370c40
-push $N9b34bd00
- Dot {
-  name Dot11
-  xpos -6
-  ypos -558
- }
- Expression {
-  expr0 max(0,1-r)
-  expr1 max(0,1-g)
-  expr2 max(0,1-b)
-  name Complement1
-  xpos -40
-  ypos -540
- }
- Expression {
-  expr0 min(2,max(0,r-(g+b)))
-  expr1 min(2,max(0,g-(r+b)))
-  expr2 min(2,max(0,b-(r+g)))
-  name CMY
-  xpos -40
-  ypos -514
- }
-set N3fbcb950 [stack 0]
- MergeExpression {
-  inputs 2
-  channel0 {rgba.red rgba.green rgba.blue none}
-  expr0 (m0*Ar+1)*(m1*Ag+1)*(m2*Ab+1)*(m3*r+1)*(m4*g+1)*(m5*b+1)
-  expr3 Aa
-  name DensityFactorRGBCMY
-  xpos 70
-  ypos -326
-  addUserKnob {20 Params}
-  addUserKnob {7 m0 l "density R" R -0.6 0.3}
-  m0 -0.33
-  addUserKnob {7 m1 l "density G" R -0.6 0.3}
-  m1 -0.3
-  addUserKnob {7 m2 l "density B" R -0.6 0.3}
-  m2 -0.2
-  addUserKnob {7 m3 l "density C" R -0.6 0.3}
-  m3 -0.15
-  addUserKnob {7 m4 l "density M" R -0.6 0.3}
-  m4 -0.2
-  addUserKnob {7 m5 l "density Y" R -0.6 0.3}
-  m5 0.2
- }
- MergeExpression {
-  inputs 2
-  temp_name0 tn
-  temp_expr0 Br>1?(1-Ar):Ar
-  temp_name1 f
-  temp_expr1 (tn**(1-p0))*(1-Ba**(1/(max(1e-6,1-p1))))
-  channel0 rgb
-  expr0 Br*f+1-f
-  expr3 tn
-  name DensityLimit
-  xpos 71
-  ypos -274
-  addUserKnob {20 Params}
-  addUserKnob {7 p0 l "density range"}
-  p0 0.75
-  addUserKnob {7 p1 l "density strength"}
-  p1 0.5
- }
-push $N17d77aa0
-push $N3fbcb950
- Expression {
-  expr0 r**(1/p0)
-  expr1 g**(1/p1)
-  expr2 b**(1/p2)
-  name Powers
-  xpos -40
-  ypos -443
-  addUserKnob {20 Params}
-  addUserKnob {7 p0}
-  p0 0.6
-  addUserKnob {7 p1}
-  p1 1
-  addUserKnob {7 p2}
-  p2 0.6
- }
- Dot {
-  name Dot4
-  tile_color 0x666666ff
-  xpos -6
-  ypos -366
- }
- MergeExpression {
-  inputs 2
-  temp_name0 ts
-  temp_expr0 1-Ar
-  expr0 r*ts**p.0
-  expr1 g*ts**p.1
-  expr2 b*ts**p.2
-  name HueShiftRangeCMY
-  xpos 180
-  ypos -370
-  addUserKnob {20 Params}
-  addUserKnob {7 p0 R -3 3}
-  addUserKnob {7 p1 R -3 3}
-  addUserKnob {7 p2 R -3 3}
-  addUserKnob {78 p n 3}
-  p {{2**-p0} {2**-p1} {2**-p2}}
- }
-push $N17da0220
-push $N9b370c40
+set N73899e10 [stack 0]
+push $N503e30b0
  MergeExpression {
   inputs 2
   temp_name0 ts
@@ -784,7 +661,7 @@ push $N9b370c40
   expr2 b*ts**p.2
   name HueShiftRangeRGB
   xpos 180
-  ypos -394
+  ypos -442
   addUserKnob {20 Params}
   addUserKnob {7 p0 R -3 3}
   p0 0.5
@@ -795,17 +672,17 @@ push $N9b370c40
   addUserKnob {78 p n 3}
   p {{2**-p0} {2**-p1} {2**-p2}}
  }
-push $N17d77aa0
-push $N9b361160
+push $N37084f00
+push $N503e30b0
  MergeExpression {
   inputs 2
   expr0 r*a**p.0
   expr1 g*a**p.1
   expr2 b*a**p.2
   expr3 Ar
-  name HueFocusRange
+  name HueFocusStrength
   xpos 180
-  ypos -466
+  ypos -514
   addUserKnob {20 Params}
   addUserKnob {7 p0 R -2 2}
   p0 1
@@ -816,7 +693,7 @@ push $N9b361160
   addUserKnob {78 p n 3}
   p {{2**-p0} {2**-p1} {2**-p2}}
  }
-push $N9b3465a0
+push $N96cbd420
  MergeExpression {
   inputs 2
   temp_name0 f0
@@ -832,7 +709,7 @@ push $N9b3465a0
   invert_mask true
   name HueFocus
   xpos 290
-  ypos -466
+  ypos -514
   disable {{!hf_enable x1102 1}}
   addUserKnob {20 Params}
   addUserKnob {7 m0r l "R low" R 0 0.8}
@@ -862,7 +739,7 @@ push $N9b3465a0
   maskChannelMask rgba.red
   name HueShiftRGB
   xpos 290
-  ypos -394
+  ypos -442
   disable {{!hs_rgb_enable}}
   addUserKnob {20 Params}
   addUserKnob {7 m0 l "hueshift R" R 0 0.6}
@@ -885,13 +762,142 @@ push $N9b3465a0
   expr2 b+f1-f0
   name HueShiftCMY
   xpos 290
-  ypos -370
+  ypos -418
   disable {{!hs_cmy_enable}}
   addUserKnob {20 Params}
   addUserKnob {7 m0 l "hueshift C" R 0 0.6}
   addUserKnob {7 m1 l "hueshift M" R 0 0.6}
   addUserKnob {7 m2 l "hueshift Y" R 0 0.6}
  }
+set Nb168f910 [stack 0]
+push $N390ccfd0
+ Expression {
+  channel0 rgb
+  expr0 r*m
+  name Scale
+  xpos -370
+  ypos -468
+  addUserKnob {20 Params}
+  addUserKnob {7 m R 0 4}
+  m {{parent.TONESCALE_CTRL.m}}
+ }
+ Expression {
+  channel0 rgba
+  expr0 r*r/(r+toe)
+  name ToeCompressQuadratic
+  label https://www.desmos.com/calculator/skk8ahmnws
+  xpos -370
+  ypos -425
+  addUserKnob {20 Params}
+  addUserKnob {7 toe R 0 0.01}
+  toe {{parent.TONESCALE_CTRL.tn_toe}}
+ }
+ Expression {
+  channel0 rgb
+  expr0 r*m
+  name Normalize
+  xpos -370
+  ypos -178
+  addUserKnob {20 Params}
+  addUserKnob {7 m R 0 4}
+  m {{parent.TONESCALE_CTRL.dsc}}
+ }
+ Dot {
+  name Dot411
+  xpos -336
+  ypos -78
+ }
+push $N503e30b0
+push $N37084f00
+ MergeExpression {
+  inputs 2
+  temp_name0 ts
+  temp_expr0 r*(m1-m0)+m0
+  temp_name1 mn
+  temp_expr1 Aa*Aa
+  channel0 rgb
+  expr0 ts*mn+1-mn
+  channel1 {-rgba.red rgba.green -rgba.blue none}
+  channel2 {-rgba.red -rgba.green rgba.blue none}
+  maskChannelMask rgba.red
+  name PurityFactor
+  xpos -150
+  ypos -346
+  addUserKnob {20 Params}
+  addUserKnob {7 m0 l "mid purity low" R 1 2}
+  m0 1.2
+  addUserKnob {7 m1 l "mid  purity high"}
+ }
+push $N73899e10
+ Expression {
+  expr0 max(0,1-r)
+  expr1 max(0,1-g)
+  expr2 max(0,1-b)
+  name Complement
+  xpos -260
+  ypos -392
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 m
+  temp_expr0 Ar
+  expr0 m*r
+  expr1 m*g
+  expr2 m*b
+  name Multiply1
+  xpos -260
+  ypos -346
+  disable {{!pt_mid_enable}}
+ }
+ Dot {
+  name Dot5
+  xpos -226
+  ypos -270
+ }
+push $N37084f00
+push $N503e30b0
+push $N515b81e0
+ MergeExpression {
+  inputs 2
+  channel0 {rgba.red rgba.green rgba.blue none}
+  expr0 (m0*Ar+1)*(m1*Ag+1)*(m2*Ab+1)*(m3*r+1)*(m4*g+1)*(m5*b+1)
+  expr3 Aa
+  name DensityFactorRGBCMY
+  xpos 70
+  ypos -398
+  addUserKnob {20 Params}
+  addUserKnob {7 m0 l "density R" R -0.6 0.3}
+  m0 -0.33
+  addUserKnob {7 m1 l "density G" R -0.6 0.3}
+  m1 -0.3
+  addUserKnob {7 m2 l "density B" R -0.6 0.3}
+  m2 -0.2
+  addUserKnob {7 m3 l "density C" R -0.6 0.3}
+  m3 -0.15
+  addUserKnob {7 m4 l "density M" R -0.6 0.3}
+  m4 -0.2
+  addUserKnob {7 m5 l "density Y" R -0.6 0.3}
+  m5 0.2
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 tn
+  temp_expr0 Br>1?(1-Ar):Ar
+  temp_name1 f
+  temp_expr1 (tn**(1-p0))*(1-Ba**(1/(max(1e-6,1-p1))))
+  channel0 rgb
+  expr0 Br*f+1-f
+  expr3 tn
+  name DensityLimit
+  xpos 70
+  ypos -322
+  addUserKnob {20 Params}
+  addUserKnob {7 p0 l "density range"}
+  p0 0.75
+  addUserKnob {7 p1 l "density strength"}
+  p1 0.5
+ }
+push $Nb168f910
  MergeExpression {
   inputs 2
   temp_name0 m
@@ -901,7 +907,7 @@ push $N9b3465a0
   expr2 m*b
   name Multiply2
   xpos 290
-  ypos -274
+  ypos -322
   disable {{!dn_enable}}
  }
  MergeExpression {
@@ -913,7 +919,7 @@ push $N9b3465a0
   expr2 b*f+1-f
   name LerpToOne2
   xpos 290
-  ypos -226
+  ypos -274
  }
  Expression {
   temp_name3 L
@@ -923,7 +929,7 @@ push $N9b3465a0
   expr2 invert?(L*s-b)/(s-1):L*(1-s)+b*s
   name SatWInverse1
   xpos 290
-  ypos -176
+  ypos -226
   addUserKnob {20 Params}
   addUserKnob {7 s}
   s {{parent.SatW.s}}
@@ -940,9 +946,9 @@ push $N9b3465a0
   name DisplayGamut
   tile_color 0xc58930ff
   xpos 290
-  ypos -146
+  ypos -202
   addUserKnob {20 Params}
-  addUserKnob {4 tn_cwp l "creative white" M {D65 D60 D55 D50 ""}}
+  addUserKnob {4 cwp l "creative white" M {D65 D60 D55 D50 ""}}
   addUserKnob {4 gamut l "display gamut" t "Choose the target display device chromaticities." M {Rec.709 P3-D65 "Rec.2020 (P3 Limited)" "" "" ""}}
  }
   Input {
@@ -956,25 +962,13 @@ push $N9b3465a0
    xpos 324
    ypos -654
   }
-set N1d6abd40 [stack 0]
-  ColorMatrix {
-   matrix {
-       {0.7538330344 0.1985973691 0.04756959659}
-       {0.04574384897 0.9417772198 0.01247893122}
-       {-0.001210340355 0.0176017173 0.9836086231}
-     }
-   name ColorMatrix37
-   label "P3D65 to Rec2020"
-   xpos 435
-   ypos -400
-  }
-push $N1d6abd40
+set Nd7f661f0 [stack 0]
   Dot {
    name Dot62
    xpos 764
    ypos -654
   }
-set N1d6bea90 [stack 0]
+set Nd7f6b840 [stack 0]
   ColorMatrix {
    matrix {
        {0.9287127388 0.06578032793 0.005506708345}
@@ -984,9 +978,9 @@ set N1d6bea90 [stack 0]
    name ColorMatrix36
    label "P3D65 to P3D65 D50"
    xpos 730
-   ypos -591
+   ypos -592
   }
-push $N1d6bea90
+push $Nd7f6b840
   ColorMatrix {
    matrix {
        {0.9559790976 0.0403850003 0.003639287409}
@@ -996,9 +990,9 @@ push $N1d6bea90
    name ColorMatrix20
    label "P3D65 to P3D65 D55"
    xpos 620
-   ypos -591
+   ypos -592
   }
-push $N1d6bea90
+push $Nd7f6b840
   ColorMatrix {
    matrix {
        {0.979832881 0.01836378979 0.001803284786}
@@ -1007,10 +1001,10 @@ push $N1d6bea90
      }
    name ColorMatrix14
    label "P3D65 to P3D65 D60"
-   xpos 508
-   ypos -591
+   xpos 510
+   ypos -592
   }
-push $N1d6bea90
+push $Nd7f6b840
   Dot {
    name Dot64
    xpos 434
@@ -1018,12 +1012,12 @@ push $N1d6bea90
   }
   Switch {
    inputs 4
-   which {{tn_cwp}}
+   which {{cwp}}
    name SwitchCWP
    xpos 400
    ypos -513
   }
-push $N1d6abd40
+push $Nd7f661f0
   ColorMatrix {
    matrix {
        {1.103807322 -0.1103425121 0.006531676079}
@@ -1033,9 +1027,9 @@ push $N1d6abd40
    name ColorMatrix9
    label "P3D65 to Rec709 D50"
    xpos 290
-   ypos -590
+   ypos -592
   }
-push $N1d6abd40
+push $Nd7f661f0
   ColorMatrix {
    matrix {
        {1.149327514 -0.1536910745 0.004366526746}
@@ -1045,9 +1039,9 @@ push $N1d6abd40
    name ColorMatrix11
    label "P3D65 to Rec709 D55"
    xpos 180
-   ypos -591
+   ypos -592
   }
-push $N1d6abd40
+push $Nd7f661f0
   ColorMatrix {
    matrix {
        {1.189986856 -0.192168414 0.002185496045}
@@ -1057,9 +1051,9 @@ push $N1d6abd40
    name ColorMatrix12
    label "P3D65 to Rec709 D60"
    xpos 70
-   ypos -591
+   ypos -592
   }
-push $N1d6abd40
+push $Nd7f661f0
   ColorMatrix {
    matrix {
        {1.224940181 -0.2249402404 0}
@@ -1069,21 +1063,21 @@ push $N1d6abd40
    name ColorMatrix13
    label "P3D65 to Rec709 D65"
    xpos -40
-   ypos -591
+   ypos -592
   }
   Switch {
    inputs 4
-   which {{tn_cwp}}
+   which {{cwp}}
    name SwitchCWP1
    xpos -40
    ypos -513
   }
   Switch {
-   inputs 3
+   inputs 2
    which {{gamut}}
    name SwitchGamut1
    xpos 290
-   ypos -372
+   ypos -370
   }
   Output {
    name Output
@@ -1097,7 +1091,7 @@ push $N1d6abd40
   expr2 1-b
   name Complement2
   xpos 290
-  ypos -120
+  ypos -178
   disable {{!pt_softclip}}
  }
  Expression {
@@ -1107,7 +1101,7 @@ push $N1d6abd40
   name PowerPRGB
   label https://www.desmos.com/calculator/flquiy0s0y
   xpos 290
-  ypos -96
+  ypos -152
   disable {{!pt_softclip}}
   addUserKnob {20 Params}
   addUserKnob {7 p0 R 0.01 0.15}
@@ -1123,10 +1117,9 @@ push $N1d6abd40
   expr2 1-b
   name Complement3
   xpos 290
-  ypos -58
+  ypos -114
   disable {{!pt_softclip}}
  }
-set Nb2ff2a0 [stack 0]
  MergeExpression {
   inputs 2
   temp_name0 m
@@ -1137,13 +1130,13 @@ set Nb2ff2a0 [stack 0]
   expr3 1
   name Multiply0
   xpos 290
-  ypos -34
+  ypos -82
  }
  Clamp {
   channels rgb
   name Clamp
   xpos 290
-  ypos 14
+  ypos -33
   disable {{!parent.clamp}}
  }
  ColorMatrix {
@@ -1155,15 +1148,16 @@ set Nb2ff2a0 [stack 0]
   name ColorMatrix37
   label "P3D65 to Rec2020"
   xpos 290
-  ypos 57
+  ypos 8
   disable {{parent.DisplayGamut.gamut!=2}}
  }
  Group {
   name InverseEOTF
   xpos 290
-  ypos 110
+  ypos 62
   addUserKnob {20 EOTF_tab l EOTF}
   addUserKnob {4 eotf t "Choose the inverse EOTF to apply for the target display device." M {Linear "2.2 Power - sRGB Display" "2.4 Power - Rec.1886" "2.6 Power DCI" PQ HLG "" "" "" ""}}
+  eotf "2.4 Power - Rec.1886"
  }
   Input {
    inputs 0
@@ -1171,7 +1165,7 @@ set Nb2ff2a0 [stack 0]
    xpos 400
    ypos -129
   }
-set N17edfcf0 [stack 0]
+set N28aba40 [stack 0]
   Expression {
    temp_name0 Yd
    temp_expr0 0.2627*r+0.6780*g+0.0593*b
@@ -1201,7 +1195,7 @@ set N17edfcf0 [stack 0]
    addUserKnob {7 _c}
    _c {{0.5-_a*log(4*_a)}}
   }
-push $N17edfcf0
+push $N28aba40
   Expression {
    temp_name0 rp
    temp_expr0 pow(r,m_1)
@@ -1227,7 +1221,7 @@ push $N17edfcf0
    addUserKnob {7 c_3}
    c_3 {{2392/128}}
   }
-push $N17edfcf0
+push $N28aba40
   Expression {
    expr0 sign(r)*pow(fabs(r),1/p)
    expr1 sign(g)*pow(fabs(g),1/p)
@@ -1252,20 +1246,18 @@ push $N17edfcf0
    ypos 86
   }
  end_group
+ Switch {
+  inputs 2
+  which 1
+  name Switch1
+  note_font Helvetica
+  xpos 570
+  ypos -127
+  disable true
+ }
  Output {
   name Output
   xpos 290
-  ypos 158
- }
-push $Nb2ff2a0
- Viewer {
-  frame 1073
-  frame_range 1001-1300
-  monitorOutNDISenderName "Nuke - dev_OpenDRT_hueDistortion_v012 - Viewer1"
-  monitorOutOutputTransform rec1886
-  name Viewer1
-  note_font Helvetica
-  xpos 377
-  ypos 2
+  ypos 110
  }
 end_group
