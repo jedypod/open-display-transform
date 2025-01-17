@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 /*  OpenDRT -------------------------------------------------
-      v1.0.0b29
+      v1.0.0b37
       Written by Jed Smith
       https://github.com/jedypod/open-display-transform
 
@@ -9,18 +9,22 @@
 
 
 // Tonescale Parameters
-DEFINE_UI_PARAMS(tn_Lp, Display Peak Luminance, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 800.0, 0.0)
-DEFINE_UI_PARAMS(tn_Lg, Display Grey Luminance, DCTLUI_SLIDER_FLOAT, 10.0, 3.0, 30.0, 0.0)
-DEFINE_UI_PARAMS(tn_gb, Grey Boost, DCTLUI_SLIDER_FLOAT, 0.13, 0.0, 0.5, 0.0)
+DEFINE_UI_PARAMS(tn_Lp, Display Peak Luminance, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 0.0)
 
-DEFINE_UI_PARAMS(look, Look Preset, DCTLUI_COMBO_BOX, 5, {look0, look1, look2, look3, look4, look5}, {base, default-lowcon, default-highcon, filmish, colorful, custom (un-comment all params in dctl)})
-
-// Display Encoding / IO
+// Input settings
 DEFINE_UI_PARAMS(in_gamut, In Gamut, DCTLUI_COMBO_BOX, 15, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_vgamut, i_bmdwg, i_egamut, i_egamut2, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, Filmlight E-Gamut2, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_oetf, In Transfer Function, DCTLUI_COMBO_BOX, 1, {ioetf_linear, ioetf_davinci_intermediate, ioetf_filmlight_tlog, ioetf_arri_logc3, ioetf_arri_logc4, ioetf_panasonic_vlog, ioetf_sony_slog3, ioetf_fuji_flog}, {Linear, Davinci Intermediate, Filmlight T-Log, Arri LogC3, Arri LogC4, Panasonic V-Log, Sony S-Log3, Fuji F-Log})
-DEFINE_UI_PARAMS(display_gamut, Display Gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3-D65, Rec.2020 (P3 Limited)})
-DEFINE_UI_PARAMS(EOTF, Display EOTF, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, dci, pq, hlg}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec.1886, 2.6 Power DCI, ST 2084 PQ, HLG})
 
+// Creative White
+DEFINE_UI_PARAMS(cwp, Creative White, DCTLUI_COMBO_BOX, 0, {d65, d60, d55, d50}, {D65, D60, D55, D50})
+DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+
+// Presets
+DEFINE_UI_PARAMS(look_preset, Look Preset, DCTLUI_COMBO_BOX, 1, {look0, look1, look2, look3}, {Base, Default, Filmish, Custom (Check DCTL)})
+DEFINE_UI_PARAMS(tonescale_preset, Tonescale Preset, DCTLUI_COMBO_BOX, 0, {tsprst0, tsprst1, tsprst2, tsprst3, tsprst4, tsprst5, tsprst6}, {High-Contrast, Low-Contrast, ACES-1.x, ACES-2.0, High-Contrast 2, Low-Contrast 2, Custom (Check DCTL)})
+
+// Display Encoding
+DEFINE_UI_PARAMS(display_encoding, Display Encoding, DCTLUI_COMBO_BOX, 0, {rec1886, srgb, p3display, rec2100pq, rec2100hlg, dolbypq, custom}, {Rec.1886 - 2.4 Power / Rec.709, sRGB Display - 2.2 Power / Rec.709, P3 Display - 2.2 Power / P3-D65, Rec.2100 - PQ / Rec.2020 (P3 Limited), Rec.2100 - HLG / Rec.2020 (P3 Limited), Dolby - PQ / P3-D65, Custom (Check DCTL)})
 
 
 
@@ -28,49 +32,53 @@ DEFINE_UI_PARAMS(EOTF, Display EOTF, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, d
 ---------------------------------------------------------------------------------------*/
 
 // Tonescale Parameters
-DEFINE_UI_PARAMS(_tn_con, Tonescale Contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1.0, 2.0, 0.0)
-DEFINE_UI_PARAMS(_tn_toe, Tonescale Toe, DCTLUI_SLIDER_FLOAT, 0.001, 0.0, 0.01, 0.0)
-DEFINE_UI_PARAMS(_tn_off, Tonescale Offset, DCTLUI_SLIDER_FLOAT, 0.001, 0.0, 0.01, 0.0)
+DEFINE_UI_PARAMS(_tn_Lg, Display Grey Luminance, DCTLUI_SLIDER_FLOAT, 11.1, 3.0, 30.0, 0.0)
+DEFINE_UI_PARAMS(_tn_gb, Grey Boost, DCTLUI_SLIDER_FLOAT, 0.13, 0.0, 0.5, 0.0)
+DEFINE_UI_PARAMS(_tn_con, Tonescale Contrast, DCTLUI_SLIDER_FLOAT, 1.5, 1.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(_tn_sh, Shoulder Clip, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(_tn_toe, Tonescale Toe, DCTLUI_SLIDER_FLOAT, 0.002, 0.0, 0.01, 0.0)
+DEFINE_UI_PARAMS(_tn_off, Tonescale Offset, DCTLUI_SLIDER_FLOAT, 0.003, 0.0, 0.01, 0.0)
+DEFINE_UI_PARAMS(_tn_hcon_enable, Enable High Contrast, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(_tn_hcon, High Contrast, DCTLUI_SLIDER_FLOAT, 1.0, 0.5, 2.0, 0.0)
+DEFINE_UI_PARAMS(_tn_hcon_pv, High Contrast Pivot, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 4.0, 0.0)
+DEFINE_UI_PARAMS(_tn_hcon_st, High Contrast Strength, DCTLUI_SLIDER_FLOAT, 4.0, 0.0, 4.0, 0.0)
 DEFINE_UI_PARAMS(_tn_mcon_enable, Enable Mid Contrast, DCTLUI_CHECK_BOX, 1)
-DEFINE_UI_PARAMS(_tn_mcon, Mid Contrast, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 3.0, 0.0)
-DEFINE_UI_PARAMS(_tn_mcon_w, Mid Contrast Width, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(_tn_mcon_rp, Ratio Preserve, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 1.0, 0.0)
-
-// Rendering Space Parameters
-DEFINE_UI_PARAMS(_rs_sa, Render Space Saturation, DCTLUI_SLIDER_FLOAT, 0.45, 0.0, 0.8, 0.0)
-DEFINE_UI_PARAMS(_rs_rw, Render Space Weight R, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 0.5, 0.0)
-DEFINE_UI_PARAMS(_rs_bw, Render Space Weight B, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 0.5, 0.0)
+DEFINE_UI_PARAMS(_tn_mcon, Mid Contrast, DCTLUI_SLIDER_FLOAT, 0.7, 0.0, 3.0, 0.0)
+DEFINE_UI_PARAMS(_tn_mcon_w, Mid Contrast Width, DCTLUI_SLIDER_FLOAT, 0.7, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(_tn_mcon_pc, Mid Contrast Per-Channel, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
 
 // Purity Compression Parameters
-DEFINE_UI_PARAMS(_pt_cmp, Base Purity Compress, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(_pt_cmp_hdr, Base Purity Compress HDR, DCTLUI_SLIDER_FLOAT, 0.7, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(_pt_cmp_r, Purity Compress R, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(_pt_cmp_g, Purity Compress G, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(_pt_cmp_b, Purity Compress B, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(_pt_r, Purity Compress R, DCTLUI_SLIDER_FLOAT, 0.65, 0.05, 2.0, 0.0)
+DEFINE_UI_PARAMS(_pt_g, Purity Compress G, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(_pt_b, Purity Compress B, DCTLUI_SLIDER_FLOAT, 1.5, 0.0, 2.0, 0.0)
+DEFINE_UI_PARAMS(_pt_rng, Purity Compress Range, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(_pt_hdr, Purity HDR, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 
 // Midrange Purity
-DEFINE_UI_PARAMS(_pt_mid_enable, Enable Mid Purity, DCTLUI_CHECK_BOX, 1)
-DEFINE_UI_PARAMS(_pt_mid_low, Mid Purity Low, DCTLUI_SLIDER_FLOAT, 1.2, 1.0, 2.0, 0.0)
-DEFINE_UI_PARAMS(_pt_mid_high, Mid Purity High, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(_ptm_enable, Enable Mid Purity, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(_ptm_low, Mid Purity Low, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(_ptm_low_st, Mid Purity Low Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(_ptm_high, Mid Purity High Compress, DCTLUI_SLIDER_FLOAT, 0.66, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(_pt_softclip, Enable Purity Softclip, DCTLUI_CHECK_BOX, 1)
 
-// Density Parameters
-DEFINE_UI_PARAMS(_dn_enable, Enable Density, DCTLUI_CHECK_BOX, 1)
-DEFINE_UI_PARAMS(_dn_r, Density R, DCTLUI_SLIDER_FLOAT, -0.33, -0.6, 0.3, 0.0)
-DEFINE_UI_PARAMS(_dn_g, Density G, DCTLUI_SLIDER_FLOAT, -0.3, -0.6, 0.3, 0.0)
-DEFINE_UI_PARAMS(_dn_b, Density B, DCTLUI_SLIDER_FLOAT, -0.2, -0.6, 0.3, 0.0)
-DEFINE_UI_PARAMS(_dn_c, Density C, DCTLUI_SLIDER_FLOAT, -0.15, -0.6, 0.3, 0.0)
-DEFINE_UI_PARAMS(_dn_m, Density M, DCTLUI_SLIDER_FLOAT, -0.2, -0.6, 0.3, 0.0)
-DEFINE_UI_PARAMS(_dn_y, Density Y, DCTLUI_SLIDER_FLOAT, 0.2, -0.6, 0.3, 0.0)
-DEFINE_UI_PARAMS(_dn_rng, Density Range, DCTLUI_SLIDER_FLOAT, 0.75, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(_dn_st, Density Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+// Value Parameters
+DEFINE_UI_PARAMS(_vl_enable, Enable Value, DCTLUI_CHECK_BOX, 1)
+DEFINE_UI_PARAMS(_vl_r, Value R, DCTLUI_SLIDER_FLOAT, -0.3, -0.6, 0.0, 0.0)
+DEFINE_UI_PARAMS(_vl_g, Value G, DCTLUI_SLIDER_FLOAT, -0.3, -0.6, 0.0, 0.0)
+DEFINE_UI_PARAMS(_vl_b, Value B, DCTLUI_SLIDER_FLOAT, -0.2, -0.6, 0.0, 0.0)
+DEFINE_UI_PARAMS(_vl_c, Value C, DCTLUI_SLIDER_FLOAT, 0.0, -0.6, 0.0, 0.0)
+DEFINE_UI_PARAMS(_vl_m, Value M, DCTLUI_SLIDER_FLOAT, -0.2, -0.6, 0.0, 0.0)
+DEFINE_UI_PARAMS(_vl_y, Value Y, DCTLUI_SLIDER_FLOAT, 0.0, -0.4, 0.2, 0.0)
+DEFINE_UI_PARAMS(_vl_rng, Value Range, DCTLUI_SLIDER_FLOAT, 0.8, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(_vl_st, Value Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 
 // HueShift Parameters
 DEFINE_UI_PARAMS(_hs_rgb_enable, Enable Hueshift RGB, DCTLUI_CHECK_BOX, 1)
-DEFINE_UI_PARAMS(_hs_r, Hueshift R, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.6, 0.0)
+DEFINE_UI_PARAMS(_hs_r, Hueshift R, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 0.6, 0.0)
 DEFINE_UI_PARAMS(_hs_g, Hueshift G, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 0.6, 0.0)
-DEFINE_UI_PARAMS(_hs_b, Hueshift B, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 0.6, 0.0)
-DEFINE_UI_PARAMS(_hs_rng_r, HuesHift Range R, DCTLUI_SLIDER_FLOAT, 0.5, -3.0, 3.0, 0.0)
+DEFINE_UI_PARAMS(_hs_b, Hueshift B, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.6, 0.0)
+DEFINE_UI_PARAMS(_hs_rng_r, HuesHift Range R, DCTLUI_SLIDER_FLOAT, 0.2, -3.0, 3.0, 0.0)
 DEFINE_UI_PARAMS(_hs_rng_g, HuesHift Range G, DCTLUI_SLIDER_FLOAT, 2.0, -3.0, 3.0, 0.0)
 DEFINE_UI_PARAMS(_hs_rng_b, HuesHift Range B, DCTLUI_SLIDER_FLOAT, 0.5, -3.0, 3.0, 0.0)
 DEFINE_UI_PARAMS(_hs_cmy_enable, Enable Hueshift CMY, DCTLUI_CHECK_BOX, 1)
@@ -80,26 +88,27 @@ DEFINE_UI_PARAMS(_hs_y, Hueshift Y, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 0.6, 0.0)
 DEFINE_UI_PARAMS(_hs_rng_c, HuesHift Range C, DCTLUI_SLIDER_FLOAT, 0.0, -3.0, 3.0, 0.0)
 DEFINE_UI_PARAMS(_hs_rng_m, HuesHift Range M, DCTLUI_SLIDER_FLOAT, 0.0, -3.0, 3.0, 0.0)
 DEFINE_UI_PARAMS(_hs_rng_y, HuesHift Range Y, DCTLUI_SLIDER_FLOAT, 0.0, -3.0, 3.0, 0.0)
-DEFINE_UI_PARAMS(_hs_st_c, Hueshift Strength C, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(_hs_st_y, Hueshift Strength Y, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
 
 // HueFocus Parameters
 DEFINE_UI_PARAMS(_hf_enable, Enable Huefocus, DCTLUI_CHECK_BOX, 1)
-DEFINE_UI_PARAMS(_hf_r0, Huefocus R Low, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.5, 0.0)
-DEFINE_UI_PARAMS(_hf_r1, Huefocus R High, DCTLUI_SLIDER_FLOAT, -0.6, -0.8, 0.0, 0.0)
-DEFINE_UI_PARAMS(_hf_g0, Huefocus G Low, DCTLUI_SLIDER_FLOAT, 0.1, -0.8, 0.5, 0.0)
-DEFINE_UI_PARAMS(_hf_g1, Huefocus G High, DCTLUI_SLIDER_FLOAT, -0.6, -0.8, 0.0, 0.0)
-DEFINE_UI_PARAMS(_hf_b0, Huefocus B Low, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 0.5, 0.0)
+DEFINE_UI_PARAMS(_hf_r0, Huefocus R Low, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 0.5, 0.0)
+DEFINE_UI_PARAMS(_hf_r1, Huefocus R High, DCTLUI_SLIDER_FLOAT, -0.5, -0.8, 0.0, 0.0)
+DEFINE_UI_PARAMS(_hf_g0, Huefocus G Low, DCTLUI_SLIDER_FLOAT, 0.2, -0.8, 0.5, 0.0)
+DEFINE_UI_PARAMS(_hf_g1, Huefocus G High, DCTLUI_SLIDER_FLOAT, -0.3, -0.8, 0.0, 0.0)
+DEFINE_UI_PARAMS(_hf_b0, Huefocus B Low, DCTLUI_SLIDER_FLOAT, 0.1, 0.0, 0.5, 0.0)
 DEFINE_UI_PARAMS(_hf_b1, Huefocus B High, DCTLUI_SLIDER_FLOAT, -0.3, -0.8, 0.0, 0.0)
-DEFINE_UI_PARAMS(_hf_st_r, Huefocus Strength R, DCTLUI_SLIDER_FLOAT, 1.0, -3.0, 3.0, 0.0)
-DEFINE_UI_PARAMS(_hf_st_g, Huefocus Strength G, DCTLUI_SLIDER_FLOAT, 2.0, -3.0, 3.0, 0.0)
-DEFINE_UI_PARAMS(_hf_st_b, Huefocus Strength B, DCTLUI_SLIDER_FLOAT, -1.0, -3.0, 3.0, 0.0)
 
-// Creative White
-DEFINE_UI_PARAMS(_cwp, Creative White, DCTLUI_COMBO_BOX, 0, {d65, d60, d55, d50}, {D65, D60, D55, D50})
 
-/*---------------------------------------------------------------------------------------
-  Un-Comment above this line to enable custom look creation   */
+
+// Custom Display Encoding
+DEFINE_UI_PARAMS(_display_gamut, Display Gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3-D65, Rec.2020 (P3 Limited)})
+DEFINE_UI_PARAMS(_eotf, Display EOTF, DCTLUI_COMBO_BOX, 2, {eotf0, eotf1, eotf2, eotf3, eotf4, eotf5}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec.1886, 2.6 Power DCI, ST 2084 PQ, HLG})
+
+
+#define INIT_PARAMS tn_Lg=_tn_Lg, tn_gb=_tn_gb, tn_hcon_enable=_tn_hcon_enable, tn_mcon_enable=_tn_mcon_enable, ptm_enable=_ptm_enable, vl_enable=_vl_enable, hs_rgb_enable=_hs_rgb_enable, hs_cmy_enable=_hs_cmy_enable, hf_enable=_hf_enable, tn_con=_tn_con, tn_sh=_tn_sh, tn_toe=_tn_toe, tn_off=_tn_off, tn_hcon=_tn_hcon, tn_hcon_pv=_tn_hcon_pv, tn_hcon_st=_tn_hcon_st, tn_mcon=_tn_mcon, tn_mcon_w=_tn_mcon_w, tn_mcon_pc=_tn_mcon_pc, pt_r=_pt_r, pt_g=_pt_g, pt_b=_pt_b, pt_rng=_pt_rng, pt_hdr=_pt_hdr, pt_softclip=_pt_softclip, ptm_low=_ptm_low, ptm_low_st=_ptm_low_st, ptm_high=_ptm_high, ptm_high_st=_ptm_high_st, vl_r=_vl_r, vl_g=_vl_g, vl_b=_vl_b, vl_c=_vl_c, vl_m=_vl_m, vl_y=_vl_y, vl_rng=_vl_rng, vl_st=_vl_st, hs_r=_hs_r, hs_g=_hs_g, hs_b=_hs_b, hs_rng_r=_hs_rng_r, hs_rng_g=_hs_rng_g, hs_rng_b=_hs_rng_b, hs_c=_hs_c, hs_m=_hs_m, hs_y=_hs_y, hs_rng_c=_hs_rng_c, hs_rng_m=_hs_rng_m, hs_rng_y=_hs_rng_y, hf_r0=_hf_r0, hf_r1=_hf_r1, hf_g0=_hf_g0, hf_g1=_hf_g1, hf_b0=_hf_b0, hf_b1=_hf_b1, cwp_rng=cwp_rng, display_gamut=_display_gamut, eotf=_eotf;
+
+  
+/* Un-Comment above this line to enable custom look creation ---------------------------------------------------------------------------------------*/
 
 
 
@@ -134,9 +143,9 @@ DEFINE_UI_PARAMS(_cwp, Creative White, DCTLUI_COMBO_BOX, 0, {d65, d60, d55, d50}
 #define matrix_p3_to_rec2020 make_float3x3(make_float3(0.7538330344f, 0.1985973691f, 0.04756959659f), make_float3(0.04574384897f, 0.9417772198f, 0.01247893122f), make_float3(-0.001210340355f, 0.0176017173f, 0.9836086231f))
 
 
-
-
 /* Math helper functions ----------------------------*/
+
+__CONSTANT__ float SQRT3 = 1.73205080756887729353f;
 
 typedef struct {
   float3 x, y, z;
@@ -186,8 +195,8 @@ __DEVICE__ float3 spowf3(float3 a, float b) {
   return make_float3(spowf(a.x, b), spowf(a.y, b), spowf(a.z, b));
 }
 
-// Return the hypot or length of float3 a
-__DEVICE__ float hypotf3(float3 a) { return  _sqrtf(spowf(a.x, 2.0f) + spowf(a.y, 2.0f) + spowf(a.z, 2.0f)); }
+// Return the hypot or vector length of float3 a
+__DEVICE__ float hypotf3(float3 a) { return _sqrtf(a.x*a.x + a.y*a.y + a.z*a.z); }
 
 // Return the min of float3 a
 __DEVICE__ float fmaxf3(float3 a) { return _fmaxf(a.x, _fmaxf(a.y, a.z)); }
@@ -201,10 +210,9 @@ __DEVICE__ float3 clampmaxf3(float3 a, float mx) { return make_float3(_fminf(a.x
 // Clamp float3 a to min value mn
 __DEVICE__ float3 clampminf3(float3 a, float mn) { return make_float3(_fmaxf(a.x, mn), _fmaxf(a.y, mn), _fmaxf(a.z, mn)); }
 
-// Clamp each component of float3 a to be between float mn and float mx
-__DEVICE__ float3 clampf3(float3 a, float mn, float mx) { 
-  return make_float3(_fminf(_fmaxf(a.x, mn), mx), _fminf(_fmaxf(a.y, mn), mx), _fminf(_fmaxf(a.z, mn), mx));
-}
+// Clamp float3 a to min value mn and max value mx
+__DEVICE__ float clampf(float a, float mn, float mx) { return _fminf(_fmaxf(a, mn), mx); }
+__DEVICE__ float3 clampf3(float3 a, float mn, float mx) { return make_float3(clampf(a.x, mn, mx), clampf(a.y, mn, mx), clampf(a.z, mn, mx)); }
 
 
 /* OETF Linearization Transfer Functions ---------------------------------------- */
@@ -212,59 +220,54 @@ __DEVICE__ float3 clampf3(float3 a, float mn, float mx) {
 __DEVICE__ float oetf_davinci_intermediate(float x) {
     return x <= 0.02740668f ? x/10.44426855f : _exp2f(x/0.07329248f - 7.0f) - 0.0075f;
 }
-
 __DEVICE__ float oetf_filmlight_tlog(float x) {
   return x < 0.075f ? (x-0.075f)/16.184376489665897f : _expf((x - 0.5520126568606655f)/0.09232902596577353f) - 0.0057048244042473785f;
 }
 __DEVICE__ float oetf_arri_logc3(float x) {
   return x < 5.367655f*0.010591f + 0.092809f ? (x - 0.092809f)/5.367655f : (_exp10f((x - 0.385537f)/0.247190f) - 0.052272f)/5.555556f;
 }
-
 __DEVICE__ float oetf_arri_logc4(float x) {
   return x < -0.7774983977293537f ? x*0.3033266726886969f - 0.7774983977293537f : (_exp2f(14.0f*(x - 0.09286412512218964f)/0.9071358748778103f + 6.0f) - 64.0f)/2231.8263090676883f;
 }
-
 __DEVICE__ float oetf_panasonic_vlog(float x) {
   return x < 0.181f ? (x - 0.125f)/5.6f : _exp10f((x - 0.598206f)/0.241514f) - 0.00873f;
 }
-
 __DEVICE__ float oetf_sony_slog3(float x) {
   return x < 171.2102946929f/1023.0f ? (x*1023.0f - 95.0f)*0.01125f/(171.2102946929f - 95.0f) : (_exp10f(((x*1023.0f - 420.0f)/261.5f))*(0.18f + 0.01f) - 0.01f);
 }
-
 __DEVICE__ float oetf_fujifilm_flog(float x) {
   return x < 0.1005377752f ? (x - 0.092864f)/8.735631f : (_exp10f(((x - 0.790453f)/0.344676f))/0.555556f - 0.009468f/0.555556f);
 }
 
 
 __DEVICE__ float3 linearize(float3 rgb, int tf) {
-  if (tf == 0) { // Linear
+  if (tf==0) { // Linear
     return rgb;
-  } else if (tf == 1) { // Davinci Intermediate
+  } else if (tf==1) { // Davinci Intermediate
     rgb.x = oetf_davinci_intermediate(rgb.x);
     rgb.y = oetf_davinci_intermediate(rgb.y);
     rgb.z = oetf_davinci_intermediate(rgb.z);
-  } else if (tf == 2) { // Filmlight T-Log
+  } else if (tf==2) { // Filmlight T-Log
     rgb.x = oetf_filmlight_tlog(rgb.x);
     rgb.y = oetf_filmlight_tlog(rgb.y);
     rgb.z = oetf_filmlight_tlog(rgb.z);
-  } else if (tf == 3) { // Arri LogC3
+  } else if (tf==3) { // Arri LogC3
     rgb.x = oetf_arri_logc3(rgb.x);
     rgb.y = oetf_arri_logc3(rgb.y);
     rgb.z = oetf_arri_logc3(rgb.z);
-  } else if (tf == 4) { // Arri LogC4
+  } else if (tf==4) { // Arri LogC4
     rgb.x = oetf_arri_logc4(rgb.x);
     rgb.y = oetf_arri_logc4(rgb.y);
     rgb.z = oetf_arri_logc4(rgb.z);
-  } else if (tf == 5) { // Panasonic V-Log
+  } else if (tf==5) { // Panasonic V-Log
     rgb.x = oetf_panasonic_vlog(rgb.x);
     rgb.y = oetf_panasonic_vlog(rgb.y);
     rgb.z = oetf_panasonic_vlog(rgb.z);
-  } else if (tf == 6) { // Sony S-Log3
+  } else if (tf==6) { // Sony S-Log3
     rgb.x = oetf_sony_slog3(rgb.x);
     rgb.y = oetf_sony_slog3(rgb.y);
     rgb.z = oetf_sony_slog3(rgb.z);
-  } else if (tf == 7) { // Fuji F-Log
+  } else if (tf==7) { // Fuji F-Log
     rgb.x = oetf_fujifilm_flog(rgb.x);
     rgb.y = oetf_fujifilm_flog(rgb.y);
     rgb.z = oetf_fujifilm_flog(rgb.z);
@@ -331,8 +334,9 @@ __DEVICE__ float compress_powerp(float x, float p) {
   return x < 0.0f ? x : x*spowf(1.0f + spowf(x, 1.0f/p), -p);
 }
 
-__DEVICE__ float compress_hyperbolic(float x, float s, float p) {
+__DEVICE__ float compress_hyperbolic_power(float x, float s, float p) {
   // Simple hyperbolic compression function https://www.desmos.com/calculator/ofwtcmzc3w
+  // x = _fmaxf(1e-6f, x);
   return spowf(x/(x + s), p);
 }
 
@@ -346,15 +350,10 @@ __DEVICE__ float compress_toe_quadratic(float x, float toe, int inv) {
   }
 }
 
-__DEVICE__ float3 narrow_ha(float3 c) {
-  return make_float3(_fmaxf(0.0f, c.x - (c.y + c.z)), _fmaxf(0.0f, c.y - (c.x + c.z)), _fmaxf(0.0f, c.z - (c.x + c.y)));
-}
-
-
 __DEVICE__ float compress_toe_cubic(float x, float m, float w, int inv) {
   // https://www.desmos.com/calculator/ubgteikoke
+  if (m==1.0f) return x;
   float x2 = x*x;
-
   if (inv == 0) {
     return x*(x2 + m*w)/(x2 + w);
   } else {
@@ -364,6 +363,32 @@ __DEVICE__ float compress_toe_cubic(float x, float m, float w, int inv) {
     return p0/(3.0f*p2) + p2/3.0f + x/3.0f;
   }
 }
+
+__DEVICE__ float contrast_high(float x, float p, float pv, float pv_lx, int inv) {
+  // High exposure adjustment with linear extension
+  // https://www.desmos.com/calculator/etjgwyrgad
+  const float x0 = 0.18f*_powf(2.0f, pv);
+  if (x < x0 || p == 1.0f) return x;
+
+  const float o = x0 - x0/p;
+  const float s0 = _powf(x0, 1.0f - p)/p;
+  const float x1 = x0*_powf(2.0f, pv_lx);
+  const float k1 = p*s0*_powf(x1, p)/x1;
+  const float y1 = s0*_powf(x1, p) + o;
+  if (inv==1)
+    return x > y1 ? (x - y1)/k1 + x1 : _powf((x - o)/s0, 1.0f/p);
+  else
+    return x > x1 ? k1*(x - x1) + y1 : s0*_powf(x, p) + o;
+}
+
+
+__DEVICE__ float3 narrow_ha(float3 c) {
+  return make_float3(_fmaxf(0.0f, c.x - (c.y + c.z)), _fmaxf(0.0f, c.y - (c.x + c.z)), _fmaxf(0.0f, c.z - (c.x + c.y)));
+}
+
+
+#define INIT_PARAMS // Blank fallback in case custom parameters are commented out
+
 
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B)
@@ -375,124 +400,168 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     --------------------------------------------------*/
   
   // Init look preset variables
-  int tn_mcon_enable, cwp, pt_mid_enable, pt_softclip, dn_enable, hs_rgb_enable, hs_cmy_enable, hf_enable;
-  float tn_con, tn_toe, tn_off, tn_mcon, tn_mcon_w, tn_mcon_rp, rs_sa, rs_rw, rs_bw, pt_cmp, pt_cmp_hdr, pt_cmp_r, pt_cmp_g, pt_cmp_b, pt_mid_low, pt_mid_high, dn_r, dn_g, dn_b, dn_c, dn_m, dn_y, dn_rng, dn_st, hs_r, hs_g, hs_b, hs_rng_r, hs_rng_g, hs_rng_b, hs_c, hs_m, hs_y, hs_rng_c, hs_rng_m, hs_rng_y, hs_st_c, hs_st_y, hf_r0, hf_r1, hf_g0, hf_g1, hf_b0, hf_b1, hf_st_r, hf_st_g, hf_st_b;
+  int tn_hcon_enable, tn_mcon_enable, ptm_enable, vl_enable, hs_rgb_enable, hs_cmy_enable, hf_enable, display_gamut, eotf;
+  float tn_Lg, tn_gb, tn_con, tn_sh, tn_toe, tn_off, tn_hcon, tn_hcon_pv, tn_hcon_st, tn_mcon, tn_mcon_w, tn_mcon_pc, pt_r, pt_g, pt_b, pt_rng, pt_hdr, pt_softclip, ptm_low, ptm_low_st, ptm_high, ptm_high_st, vl_r, vl_g, vl_b, vl_c, vl_m, vl_y, vl_rng, vl_st, hs_r, hs_g, hs_b, hs_rng_r, hs_rng_g, hs_rng_b, hs_c, hs_m, hs_y, hs_rng_c, hs_rng_m, hs_rng_y, hf_r0, hf_r1, hf_g0, hf_g1, hf_b0, hf_b1;
+  
+  tn_gb = 0.13f;
 
-  if (look==look0) { // base
-    tn_con = 1.4f, tn_toe = 0.001f, tn_off = 0.001f, tn_mcon_enable = 0, tn_mcon = 0.0f, tn_mcon_w = 0.6f, tn_mcon_rp = 0.0f, cwp = 0, rs_sa = 0.45f, rs_rw = 0.2f, rs_bw = 0.2f, pt_cmp = 0.3f, pt_cmp_hdr = 0.7f, pt_cmp_r = 0.25f, pt_cmp_g = 0.0f, pt_cmp_b = 0.5f, pt_mid_enable = 0, pt_mid_low = 1.0f, pt_mid_high = 1.0f, pt_softclip = 1, dn_enable = 1, dn_r = -0.33f, dn_g = -0.3f, dn_b = -0.2f, dn_c = -0.15f, dn_m = -0.2f, dn_y = 0.2f, dn_rng = 0.75f, dn_st = 0.5f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_rng_r = 0.0f, hs_rng_g = 0.0f, hs_rng_b = 0.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hs_rng_c = 0.0f, hs_rng_m = 0.0f, hs_rng_y = 0.0f, hs_st_c = 0.6f, hs_st_y = 0.6f, hf_enable = 0, hf_r0 = 0.0f, hf_r1 = 0.0f, hf_g0 = 0.0f, hf_g1 = 0.0f, hf_b0 = 0.0f, hf_b1 = 0.0f, hf_st_r = 0.0f, hf_st_g = 0.0f, hf_st_b = 0.0f;
+  INIT_PARAMS
+
+
+  if (look_preset==0) { // base
+    tn_Lg = 11.1f, tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.001f, tn_hcon_enable = 0, tn_hcon = 1.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon_enable = 0, tn_mcon = 0.0f, tn_mcon_w = 0.5f, tn_mcon_pc = 1.0f, pt_r = 0.65f, pt_g = 0.2f, pt_b = 1.5f, pt_rng = 0.25f, pt_hdr = 0.5f, pt_softclip = 1, ptm_enable = 0, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_st = 0.5f, vl_enable = 1, vl_r = -0.3f, vl_g = -0.3f, vl_b = -0.2f, vl_c = 0.0f, vl_m = -0.2f, vl_y = 0.0f, vl_rng = 0.8f, vl_st = 0.5f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_rng_r = 0.0f, hs_rng_g = 0.0f, hs_rng_b = 0.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hs_rng_c = 0.0f, hs_rng_m = 0.0f, hs_rng_y = 0.0f, hf_enable = 0, hf_r0 = 0.0f, hf_r1 = 0.0f, hf_g0 = 0.0f, hf_g1 = 0.0f, hf_b0 = 0.0f, hf_b1 = 0.0f;
   }
-  else if (look==look1) { // default-lowcon
-    tn_con = 1.4f, tn_toe = 0.001f, tn_off = 0.001f, tn_mcon_enable = 0, tn_mcon = 0.0f, tn_mcon_w = 0.6f, tn_mcon_rp = 0.0f, cwp = 0, rs_sa = 0.45f, rs_rw = 0.2f, rs_bw = 0.2f, pt_cmp = 0.3f, pt_cmp_hdr = 0.7f, pt_cmp_r = 0.25f, pt_cmp_g = 0.0f, pt_cmp_b = 0.5f, pt_mid_enable = 1, pt_mid_low = 1.2f, pt_mid_high = 0.0f, pt_softclip = 1, dn_enable = 1, dn_r = -0.33f, dn_g = -0.3f, dn_b = -0.2f, dn_c = -0.15f, dn_m = -0.2f, dn_y = 0.2f, dn_rng = 0.75f, dn_st = 0.5f, hs_rgb_enable = 1, hs_r = 0.25f, hs_g = 0.2f, hs_b = 0.2f, hs_rng_r = 0.5f, hs_rng_g = 2.0f, hs_rng_b = 0.5f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hs_rng_c = 0.0f, hs_rng_m = 0.0f, hs_rng_y = 0.0f, hs_st_c = 0.6f, hs_st_y = 0.6f, hf_enable = 1, hf_r0 = 0.25f, hf_r1 = -0.6f, hf_g0 = 0.1f, hf_g1 = -0.6f, hf_b0 = 0.2f, hf_b1 = -0.3f, hf_st_r = 1.0f, hf_st_g = 2.0f, hf_st_b = -1.0f;
-  } 
-  else if (look==2) { // default-highcon
-    tn_con = 1.4f, tn_toe = 0.001f, tn_off = 0.001f, tn_mcon_enable = 1, tn_mcon = 1.0f, tn_mcon_w = 0.6f, tn_mcon_rp = 0.0f, cwp = 0, rs_sa = 0.45f, rs_rw = 0.2f, rs_bw = 0.2f, pt_cmp = 0.3f, pt_cmp_hdr = 0.7f, pt_cmp_r = 0.25f, pt_cmp_g = 0.0f, pt_cmp_b = 0.5f, pt_mid_enable = 1, pt_mid_low = 1.2f, pt_mid_high = 0.0f, pt_softclip = 1, dn_enable = 1, dn_r = -0.33f, dn_g = -0.3f, dn_b = -0.2f, dn_c = -0.15f, dn_m = -0.2f, dn_y = 0.2f, dn_rng = 0.75f, dn_st = 0.5f, hs_rgb_enable = 1, hs_r = 0.25f, hs_g = 0.2f, hs_b = 0.2f, hs_rng_r = 0.5f, hs_rng_g = 2.0f, hs_rng_b = 0.5f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hs_rng_c = 0.0f, hs_rng_m = 0.0f, hs_rng_y = 0.0f, hs_st_c = 0.6f, hs_st_y = 0.6f, hf_enable = 1, hf_r0 = 0.25f, hf_r1 = -0.6f, hf_g0 = 0.1f, hf_g1 = -0.6f, hf_b0 = 0.2f, hf_b1 = -0.3f, hf_st_r = 1.0f, hf_st_g = 2.0f, hf_st_b = -1.0f;
-  } 
-  else if (look==3) { // filmish
-    tn_con = 1.4f, tn_toe = 0.001f, tn_off = 0.001f, tn_mcon_enable = 1, tn_mcon = 1.0f, tn_mcon_w = 0.6f, tn_mcon_rp = 0.0f, cwp = 2, rs_sa = 0.4f, rs_rw = 0.2f, rs_bw = 0.1f, pt_cmp = 0.3f, pt_cmp_hdr = 0.7f, pt_cmp_r = 0.0f, pt_cmp_g = 0.0f, pt_cmp_b = 0.5f, pt_mid_enable = 1, pt_mid_low = 1.3f, pt_mid_high = 0.0f, pt_softclip = 1, dn_enable = 1, dn_r = -0.4f, dn_g = -0.35f, dn_b = -0.2f, dn_c = 0.0f, dn_m = -0.3f, dn_y = -0.1f, dn_rng = 0.9f, dn_st = 0.8f, hs_rgb_enable = 1, hs_r = 0.4f, hs_g = 0.4f, hs_b = 0.3f, hs_rng_r = 0.8f, hs_rng_g = 1.5f, hs_rng_b = 0.8f, hs_cmy_enable = 1, hs_c = 0.4f, hs_m = 0.4f, hs_y = 0.6f, hs_rng_c = 0.0f, hs_rng_m = 1.0f, hs_rng_y = -1.0f, hs_st_c = 0.6f, hs_st_y = 0.5f, hf_enable = 1, hf_r0 = 0.25f, hf_r1 = -0.6f, hf_g0 = -0.3f, hf_g1 = -0.6f, hf_b0 = 0.2f, hf_b1 = -0.4f, hf_st_r = 1.0f, hf_st_g = 2.0f, hf_st_b = -1.0f;
-  } 
-  else if (look==4) { // colorful
-    tn_con = 1.4f, tn_toe = 0.001f, tn_off = 0.001f, tn_mcon_enable = 1, tn_mcon = 1.0f, tn_mcon_w = 0.6f, tn_mcon_rp = 0.0f, cwp = 0, rs_sa = 0.6f, rs_rw = 0.3f, rs_bw = 0.3f, pt_cmp = 0.3f, pt_cmp_hdr = 0.7f, pt_cmp_r = 0.0f, pt_cmp_g = 0.0f, pt_cmp_b = 0.75f, pt_mid_enable = 1, pt_mid_low = 1.5f, pt_mid_high = 0.3f, pt_softclip = 1, dn_enable = 1, dn_r = -0.5f, dn_g = -0.5f, dn_b = -0.25f, dn_c = -0.25f, dn_m = -0.25f, dn_y = 0.1f, dn_rng = 0.75f, dn_st = 0.5f, hs_rgb_enable = 1, hs_r = 0.25f, hs_g = 0.2f, hs_b = 0.2f, hs_rng_r = 0.5f, hs_rng_g = 2.0f, hs_rng_b = 0.5f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hs_rng_c = 0.0f, hs_rng_m = 0.0f, hs_rng_y = 0.0f, hs_st_c = 0.6f, hs_st_y = 0.6f, hf_enable = 1, hf_r0 = 0.25f, hf_r1 = -0.6f, hf_g0 = 0.2f, hf_g1 = -0.6f, hf_b0 = 0.2f, hf_b1 = -0.3f, hf_st_r = 1.0f, hf_st_g = 2.0f, hf_st_b = -2.0f;
+  else if (look_preset==1) { // default
+    tn_Lg = 11.1f, tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.002f, tn_off = 0.003f, tn_hcon_enable = 0, tn_hcon = 1.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon_enable = 1, tn_mcon = 0.7f, tn_mcon_w = 0.7f, tn_mcon_pc = 1.0f, pt_r = 0.65f, pt_g = 0.2f, pt_b = 1.5f, pt_rng = 0.25f, pt_hdr = 0.5f, pt_softclip = 1, ptm_enable = 1, ptm_low = 0.25f, ptm_low_st = 0.5f, ptm_high = 0.66f, ptm_high_st = 0.5f, vl_enable = 1, vl_r = -0.3f, vl_g = -0.3f, vl_b = -0.2f, vl_c = 0.0f, vl_m = -0.2f, vl_y = 0.0f, vl_rng = 0.8f, vl_st = 0.5f, hs_rgb_enable = 1, hs_r = 0.35f, hs_g = 0.2f, hs_b = 0.25f, hs_rng_r = 0.2f, hs_rng_g = 2.0f, hs_rng_b = 0.5f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hs_rng_c = 0.0f, hs_rng_m = 0.0f, hs_rng_y = 0.0f, hf_enable = 1, hf_r0 = 0.3f, hf_r1 = -0.5f, hf_g0 = 0.2f, hf_g1 = -0.3f, hf_b0 = 0.1f, hf_b1 = -0.3f;
+  }
+  else if (look_preset==2) { // filmish
+    tn_Lg = 11.1f, tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.002f, tn_off = 0.003f, tn_hcon_enable = 0, tn_hcon = 1.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon_enable = 1, tn_mcon = 0.7f, tn_mcon_w = 0.7f, tn_mcon_pc = 1.0f, pt_r = 0.15f, pt_g = 0.2f, pt_b = 1.0f, pt_rng = 0.25f, pt_hdr = 0.5f, pt_softclip = 1, ptm_enable = 1, ptm_low = 0.8f, ptm_low_st = 0.6f, ptm_high = 1.0f, ptm_high_st = 0.5f, vl_enable = 1, vl_r = -0.43f, vl_g = -0.4f, vl_b = -0.3f, vl_c = -0.2f, vl_m = -0.4f, vl_y = 0.0f, vl_rng = 1.0f, vl_st = 0.6f, hs_rgb_enable = 1, hs_r = 0.4f, hs_g = 0.4f, hs_b = 0.3f, hs_rng_r = 0.8f, hs_rng_g = 2.0f, hs_rng_b = 1.0f, hs_cmy_enable = 1, hs_c = 0.398f, hs_m = 0.4f, hs_y = 0.5f, hs_rng_c = 0.5f, hs_rng_m = 1.0f, hs_rng_y = 0.0f, hf_enable = 1, hf_r0 = 0.15f, hf_r1 = -0.5f, hf_g0 = -0.5f, hf_g1 = -0.5f, hf_b0 = -0.2f, hf_b1 = 0.0f;
   }
   
-  /* Un-Comment below this line to enable custom look creation
-  ---------------------------------------------------------------------------------------*/
 
-  else if (look==5) { // custom
-    tn_con =_tn_con, tn_toe =_tn_toe, tn_off =_tn_off, tn_mcon_enable =_tn_mcon_enable, tn_mcon =_tn_mcon, tn_mcon_w =_tn_mcon_w, tn_mcon_rp =_tn_mcon_rp, rs_sa =_rs_sa, rs_rw =_rs_rw, rs_bw =_rs_bw, pt_cmp =_pt_cmp, pt_cmp_hdr =_pt_cmp_hdr, pt_cmp_r =_pt_cmp_r, pt_cmp_g =_pt_cmp_g, pt_cmp_b =_pt_cmp_b, pt_mid_enable =_pt_mid_enable, pt_mid_low =_pt_mid_low, pt_mid_high =_pt_mid_high, pt_softclip =_pt_softclip, dn_enable =_dn_enable, dn_r =_dn_r, dn_g =_dn_g, dn_b =_dn_b, dn_c =_dn_c, dn_m =_dn_m, dn_y =_dn_y, dn_rng =_dn_rng, dn_st =_dn_st, hs_rgb_enable =_hs_rgb_enable, hs_r =_hs_r, hs_g =_hs_g, hs_b =_hs_b, hs_rng_r =_hs_rng_r, hs_rng_g =_hs_rng_g, hs_rng_b =_hs_rng_b, hs_cmy_enable =_hs_cmy_enable, hs_c =_hs_c, hs_m =_hs_m, hs_y =_hs_y, hs_rng_c =_hs_rng_c, hs_rng_m =_hs_rng_m, hs_rng_y =_hs_rng_y, hs_st_c =_hs_st_c, hs_st_y =_hs_st_y, hf_enable =_hf_enable, hf_r0 =_hf_r0, hf_r1 =_hf_r1, hf_g0 =_hf_g0, hf_g1 =_hf_g1, hf_b0 =_hf_b0, hf_b1 =_hf_b1, hf_st_r =_hf_st_r, hf_st_g =_hf_st_g, hf_st_b =_hf_st_b;
-  
-    if (_cwp==d65) cwp = 0;
-    else if (_cwp==d60) cwp = 1;
-    else if (_cwp==d55) cwp = 2;
-    else if (_cwp==d50) cwp = 3;
+  if (tonescale_preset==0) { // high-contrast
+    tn_Lg = 11.1f, tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.002f, tn_off = 0.003f, tn_hcon_enable = 0, tn_hcon = 1.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon_enable = 1, tn_mcon = 0.7f, tn_mcon_w = 0.7f, tn_mcon_pc = 1.0f;
+  }
+  else if (tonescale_preset==1) { // low-contrast
+    tn_Lg = 11.1f, tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.002f, tn_off = 0.003f, tn_hcon = 1.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon = 0.0f, tn_mcon_w = 0.5f, tn_mcon_pc = 1.0f;
+  }
+  else if (tonescale_preset==2) { // aces-1.x
+    tn_Lg = 10.0f, tn_con = 1.0f, tn_sh = 0.12f, tn_toe = 0.02f, tn_off = 0.0f, tn_hcon_enable = 1, tn_hcon = 1.45f, tn_hcon_pv = 0.0f, tn_hcon_st = 2.0f, tn_mcon_enable = 1, tn_mcon = 1.13f, tn_mcon_w = 1.0f, tn_mcon_pc = 1.0f;
+  }
+  else if (tonescale_preset==3) { // aces-2.0
+    tn_Lg = 10.0f, tn_con = 1.15f, tn_sh = 0.5f, tn_toe = 0.04f, tn_off = 0.0f, tn_hcon_enable = 0, tn_hcon = 1.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 1.0f, tn_mcon_enable = 0, tn_mcon = 1.0f, tn_mcon_w = 0.6f, tn_mcon_pc = 1.0f;
+  }
+  else if (tonescale_preset==4) { // high-contrast2
+    tn_Lg = 6.0f, tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.01f, tn_hcon = 1.2f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon = 1.0f, tn_mcon_w = 1.0f, tn_mcon_pc = 1.0f;
+  }
+  else if (tonescale_preset==5) { // low-contrast2
+    tn_Lg = 11.1f, tn_con = 1.2f, tn_sh = 0.5f, tn_toe = 0.01f, tn_off = 0.006f, tn_hcon = 1.2f, tn_hcon_pv = 1.3f, tn_hcon_st = 2.0f, tn_mcon = 1.2f, tn_mcon_w = 0.25f, tn_mcon_pc = 1.0f;
   }
 
-  /*---------------------------------------------------------------------------------------
-  Un-Comment above this line to enable custom look creation   */
+
+  // Creative White
+  if (cwp==0) cwp = 0;
+  else if (cwp==1) cwp = 1;
+  else if (cwp==2) cwp = 2;
+  else if (cwp==3) cwp = 3;
 
 
   float3x3 in_to_xyz;
-  if (in_gamut == i_xyz) in_to_xyz = identity();
-  else if (in_gamut == i_ap0) in_to_xyz = matrix_ap0_to_xyz;
-  else if (in_gamut == i_ap1) in_to_xyz = matrix_ap1_to_xyz;
-  else if (in_gamut == i_p3d65) in_to_xyz = matrix_p3d65_to_xyz;
-  else if (in_gamut == i_rec2020) in_to_xyz = matrix_rec2020_to_xyz;
-  else if (in_gamut == i_rec709) in_to_xyz = matrix_rec709_to_xyz;
-  else if (in_gamut == i_awg3) in_to_xyz = matrix_arriwg3_to_xyz;
-  else if (in_gamut == i_awg4) in_to_xyz = matrix_arriwg4_to_xyz;
-  else if (in_gamut == i_rwg) in_to_xyz = matrix_redwg_to_xyz;
-  else if (in_gamut == i_sgamut3) in_to_xyz = matrix_sonysgamut3_to_xyz;
-  else if (in_gamut == i_sgamut3cine) in_to_xyz = matrix_sonysgamut3cine_to_xyz;
-  else if (in_gamut == i_vgamut) in_to_xyz = matrix_vgamut_to_xyz;
-  else if (in_gamut == i_bmdwg) in_to_xyz = matrix_bmdwg_to_xyz;
-  else if (in_gamut == i_egamut) in_to_xyz = matrix_egamut_to_xyz;
-  else if (in_gamut == i_egamut2) in_to_xyz = matrix_egamut2_to_xyz;
-  else if (in_gamut == i_davinciwg) in_to_xyz = matrix_davinciwg_to_xyz;
+  if (in_gamut==0) in_to_xyz = identity();
+  else if (in_gamut==1) in_to_xyz = matrix_ap0_to_xyz;
+  else if (in_gamut==2) in_to_xyz = matrix_ap1_to_xyz;
+  else if (in_gamut==3) in_to_xyz = matrix_p3d65_to_xyz;
+  else if (in_gamut==4) in_to_xyz = matrix_rec2020_to_xyz;
+  else if (in_gamut==5) in_to_xyz = matrix_rec709_to_xyz;
+  else if (in_gamut==6) in_to_xyz = matrix_arriwg3_to_xyz;
+  else if (in_gamut==7) in_to_xyz = matrix_arriwg4_to_xyz;
+  else if (in_gamut==8) in_to_xyz = matrix_redwg_to_xyz;
+  else if (in_gamut==9) in_to_xyz = matrix_sonysgamut3_to_xyz;
+  else if (in_gamut==10) in_to_xyz = matrix_sonysgamut3cine_to_xyz;
+  else if (in_gamut==11) in_to_xyz = matrix_vgamut_to_xyz;
+  else if (in_gamut==12) in_to_xyz = matrix_bmdwg_to_xyz;
+  else if (in_gamut==13) in_to_xyz = matrix_egamut_to_xyz;
+  else if (in_gamut==14) in_to_xyz = matrix_egamut2_to_xyz;
+  else if (in_gamut==15) in_to_xyz = matrix_davinciwg_to_xyz;
 
-  int eotf;
-  if (EOTF == lin)          eotf = 0;
-  else if (EOTF == srgb)    eotf = 1;
-  else if (EOTF == rec1886) eotf = 2;
-  else if (EOTF == dci)     eotf = 3;
-  else if (EOTF == pq)      eotf = 4;
-  else if (EOTF == hlg)     eotf = 5;
 
+
+  if (display_encoding==0) { // Rec.1886
+    display_gamut = 0;
+    eotf = 2;
+  }
+  else if (display_encoding==1) { // sRGB Display
+    display_gamut = 0;
+    eotf = 1;
+  }
+  else if (display_encoding==2) { // Display P3
+    display_gamut = 1;
+    eotf = 1;
+  }
+  else if (display_encoding==3) { // Rec.2100 PQ
+    display_gamut = 2;
+    eotf = 4;
+  }
+  else if (display_encoding==4) { // Rec.2100 HLG
+    display_gamut = 2;
+    eotf = 5;
+  }
+  else if (display_encoding==4) { // Dolby PQ
+    display_gamut = 1;
+    eotf = 4;
+  }
+
+  
 
   // Linearize if a non-linear input oetf / transfer function is selected
-  if (in_oetf == ioetf_davinci_intermediate) { // Davinci Intermediate
+  if (in_oetf==1) {
     rgb.x = oetf_davinci_intermediate(rgb.x);
     rgb.y = oetf_davinci_intermediate(rgb.y);
     rgb.z = oetf_davinci_intermediate(rgb.z);
-  } else if (in_oetf == ioetf_filmlight_tlog) { // Filmlight T-Log
+  } else if (in_oetf==2) {
     rgb.x = oetf_filmlight_tlog(rgb.x);
     rgb.y = oetf_filmlight_tlog(rgb.y);
     rgb.z = oetf_filmlight_tlog(rgb.z);
-  } else if (in_oetf == ioetf_arri_logc3) { // Arri LogC3
+  } else if (in_oetf==3) {
     rgb.x = oetf_arri_logc3(rgb.x);
     rgb.y = oetf_arri_logc3(rgb.y);
     rgb.z = oetf_arri_logc3(rgb.z);
-  } else if (in_oetf == ioetf_arri_logc4) { // Arri LogC4
+  } else if (in_oetf==4) {
     rgb.x = oetf_arri_logc4(rgb.x);
     rgb.y = oetf_arri_logc4(rgb.y);
     rgb.z = oetf_arri_logc4(rgb.z);
-  } else if (in_oetf == ioetf_panasonic_vlog) { // Panasonic V-Log
+  } else if (in_oetf==5) {
     rgb.x = oetf_panasonic_vlog(rgb.x);
     rgb.y = oetf_panasonic_vlog(rgb.y);
     rgb.z = oetf_panasonic_vlog(rgb.z);
-  } else if (in_oetf == ioetf_sony_slog3) { // Sony S-Log3
+  } else if (in_oetf==6) {
     rgb.x = oetf_sony_slog3(rgb.x);
     rgb.y = oetf_sony_slog3(rgb.y);
     rgb.z = oetf_sony_slog3(rgb.z);
-  } else if (in_oetf == ioetf_fuji_flog) { // Fuji F-Log
+  } else if (in_oetf==7) {
     rgb.x = oetf_fujifilm_flog(rgb.x);
     rgb.y = oetf_fujifilm_flog(rgb.y);
     rgb.z = oetf_fujifilm_flog(rgb.z);
   }
 
-
   /***************************************************
     Tonescale Constraint Calculations
+    https://www.desmos.com/calculator/1c4fhzy3bw
+
     These could be pre-calculated but there is no way to do this in DCTL.
     Anything that is const should be precalculated and not run per-pixel
     --------------------------------------------------*/
+  const float ts_x1 = _powf(2.0f, 6.0f*tn_sh + 4.0f);
   const float ts_y1 = tn_Lp/100.0f;
   const float ts_x0 = 0.18f + tn_off;
   const float ts_y0 = tn_Lg/100.0f*(1.0f + tn_gb*_log2f(ts_y1));
-  const float ts_m = compress_toe_quadratic(ts_y1, tn_toe, 1);
   const float ts_s0 = compress_toe_quadratic(ts_y0, tn_toe, 1);
-  const float ts_s = ts_x0*(_powf(ts_s0/ts_m, -1.0f/tn_con) - 1.0f);
+  const float ts_s10 = ts_x0*(_powf(ts_s0, -1.0f/tn_con) - 1.0f);
+  const float ts_m1 = ts_y1/_powf(ts_x1/(ts_x1 + ts_s10), tn_con);
+  const float ts_m2 = compress_toe_quadratic(ts_m1, tn_toe, 1);
+  const float ts_s = ts_x0*(_powf(ts_s0/ts_m2, -1.0f/tn_con) - 1.0f);
   const float ts_dsc = eotf==4 ? 0.01 : eotf==5 ? 0.1 : 100.0f/tn_Lp;
+
+  // Lerp from pt_cmp at 100 nits to pt_cmp_hdr at 1000 nits
+  const float pt_cmp_Lf = (tn_Lp - 100.0f)/900.0f;
+  const float ts_s1 = ts_s/((ts_s*pt_cmp_Lf + 1.0f - pt_cmp_Lf)*(1.0f - pt_hdr) + pt_hdr);
   
 
   // Convert from input gamut into P3-D65
   rgb = vdot(in_to_xyz, rgb);
   rgb = vdot(matrix_xyz_to_p3d65, rgb);
 
+
   // Rendering Space: "Desaturate" to control scale of the color volume in the rgb ratios
-  float sat_L = rgb.x*rs_rw + rgb.y*(1-(rs_rw + rs_bw)) + rgb.z*rs_bw;
+  float3 rs_w = make_float3(0.2f, 0.55f, 0.25f); // render space weights
+  float rs_sa = 0.4f; // render space "desaturation"
+  float sat_L = rgb.x*rs_w.x + rgb.y*rs_w.y + rgb.z*rs_w.z;
   rgb = sat_L*rs_sa + rgb*(1.0f - rs_sa);
   
+
   // Offset
   rgb += tn_off;
+
 
   /***************************************************
     Midtone Contrast Module
@@ -503,54 +572,80 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     mcon_w *= mcon_w;
 
     // Normalize for ts_x0 intersection constraint
-    rgb *= compress_toe_cubic(ts_x0, mcon_m, mcon_w, 1)/ts_x0;
+    const float mcon_cnst_sc = compress_toe_cubic(ts_x0, mcon_m, mcon_w, 1)/ts_x0;
+    rgb *= mcon_cnst_sc;
+   
     // Apply per-channel midtone contrast
     float3 mcon_rgb = rgb;
     mcon_rgb.x = compress_toe_cubic(rgb.x, mcon_m, mcon_w, 0);
     mcon_rgb.y = compress_toe_cubic(rgb.y, mcon_m, mcon_w, 0);
     mcon_rgb.z = compress_toe_cubic(rgb.z, mcon_m, mcon_w, 0);
-    if (tn_mcon_rp > 0.0f) {
-      // Scale for ratio-preserving midtone contrast
-      float mcon_nm = hypotf3(clampminf3(rgb, 0.0f))/_sqrtf(3.0f);
-      float mcon_sc = (mcon_nm*mcon_nm + mcon_m*mcon_w)/(mcon_nm*mcon_nm + mcon_w);
-      rgb = mcon_sc*rgb*tn_mcon_rp + mcon_rgb*(1.0f - tn_mcon_rp);
-    } 
-    else rgb = mcon_rgb;
+    
+    // Scale for ratio-preserving midtone contrast
+    float mcon_nm = hypotf3(clampminf3(rgb, 0.0f))/SQRT3;
+    float mcon_sc = (mcon_nm*mcon_nm + mcon_m*mcon_w)/(mcon_nm*mcon_nm + mcon_w);
+    
+    // Always use some amount of ratio-preserving method towards gamut boundary
+    float mcon_mx = fmaxf3(rgb);
+    float mcon_mn = fminf3(rgb);
+    float mcon_ch = clampf(1.0f - sdivf(mcon_mn, mcon_mx), 0.0, 1.0);
+    mcon_ch = _powf(mcon_ch, 4.0f*tn_mcon_pc);
+
+    rgb = mcon_sc*rgb*mcon_ch + mcon_rgb*(1.0f - mcon_ch);
   }
 
-  // Norm and RGB Ratios
-  float tsn = hypotf3(clampminf3(rgb, 0.0f))/_sqrtf(3.0f);
+
+  // Tonescale Norm
+  float tsn = hypotf3(clampminf3(rgb, 0.0f))/SQRT3;
+
+  // Purity Compression Norm
+  float ts_pt = _sqrtf(_fmaxf(0.0f, rgb.x*rgb.x*pt_r) + _fmaxf(0.0f, rgb.y*rgb.y*pt_g) + _fmaxf(0.0f, rgb.z*rgb.z*pt_b));
+
+  // RGB Ratios
   rgb = sdivf3f(clampminf3(rgb, -2.0f), tsn);
+
   
+  // Apply High Contrast
+  if (tn_hcon_enable) {
+    tsn = contrast_high(tsn, tn_hcon, tn_hcon_pv, tn_hcon_st, 0);
+    ts_pt = contrast_high(ts_pt, tn_hcon, tn_hcon_pv, tn_hcon_st, 0);
+  }
+
+
   // Apply tonescale
-  tsn = compress_hyperbolic(tsn, ts_s, tn_con);
+  tsn = compress_hyperbolic_power(tsn, ts_s, tn_con);
+
+
+  ts_pt = compress_hyperbolic_power(ts_pt, ts_s1, tn_con);
+  
+  // Purity Compression Range
+  float ts_pt_cmp = _powf(ts_pt, 1.0f/pt_rng);
+
 
   // RGB CMY Hue Angles
   float mn = _fmaxf(0.0f, fminf3(rgb));
   float3 ha_rgb = narrow_ha(rgb - mn);
-  float3 ha_cmy = narrow_ha(clampminf3(1.0f - rgb, 0.0f));
+  float3 rats_mx_div = sdivf3f(rgb, fmaxf3(rgb));
+  float rats_mx_div_mn = _fmaxf(0.0f, fminf3(rats_mx_div));
+  float3 ha_cmy_wide = clampminf3(1.0f - rats_mx_div, 0.0f);
+  float3 ha_cmy = narrow_ha(ha_cmy_wide);
 
-  // Purity Compression Factor  
-  // Lerp from pt_cmp at 100 nits to pt_cmp_hdr at 1000 nits
-  const float pt_cmp_Lf = (tn_Lp - 100.0f)/900.0f;
-  const float pt_cmp_p = 1.0f/(pt_cmp*(1.0f - pt_cmp_Lf) + pt_cmp_hdr*pt_cmp_Lf);
-  // Vary by primary hue angle
-  float tsn_pt_cmp = spowf(tsn, pt_cmp_p/((pt_cmp_r*ha_rgb.x + 1.0f)*(pt_cmp_g*ha_rgb.y + 1.0f)*(pt_cmp_b*ha_rgb.z + 1.0f)));
-    
+
 
   /***************************************************
     Hue Focus
   --------------------------------------------------*/
   if (hf_enable) {
-    float3 hf_rgb = make_float3(
-      _powf(mn, _powf(2.0f, -hf_st_r)),
-      _powf(mn, _powf(2.0f, -hf_st_g)),
-      _powf(mn, _powf(2.0f, -hf_st_b)));
-    hf_rgb *= ha_rgb;
+    // Limit to mid-range purity
+    float mn_sqrt = _sqrtf(mn);
+    float3 hf_rgb = make_float3(ha_rgb.x*mn_sqrt, ha_rgb.y*mn_sqrt, ha_rgb.z*mn);
+    float hf_tsn = 1.0f - tsn;
+    hf_tsn *= hf_tsn;
+    // Bias focus based on tonescale using Lift/Mult: https://www.desmos.com/calculator/gzbgov62hl
     float3 hff = make_float3(
-      (hf_r0*(tsn - 1.0f) - hf_r1*tsn),
-      (hf_g0*(tsn - 1.0f) - hf_g1*tsn),
-      (hf_b0*(tsn - 1.0f) - hf_b1*tsn)); // https://www.desmos.com/calculator/gzbgov62hl
+      (hf_tsn*(hf_r1 - hf_r0) - hf_r1),
+      (hf_tsn*(hf_g1 - hf_g0) - hf_g1),
+      (hf_tsn*(hf_b1 - hf_b0) - hf_b1));
     hff *= hf_rgb;
     hff = make_float3(
       hff.y + hff.z + 1.0f,
@@ -560,15 +655,16 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   }
 
 
+
   /***************************************************
     Hue Shift
   --------------------------------------------------*/
   // Hue Shift RGB
   if (hs_rgb_enable) {
     float3 hs_rgb = make_float3(
-      _powf(tsn_pt_cmp, _powf(2.0f, -hs_rng_r)),
-      _powf(tsn_pt_cmp, _powf(2.0f, -hs_rng_g)),
-      _powf(tsn_pt_cmp, _powf(2.0f, -hs_rng_b)));
+      _powf(ts_pt_cmp, _powf(2.0f, -hs_rng_r)),
+      _powf(ts_pt_cmp, _powf(2.0f, -hs_rng_g)),
+      _powf(ts_pt_cmp, _powf(2.0f, -hs_rng_b)));
     hs_rgb *= ha_rgb;
     float3 hsf = make_float3(hs_rgb.x*hs_r, hs_rgb.y*-hs_g, hs_rgb.z*-hs_b);
     hsf = make_float3(hsf.z - hsf.y, hsf.x - hsf.z, hsf.y - hsf.x);
@@ -581,54 +677,81 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       _powf(1.0f - tsn, _powf(2.0f, -hs_rng_c)),
       _powf(1.0f - tsn, _powf(2.0f, -hs_rng_m)),
       _powf(1.0f - tsn, _powf(2.0f, -hs_rng_y)));
-    hs_cmy *= make_float3(_powf(ha_cmy.x, 1.0f/hs_st_c), ha_cmy.y, _powf(ha_cmy.z, 1.0f/hs_st_y)); // limit C and Y strength
+    
+    // limit C and Y strength
+    hs_cmy *= make_float3(ha_cmy.x*ha_cmy.x, ha_cmy.y*ha_cmy.y, _powf(ha_cmy.z, 1.5f));
     float3 hsf = make_float3(hs_cmy.x*-hs_c, hs_cmy.y*hs_m, hs_cmy.z*hs_y);
     hsf = make_float3(hsf.z - hsf.y, hsf.x - hsf.z, hsf.y - hsf.x);
     rgb += hsf;
   }
+
   
 
   /***************************************************
-    Density
+    Value
   --------------------------------------------------*/
-  if (dn_enable) {
-    float dn_f = (dn_r*ha_rgb.x + 1.0f)*(dn_g*ha_rgb.y + 1.0f)*(dn_b*ha_rgb.z + 1.0f);
-    dn_f *= (dn_c*ha_cmy.x + 1.0f)*(dn_m*ha_cmy.y + 1.0f)*(dn_y*ha_cmy.z + 1.0f);
-    float dn_lim = spowf(dn_f>1.0f ? (1.0f - tsn) : tsn, 1.0f - dn_rng)*(1.0f - spowf(mn, 1.0f/(_fmaxf(1e-6, 1.0f - dn_st))));
-    dn_f = dn_f*dn_lim + 1.0f - dn_lim;
-    rgb *= dn_f;
+  if (vl_enable) {
+    float vl_f = (vl_r*ha_rgb.x + 1.0f)*(vl_g*ha_rgb.y + 1.0f)*(vl_b*ha_rgb.z + 1.0f);
+    vl_f *= (vl_c*ha_cmy.x + 1.0f)*(vl_m*ha_cmy.y + 1.0f)*(vl_y*ha_cmy.z + 1.0f);
+    float vl_ts = vl_f > 1.0f ? 1.0f - ts_pt : ts_pt;
+    float vl_lim = spowf(vl_f>1.0f ? (1.0f - vl_ts) : vl_ts, 1.0f - vl_rng)*(1.0f - spowf(mn, 1.0f/(_fmaxf(1e-6, 1.0f - vl_st))));
+    vl_f = vl_f*vl_lim + 1.0f - vl_lim;
+    vl_f = _fmaxf(0.0f, _fminf(2.0f, vl_f)); // protect for shadow grain
+    rgb *= vl_f;
   }
 
+
+
+  ts_pt_cmp = 1.0f - ts_pt_cmp;
+
+
   /***************************************************
-    Midrange Purity
+    Mid-Range Purity 
   --------------------------------------------------*/
-  tsn_pt_cmp = 1.0f - tsn_pt_cmp;
-  if (pt_mid_enable) {
-    float pt_mid_f = tsn*(pt_mid_high - pt_mid_low) + pt_mid_low;
-    float mn2 = mn*mn;
-    pt_mid_f = pt_mid_f*mn2 + 1.0f - mn2;
-    tsn_pt_cmp *= pt_mid_f;
+  if (ptm_enable) {
+    // Mid Purity High
+    float ptm_high_rng = 1.0f; // tonescale range
+    float ptm_high_st0 = 0.5f; // sat strength (ptm_high_st is post-mix with tsn)
+    float ptm_high_f = _powf(1.0f - ptm_high*_powf(rats_mx_div_mn, 1.0f/ptm_high_st0)*_powf(tsn, ptm_high_rng), 1.0f/_fmaxf(1e-3f, 1.0f - ptm_high_st));
+    rgb = rgb*ptm_high_f + ((rgb.x + rgb.y + rgb.z)/3.0f)*(1.0f - ptm_high_f);
+
+    // Mid Purity Low
+    float ptm_mn = 1.0f - rats_mx_div_mn;
+    float ptm_c = _powf(_fmaxf(0.0f, 1.0f - 1.2f*ptm_mn), 1.0f/ptm_low_st); // limit sat strength 
+    float ptm_wt = ptm_mn < 1e-3f ? 1.0f : (ha_cmy_wide.x*0.25f + ha_cmy_wide.y*0.65f + ha_cmy_wide.z*0.1f)/0.9f/ptm_mn;
+    float ptm_low_f = (1.0f + 2.0f*ptm_low*ptm_wt*ptm_c)*(1.0f - ts_pt) + ts_pt;
+    ts_pt_cmp *= ptm_low_f;
   }
+
 
   // Purity Compression
-  rgb = rgb*tsn_pt_cmp + 1.0f - tsn_pt_cmp;
+  rgb = rgb*ts_pt_cmp + 1.0f - ts_pt_cmp;
+
 
   // Inverse Rendering Space
-  sat_L = rgb.x*rs_rw + rgb.y*(1-(rs_rw + rs_bw)) + rgb.z*rs_bw;
+  sat_L = rgb.x*rs_w.x + rgb.y*rs_w.y + rgb.z*rs_w.z;
   rgb = (sat_L*rs_sa - rgb)/(rs_sa - 1.0f);
   
+
   // Convert to final display gamut
-  if (display_gamut == P3D65) {
-    if (cwp==1) rgb = vdot(matrix_p3_to_p3_d60, rgb);
-    if (cwp==2) rgb = vdot(matrix_p3_to_p3_d55, rgb);
-    if (cwp==3) rgb = vdot(matrix_p3_to_p3_d50, rgb);
+  float3 cwp_rgb = rgb;
+  if (display_gamut==0) {
+    if (cwp==1) cwp_rgb = vdot(matrix_p3_to_rec709_d60, rgb);
+    if (cwp==2) cwp_rgb = vdot(matrix_p3_to_rec709_d55, rgb);
+    if (cwp==3) cwp_rgb = vdot(matrix_p3_to_rec709_d50, rgb);
+    rgb = vdot(matrix_p3_to_rec709_d65, rgb);
+    if (cwp==0) cwp_rgb = rgb;
   }
-  if (display_gamut==Rec709) {
-    if (cwp==0) rgb = vdot(matrix_p3_to_rec709_d65, rgb);
-    if (cwp==1) rgb = vdot(matrix_p3_to_rec709_d60, rgb);
-    if (cwp==2) rgb = vdot(matrix_p3_to_rec709_d55, rgb);
-    if (cwp==3) rgb = vdot(matrix_p3_to_rec709_d50, rgb);
+  else if (display_gamut==1) {
+    if (cwp==1) cwp_rgb = vdot(matrix_p3_to_p3_d60, rgb);
+    if (cwp==2) cwp_rgb = vdot(matrix_p3_to_p3_d55, rgb);
+    if (cwp==3) cwp_rgb = vdot(matrix_p3_to_p3_d50, rgb);
   }
+
+  // Mix between Creative Whitepoint and D65 by tsn
+  float cwp_f = _powf(tsn, 1.0f - cwp_rng);
+  rgb = cwp_rgb*cwp_f + rgb*(1.0f - cwp_f);
+
 
   // Purity Softclip
   if (pt_softclip) {
@@ -640,7 +763,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   }
 
   // Final tonescale scaling 
-  tsn *= ts_m;
+  tsn *= ts_m2;
   tsn = compress_toe_quadratic(tsn, tn_toe, 0);
   tsn *= ts_dsc;
   rgb *= tsn;
@@ -649,7 +772,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   rgb = clampf3(rgb, 0.0f, 1.0f);
 
   // Rec.2020 (P3 Limited)
-  if (display_gamut == Rec2020) {
+  if (display_gamut==2) {
     rgb = vdot(matrix_p3_to_rec2020, rgb);
   }
 
