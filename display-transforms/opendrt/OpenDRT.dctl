@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 
-/* OpenDRT v1.0.0b40 -------------------------------------------------
+/* OpenDRT v1.0.0b41 -------------------------------------------------
 
 # Release Notes
 
@@ -58,19 +58,18 @@ This version of OpenDRT adds significant updates refinements and new features, w
 
 
 
-// Creative White
-DEFINE_UI_PARAMS(cwp, Creative White, DCTLUI_COMBO_BOX, 0, {d65, d60, d55, d50}, {D65, D60, D55, D50})
-DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+
+// Tonescale Parameters
+DEFINE_UI_PARAMS(tn_Lp, Display Peak Luminance, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 0.0)
+// Clamp
+DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
+
 
 // Input settings
 DEFINE_UI_PARAMS(in_gamut, Input Gamut, DCTLUI_COMBO_BOX, 15, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_vgamut, i_bmdwg, i_egamut, i_egamut2, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Panasonic V-Gamut, Blackmagic Wide Gamut, Filmlight E-Gamut, Filmlight E-Gamut2, DaVinci Wide Gamut})
 DEFINE_UI_PARAMS(in_oetf, Input Transfer Function, DCTLUI_COMBO_BOX, 1, {ioetf_linear, ioetf_davinci_intermediate, ioetf_filmlight_tlog, ioetf_arri_logc3, ioetf_arri_logc4, ioetf_panasonic_vlog, ioetf_sony_slog3, ioetf_fuji_flog}, {Linear, Davinci Intermediate, Filmlight T-Log, Arri LogC3, Arri LogC4, Panasonic V-Log, Sony S-Log3, Fuji F-Log})
 
 
-// Tonescale Parameters
-DEFINE_UI_PARAMS(tn_Lp, Display Peak Luminance, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 0.0)
-// Clamp
-DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
 
 /*-------------------------------------------------------------------------------------- 
   Due to the limited nature of DCTL, I've made the choice to only expose the presets 
@@ -97,7 +96,7 @@ DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_tn_sh, Shoulder Clip, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_toe, Toe, DCTLUI_SLIDER_FLOAT, 0.001, 0.0, 0.04, 0.0)
 // DEFINE_UI_PARAMS(_tn_off, Offset, DCTLUI_SLIDER_FLOAT, 0.002, 0.0, 0.02, 0.0)
-// DEFINE_UI_PARAMS(_tn_hcon_enable, High Contrast, DCTLUI_CHECK_BOX, 0)
+// DEFINE_UI_PARAMS(_tn_hcon_enable, High Contrast, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_tn_hcon, High Contrast, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_hcon_pv, High Contrast Pivot, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_hcon_st, High Contrast Strength, DCTLUI_SLIDER_FLOAT, 4.0, 0.0, 4.0, 0.0)
@@ -105,11 +104,13 @@ DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_tn_mcon, Mid Contrast, DCTLUI_SLIDER_FLOAT, 0.8, 0.0, 3.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_mcon_w, Mid Contrast Width, DCTLUI_SLIDER_FLOAT, 0.7, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_mcon_pc, Mid Contrast Per-Channel, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_pt_r, Purity Compress R, DCTLUI_SLIDER_FLOAT, 0.4, 0.05, 2.0, 0.0)
-// DEFINE_UI_PARAMS(_pt_g, Purity Compress G, DCTLUI_SLIDER_FLOAT, 0.3, 0.05, 2.0, 0.0)
-// DEFINE_UI_PARAMS(_pt_b, Purity Compress B, DCTLUI_SLIDER_FLOAT, 1.3, 0.05, 2.0, 0.0)
+// DEFINE_UI_PARAMS(_cwp, Creative White, DCTLUI_COMBO_BOX, 0, {_cwp0, _cwp1, _cwp2, _cwp3}, {D65, D60, D55, D50})
+// DEFINE_UI_PARAMS(_cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_pt_r, Purity Compress R, DCTLUI_SLIDER_FLOAT, 0.6, 0.1, 2.0, 0.0)
+// DEFINE_UI_PARAMS(_pt_g, Purity Compress G, DCTLUI_SLIDER_FLOAT, 0.8, 0.1, 2.0, 0.0)
+// DEFINE_UI_PARAMS(_pt_b, Purity Compress B, DCTLUI_SLIDER_FLOAT, 1.5, 0.1, 2.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_rng_low, Purity Range Low, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_pt_rng_high, Purity Range High, DCTLUI_SLIDER_FLOAT, 0.8, 0.5, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_pt_rng_high_r, Purity Range High R, DCTLUI_SLIDER_FLOAT, 0.66, 0.5, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_hdr, Purity HDR, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_softclip, Softclip , DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_ptm_low_enable, Mid Purity Low, DCTLUI_CHECK_BOX, 1)
@@ -120,25 +121,25 @@ DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_ptm_high_rng, Mid Purity High Range, DCTLUI_SLIDER_FLOAT, 0.4, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 0.9, 0.0)
 // DEFINE_UI_PARAMS(_vl_enable, Value, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_vl_r, Value R, DCTLUI_SLIDER_FLOAT, -0.33, -0.6, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_vl_g, Value G, DCTLUI_SLIDER_FLOAT, -0.3, -0.6, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_vl_b, Value B, DCTLUI_SLIDER_FLOAT, -0.2, -0.6, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_vl_c, Value C, DCTLUI_SLIDER_FLOAT, 0.0, -0.6, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_vl_m, Value M, DCTLUI_SLIDER_FLOAT, -0.2, -0.6, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_vl_y, Value Y, DCTLUI_SLIDER_FLOAT, 0.0, -0.6, 0.2, 0.0)
+// DEFINE_UI_PARAMS(_vl_r, Value R, DCTLUI_SLIDER_FLOAT, -0.33, -0.5, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_vl_g, Value G, DCTLUI_SLIDER_FLOAT, -0.2, -0.5, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_vl_b, Value B, DCTLUI_SLIDER_FLOAT, -0.1, -0.5, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_vl_c, Value C, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_vl_m, Value M, DCTLUI_SLIDER_FLOAT, -0.2, -0.5, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_vl_y, Value Y, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.2, 0.0)
 // DEFINE_UI_PARAMS(_vl_rng, Value Range, DCTLUI_SLIDER_FLOAT, 0.8, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_vl_st, Value Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_rgb_enable, Hueshift RGB, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_hs_r, Hueshift R, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 0.6, 0.0)
-// DEFINE_UI_PARAMS(_hs_g, Hueshift G, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 0.6, 0.0)
-// DEFINE_UI_PARAMS(_hs_b, Hueshift B, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.6, 0.0)
-// DEFINE_UI_PARAMS(_hs_rng_r, Hueshift Range R, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 3.0, 0.0)
+// DEFINE_UI_PARAMS(_hs_r, Hueshift R, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 0.5, 0.0)
+// DEFINE_UI_PARAMS(_hs_g, Hueshift G, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 0.5, 0.0)
+// DEFINE_UI_PARAMS(_hs_b, Hueshift B, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 0.5, 0.0)
+// DEFINE_UI_PARAMS(_hs_rng_r, Hueshift Range R, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 3.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_rng_g, Hueshift Range G, DCTLUI_SLIDER_FLOAT, 2.0, 0.0, 3.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_rng_b, Hueshift Range B, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 3.0, 0.0)
-// DEFINE_UI_PARAMS(_hs_cmy_enable, Hueshift CMY, DCTLUI_CHECK_BOX, 0)
-// DEFINE_UI_PARAMS(_hs_c, Hueshift C, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 0.6, 0.0)
-// DEFINE_UI_PARAMS(_hs_m, Hueshift M, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 0.6, 0.0)
-// DEFINE_UI_PARAMS(_hs_y, Hueshift Y, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 0.6, 0.0)
+// DEFINE_UI_PARAMS(_hs_cmy_enable, Hueshift CMY, DCTLUI_CHECK_BOX, 1)
+// DEFINE_UI_PARAMS(_hs_c, Hueshift C, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 0.5, 0.0)
+// DEFINE_UI_PARAMS(_hs_m, Hueshift M, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 0.5, 0.0)
+// DEFINE_UI_PARAMS(_hs_y, Hueshift Y, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 0.5, 0.0)
 // DEFINE_UI_PARAMS(_hs_rng_c, Hueshift Range C, DCTLUI_SLIDER_FLOAT, 0.0, -3.0, 3.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_rng_m, Hueshift Range M, DCTLUI_SLIDER_FLOAT, 0.0, -3.0, 3.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_rng_y, Hueshift Range Y, DCTLUI_SLIDER_FLOAT, 0.0, -3.0, 3.0, 0.0)
@@ -151,10 +152,8 @@ DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_hc_b1, Hue Contrast B High, DCTLUI_SLIDER_FLOAT, 0.1, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hc_st, Hue Contrast Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 
-
 // DEFINE_UI_PARAMS(_display_gamut, Display Gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3-D65, Rec.2020 (P3 Limited)})
 // DEFINE_UI_PARAMS(_eotf, Display EOTF, DCTLUI_COMBO_BOX, 2, {eotf0, eotf1, eotf2, eotf3, eotf4, eotf5}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec.1886, 2.6 Power DCI, ST 2084 PQ, HLG})
-
 
 
 /*---------------------------------------------------------------------------------------
@@ -457,24 +456,24 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     --------------------------------------------------*/
   
   // Init look preset variables
-  int tn_hcon_enable, tn_mcon_enable, ptm_low_enable, ptm_high_enable, vl_enable, hs_rgb_enable, hs_cmy_enable, hc_enable, display_gamut, eotf;
-  float tn_Lg, tn_gb, tn_con, tn_sh, tn_toe, tn_off, tn_hcon, tn_hcon_pv, tn_hcon_st, tn_mcon, tn_mcon_w, tn_mcon_pc, pt_r, pt_g, pt_b, pt_rng_low, pt_rng_high, pt_hdr, pt_softclip, ptm_low, ptm_low_st, ptm_high, ptm_high_rng, ptm_high_st, vl_r, vl_g, vl_b, vl_c, vl_m, vl_y, vl_rng, vl_st, hs_r, hs_g, hs_b, hs_rng_r, hs_rng_g, hs_rng_b, hs_c, hs_m, hs_y, hs_rng_c, hs_rng_m, hs_rng_y, hc_r0, hc_r1, hc_g0, hc_g1, hc_b0, hc_b1, hc_st;
+  int tn_hcon_enable, tn_mcon_enable, ptm_low_enable, ptm_high_enable, vl_enable, hs_rgb_enable, hs_cmy_enable, hc_enable, display_gamut, eotf, cwp;
+  float tn_Lg, tn_gb, tn_con, tn_sh, tn_toe, tn_off, tn_hcon, tn_hcon_pv, tn_hcon_st, tn_mcon, tn_mcon_w, tn_mcon_pc, cwp_rng, pt_r, pt_g, pt_b, pt_rng_low, pt_rng_high_r, pt_hdr, pt_softclip, ptm_low, ptm_low_st, ptm_high, ptm_high_rng, ptm_high_st, vl_r, vl_g, vl_b, vl_c, vl_m, vl_y, vl_rng, vl_st, hs_r, hs_g, hs_b, hs_rng_r, hs_rng_g, hs_rng_b, hs_c, hs_m, hs_y, hs_rng_c, hs_rng_m, hs_rng_y, hc_r0, hc_r1, hc_g0, hc_g1, hc_b0, hc_b1, hc_st;
 
   #ifdef INIT_PARAMS  // Set all parameters to the user-controllable ones instead of presets if INIT_PARAMS defined by user.
     
-    tn_Lg=_tn_Lg, tn_gb=_tn_gb, tn_hcon_enable=_tn_hcon_enable, tn_mcon_enable=_tn_mcon_enable, ptm_low_enable=_ptm_low_enable, ptm_high_enable=_ptm_high_enable, vl_enable=_vl_enable, hs_rgb_enable=_hs_rgb_enable, hs_cmy_enable=_hs_cmy_enable, hc_enable=_hc_enable, tn_con=_tn_con, tn_sh=_tn_sh, tn_toe=_tn_toe, tn_off=_tn_off, tn_hcon=_tn_hcon, tn_hcon_pv=_tn_hcon_pv, tn_hcon_st=_tn_hcon_st, tn_mcon=_tn_mcon, tn_mcon_w=_tn_mcon_w, tn_mcon_pc=_tn_mcon_pc, pt_r=_pt_r, pt_g=_pt_g, pt_b=_pt_b, pt_rng_low=_pt_rng_low, pt_rng_high=_pt_rng_high, pt_hdr=_pt_hdr, pt_softclip=_pt_softclip, ptm_low=_ptm_low, ptm_low_st=_ptm_low_st, ptm_high=_ptm_high, ptm_high_rng=_ptm_high_rng, ptm_high_st=_ptm_high_st, vl_r=_vl_r, vl_g=_vl_g, vl_b=_vl_b, vl_c=_vl_c, vl_m=_vl_m, vl_y=_vl_y, vl_rng=_vl_rng, vl_st=_vl_st, hs_r=_hs_r, hs_g=_hs_g, hs_b=_hs_b, hs_rng_r=_hs_rng_r, hs_rng_g=_hs_rng_g, hs_rng_b=_hs_rng_b, hs_c=_hs_c, hs_m=_hs_m, hs_y=_hs_y, hs_rng_c=_hs_rng_c, hs_rng_m=_hs_rng_m, hs_rng_y=_hs_rng_y, hc_r0=_hc_r0, hc_r1=_hc_r1, hc_g0=_hc_g0, hc_g1=_hc_g1, hc_b0=_hc_b0, hc_b1=_hc_b1, hc_st=_hc_st, cwp_rng=cwp_rng, display_gamut=_display_gamut, eotf=_eotf;
+    tn_Lg=_tn_Lg, tn_gb=_tn_gb, tn_hcon_enable=_tn_hcon_enable, tn_mcon_enable=_tn_mcon_enable, cwp=_cwp, cwp_rng=_cwp_rng, ptm_low_enable=_ptm_low_enable, ptm_high_enable=_ptm_high_enable, vl_enable=_vl_enable, hs_rgb_enable=_hs_rgb_enable, hs_cmy_enable=_hs_cmy_enable, hc_enable=_hc_enable, tn_con=_tn_con, tn_sh=_tn_sh, tn_toe=_tn_toe, tn_off=_tn_off, tn_hcon=_tn_hcon, tn_hcon_pv=_tn_hcon_pv, tn_hcon_st=_tn_hcon_st, tn_mcon=_tn_mcon, tn_mcon_w=_tn_mcon_w, tn_mcon_pc=_tn_mcon_pc, pt_r=_pt_r, pt_g=_pt_g, pt_b=_pt_b, pt_rng_low=_pt_rng_low, pt_rng_high_r=_pt_rng_high_r, pt_hdr=_pt_hdr, pt_softclip=_pt_softclip, ptm_low=_ptm_low, ptm_low_st=_ptm_low_st, ptm_high=_ptm_high, ptm_high_rng=_ptm_high_rng, ptm_high_st=_ptm_high_st, vl_r=_vl_r, vl_g=_vl_g, vl_b=_vl_b, vl_c=_vl_c, vl_m=_vl_m, vl_y=_vl_y, vl_rng=_vl_rng, vl_st=_vl_st, hs_r=_hs_r, hs_g=_hs_g, hs_b=_hs_b, hs_rng_r=_hs_rng_r, hs_rng_g=_hs_rng_g, hs_rng_b=_hs_rng_b, hs_c=_hs_c, hs_m=_hs_m, hs_y=_hs_y, hs_rng_c=_hs_rng_c, hs_rng_m=_hs_rng_m, hs_rng_y=_hs_rng_y, hc_r0=_hc_r0, hc_r1=_hc_r1, hc_g0=_hc_g0, hc_g1=_hc_g1, hc_b0=_hc_b0, hc_b1=_hc_b1, hc_st=_hc_st, cwp_rng=cwp_rng, display_gamut=_display_gamut, eotf=_eotf;
 
   #else // Otherwise, drive everything based on the preset combo box parameters.
     
     /*----------- LOOK PRESETS -----------------*/
     if (look_preset==0) { // base
-      tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.002f, tn_hcon_enable = 1, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon_enable = 1, tn_mcon = 0.8f, tn_mcon_w = 0.7f, tn_mcon_pc = 1.0f, pt_r = 0.4f, pt_g = 0.3f, pt_b = 1.3f, pt_rng_low = 0.25f, pt_rng_high = 0.8f, pt_hdr = 0.5f, pt_softclip = 1, ptm_low_enable = 1, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high_enable = 1, ptm_high = 0.0f, ptm_high_rng = 0.4f, ptm_high_st = 0.5f, vl_enable = 1, vl_r = -0.33f, vl_g = -0.3f, vl_b = -0.2f, vl_c = 0.0f, vl_m = -0.2f, vl_y = 0.0f, vl_rng = 0.8f, vl_st = 0.5f, hs_rgb_enable = 1, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_rng_r = 0.0f, hs_rng_g = 0.0f, hs_rng_b = 0.0f, hs_cmy_enable = 1, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hs_rng_c = 0.0f, hs_rng_m = 0.0f, hs_rng_y = 0.0f, hc_enable = 1, hc_r0 = 0.0f, hc_r1 = 0.0f, hc_g0 = 0.0f, hc_g1 = 0.0f, hc_b0 = 0.0f, hc_b1 = 0.0f, hc_st = 0.5f;
+      tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.002f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon_enable = 1, tn_mcon = 0.8f, tn_mcon_w = 0.7f, tn_mcon_pc = 1.0f, cwp_rng = 0.5f, pt_r = 0.6f, pt_g = 0.8f, pt_b = 1.5f, pt_rng_low = 0.25f, pt_rng_high_r = 0.66f, pt_hdr = 0.5f, pt_softclip = 0, ptm_low_enable = 0, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high_enable = 0, ptm_high = 0.0f, ptm_high_rng = 0.4f, ptm_high_st = 0.5f, vl_enable = 1, vl_r = -0.33f, vl_g = -0.2f, vl_b = -0.1f, vl_c = 0.0f, vl_m = -0.2f, vl_y = 0.0f, vl_rng = 0.8f, vl_st = 0.5f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_rng_r = 0.0f, hs_rng_g = 0.0f, hs_rng_b = 0.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hs_rng_c = 0.0f, hs_rng_m = 0.0f, hs_rng_y = 0.0f, hc_enable = 0, hc_r0 = 0.0f, hc_r1 = 0.0f, hc_g0 = 0.0f, hc_g1 = 0.0f, hc_b0 = 0.0f, hc_b1 = 0.0f, hc_st = 0.5f;
     }
     else if (look_preset==1) { // default
-      tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.002f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon_enable = 1, tn_mcon = 0.8f, tn_mcon_w = 0.7f, tn_mcon_pc = 1.0f, pt_r = 0.4f, pt_g = 0.3f, pt_b = 1.3f, pt_rng_low = 0.25f, pt_rng_high = 0.8f, pt_hdr = 0.5f, pt_softclip = 1, ptm_low_enable = 1, ptm_low = 0.5f, ptm_low_st = 0.5f, ptm_high_enable = 1, ptm_high = 0.8f, ptm_high_rng = 0.4f, ptm_high_st = 0.5f, vl_enable = 1, vl_r = -0.33f, vl_g = -0.3f, vl_b = -0.2f, vl_c = 0.0f, vl_m = -0.2f, vl_y = 0.0f, vl_rng = 0.8f, vl_st = 0.5f, hs_rgb_enable = 1, hs_r = 0.35f, hs_g = 0.2f, hs_b = 0.25f, hs_rng_r = 0.2f, hs_rng_g = 2.0f, hs_rng_b = 0.5f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hs_rng_c = 0.0f, hs_rng_m = 0.0f, hs_rng_y = 0.0f, hc_enable = 1, hc_r0 = 0.3f, hc_r1 = 0.5f, hc_g0 = 0.2f, hc_g1 = 0.3f, hc_b0 = 0.1f, hc_b1 = 0.1f, hc_st = 0.5f;
+      tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.002f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon_enable = 1, tn_mcon = 0.8f, tn_mcon_w = 0.7f, tn_mcon_pc = 1.0f, cwp_rng = 0.5f, pt_r = 0.6f, pt_g = 0.8f, pt_b = 1.5f, pt_rng_low = 0.25f, pt_rng_high_r = 0.66f, pt_hdr = 0.5f, pt_softclip = 1, ptm_low_enable = 1, ptm_low = 0.5f, ptm_low_st = 0.5f, ptm_high_enable = 1, ptm_high = 0.8f, ptm_high_rng = 0.4f, ptm_high_st = 0.5f, vl_enable = 1, vl_r = -0.33f, vl_g = -0.2f, vl_b = -0.1f, vl_c = 0.0f, vl_m = -0.2f, vl_y = 0.0f, vl_rng = 0.8f, vl_st = 0.5f, hs_rgb_enable = 1, hs_r = 0.3f, hs_g = 0.2f, hs_b = 0.3f, hs_rng_r = 0.5f, hs_rng_g = 2.0f, hs_rng_b = 0.5f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hs_rng_c = 0.0f, hs_rng_m = 0.0f, hs_rng_y = 0.0f, hc_enable = 1, hc_r0 = 0.3f, hc_r1 = 0.5f, hc_g0 = 0.2f, hc_g1 = 0.3f, hc_b0 = 0.1f, hc_b1 = 0.1f, hc_st = 0.5f;
     }
     else if (look_preset==2) { // filmish
-      tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.002f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon_enable = 1, tn_mcon = 0.8f, tn_mcon_w = 0.7f, tn_mcon_pc = 1.0f, pt_r = 0.15f, pt_g = 0.2f, pt_b = 1.0f, pt_rng_low = 0.25f, pt_rng_high = 1.0f, pt_hdr = 0.5f, pt_softclip = 1, ptm_low_enable = 1, ptm_low = 0.6f, ptm_low_st = 0.6f, ptm_high_enable = 1, ptm_high = 1.0f, ptm_high_rng = 0.4f, ptm_high_st = 0.6f, vl_enable = 1, vl_r = -0.43f, vl_g = -0.4f, vl_b = -0.3f, vl_c = -0.2f, vl_m = -0.4f, vl_y = 0.0f, vl_rng = 1.0f, vl_st = 0.6f, hs_rgb_enable = 1, hs_r = 0.4f, hs_g = 0.4f, hs_b = 0.3f, hs_rng_r = 0.8f, hs_rng_g = 2.0f, hs_rng_b = 1.0f, hs_cmy_enable = 1, hs_c = 0.398f, hs_m = 0.4f, hs_y = 0.5f, hs_rng_c = 0.5f, hs_rng_m = 1.0f, hs_rng_y = 0.0f, hc_enable = 1, hc_r0 = 0.4f, hc_r1 = 0.6f, hc_g0 = -0.5f, hc_g1 = 0.5f, hc_b0 = -0.2f, hc_b1 = 0.0f, hc_st = 1.0f;
+      tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.002f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_mcon_enable = 1, tn_mcon = 0.8f, tn_mcon_w = 0.7f, tn_mcon_pc = 1.0f, cwp_rng = 0.5f, pt_r = 0.25f, pt_g = 1.0f, pt_b = 1.0f, pt_rng_low = 0.25f, pt_rng_high_r = 0.66f, pt_hdr = 0.5f, pt_softclip = 0, ptm_low_enable = 1, ptm_low = 0.3f, ptm_low_st = 0.5f, ptm_high_enable = 1, ptm_high = 1.0f, ptm_high_rng = 0.4f, ptm_high_st = 0.6f, vl_enable = 1, vl_r = -0.5f, vl_g = -0.45f, vl_b = -0.3f, vl_c = -0.3f, vl_m = -0.5f, vl_y = -0.15f, vl_rng = 1.0f, vl_st = 0.5f, hs_rgb_enable = 1, hs_r = 0.3f, hs_g = 0.25f, hs_b = 0.3f, hs_rng_r = 1.4f, hs_rng_g = 3.0f, hs_rng_b = 2.0f, hs_cmy_enable = 1, hs_c = 0.4f, hs_m = 0.35f, hs_y = 0.4f, hs_rng_c = 1.5f, hs_rng_m = -1.5f, hs_rng_y = 1.5f, hc_enable = 1, hc_r0 = 0.3f, hc_r1 = 0.5f, hc_g0 = -0.3f, hc_g1 = 1.0f, hc_b0 = 0.4f, hc_b1 = 0.3f, hc_st = 0.5f;
     }
 
     /*----------- TONESCALE PRESETS -----------------*/
@@ -525,11 +524,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   #endif
 
-  // Creative White
-  if (cwp==0) cwp = 0;
-  else if (cwp==1) cwp = 1;
-  else if (cwp==2) cwp = 2;
-  else if (cwp==3) cwp = 3;
 
 
   float3x3 in_to_xyz;
@@ -604,8 +598,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   const float ts_dsc = eotf==4 ? 0.01 : eotf==5 ? 0.1 : 100.0f/tn_Lp;
 
   // Lerp from pt_cmp at 100 nits to pt_cmp_hdr at 1000 nits
-  const float pt_cmp_Lf = (tn_Lp - 100.0f)/900.0f;
-  const float ts_s1 = ts_s/((ts_s*pt_cmp_Lf + 1.0f - pt_cmp_Lf)*(1.0f - pt_hdr) + pt_hdr);
+  const float pt_cmp_Lf = pt_hdr*_fminf(1.0f, (tn_Lp - 100.0f)/900.0f);
+  // Approximate scene-linear scale at Lp=100 nits
+  const float s_Lp100 = ts_x0*(_powf((tn_Lg/100.0f), -1.0f/tn_con) - 1.0f);
+  const float ts_s1 = ts_s*pt_cmp_Lf + s_Lp100*(1.0f - pt_cmp_Lf);
   
 
   // Convert from input gamut into P3-D65
@@ -682,17 +678,22 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   tsn = compress_hyperbolic_power(tsn, ts_s, tn_con);
   ts_pt = compress_hyperbolic_power(ts_pt, ts_s1, tn_con);
   
-  // Purity Compression Range
-  float ts_pt_cmp = 1.0f - _powf(ts_pt, 1.0f/pt_rng_low);
-  if (pt_rng_high < 1.0f) ts_pt_cmp = _powf(ts_pt_cmp, pt_rng_high);
 
   // RGB CMY Hue Angles
   float mn = _fmaxf(0.0f, fminf3(rgb));
-  float3 ha_rgb = narrow_ha(rgb - mn);
+  float3 ha_rgb_wide = rgb - mn;
+  float3 ha_rgb = narrow_ha(ha_rgb_wide);
   float3 rats_mx_div = sdivf3f(rgb, fmaxf3(rgb));
   float rats_mx_div_mn = _fmaxf(0.0f, fminf3(rats_mx_div));
   float3 ha_cmy_wide = clampminf3(1.0f - rats_mx_div, 0.0f);
   float3 ha_cmy = narrow_ha(ha_cmy_wide);
+
+  // Purity Compression Range
+  float ts_pt_cmp = 1.0f - _powf(ts_pt, 1.0f/pt_rng_low);
+  if (pt_rng_high_r < 1.0f) {
+    float pt_rng_high_r_f = _fminf(1.0f, ha_rgb_wide.x*(1.0f - ha_cmy.y));
+    ts_pt_cmp = _powf(ts_pt_cmp, pt_rng_high_r)*pt_rng_high_r_f + ts_pt_cmp*(1.0f - pt_rng_high_r_f);
+  }
 
 
 
@@ -700,7 +701,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     Hue Focus
   --------------------------------------------------*/
   if (hc_enable) {
-    float hc_ts = _powf(1.0f - tsn, _powf(4.0f, hc_st));
+    float hc_ts = _powf(1.0f - ts_pt, _powf(4.0f, hc_st));
     // Limit high purity on bottom end and low purity on top end.
     float hc_c = mn*hc_ts + (1.0f - mn)*(1.0f - hc_ts); 
     float3 hc_rgb = make_float3(ha_rgb.x*hc_c, ha_rgb.y*hc_c, ha_rgb.z*hc_c/2.0f);
@@ -815,8 +816,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   if (pt_softclip) {
     rgb = 1.0f - rgb;
     rgb.x = compress_powerp(rgb.x, 0.02f);
-    rgb.y = compress_powerp(rgb.y, 0.05f);
-    rgb.z = compress_powerp(rgb.z, 0.015f);
+    rgb.y = compress_powerp(rgb.y, 0.03f);
+    rgb.z = compress_powerp(rgb.z, 0.01f);
     rgb = 1.0f - rgb;
   }
 
