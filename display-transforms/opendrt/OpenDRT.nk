@@ -745,9 +745,9 @@ push $Nd633afa0
   xpos -260
   ypos -472
   addUserKnob {20 Params}
-  addUserKnob {7 p0 l "Purity Range Low"}
+  addUserKnob {7 p0 l "Purity Range Low" R 0.1 0.6}
   p0 0.2
-  addUserKnob {7 p1 l "Purity Range High"}
+  addUserKnob {7 p1 l "Purity Range High" R 0.5 2.0}
   p1 0.8
  }
  Dot {
