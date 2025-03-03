@@ -575,38 +575,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (in_gamut==15) in_to_xyz = matrix_davinciwg_to_xyz;
 
 
-
   // Linearize if a non-linear input oetf / transfer function is selected
-  if (in_oetf==1) {
-    rgb.x = oetf_davinci_intermediate(rgb.x);
-    rgb.y = oetf_davinci_intermediate(rgb.y);
-    rgb.z = oetf_davinci_intermediate(rgb.z);
-  } else if (in_oetf==2) {
-    rgb.x = oetf_filmlight_tlog(rgb.x);
-    rgb.y = oetf_filmlight_tlog(rgb.y);
-    rgb.z = oetf_filmlight_tlog(rgb.z);
-  } else if (in_oetf==3) {
-    rgb.x = oetf_arri_logc3(rgb.x);
-    rgb.y = oetf_arri_logc3(rgb.y);
-    rgb.z = oetf_arri_logc3(rgb.z);
-  } else if (in_oetf==4) {
-    rgb.x = oetf_arri_logc4(rgb.x);
-    rgb.y = oetf_arri_logc4(rgb.y);
-    rgb.z = oetf_arri_logc4(rgb.z);
-  } else if (in_oetf==5) {
-    rgb.x = oetf_panasonic_vlog(rgb.x);
-    rgb.y = oetf_panasonic_vlog(rgb.y);
-    rgb.z = oetf_panasonic_vlog(rgb.z);
-  } else if (in_oetf==6) {
-    rgb.x = oetf_sony_slog3(rgb.x);
-    rgb.y = oetf_sony_slog3(rgb.y);
-    rgb.z = oetf_sony_slog3(rgb.z);
-  } else if (in_oetf==7) {
-    rgb.x = oetf_fujifilm_flog2(rgb.x);
-    rgb.y = oetf_fujifilm_flog2(rgb.y);
-    rgb.z = oetf_fujifilm_flog2(rgb.z);
-  }
-
+  rgb = linearize(rgb, in_oetf);
 
 
   /***************************************************
@@ -853,12 +823,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     ptl_norm = softplus(ptl_norm, 0.094f, -100.0f, 0.5f);
     rgb *= ptl_norm;
   }
-
-  // return rgb;
-
-  // float _tmp = tsn;
-  // return make_float3(_tmp, _tmp, _tmp);
-  // return rgb;
 
   // Final tonescale adjustments
   tsn *= ts_m2; // scale for inverse toe
