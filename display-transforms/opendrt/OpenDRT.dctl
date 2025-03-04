@@ -27,8 +27,8 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 
 
 
-/*-------------------------------------------------------------------------------------- 
-  Due to the limited nature of DCTL, I've made the choice to only expose the presets 
+/*--------------------------------------------------------------------------------------
+  Due to the limited nature of DCTL, I've made the choice to only expose the presets
   and not the full parameter space. For those of you who are too curious for your own good
   and interested in experimenting...
 
@@ -36,9 +36,9 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
     1. **UN-COMMENT** the lines below, including the define INIT_PARAMS line. This enables all of the user parameters.
     2. Comment out the lines below that for the preset parameters (You can leave them enabled, but they won't do anything)
 
-  Tip 1: If you are using a modern text editor like VSCode, 
+  Tip 1: If you are using a modern text editor like VSCode,
     you can comment or un-comment multiple selected lines with Ctrl+/
-  Tip 2: You can use the Nuke node to create a preset and click the "Show DCTL" button 
+  Tip 2: You can use the Nuke node to create a preset and click the "Show DCTL" button
     to show code for the below with your custom parameter values. Or add your own presets
     in the LOOK PRESETS section around line 464.
 ---------------------------------------------------------------------------------------*/
@@ -63,7 +63,7 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 // DEFINE_UI_PARAMS(_rs_sa, Render Space Strength, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.6, 0.0)
 // DEFINE_UI_PARAMS(_rs_rw, Render Space Red Weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.8, 0.0)
 // DEFINE_UI_PARAMS(_rs_bw, Render Space Blue Weight, DCTLUI_SLIDER_FLOAT, 0.4, 0.0, 0.8, 0.0)
-// DEFINE_UI_PARAMS(_pt_r, Purity Compress R, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 4.0, 0.0)
+// DEFINE_UI_PARAMS(_pt_r, Purity Compress R, DCTLUI_SLIDER_FLOAT, 0.4, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_g, Purity Compress G, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_b, Purity Compress B, DCTLUI_SLIDER_FLOAT, 2.5, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_rng_low, Purity Range Low, DCTLUI_SLIDER_FLOAT, 0.2, 0.1, 0.6, 0.0)
@@ -77,7 +77,7 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 // DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.66, 0.1, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_brl_enable, Brilliance, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_brl_r, Brilliance R, DCTLUI_SLIDER_FLOAT, -0.4, -1.0, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_brl_g, Brilliance G, DCTLUI_SLIDER_FLOAT, -0.4, -1.0, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_brl_g, Brilliance G, DCTLUI_SLIDER_FLOAT, -0.35, -1.0, 0.0, 0.0)
 // DEFINE_UI_PARAMS(_brl_b, Brilliance B, DCTLUI_SLIDER_FLOAT, -0.1, -1.0, 0.0, 0.0)
 // DEFINE_UI_PARAMS(_brl_c, Brilliance C, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.5, 0.0)
 // DEFINE_UI_PARAMS(_brl_m, Brilliance M, DCTLUI_SLIDER_FLOAT, -0.15, -0.5, 0.5, 0.0)
@@ -104,7 +104,7 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 
 // Preset Parameters
 DEFINE_UI_PARAMS(look_preset, Look Preset, DCTLUI_COMBO_BOX, 1, {look0, look1}, {Base, Default})
-DEFINE_UI_PARAMS(tonescale_preset, Tonescale Preset, DCTLUI_COMBO_BOX, 0, {tsprst0, tsprst1, tsprst2, tsprst3, tsprst4, tsprst5, tsprst6, tsprst7}, {Use Look Preset, High-Contrast, Low-Contrast, ACES-1.x, ACES-2.0, Marvelous Tonescape, Arriba Tonecall, DaGrinchi Tone})
+DEFINE_UI_PARAMS(tonescale_preset, Tonescale Preset, DCTLUI_COMBO_BOX, 0, {tsprst0, tsprst1, tsprst2, tsprst3, tsprst4, tsprst5, tsprst6, tsprst7}, {Use Look Preset, High-Contrast, Low-Contrast, ACES-1.x, ACES-2.0, Marvelous Tonescape, Arriba Tonecall, DaGrinchi Tonegroan})
 DEFINE_UI_PARAMS(display_encoding_preset, Display Encoding Preset, DCTLUI_COMBO_BOX, 0, {rec1886, srgb, displayp3, rec2100pq, rec2100hlg, dolbypq}, {Rec.1886 - 2.4 Power / Rec.709, sRGB Display - 2.2 Power / Rec.709, Display P3 - 2.2 Power / P3-D65, Rec.2100 - PQ / Rec.2020 (P3 Limited), Rec.2100 - HLG / Rec.2020 (P3 Limited), Dolby - PQ / P3-D65})
 
 /*---------------------------------------------------------------------------------------*/
@@ -355,11 +355,11 @@ __DEVICE__ float3 linearize(float3 rgb, int tf) {
 /* EOTF Transfer Functions ---------------------------------------- */
 
 __DEVICE__ float3 eotf_hlg(float3 rgb, int inverse) {
-  /* Apply the HLG Forward or Inverse EOTF for 1000 nits. 
-      ITU-R Rec BT.2100-2 https://www.itu.int/rec/R-REC-BT.2100 
+  /* Apply the HLG Forward or Inverse EOTF for 1000 nits.
+      ITU-R Rec BT.2100-2 https://www.itu.int/rec/R-REC-BT.2100
       ITU-R Rep BT.2390-8: https://www.itu.int/pub/R-REP-BT.2390
   */
-  
+
   if (inverse == 1) {
     float Yd = 0.2627f*rgb.x + 0.6780f*rgb.y + 0.0593f*rgb.z;
     rgb = rgb*spowf(Yd, (1.0f - 1.2f)/1.2f);
@@ -381,10 +381,10 @@ __DEVICE__ float3 eotf_pq(float3 rgb, int inverse) {
   /* Apply the ST-2084 PQ Forward or Inverse EOTF
       ITU-R Rec BT.2100-2 https://www.itu.int/rec/R-REC-BT.2100
       ITU-R Rep BT.2390-9 https://www.itu.int/pub/R-REP-BT.2390
-      Note: in the spec there is a normalization for peak display luminance. 
+      Note: in the spec there is a normalization for peak display luminance.
       For this function we assume the input is already normalized such that 1.0 = 10,000 nits
   */
-  
+
   const float m1 = 2610.0f/16384.0f;
   const float m2 = 2523.0f/32.0f;
   const float c1 = 107.0f/128.0f;
@@ -461,8 +461,8 @@ __DEVICE__ float softplus(float x, float s, float x0, float y0) {
   // Softplus https://www.desmos.com/calculator/doipi4u0ce
   if (x > 10.0f*s + y0 || s < 1e-3f) return x;
   float m = 1.0f;
-  if (_fabs(y0) > 1e-6f) m = _expf(y0/s);
-  m -= _expf(x0/s);
+  if (_fabs(y0) > 1e-6f) m = _expf(y0/s); // do y0 constraint calculation
+  if (x0 < -10.0f) m -= _expf(x0/s); // do x0 constraint calculation
   return s*_logf(_fmaxf(0.0f, m + _expf(x/s)));
 }
 
@@ -493,18 +493,18 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float tn_Lg, tn_gb, tn_con, tn_sh, tn_toe, tn_off, tn_hcon, tn_hcon_pv, tn_hcon_st, tn_lcon, tn_lcon_w, tn_lcon_pc, rs_sa, rs_rw, rs_bw, pt_r, pt_g, pt_b, pt_rng_low, pt_rng_high, pt_hdr, ptm_low, ptm_low_st, ptm_high, ptm_high_st, brl_r, brl_g, brl_b, brl_c, brl_m, brl_y, brl_rng, hs_r, hs_g, hs_b, hs_c, hs_m, hs_y, hc_r;
 
   #ifdef INIT_PARAMS  // Set all parameters to the user-controllable ones instead of presets if INIT_PARAMS defined by user.
-    
+
   tn_Lg=_tn_Lg, tn_gb=_tn_gb, tn_con=_tn_con, tn_sh=_tn_sh, tn_toe=_tn_toe, tn_off=_tn_off, tn_hcon_enable=_tn_hcon_enable, tn_hcon=_tn_hcon, tn_hcon_pv=_tn_hcon_pv, tn_hcon_st=_tn_hcon_st, tn_lcon_enable=_tn_lcon_enable, tn_lcon=_tn_lcon, tn_lcon_w=_tn_lcon_w, tn_lcon_pc=_tn_lcon_pc, rs_sa=_rs_sa, rs_rw=_rs_rw, rs_bw=_rs_bw, pt_r=_pt_r, pt_g=_pt_g, pt_b=_pt_b, pt_rng_low=_pt_rng_low, pt_rng_high=_pt_rng_high, pt_hdr=_pt_hdr, ptl_enable=_ptl_enable, ptm_enable=_ptm_enable, ptm_low=_ptm_low, ptm_low_st=_ptm_low_st, ptm_high=_ptm_high, ptm_high_st=_ptm_high_st, brl_enable=_brl_enable, brl_r=_brl_r, brl_g=_brl_g, brl_b=_brl_b, brl_c=_brl_c, brl_m=_brl_m, brl_y=_brl_y, brl_rng=_brl_rng, hs_rgb_enable=_hs_rgb_enable, hs_r=_hs_r, hs_g=_hs_g, hs_b=_hs_b, hs_cmy_enable=_hs_cmy_enable, hs_c=_hs_c, hs_m=_hs_m, hs_y=_hs_y, hc_enable=_hc_enable, hc_r=_hc_r, display_gamut=_display_gamut, eotf=_eotf;
 
   #else // Otherwise, drive everything based on the preset combo box parameters.
 
   /*----------- LOOK PRESETS -----------------*/
-  // Look presets to go after 
+  // Look presets to go after
   if (look_preset==0) { // Base
-    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.45f, pt_r = 0.25f, pt_g = 1.0f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 0.8f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 0, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_st = 0.6f, brl_enable = 1, brl_r = -0.45f, brl_g = -0.4f, brl_b = -0.1f, brl_c = 0.0f, brl_m = -0.1f, brl_y = -0.0f, brl_rng = 0.8f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hc_enable = 0, hc_r = 0.0f;
+    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.4f, pt_r = 0.4f, pt_g = 1.0f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 1.0f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 0, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_st = 0.66f, brl_enable = 1, brl_r = -0.4f, brl_g = -0.35f, brl_b = -0.1f, brl_c = 0.0f, brl_m = -0.15f, brl_y = 0.0f, brl_rng = 0.75f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hc_enable = 0, hc_r = 0.0f;
   }
   else if (look_preset==1) { // Default
-    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.4f, pt_r = 0.3f, pt_g = 1.0f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 1.0f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.35f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_st = 0.66f, brl_enable = 1, brl_r = -0.4f, brl_g = -0.4f, brl_b = -0.1f, brl_c = 0.0f, brl_m = -0.15f, brl_y = 0.0f, brl_rng = 0.75f, hs_rgb_enable = 1, hs_r = 0.35f, hs_g = 0.35f, hs_b = 0.35f, hs_cmy_enable = 1, hs_c = 0.2f, hs_m = 0.2f, hs_y = 0.2f, hc_enable = 1, hc_r = 0.5f;
+    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.4f, pt_r = 0.4f, pt_g = 1.0f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 1.0f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.35f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_st = 0.66f, brl_enable = 1, brl_r = -0.4f, brl_g = -0.35f, brl_b = -0.1f, brl_c = 0.0f, brl_m = -0.15f, brl_y = 0.0f, brl_rng = 0.75f, hs_rgb_enable = 1, hs_r = 0.35f, hs_g = 0.35f, hs_b = 0.35f, hs_cmy_enable = 1, hs_c = 0.2f, hs_m = 0.2f, hs_y = 0.2f, hc_enable = 1, hc_r = 0.5f;
   }
 
   /*----------- TONESCALE PRESETS -----------------*/
@@ -605,7 +605,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Approximate scene-linear scale at Lp=100 nits
   const float s_Lp100 = ts_x0*(_powf((tn_Lg/100.0f), -1.0f/tn_con) - 1.0f);
   const float ts_s1 = ts_s*pt_cmp_Lf + s_Lp100*(1.0f - pt_cmp_Lf);
-  
+
 
   // Convert from input gamut into P3-D65
   rgb = vdot(in_to_xyz, rgb);
@@ -617,7 +617,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float3 rs_w = make_float3(rs_rw, 1.0f - rs_rw - rs_bw, rs_bw);
   float sat_L = rgb.x*rs_w.x + rgb.y*rs_w.y + rgb.z*rs_w.z;
   rgb = sat_L*rs_sa + rgb*(1.0f - rs_sa);
-  
+
 
   // Offset
   rgb += tn_off;
@@ -634,11 +634,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Normalize for ts_x0 intersection constraint: https://www.desmos.com/calculator/blyvi8t2b2
     const float mcon_cnst_sc = compress_toe_cubic(ts_x0, mcon_m, mcon_w, 1)/ts_x0;
     rgb *= mcon_cnst_sc;
-    
+
     // Scale for ratio-preserving midtone contrast
     float mcon_nm = hypotf3(clampminf3(rgb, 0.0f))/SQRT3;
     float mcon_sc = (mcon_nm*mcon_nm + mcon_m*mcon_w)/(mcon_nm*mcon_nm + mcon_w);
-    
+
     if (tn_lcon_pc > 0.0f) {
       // Mix between ratio-preserving and per-channel by blending based on distance from achromatic
 
@@ -654,13 +654,13 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       float mcon_ch = clampf(1.0f - sdivf(mcon_mn, mcon_mx), 0.0, 1.0);
       mcon_ch = _powf(mcon_ch, 4.0f*tn_lcon_pc);
       rgb = mcon_sc*rgb*mcon_ch + mcon_rgb*(1.0f - mcon_ch);
-    } 
+    }
     else { // Just use ratio-preserving
       rgb = mcon_sc*rgb;
     }
   }
-  
-  
+
+
   // Tonescale Norm
   float tsn = hypotf3(clampminf3(rgb, 0.0f))/SQRT3;
   // Purity Compression Norm
@@ -668,9 +668,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // RGB Ratios
   rgb = sdivf3f(clampminf3(rgb, -2.0f), tsn);
-  
-  
-  
+
+
+
   // Apply High Contrast
   if (tn_hcon_enable) {
     float hcon_p = _powf(2.0f, tn_hcon);
@@ -687,26 +687,26 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float opp_cy = rgb.x - rgb.z;
   float opp_gm = rgb.y - (rgb.x + rgb.z)/2.0f;
   float ach_d = _sqrtf(_fmaxf(0.0f, opp_cy*opp_cy + opp_gm*opp_gm))/SQRT3;
-  
+
   // Smooth ach_d, normalized so 1.0 doesn't change https://www.desmos.com/calculator/ozjg09hzef
   ach_d = (1.25f)*compress_toe_quadratic(ach_d, 0.25f, 0);
-  
+
   // Hue angle, rotated so that red = 0.0
-  float hue = _fmod(_atan2f(opp_cy, opp_gm) + PI + 1.10714931f, 2.0f*PI); 
-  
+  float hue = _fmod(_atan2f(opp_cy, opp_gm) + PI + 1.10714931f, 2.0f*PI);
+
   // RGB Hue Angles
   float3 ha_rgb = make_float3(
     gauss_window(hue_offset(hue, 0.0f), 0.8f),
     gauss_window(hue_offset(hue, 4.0f*PI/3.0f), 0.8f),
     gauss_window(hue_offset(hue, 2.0f*PI/3.0f), 0.8f));
 
-  // CMY Hue Angles
-  // Magenta would be PI/3.0f, but we rotate it slightly towards the red primary
+    // CMY Hue Angles
+    // Magenta would be PI/3.0f, but we rotate it slightly towards the red primary
   float3 ha_cmy = make_float3(
     gauss_window(hue_offset(hue, PI), 0.6f),
     gauss_window(hue_offset(hue, 0.9f), 0.6f),
     gauss_window(hue_offset(hue, -PI/3.0f), 0.6f));
-  
+
 
   // Purity Compression Range: https://www.desmos.com/calculator/8ynarg1uxk
   float ts_pt_cmp = _powf(1.0f - _powf(ts_pt, 1.0f/pt_rng_low), pt_rng_high);
@@ -728,7 +728,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
 
   /***************************************************
-    Mid-Range Purity 
+  Mid-Range Purity
       This boosts mid-range purity on the low end
       and reduces mid-range purity on the high end
   --------------------------------------------------*/
@@ -736,7 +736,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   if (ptm_enable) {
     // Mid Purity Low
     ptm_sc = sigmoid_cubic_power(ach_d, ptm_low*(1.0f - ts_pt), ptm_low_st);
-  
+
     // Mid Purity High
     ptm_sc *= sigmoid_cubic_power(ach_d, ptm_high*ts_pt, ptm_high_st);
   }
@@ -765,9 +765,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
 
   /***************************************************
-    Hue Shift
+  Hue Shift
   --------------------------------------------------*/
-  
+
   // Hue Shift RGB by purity compress tonescale, shifting more as intensity increases
   if (hs_rgb_enable) {
     float3 hs_rgb = ha_rgb*ts_pt*ts_pt;
@@ -783,7 +783,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     hsf = make_float3(hsf.z - hsf.y, hsf.x - hsf.z, hsf.y - hsf.x);
     rgb += hsf;
   }
-  
 
   // Apply brilliance
   rgb *= brl_f;
@@ -817,13 +816,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Purity Compress Low
   if (ptl_enable) {
-    float sum0 = rgb.x + rgb.y + rgb.z;
+    float sum0 = softplus(rgb.x, 0.2f, -100.0f, -0.3f) + rgb.y + softplus(rgb.z, 0.2f, -100.0f, -0.3f);
     rgb.x = softplus(rgb.x, 0.04f, -0.3f, 0.0f);
     rgb.y = softplus(rgb.y, 0.06f, -0.3f, 0.0f);
     rgb.z = softplus(rgb.z, 0.01f, -0.05f, 0.0f);
 
-    float ptl_norm = sdivf(sum0, rgb.x + rgb.y + rgb.z);
-    ptl_norm = softplus(ptl_norm, 0.094f, -100.0f, 0.5f);
+    float ptl_norm = _fminf(1.0f, sdivf(sum0, rgb.x + rgb.y + rgb.z));
     rgb *= ptl_norm;
   }
 
@@ -831,7 +829,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   tsn *= ts_m2; // scale for inverse toe
   tsn = compress_toe_quadratic(tsn, tn_toe, 0);
   tsn *= ts_dsc; // scale for display encoding
-  
+
   // Return from RGB ratios
   rgb *= tsn;
 
