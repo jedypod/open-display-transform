@@ -62,27 +62,27 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 // DEFINE_UI_PARAMS(_tn_lcon_pc, Contrast Low Per-Channel, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_rs_sa, Render Space Strength, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.6, 0.0)
 // DEFINE_UI_PARAMS(_rs_rw, Render Space Red Weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.8, 0.0)
-// DEFINE_UI_PARAMS(_rs_bw, Render Space Blue Weight, DCTLUI_SLIDER_FLOAT, 0.45, 0.0, 0.8, 0.0)
-// DEFINE_UI_PARAMS(_pt_r, Purity Compress R, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 4.0, 0.0)
+// DEFINE_UI_PARAMS(_rs_bw, Render Space Blue Weight, DCTLUI_SLIDER_FLOAT, 0.4, 0.0, 0.8, 0.0)
+// DEFINE_UI_PARAMS(_pt_r, Purity Compress R, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_g, Purity Compress G, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_b, Purity Compress B, DCTLUI_SLIDER_FLOAT, 2.5, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_rng_low, Purity Range Low, DCTLUI_SLIDER_FLOAT, 0.2, 0.1, 0.6, 0.0)
-// DEFINE_UI_PARAMS(_pt_rng_high, Purity Range High, DCTLUI_SLIDER_FLOAT, 0.8, 0.5, 2.0, 0.0)
+// DEFINE_UI_PARAMS(_pt_rng_high, Purity Range High, DCTLUI_SLIDER_FLOAT, 1.0, 0.5, 2.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_hdr, Purity HDR, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_ptl_enable, Purity Compress Low , DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_ptm_enable, Mid Purity, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_ptm_low, Mid Purity Low, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_ptm_low, Mid Purity Low, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_ptm_low_st, Mid Purity Low Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.1, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_ptm_high, Mid Purity High, DCTLUI_SLIDER_FLOAT, -0.6, -1.0, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.6, 0.1, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_ptm_high, Mid Purity High, DCTLUI_SLIDER_FLOAT, -0.8, -1.0, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.66, 0.1, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_brl_enable, Brilliance, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_brl_r, Brilliance R, DCTLUI_SLIDER_FLOAT, -0.45, -1.0, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_brl_r, Brilliance R, DCTLUI_SLIDER_FLOAT, -0.4, -1.0, 0.0, 0.0)
 // DEFINE_UI_PARAMS(_brl_g, Brilliance G, DCTLUI_SLIDER_FLOAT, -0.4, -1.0, 0.0, 0.0)
 // DEFINE_UI_PARAMS(_brl_b, Brilliance B, DCTLUI_SLIDER_FLOAT, -0.1, -1.0, 0.0, 0.0)
 // DEFINE_UI_PARAMS(_brl_c, Brilliance C, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.5, 0.0)
-// DEFINE_UI_PARAMS(_brl_m, Brilliance M, DCTLUI_SLIDER_FLOAT, -0.1, -0.5, 0.5, 0.0)
-// DEFINE_UI_PARAMS(_brl_y, Brilliance Y, DCTLUI_SLIDER_FLOAT, -0.0, -0.5, 0.5, 0.0)
-// DEFINE_UI_PARAMS(_brl_rng, Brilliance Range, DCTLUI_SLIDER_FLOAT, 0.8, 0.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_brl_m, Brilliance M, DCTLUI_SLIDER_FLOAT, -0.15, -0.5, 0.5, 0.0)
+// DEFINE_UI_PARAMS(_brl_y, Brilliance Y, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.5, 0.0)
+// DEFINE_UI_PARAMS(_brl_rng, Brilliance Range, DCTLUI_SLIDER_FLOAT, 0.75, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_rgb_enable, Hueshift RGB, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_hs_r, Hueshift R, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_g, Hueshift G, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
@@ -104,7 +104,7 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 
 // Preset Parameters
 DEFINE_UI_PARAMS(look_preset, Look Preset, DCTLUI_COMBO_BOX, 1, {look0, look1}, {Base, Default})
-DEFINE_UI_PARAMS(tonescale_preset, Tonescale Preset, DCTLUI_COMBO_BOX, 0, {tsprst0, tsprst1, tsprst2, tsprst3, tsprst4, tsprst5, tsprst6}, {Use Look Preset, High-Contrast, Low-Contrast, ACES-1.x, ACES-2.0, High-Contrast 2, Low-Contrast 2})
+DEFINE_UI_PARAMS(tonescale_preset, Tonescale Preset, DCTLUI_COMBO_BOX, 0, {tsprst0, tsprst1, tsprst2, tsprst3, tsprst4, tsprst5, tsprst6, tsprst7}, {Use Look Preset, High-Contrast, Low-Contrast, ACES-1.x, ACES-2.0, Marvelous Tonescape, Arriba Tonecall, DaGrinchi Tone})
 DEFINE_UI_PARAMS(display_encoding_preset, Display Encoding Preset, DCTLUI_COMBO_BOX, 0, {rec1886, srgb, displayp3, rec2100pq, rec2100hlg, dolbypq}, {Rec.1886 - 2.4 Power / Rec.709, sRGB Display - 2.2 Power / Rec.709, Display P3 - 2.2 Power / P3-D65, Rec.2100 - PQ / Rec.2020 (P3 Limited), Rec.2100 - HLG / Rec.2020 (P3 Limited), Dolby - PQ / P3-D65})
 
 /*---------------------------------------------------------------------------------------*/
@@ -504,7 +504,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.45f, pt_r = 0.25f, pt_g = 1.0f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 0.8f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 0, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_st = 0.6f, brl_enable = 1, brl_r = -0.45f, brl_g = -0.4f, brl_b = -0.1f, brl_c = 0.0f, brl_m = -0.1f, brl_y = -0.0f, brl_rng = 0.8f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hc_enable = 0, hc_r = 0.0f;
   }
   else if (look_preset==1) { // Default
-    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.45f, pt_r = 0.25f, pt_g = 1.0f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 0.8f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.25f, ptm_low_st = 0.5f, ptm_high = -0.6f, ptm_high_st = 0.6f, brl_enable = 1, brl_r = -0.45f, brl_g = -0.4f, brl_b = -0.1f, brl_c = 0.0f, brl_m = -0.1f, brl_y = -0.0f, brl_rng = 0.8f, hs_rgb_enable = 1, hs_r = 0.35f, hs_g = 0.35f, hs_b = 0.35f, hs_cmy_enable = 1, hs_c = 0.2f, hs_m = 0.2f, hs_y = 0.2f, hc_enable = 1, hc_r = 0.5f;
+    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.4f, pt_r = 0.3f, pt_g = 1.0f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 1.0f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.35f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_st = 0.66f, brl_enable = 1, brl_r = -0.4f, brl_g = -0.4f, brl_b = -0.1f, brl_c = 0.0f, brl_m = -0.15f, brl_y = 0.0f, brl_rng = 0.75f, hs_rgb_enable = 1, hs_r = 0.35f, hs_g = 0.35f, hs_b = 0.35f, hs_cmy_enable = 1, hs_c = 0.2f, hs_m = 0.2f, hs_y = 0.2f, hc_enable = 1, hc_r = 0.5f;
   }
 
   /*----------- TONESCALE PRESETS -----------------*/
@@ -522,11 +522,14 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (tonescale_preset==4) { // ACES-2.0
     tn_Lg = 10.0f, tn_con = 1.15f, tn_sh = 0.5f, tn_toe = 0.04f, tn_off = 0.0f, tn_hcon_enable = 0, tn_hcon = 1.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 0, tn_lcon = 1.0f, tn_lcon_w = 0.6f, tn_lcon_pc = 1.0f;
   }
-  else if (tonescale_preset==5) { // High-Contrast 2
+  else if (tonescale_preset==5) { // Marvelous Tonescape
     tn_Lg = 6.0f, tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.01f, tn_hcon_enable = 1, tn_hcon = 0.25f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f, tn_lcon_pc = 1.0f;
   }
-  else if (tonescale_preset==6) { // Low-Contrast 2
-    tn_Lg = 11.1f, tn_con = 1.0f, tn_sh = 0.5f, tn_toe = 0.1f, tn_off = 0.01f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 2.0f, tn_lcon_enable = 1, tn_lcon = 2.5f, tn_lcon_w = 0.16f, tn_lcon_pc = 1.0f;
+  else if (tonescale_preset==6) { // Arriba Tonecall
+    tn_Lg = 11.1f, tn_con = 1.05f, tn_sh = 0.5f, tn_toe = 0.1f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 2.0f, tn_lcon_enable = 1, tn_lcon = 2.0f, tn_lcon_w = 0.2f, tn_lcon_pc = 1.0f;
+  }
+  else if (tonescale_preset==7) { // DaGrinchi Tone
+    tn_Lg = 10.42f, tn_con = 1.2f, tn_sh = 0.5f, tn_toe = 0.02f, tn_off = 0.0f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.6f, tn_lcon_pc = 1.0f;
   }
 
   /*----------- DISPLAY ENCODING PRESETS -----------------*/
