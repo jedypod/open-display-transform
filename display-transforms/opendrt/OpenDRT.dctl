@@ -104,7 +104,7 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 
 // Preset Parameters
 DEFINE_UI_PARAMS(look_preset, Look Preset, DCTLUI_COMBO_BOX, 1, {look0, look1}, {Base, Default})
-DEFINE_UI_PARAMS(tonescale_preset, Tonescale Preset, DCTLUI_COMBO_BOX, 0, {tsprst0, tsprst1, tsprst2, tsprst3, tsprst4, tsprst5, tsprst6, tsprst7}, {Use Look Preset, High-Contrast, Low-Contrast, ACES-1.x, ACES-2.0, Marvelous Tonescape, Arriba Tonecall, DaGrinchi Tone})
+DEFINE_UI_PARAMS(tonescale_preset, Tonescale Preset, DCTLUI_COMBO_BOX, 0, {tsprst0, tsprst1, tsprst2, tsprst3, tsprst4, tsprst5, tsprst6, tsprst7}, {Use Look Preset, High-Contrast, Low-Contrast, ACES-1.x, ACES-2.0, Marvelous Tonescape, Arriba Tonecall, DaGrinchi Tonegroan})
 DEFINE_UI_PARAMS(display_encoding_preset, Display Encoding Preset, DCTLUI_COMBO_BOX, 0, {rec1886, srgb, displayp3, rec2100pq, rec2100hlg, dolbypq}, {Rec.1886 - 2.4 Power / Rec.709, sRGB Display - 2.2 Power / Rec.709, Display P3 - 2.2 Power / P3-D65, Rec.2100 - PQ / Rec.2020 (P3 Limited), Rec.2100 - HLG / Rec.2020 (P3 Limited), Dolby - PQ / P3-D65})
 
 /*---------------------------------------------------------------------------------------*/
@@ -784,7 +784,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb += hsf;
   }
   
-
   // Apply brilliance
   rgb *= brl_f;
 
