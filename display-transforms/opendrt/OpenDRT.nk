@@ -391,7 +391,7 @@ push $Ncdf711b0
 set Ncd96a810 [stack 0]
   Expression {
    temp_name0 n
-   temp_expr0 sqrt(r*r+g*g+0.5*b*b)/sqrt(3)
+   temp_expr0 sqrt(r*r+g*g+b*b)/sqrt(3)
    temp_name1 s
    temp_expr1 (n*n+m*w)/(n*n+w)
    temp_name2 mx
