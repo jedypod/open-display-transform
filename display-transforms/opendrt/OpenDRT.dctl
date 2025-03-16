@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 
-/* OpenDRT v1.0.0b43 -------------------------------------------------
+/* OpenDRT v1.0.0b44 -------------------------------------------------
 
 
   Written by Jed Smith
@@ -50,7 +50,7 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 // DEFINE_UI_PARAMS(_tn_gb, Grey Boost, DCTLUI_SLIDER_FLOAT, 0.13, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_con, Contrast, DCTLUI_SLIDER_FLOAT, 1.4, 1.0, 2.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_sh, Shoulder Clip, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_tn_toe, Toe, DCTLUI_SLIDER_FLOAT, 0.001, 0.0, 0.1, 0.0)
+// DEFINE_UI_PARAMS(_tn_toe, Toe, DCTLUI_SLIDER_FLOAT, 0.003, 0.0, 0.1, 0.0)
 // DEFINE_UI_PARAMS(_tn_off, Offset, DCTLUI_SLIDER_FLOAT, 0.005, 0.0, 0.02, 0.0)
 // DEFINE_UI_PARAMS(_tn_hcon_enable, Contrast High, DCTLUI_CHECK_BOX, 0)
 // DEFINE_UI_PARAMS(_tn_hcon, Contrast High, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
@@ -62,27 +62,27 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 // DEFINE_UI_PARAMS(_tn_lcon_pc, Contrast Low Per-Channel, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_rs_sa, Render Space Strength, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.6, 0.0)
 // DEFINE_UI_PARAMS(_rs_rw, Render Space Red Weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.8, 0.0)
-// DEFINE_UI_PARAMS(_rs_bw, Render Space Blue Weight, DCTLUI_SLIDER_FLOAT, 0.4, 0.0, 0.8, 0.0)
-// DEFINE_UI_PARAMS(_pt_r, Purity Compress R, DCTLUI_SLIDER_FLOAT, 0.4, 0.0, 4.0, 0.0)
-// DEFINE_UI_PARAMS(_pt_g, Purity Compress G, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 4.0, 0.0)
+// DEFINE_UI_PARAMS(_rs_bw, Render Space Blue Weight, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 0.8, 0.0)
+// DEFINE_UI_PARAMS(_pt_r, Purity Compress R, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 4.0, 0.0)
+// DEFINE_UI_PARAMS(_pt_g, Purity Compress G, DCTLUI_SLIDER_FLOAT, 2.0, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_b, Purity Compress B, DCTLUI_SLIDER_FLOAT, 2.5, 0.0, 4.0, 0.0)
-// DEFINE_UI_PARAMS(_pt_rng_low, Purity Range Low, DCTLUI_SLIDER_FLOAT, 0.2, 0.1, 0.6, 0.0)
-// DEFINE_UI_PARAMS(_pt_rng_high, Purity Range High, DCTLUI_SLIDER_FLOAT, 1.0, 0.5, 2.0, 0.0)
+// DEFINE_UI_PARAMS(_pt_rng_low, Purity Range Low, DCTLUI_SLIDER_FLOAT, 0.15, 0.1, 0.6, 0.0)
+// DEFINE_UI_PARAMS(_pt_rng_high, Purity Range High, DCTLUI_SLIDER_FLOAT, 0.66, 0.5, 2.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_hdr, Purity HDR, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_ptl_enable, Purity Compress Low , DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_ptm_enable, Mid Purity, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_ptm_low, Mid Purity Low, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_ptm_low, Mid Purity Low, DCTLUI_SLIDER_FLOAT, 0.33, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_ptm_low_st, Mid Purity Low Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.1, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_ptm_high, Mid Purity High, DCTLUI_SLIDER_FLOAT, -0.8, -1.0, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.66, 0.1, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_ptm_high, Mid Purity High, DCTLUI_SLIDER_FLOAT, -0.66, -1.0, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_brl_enable, Brilliance, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_brl_r, Brilliance R, DCTLUI_SLIDER_FLOAT, -0.4, -1.0, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_brl_g, Brilliance G, DCTLUI_SLIDER_FLOAT, -0.35, -1.0, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_brl_b, Brilliance B, DCTLUI_SLIDER_FLOAT, -0.1, -1.0, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_brl_g, Brilliance G, DCTLUI_SLIDER_FLOAT, -0.4, -1.0, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_brl_b, Brilliance B, DCTLUI_SLIDER_FLOAT, -0.2, -1.0, 0.0, 0.0)
 // DEFINE_UI_PARAMS(_brl_c, Brilliance C, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.5, 0.0)
-// DEFINE_UI_PARAMS(_brl_m, Brilliance M, DCTLUI_SLIDER_FLOAT, -0.15, -0.5, 0.5, 0.0)
+// DEFINE_UI_PARAMS(_brl_m, Brilliance M, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.5, 0.0)
 // DEFINE_UI_PARAMS(_brl_y, Brilliance Y, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.5, 0.0)
-// DEFINE_UI_PARAMS(_brl_rng, Brilliance Range, DCTLUI_SLIDER_FLOAT, 0.75, 0.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_brl_rng, Brilliance Range, DCTLUI_SLIDER_FLOAT, 0.66, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_rgb_enable, Hueshift RGB, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_hs_r, Hueshift R, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_g, Hueshift G, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
@@ -117,7 +117,7 @@ DEFINE_UI_PARAMS(display_encoding_preset, Display Encoding Preset, DCTLUI_COMBO_
 
 DEFINE_UI_TOOLTIP(Display Peak Luminance, "Peak display luminance in nits. In SDR, the max value stays pinned at 1.0. In HDR, the max value is adjusted to match peak luminance in the HDR container.")
 DEFINE_UI_TOOLTIP(Creative White, "Set the creative whitepoint of the display peak luminance. With D65 all channels are equal. With D50, the peak luminance value will match a D50 whitepoint. This can be creatively desireable. This adjustment is applied post-tonescale.")
-DEFINE_UI_TOOLTIP(Creative White Range, "The intensity range affected by the Creative White adjustment. At 0.0, the entire range is affected. As Range is increased, more of midtones and shadows are unaffected. It can be creatively desireable to keep midtones more neutral while shifting highlights warmer.")
+DEFINE_UI_TOOLTIP(Creative White Range, "The intensity range affected by the Creative White adjustment. At 1.0, the entire intensity range is affected. As Range is decreased, more of midtones and shadows are left unaffected. It can be creatively desireable to keep midtones more neutral while shifting highlights warmer.")
 DEFINE_UI_TOOLTIP(Clamp, "Clamp the final image into the final range supported by the display device.")
 DEFINE_UI_TOOLTIP(Look Preset, "Choose a look preset: Base is only the basic components of the image rendering, a good starting point for look development. Default is an image formation that includes minimal adjustments for an aesthetically pleasing image.")
 DEFINE_UI_TOOLTIP(Tonescale Preset, "Choose a preset for the tonescale function.")
@@ -433,10 +433,13 @@ __DEVICE__ float compress_toe_cubic(float x, float m, float w, int inv) {
   }
 }
 
-__DEVICE__ float sigmoid_cubic_power(float x, float s, float p) {
+__DEVICE__ float complement_power(float x, float p) {
+  return 1.0f - spowf(1.0f - x, 1.0f/p);
+}
+
+__DEVICE__ float sigmoid_cubic(float x, float s) {
   // Simple cubic sigmoid: https://www.desmos.com/calculator/hzgib42en6
   if (x < 0.0f || x > 1.0f) return 1.0f;
-  x = 1.0f - _powf(1.0f - x, 1.0f/p);
   return 1.0f + s*(1.0f - 3.0f*x*x + 2.0f*x*x*x);
 }
 
@@ -461,8 +464,8 @@ __DEVICE__ float softplus(float x, float s, float x0, float y0) {
   // Softplus https://www.desmos.com/calculator/doipi4u0ce
   if (x > 10.0f*s + y0 || s < 1e-3f) return x;
   float m = 1.0f;
-  if (_fabs(y0) > 1e-6f) m = _expf(y0/s); // do y0 constraint calculation
-  if (x0 < -10.0f) m -= _expf(x0/s); // do x0 constraint calculation
+  if (_fabs(y0) > 1e-6f) m = _expf(y0/s);
+  m -= _expf(x0/s);
   return s*_logf(_fmaxf(0.0f, m + _expf(x/s)));
 }
 
@@ -501,20 +504,20 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   /*----------- LOOK PRESETS -----------------*/
   // Look presets to go after
   if (look_preset==0) { // Base
-    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.4f, pt_r = 0.4f, pt_g = 1.0f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 1.0f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 0, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_st = 0.66f, brl_enable = 1, brl_r = -0.4f, brl_g = -0.35f, brl_b = -0.1f, brl_c = 0.0f, brl_m = -0.15f, brl_y = 0.0f, brl_rng = 0.75f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hc_enable = 0, hc_r = 0.0f;
+    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.5f, pt_r = 0.5f, pt_g = 2.0f, pt_b = 2.5f, pt_rng_low = 0.15f, pt_rng_high = 0.66f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 0, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_st = 0.3f, brl_enable = 1, brl_r = -0.4f, brl_g = -0.4f, brl_b = -0.2f, brl_c = 0.0f, brl_m = 0.0f, brl_y = 0.0f, brl_rng = 0.66f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hc_enable = 0, hc_r = 0.0f;
   }
   else if (look_preset==1) { // Default
-    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.4f, pt_r = 0.4f, pt_g = 1.0f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 1.0f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.35f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_st = 0.66f, brl_enable = 1, brl_r = -0.4f, brl_g = -0.35f, brl_b = -0.1f, brl_c = 0.0f, brl_m = -0.15f, brl_y = 0.0f, brl_rng = 0.75f, hs_rgb_enable = 1, hs_r = 0.35f, hs_g = 0.35f, hs_b = 0.35f, hs_cmy_enable = 1, hs_c = 0.2f, hs_m = 0.2f, hs_y = 0.2f, hc_enable = 1, hc_r = 0.5f;
+    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.5f, pt_r = 0.5f, pt_g = 2.0f, pt_b = 2.5f, pt_rng_low = 0.15f, pt_rng_high = 0.66f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.33f, ptm_low_st = 0.5f, ptm_high = -0.66f, ptm_high_st = 0.3f, brl_enable = 1, brl_r = -0.4f, brl_g = -0.4f, brl_b = -0.2f, brl_c = 0.0f, brl_m = 0.0f, brl_y = 0.0f, brl_rng = 0.66f, hs_rgb_enable = 1, hs_r = 0.35f, hs_g = 0.35f, hs_b = 0.35f, hs_cmy_enable = 1, hs_c = 0.2f, hs_m = 0.2f, hs_y = 0.2f, hc_enable = 1, hc_r = 0.5f;
   }
 
   /*----------- TONESCALE PRESETS -----------------*/
   if (tonescale_preset==0) { // Do nothing and use tonescale settings from the look preset
   }
   if (tonescale_preset==1) { // High-Contrast
-    tn_Lg = 11.1f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f;
+    tn_Lg = 11.1f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f;
   }
   else if (tonescale_preset==2) { // Low-Contrast
-    tn_Lg = 11.1f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f;
+    tn_Lg = 11.1f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f;
   }
   else if (tonescale_preset==3) { // ACES-1.x
     tn_Lg = 10.0f, tn_con = 1.0f, tn_sh = 0.245f, tn_toe = 0.02f, tn_off = 0.0f, tn_hcon_enable = 1, tn_hcon = 0.55f, tn_hcon_pv = 0.0f, tn_hcon_st = 2.0f, tn_lcon_enable = 1, tn_lcon = 1.13f, tn_lcon_w = 1.0f, tn_lcon_pc = 1.0f;
@@ -700,8 +703,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     gauss_window(hue_offset(hue, 4.0f*PI/3.0f), 0.8f),
     gauss_window(hue_offset(hue, 2.0f*PI/3.0f), 0.8f));
 
-    // CMY Hue Angles
-    // Magenta would be PI/3.0f, but we rotate it slightly towards the red primary
+  // CMY Hue Angles
+  // Magenta would be PI/3.0f, but we rotate it slightly towards the red primary
   float3 ha_cmy = make_float3(
     gauss_window(hue_offset(hue, PI), 0.6f),
     gauss_window(hue_offset(hue, 0.9f), 0.6f),
@@ -709,7 +712,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
 
   // Purity Compression Range: https://www.desmos.com/calculator/8ynarg1uxk
-  float ts_pt_cmp = _powf(1.0f - _powf(ts_pt, 1.0f/pt_rng_low), pt_rng_high);
+  float ts_pt_cmp = 1.0f - _powf(ts_pt, 1.0f/pt_rng_low);
+
+  float pt_rng_high_f = _fminf(1.0f, ach_d/1.2f);
+  pt_rng_high_f *= pt_rng_high_f;
+  pt_rng_high_f = pt_rng_high < 1.0f ? 1.0f - pt_rng_high_f : pt_rng_high_f;
+  ts_pt_cmp = _powf(ts_pt_cmp, pt_rng_high)*(1.0f - pt_rng_high_f) + ts_pt_cmp*pt_rng_high_f;
 
 
   /***************************************************
@@ -728,17 +736,19 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
 
   /***************************************************
-  Mid-Range Purity
+    Mid-Range Purity
       This boosts mid-range purity on the low end
       and reduces mid-range purity on the high end
   --------------------------------------------------*/
   float ptm_sc = 1.0f;
   if (ptm_enable) {
     // Mid Purity Low
-    ptm_sc = sigmoid_cubic_power(ach_d, ptm_low*(1.0f - ts_pt), ptm_low_st);
+    float ptm_ach_d = complement_power(ach_d, ptm_low_st);
+    ptm_sc = sigmoid_cubic(ptm_ach_d, ptm_low*(1.0f - ts_pt));
 
     // Mid Purity High
-    ptm_sc *= sigmoid_cubic_power(ach_d, ptm_high*ts_pt, ptm_high_st);
+    ptm_ach_d = complement_power(ach_d, ptm_high_st)*(1.0f - ts_pt) + ach_d*ach_d*ts_pt;
+    ptm_sc *= sigmoid_cubic(ptm_ach_d, ptm_high*ts_pt);
   }
 
 
