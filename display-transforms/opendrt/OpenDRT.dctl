@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 
-/* OpenDRT v1.0.0b44 -------------------------------------------------
+/* OpenDRT v1.0.0b45 -------------------------------------------------
 
 
   Written by Jed Smith
@@ -20,9 +20,7 @@ DEFINE_UI_PARAMS(tn_Lp, Display Peak Luminance, DCTLUI_SLIDER_FLOAT, 100.0, 100.
 // Clamp
 DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
 
-// Creative White
-DEFINE_UI_PARAMS(cwp, Creative White, DCTLUI_COMBO_BOX, 0, {_cwp0, _cwp1, _cwp2, _cwp3}, {D65, D60, D55, D50})
-DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+
 
 
 
@@ -52,14 +50,16 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 // DEFINE_UI_PARAMS(_tn_sh, Shoulder Clip, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_toe, Toe, DCTLUI_SLIDER_FLOAT, 0.003, 0.0, 0.1, 0.0)
 // DEFINE_UI_PARAMS(_tn_off, Offset, DCTLUI_SLIDER_FLOAT, 0.005, 0.0, 0.02, 0.0)
-// DEFINE_UI_PARAMS(_tn_hcon_enable, Contrast High, DCTLUI_CHECK_BOX, 0)
+// DEFINE_UI_PARAMS(_tn_hcon_enable, Enable Contrast High, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_tn_hcon, Contrast High, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_hcon_pv, Contrast High Pivot, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_hcon_st, Contrast High Strength, DCTLUI_SLIDER_FLOAT, 4.0, 0.0, 4.0, 0.0)
-// DEFINE_UI_PARAMS(_tn_lcon_enable, Contrast Low, DCTLUI_CHECK_BOX, 1)
+// DEFINE_UI_PARAMS(_tn_lcon_enable, Enable Contrast Low, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_tn_lcon, Contrast Low, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 3.0, 0.0)
-// DEFINE_UI_PARAMS(_tn_lcon_w, Contrast Low Width, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_tn_lcon_w, Contrast Low Width, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 2.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_lcon_pc, Contrast Low Per-Channel, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_cwp, Creative White, DCTLUI_COMBO_BOX, 0, {_cwp0, _cwp1, _cwp2, _cwp3}, {D65, D60, D55, D50})
+// DEFINE_UI_PARAMS(_cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_rs_sa, Render Space Strength, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.6, 0.0)
 // DEFINE_UI_PARAMS(_rs_rw, Render Space Red Weight, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 0.8, 0.0)
 // DEFINE_UI_PARAMS(_rs_bw, Render Space Blue Weight, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 0.8, 0.0)
@@ -67,32 +67,34 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 // DEFINE_UI_PARAMS(_pt_g, Purity Compress G, DCTLUI_SLIDER_FLOAT, 2.0, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_b, Purity Compress B, DCTLUI_SLIDER_FLOAT, 2.5, 0.0, 4.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_rng_low, Purity Range Low, DCTLUI_SLIDER_FLOAT, 0.15, 0.1, 0.6, 0.0)
-// DEFINE_UI_PARAMS(_pt_rng_high, Purity Range High, DCTLUI_SLIDER_FLOAT, 0.66, 0.5, 2.0, 0.0)
+// DEFINE_UI_PARAMS(_pt_rng_high, Purity Range High, DCTLUI_SLIDER_FLOAT, 0.8, 0.5, 2.0, 0.0)
 // DEFINE_UI_PARAMS(_pt_hdr, Purity HDR, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_ptl_enable, Purity Compress Low , DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_ptm_enable, Mid Purity, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_ptm_low, Mid Purity Low, DCTLUI_SLIDER_FLOAT, 0.33, 0.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_ptl_enable, Enable Purity Compress Low , DCTLUI_CHECK_BOX, 1)
+// DEFINE_UI_PARAMS(_ptm_enable, Enable Mid Purity, DCTLUI_CHECK_BOX, 1)
+// DEFINE_UI_PARAMS(_ptm_low, Mid Purity Low, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_ptm_low_st, Mid Purity Low Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.1, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_ptm_high, Mid Purity High, DCTLUI_SLIDER_FLOAT, -0.66, -1.0, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_brl_enable, Brilliance, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_brl_r, Brilliance R, DCTLUI_SLIDER_FLOAT, -0.4, -1.0, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_brl_g, Brilliance G, DCTLUI_SLIDER_FLOAT, -0.4, -1.0, 0.0, 0.0)
-// DEFINE_UI_PARAMS(_brl_b, Brilliance B, DCTLUI_SLIDER_FLOAT, -0.2, -1.0, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_ptm_high, Mid Purity High, DCTLUI_SLIDER_FLOAT, -0.66, -0.9, 0.0, 0.0)
+// DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.3, 0.2, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_brl_enable, Enable Brilliance, DCTLUI_CHECK_BOX, 1)
+// DEFINE_UI_PARAMS(_brl_r, Brilliance R, DCTLUI_SLIDER_FLOAT, -0.5, -1.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_brl_g, Brilliance G, DCTLUI_SLIDER_FLOAT, -0.45, -1.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_brl_b, Brilliance B, DCTLUI_SLIDER_FLOAT, -0.2, -1.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_brl_c, Brilliance C, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.5, 0.0)
 // DEFINE_UI_PARAMS(_brl_m, Brilliance M, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.5, 0.0)
 // DEFINE_UI_PARAMS(_brl_y, Brilliance Y, DCTLUI_SLIDER_FLOAT, 0.0, -0.5, 0.5, 0.0)
 // DEFINE_UI_PARAMS(_brl_rng, Brilliance Range, DCTLUI_SLIDER_FLOAT, 0.66, 0.0, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_hs_rgb_enable, Hueshift RGB, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_hs_r, Hueshift R, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_hs_rgb_enable, Enable Hueshift RGB, DCTLUI_CHECK_BOX, 1)
+// DEFINE_UI_PARAMS(_hs_r, Hueshift R, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_g, Hueshift G, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_b, Hueshift B, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_hs_cmy_enable, Hueshift CMY, DCTLUI_CHECK_BOX, 1)
+// DEFINE_UI_PARAMS(_hs_rgb_rng, Hueshift RGB Range, DCTLUI_SLIDER_FLOAT, 0.6, 0.25, 1.0, 0.0)
+// DEFINE_UI_PARAMS(_hs_cmy_enable, Enable Hueshift CMY, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_hs_c, Hueshift C, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_m, Hueshift M, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_y, Hueshift Y, DCTLUI_SLIDER_FLOAT, 0.2, 0.0, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_hc_enable, Hue Contrast, DCTLUI_CHECK_BOX, 1)
+// DEFINE_UI_PARAMS(_hc_enable, Enable Hue Contrast, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_hc_r, Hue Contrast R, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+
 
 // DEFINE_UI_PARAMS(_display_gamut, Display Gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020}, {Rec.709, P3-D65, Rec.2020 (P3 Limited)})
 // DEFINE_UI_PARAMS(_eotf, Display EOTF, DCTLUI_COMBO_BOX, 2, {eotf0, eotf1, eotf2, eotf3, eotf4, eotf5}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec.1886, 2.6 Power DCI, ST 2084 PQ, HLG})
@@ -103,8 +105,12 @@ DEFINE_UI_PARAMS(cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1
 ---------------------------------------------------------------------------------------*/
 
 // Preset Parameters
-DEFINE_UI_PARAMS(look_preset, Look Preset, DCTLUI_COMBO_BOX, 1, {look0, look1}, {Base, Default})
-DEFINE_UI_PARAMS(tonescale_preset, Tonescale Preset, DCTLUI_COMBO_BOX, 0, {tsprst0, tsprst1, tsprst2, tsprst3, tsprst4, tsprst5, tsprst6, tsprst7}, {Use Look Preset, High-Contrast, Low-Contrast, ACES-1.x, ACES-2.0, Marvelous Tonescape, Arriba Tonecall, DaGrinchi Tonegroan})
+DEFINE_UI_PARAMS(look_preset, Look Preset, DCTLUI_COMBO_BOX, 0, {look0, look1, look2, look3, look4}, {Default, Colorful, Aery, Umbra, Base})
+DEFINE_UI_PARAMS(tonescale_preset, Tonescale Preset, DCTLUI_COMBO_BOX, 0, {tsprst0, tsprst1, tsprst2, tsprst3, tsprst4, tsprst5, tsprst6, tsprst7, tsprst8, tsprst9}, {Use Look Preset, High-Contrast, Low-Contrast, ACES-1.x, ACES-2.0, Marvelous Tonescape, Arriba Tonecall, DaGrinchi Tonegroan, Aery Tonescale, Umbra Tonescale})
+// Creative White
+DEFINE_UI_PARAMS(_cwp, Creative White, DCTLUI_COMBO_BOX, 4, {_cwp0, _cwp1, _cwp2, _cwp3, _cwp4}, {D65, D60, D55, D50, Use Look Preset})
+DEFINE_UI_PARAMS(_cwp_rng, Creative White Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+// Display Encoding
 DEFINE_UI_PARAMS(display_encoding_preset, Display Encoding Preset, DCTLUI_COMBO_BOX, 0, {rec1886, srgb, displayp3, rec2100pq, rec2100hlg, dolbypq}, {Rec.1886 - 2.4 Power / Rec.709, sRGB Display - 2.2 Power / Rec.709, Display P3 - 2.2 Power / P3-D65, Rec.2100 - PQ / Rec.2020 (P3 Limited), Rec.2100 - HLG / Rec.2020 (P3 Limited), Dolby - PQ / P3-D65})
 
 /*---------------------------------------------------------------------------------------*/
@@ -119,7 +125,7 @@ DEFINE_UI_TOOLTIP(Display Peak Luminance, "Peak display luminance in nits. In SD
 DEFINE_UI_TOOLTIP(Creative White, "Set the creative whitepoint of the display peak luminance. With D65 all channels are equal. With D50, the peak luminance value will match a D50 whitepoint. This can be creatively desireable. This adjustment is applied post-tonescale.")
 DEFINE_UI_TOOLTIP(Creative White Range, "The intensity range affected by the Creative White adjustment. At 1.0, the entire intensity range is affected. As Range is decreased, more of midtones and shadows are left unaffected. It can be creatively desireable to keep midtones more neutral while shifting highlights warmer.")
 DEFINE_UI_TOOLTIP(Clamp, "Clamp the final image into the final range supported by the display device.")
-DEFINE_UI_TOOLTIP(Look Preset, "Choose a look preset: Base is only the basic components of the image rendering, a good starting point for look development. Default is an image formation that includes minimal adjustments for an aesthetically pleasing image.")
+DEFINE_UI_TOOLTIP(Look Preset, "Choose a preset look. DEFAULT is an image formation that includes minimal adjustments for an aesthetically pleasing image. COLORFUL: A very saturated bright exhuberant look, maybe a good fit for animation. AERY: Low contrast colorful look with strong preservation of color in highlights and strong mid-range purity reduction. UMBRA: Dark moody cinematic look with strong color crosstalk, natural blues, and a warm D50 whitepoint. BASE: only the base components of the OpenDRT image rendering, a good starting point for further look development.")
 DEFINE_UI_TOOLTIP(Tonescale Preset, "Choose a preset for the tonescale function.")
 DEFINE_UI_TOOLTIP(Display Encoding Preset, "Choose the target display standard.")
 
@@ -129,14 +135,16 @@ DEFINE_UI_TOOLTIP(Contrast, "Adjusts contrast or slope. A constrained power func
 DEFINE_UI_TOOLTIP(Shoulder Clip, "Unitless control for the scene-linear value at which the tonescale system crosses the peak display linear value (1.0) and clips. This is not an exact constraint in order to keep the system simple, but corresponds to roughly 16 at Shoulder Clip = 0 and 1024 at Shoulder Clip = 1")
 DEFINE_UI_TOOLTIP(Toe, "Quadratic toe compression. Strongly compresses deep shadows. Helpful to have some amount to smooth the transition into display minimum. Higher values with a strong positive Offset also valid. Similar to common camera DRT tonescale strategies.")
 DEFINE_UI_TOOLTIP(Offset, "Pre-tonescale scene-linear offset. If 0.0, scene-linear 0.0 maps to display-linear 0.0 through the tonescale system. Many camera imaging pipelines apply a negative offset to set the average of shadow grain at 0.0. A positive Offset can be desireable to compensate for this and increase detail in shadows, in addition to being aesthetically desireable. Offset should NOT be a negative number (Looking at you ACES 1.x)")
-DEFINE_UI_TOOLTIP(Contrast High, "Contrast High allows control of the upper section of the tonescale function. Off by default, but can be useful if a stronger highlight contrast, or a softer highlight rolloff behavior is desired.")
+DEFINE_UI_TOOLTIP(Enable Contrast High, "Contrast High allows control of the upper section of the tonescale function. Off by default, but can be useful if a stronger highlight contrast, or a softer highlight rolloff behavior is desired.")
 DEFINE_UI_TOOLTIP(Contrast High, "Amount adjust highlights. Positive values increase highlight exposure, negative values decrease. 0 has no effect.")
 DEFINE_UI_TOOLTIP(Contrast High Pivot, "Amount of stops above middle grey (0.18) to start the adjustment.")
 DEFINE_UI_TOOLTIP(Contrast High Strength, "How quickly above the Contrast High Pivot the effect begins.")
-DEFINE_UI_TOOLTIP(Contrast Low, "Contrast Low adds contrast to the midtones and shadows. Middle grey (0.18) is un-changed through the adjustment.")
+DEFINE_UI_TOOLTIP(Enable Contrast Low, "Contrast Low adds contrast to the midtones and shadows. Middle grey (0.18) is un-changed through the adjustment.")
 DEFINE_UI_TOOLTIP(Contrast Low, "Amount of contrast to add. 0.0 has no effect. 1.0 will expose down by 1 stop at the origin (0,0)")
 DEFINE_UI_TOOLTIP(Contrast Low Width, "The width of the adjustment. Width below 0.5 will mostly affect values between 0 and middle grey. Values above 0.5 will increasingly start to increase highlight contrast, which could be desired or not depending on what you are trying to do.")
 DEFINE_UI_TOOLTIP(Contrast Low Per-Channel, "How much to apply Contrast Low using a per-channel method, which can introduce pleasing mid-range purity boosts and hue distortions. A value of 0.0 will preserve purity and hue angle. A value of 1.0 will use a per-channel method in low and mid purities. At high purities, purity is always preserved to avoid artifacts.")
+DEFINE_UI_TOOLTIP(Creative White, "Set the creative whitepoint of the display peak luminance. With D65 all channels are equal. With D50, the peak luminance value will match a D50 whitepoint. This can be creatively desireable. This adjustment is applied post-tonescale.")
+DEFINE_UI_TOOLTIP(Creative White Range, "The intensity range affected by the Creative White adjustment. At 1.0, the entire intensity range is affected. As Range is decreased, more of midtones and shadows are left unaffected. It can be creatively desireable to keep midtones more neutral while shifting highlights warmer.")
 DEFINE_UI_TOOLTIP(Render Space Strength, "Render space is the encoding in which the RGB Ratios are taken. Strength controls how much to desaturate from P3 gamut. Creatively, the more you desaturate, the more brilliance is increased in the resulting image. To be used with caution as this affects every other aspect of the image rendering.")
 DEFINE_UI_TOOLTIP(Render Space Red Weight, "The Red weight of the Render Space Strength. Modify with caution as this affects every other part of the image rendering.")
 DEFINE_UI_TOOLTIP(Render Space Blue Weight, "The Blue weight of the Render Space Strength. Modify with caution as this affects every other part of the image rendering.")
@@ -146,13 +154,13 @@ DEFINE_UI_TOOLTIP(Purity Compress B, "Adjust the amount of purity compression as
 DEFINE_UI_TOOLTIP(Purity Range Low, "Where over the intensity range the purity compression starts. Higher values will compress purity more for low intensity. For example a Purity Range Low value of 0.5 will result in desaturated looking midtones.")
 DEFINE_UI_TOOLTIP(Purity Range High, "Where over the intensity range the purity compression ends. Lower values will limit how much purity will be compressed at high intensities. For example a Purity Range High value of 0.5 will result in highly saturated looking highlights, at the risk of gradient discontinuities.")
 DEFINE_UI_TOOLTIP(Purity HDR, "How much to affect purity compression as Peak Luminance increases. A value of 0.0 will keep the purity compression behavior exactly the same for SDR and HDR. A value of 1.0 will preserve more purity as peak luminance increases (at the risk of gradient disruptions in high purity high intensity light sources).")
-DEFINE_UI_TOOLTIP(Purity Compress Low , "Purity Compress Low increases tonality and smoothness in extremely pure input values that can not be adequately compressed into the display-referred gamut volume. The algorithm is tuned for common camera observer colorimetry sources. To keep the interface simple, this algorithm is exposed only as a boolean checkbox.")
-DEFINE_UI_TOOLTIP(Mid Purity, "The Mid Purity module adjusts mid-range purity of midtones and highlights. Without this module enabled, it is likely that midtones will not appear colorful enough, and highlights will appear too colorful resulting in chaulky pasty looking images especially in yellows and cyans. ")
+DEFINE_UI_TOOLTIP(Enable Purity Compress Low , "Purity Compress Low increases tonality and smoothness in extremely pure input values that can not be adequately compressed into the display-referred gamut volume. The algorithm is tuned for common camera observer colorimetry sources. To keep the interface simple, this algorithm is exposed only as a boolean checkbox.")
+DEFINE_UI_TOOLTIP(Enable Mid Purity, "The Mid Purity module adjusts mid-range purity of midtones and highlights. Without this module enabled, it is likely that midtones will not appear colorful enough, and highlights will appear too colorful resulting in chaulky pasty looking images especially in yellows and cyans. ")
 DEFINE_UI_TOOLTIP(Mid Purity Low, "Amount to increase purity of midtones and shadows in mid-range purity areas. A value of 0.0 will have no effect. A value of 1.0 is the maximum possible value while preserving smoothness.")
 DEFINE_UI_TOOLTIP(Mid Purity Low Strength, "The strength of the Mid Purity Low adjustment. Higher values affect more of the purity range.")
 DEFINE_UI_TOOLTIP(Mid Purity High, "Amount to decrease purity of upper midtones and highlights in mid-range purity areas. A value of 0.0 will have no effect. A value of 1.0 is the maximum possible value while preserving smoothness.")
 DEFINE_UI_TOOLTIP(Mid Purity High Strength, "The strength of the Mid Purity High adjustment. Higher values affect more of the purity range.")
-DEFINE_UI_TOOLTIP(Brilliance, "Brilliance scales the intensity of more pure stimuli. With the OpenDRT algorithm it is possible to get high intensity high purity values going out of the top of the display-referred gamut volume, which can cause discontinuities in gradients. The Brilliance module exists compensate for this, and to add some darkening to more pure stimuli, which can be creatively desireable.")
+DEFINE_UI_TOOLTIP(Enable Brilliance, "Brilliance scales the intensity of more pure stimuli. With the OpenDRT algorithm it is possible to get high intensity high purity values going out of the top of the display-referred gamut volume, which can cause discontinuities in gradients. The Brilliance module exists compensate for this, and to add some darkening to more pure stimuli, which can be creatively desireable.")
 DEFINE_UI_TOOLTIP(Brilliance R, "Scale intensity of high-purity reds.")
 DEFINE_UI_TOOLTIP(Brilliance G, "Scale intensity of high-purity greens.")
 DEFINE_UI_TOOLTIP(Brilliance B, "Scale intensity of high-purity blues.")
@@ -160,15 +168,16 @@ DEFINE_UI_TOOLTIP(Brilliance C, "Scale intensity of high-purity cyans.")
 DEFINE_UI_TOOLTIP(Brilliance M, "Scale intensity of high-purity megantas.")
 DEFINE_UI_TOOLTIP(Brilliance Y, "Scale intensity of high-purity yellows.")
 DEFINE_UI_TOOLTIP(Brilliance Range, "As Brilliance Range is increased, the brilliance adjustments affect more the low intensity values of the image data.")
-DEFINE_UI_TOOLTIP(Hueshift RGB, "Hue Shift RGB adds hue distortion to the red green and blue primary hue angles as intensity increases. By default OpenDRT will compress purity in a straight line in RGB/Chromaticity space. This can lead to perceived hue shifts due to the Abney Effect, for example a pure blue will perceptually shift towards purple as it desaturates. To compensate for this, and to use as a creative tool, this module allows creative control over the path that red green and blue hue angles take as their purity is compressed. ")
+DEFINE_UI_TOOLTIP(Enable Hueshift RGB, "Hue Shift RGB adds hue distortion to the red green and blue primary hue angles as intensity increases. By default OpenDRT will compress purity in a straight line in RGB/Chromaticity space. This can lead to perceived hue shifts due to the Abney Effect, for example a pure blue will perceptually shift towards purple as it desaturates. To compensate for this, and to use as a creative tool, this module allows creative control over the path that red green and blue hue angles take as their purity is compressed.")
 DEFINE_UI_TOOLTIP(Hueshift R, "Amount to distort the red hue angle towards yellow as intensity increases.")
 DEFINE_UI_TOOLTIP(Hueshift G, "Amount to distort the green hue angle towards yellow as intensity increases.")
 DEFINE_UI_TOOLTIP(Hueshift B, "Amount to distort the blue hue angle towards cyan as intensity increases.")
-DEFINE_UI_TOOLTIP(Hueshift CMY, "Hue Shift CMY adds hue distortion to the cyan magenta and yellow secondary hue angles as intensity decreases. This module allows some very minimal adjustments of secondary hue angles as a creative tool.")
+DEFINE_UI_TOOLTIP(Hueshift RGB Range, "Amount of intensity range to affect with HueShift RGB.")
+DEFINE_UI_TOOLTIP(Enable Hueshift CMY, "Hue Shift CMY adds hue distortion to the cyan magenta and yellow secondary hue angles as intensity decreases. This module allows some very minimal adjustments of secondary hue angles as a creative tool.")
 DEFINE_UI_TOOLTIP(Hueshift C, "Amount to distort the cyan hue angle towards blue as intensity decreases.")
 DEFINE_UI_TOOLTIP(Hueshift M, "Amount to distort the magenta hue angle towards blue as intensity decreases.")
 DEFINE_UI_TOOLTIP(Hueshift Y, "Amount to distort the yellow hue angle towards red as intensity decreases.")
-DEFINE_UI_TOOLTIP(Hue Contrast, "Hue Contrast compresses hue angle towards the primary at the bottom end and expands the hue angle towards the secondary as intensity increases. It also increases purity as it compresses, and decreases purity as it expands. This leads to a nice creatively controllable simulation of this effect from per-channel tonescales. For OpenDRT we only keep the red hue angle control since it is the most useful.")
+DEFINE_UI_TOOLTIP(Enable Hue Contrast, "Hue Contrast compresses hue angle towards the primary at the bottom end and expands the hue angle towards the secondary as intensity increases. It also increases purity as it compresses, and decreases purity as it expands. This leads to a nice creatively controllable simulation of this effect from per-channel tonescales. For OpenDRT we only keep the red hue angle control since it is the most useful.")
 DEFINE_UI_TOOLTIP(Hue Contrast R, "Amount to increase Hue Contrast at the red hue angle.")
 
 #endif
@@ -492,22 +501,31 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     --------------------------------------------------*/
 
   // Init look preset variables
-  int tn_hcon_enable, tn_lcon_enable, ptl_enable, ptm_enable, brl_enable, hs_rgb_enable, hs_cmy_enable, hc_enable, display_gamut, eotf;
-  float tn_Lg, tn_gb, tn_con, tn_sh, tn_toe, tn_off, tn_hcon, tn_hcon_pv, tn_hcon_st, tn_lcon, tn_lcon_w, tn_lcon_pc, rs_sa, rs_rw, rs_bw, pt_r, pt_g, pt_b, pt_rng_low, pt_rng_high, pt_hdr, ptm_low, ptm_low_st, ptm_high, ptm_high_st, brl_r, brl_g, brl_b, brl_c, brl_m, brl_y, brl_rng, hs_r, hs_g, hs_b, hs_c, hs_m, hs_y, hc_r;
+  int tn_hcon_enable, tn_lcon_enable, ptl_enable, ptm_enable, brl_enable, hs_rgb_enable, hs_cmy_enable, hc_enable, cwp, display_gamut, eotf;
+  float tn_Lg, tn_gb, tn_con, tn_sh, tn_toe, tn_off, tn_hcon, tn_hcon_pv, tn_hcon_st, tn_lcon, tn_lcon_w, tn_lcon_pc, cwp_rng, rs_sa, rs_rw, rs_bw, pt_r, pt_g, pt_b, pt_rng_low, pt_rng_high, pt_hdr, ptm_low, ptm_low_st, ptm_high, ptm_high_st, brl_r, brl_g, brl_b, brl_c, brl_m, brl_y, brl_rng, hs_r, hs_g, hs_b, hs_rgb_rng, hs_c, hs_m, hs_y, hc_r;
 
   #ifdef INIT_PARAMS  // Set all parameters to the user-controllable ones instead of presets if INIT_PARAMS defined by user.
 
-  tn_Lg=_tn_Lg, tn_gb=_tn_gb, tn_con=_tn_con, tn_sh=_tn_sh, tn_toe=_tn_toe, tn_off=_tn_off, tn_hcon_enable=_tn_hcon_enable, tn_hcon=_tn_hcon, tn_hcon_pv=_tn_hcon_pv, tn_hcon_st=_tn_hcon_st, tn_lcon_enable=_tn_lcon_enable, tn_lcon=_tn_lcon, tn_lcon_w=_tn_lcon_w, tn_lcon_pc=_tn_lcon_pc, rs_sa=_rs_sa, rs_rw=_rs_rw, rs_bw=_rs_bw, pt_r=_pt_r, pt_g=_pt_g, pt_b=_pt_b, pt_rng_low=_pt_rng_low, pt_rng_high=_pt_rng_high, pt_hdr=_pt_hdr, ptl_enable=_ptl_enable, ptm_enable=_ptm_enable, ptm_low=_ptm_low, ptm_low_st=_ptm_low_st, ptm_high=_ptm_high, ptm_high_st=_ptm_high_st, brl_enable=_brl_enable, brl_r=_brl_r, brl_g=_brl_g, brl_b=_brl_b, brl_c=_brl_c, brl_m=_brl_m, brl_y=_brl_y, brl_rng=_brl_rng, hs_rgb_enable=_hs_rgb_enable, hs_r=_hs_r, hs_g=_hs_g, hs_b=_hs_b, hs_cmy_enable=_hs_cmy_enable, hs_c=_hs_c, hs_m=_hs_m, hs_y=_hs_y, hc_enable=_hc_enable, hc_r=_hc_r, display_gamut=_display_gamut, eotf=_eotf;
+  tn_Lg=_tn_Lg, tn_gb=_tn_gb, tn_con=_tn_con, tn_sh=_tn_sh, tn_toe=_tn_toe, tn_off=_tn_off, tn_hcon_enable=_tn_hcon_enable, tn_hcon=_tn_hcon, tn_hcon_pv=_tn_hcon_pv, tn_hcon_st=_tn_hcon_st, tn_lcon_enable=_tn_lcon_enable, tn_lcon=_tn_lcon, tn_lcon_w=_tn_lcon_w, tn_lcon_pc=_tn_lcon_pc, cwp=_cwp, cwp_rng=_cwp_rng, rs_sa=_rs_sa, rs_rw=_rs_rw, rs_bw=_rs_bw, pt_r=_pt_r, pt_g=_pt_g, pt_b=_pt_b, pt_rng_low=_pt_rng_low, pt_rng_high=_pt_rng_high, pt_hdr=_pt_hdr, ptl_enable=_ptl_enable, ptm_enable=_ptm_enable, ptm_low=_ptm_low, ptm_low_st=_ptm_low_st, ptm_high=_ptm_high, ptm_high_st=_ptm_high_st, brl_enable=_brl_enable, brl_r=_brl_r, brl_g=_brl_g, brl_b=_brl_b, brl_c=_brl_c, brl_m=_brl_m, brl_y=_brl_y, brl_rng=_brl_rng, hs_rgb_enable=_hs_rgb_enable, hs_r=_hs_r, hs_g=_hs_g, hs_b=_hs_b, hs_rgb_rng=_hs_rgb_rng, hs_cmy_enable=_hs_cmy_enable, hs_c=_hs_c, hs_m=_hs_m, hs_y=_hs_y, hc_enable=_hc_enable, hc_r=_hc_r, display_gamut=_display_gamut, eotf=_eotf;
 
   #else // Otherwise, drive everything based on the preset combo box parameters.
 
   /*----------- LOOK PRESETS -----------------*/
   // Look presets to go after
-  if (look_preset==0) { // Base
-    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.5f, pt_r = 0.5f, pt_g = 2.0f, pt_b = 2.5f, pt_rng_low = 0.15f, pt_rng_high = 0.66f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 0, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_st = 0.3f, brl_enable = 1, brl_r = -0.4f, brl_g = -0.4f, brl_b = -0.2f, brl_c = 0.0f, brl_m = 0.0f, brl_y = 0.0f, brl_rng = 0.66f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hc_enable = 0, hc_r = 0.0f;
+  if (look_preset==0) { // Default
+    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, cwp = 0, cwp_rng = 0.5f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.5f, pt_r = 0.5f, pt_g = 2.0f, pt_b = 2.5f, pt_rng_low = 0.15f, pt_rng_high = 0.8f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.35f, ptm_low_st = 0.5f, ptm_high = -0.66f, ptm_high_st = 0.3f, brl_enable = 1, brl_r = -0.5f, brl_g = -0.45f, brl_b = -0.2f, brl_c = 0.0f, brl_m = 0.0f, brl_y = 0.0f, brl_rng = 0.66f, hs_rgb_enable = 1, hs_r = 0.3f, hs_g = 0.35f, hs_b = 0.35f, hs_rgb_rng = 0.6f, hs_cmy_enable = 1, hs_c = 0.2f, hs_m = 0.2f, hs_y = 0.2f, hc_enable = 1, hc_r = 0.5f;
   }
-  else if (look_preset==1) { // Default
-    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.5f, pt_r = 0.5f, pt_g = 2.0f, pt_b = 2.5f, pt_rng_low = 0.15f, pt_rng_high = 0.66f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.33f, ptm_low_st = 0.5f, ptm_high = -0.66f, ptm_high_st = 0.3f, brl_enable = 1, brl_r = -0.4f, brl_g = -0.4f, brl_b = -0.2f, brl_c = 0.0f, brl_m = 0.0f, brl_y = 0.0f, brl_rng = 0.66f, hs_rgb_enable = 1, hs_r = 0.35f, hs_g = 0.35f, hs_b = 0.35f, hs_cmy_enable = 1, hs_c = 0.2f, hs_m = 0.2f, hs_y = 0.2f, hc_enable = 1, hc_r = 0.5f;
+  else if (look_preset==1) { // Colorful
+    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.3f, tn_sh = 0.5f, tn_toe = 0.005f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 0.75f, tn_lcon_w = 1.0f, tn_lcon_pc = 1.0f, cwp = 0, cwp_rng = 0.5f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.5f, pt_r = 0.3f, pt_g = 0.5f, pt_b = 0.5f, pt_rng_low = 0.25f, pt_rng_high = 1.0f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.5f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_st = 0.5f, brl_enable = 1, brl_r = -0.5f, brl_g = -0.5f, brl_b = -0.1f, brl_c = 0.0f, brl_m = 0.0f, brl_y = 0.2f, brl_rng = 0.5f, hs_rgb_enable = 1, hs_r = 0.4f, hs_g = 0.5f, hs_b = 0.6f, hs_rgb_rng = 0.6f, hs_cmy_enable = 1, hs_c = 0.2f, hs_m = 0.1f, hs_y = 0.2f, hc_enable = 1, hc_r = 0.8f;
+  }
+  else if (look_preset==2) { // Aery
+    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.2f, tn_sh = 0.5f, tn_toe = 0.01f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 0.5f, tn_lcon_enable = 1, tn_lcon = 0.5f, tn_lcon_w = 2.0f, tn_lcon_pc = 0.0f, cwp = 1, cwp_rng = 0.5f, rs_sa = 0.35f, rs_rw = 0.2f, rs_bw = 0.4f, pt_r = 0.4f, pt_g = 0.6f, pt_b = 1.0f, pt_rng_low = 0.2f, pt_rng_high = 0.5f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.5f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_st = 0.35f, brl_enable = 1, brl_r = -0.6f, brl_g = -0.5f, brl_b = -0.3f, brl_c = 0.0f, brl_m = 0.0f, brl_y = 0.0f, brl_rng = 0.66f, hs_rgb_enable = 1, hs_r = 0.35f, hs_g = 0.3f, hs_b = 0.5f, hs_rgb_rng = 0.66f, hs_cmy_enable = 1, hs_c = 0.15f, hs_m = 0.0f, hs_y = 0.15f, hc_enable = 1, hc_r = 0.5f;
+  }
+  else if (look_preset==3) { // Umbra
+    tn_Lg = 5.0f, tn_gb = 0.13f, tn_con = 1.8f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f, tn_lcon_pc = 1.0f, cwp = 3, cwp_rng = 0.8f, rs_sa = 0.45f, rs_rw = 0.1f, rs_bw = 0.35f, pt_r = 0.1f, pt_g = 0.4f, pt_b = 2.5f, pt_rng_low = 0.15f, pt_rng_high = 0.8f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.4f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_st = 0.3f, brl_enable = 1, brl_r = -0.7f, brl_g = -0.6f, brl_b = -0.3f, brl_c = 0.0f, brl_m = -0.25f, brl_y = 0.0f, brl_rng = 0.9f, hs_rgb_enable = 1, hs_r = 0.5f, hs_g = 0.5f, hs_b = 0.5f, hs_rgb_rng = 1.0f, hs_cmy_enable = 1, hs_c = 1.0f, hs_m = 1.0f, hs_y = 1.0f, hc_enable = 1, hc_r = 0.8f;
+  }
+  else if (look_preset==4) { // Base
+    tn_Lg = 11.1f, tn_gb = 0.13f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, cwp = 0, cwp_rng = 0.5f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.5f, pt_r = 0.5f, pt_g = 2.0f, pt_b = 2.5f, pt_rng_low = 0.15f, pt_rng_high = 0.66f, pt_hdr = 1.0f, ptl_enable = 1, ptm_enable = 0, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_st = 0.3f, brl_enable = 0, brl_r = -0.4f, brl_g = -0.4f, brl_b = -0.2f, brl_c = 0.0f, brl_m = 0.0f, brl_y = 0.0f, brl_rng = 0.66f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_rgb_rng = 0.5f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hc_enable = 0, hc_r = 0.0f;
   }
 
   /*----------- TONESCALE PRESETS -----------------*/
@@ -531,8 +549,33 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (tonescale_preset==6) { // Arriba Tonecall
     tn_Lg = 11.1f, tn_con = 1.05f, tn_sh = 0.5f, tn_toe = 0.1f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 2.0f, tn_lcon_enable = 1, tn_lcon = 2.0f, tn_lcon_w = 0.2f, tn_lcon_pc = 1.0f;
   }
-  else if (tonescale_preset==7) { // DaGrinchi Tone
+  else if (tonescale_preset==7) { // DaGrinchi Tonegroan
     tn_Lg = 10.42f, tn_con = 1.2f, tn_sh = 0.5f, tn_toe = 0.02f, tn_off = 0.0f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.6f, tn_lcon_pc = 1.0f;
+  }
+  else if (tonescale_preset==8) { // Aery Tonescale
+    tn_Lg = 11.1f, tn_con = 1.2f, tn_sh = 0.5f, tn_toe = 0.01f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 0.5f, tn_lcon_enable = 1, tn_lcon = 0.5f, tn_lcon_w = 2.0f, tn_lcon_pc = 0.0f;
+  }
+  else if (tonescale_preset==9) { // Umbra Tonescale
+    tn_Lg = 5.0f, tn_con = 1.8f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f, tn_lcon_pc = 1.0f;
+  }
+
+  if (_cwp==0) { // D65
+    cwp = 0;
+    cwp_rng = _cwp_rng;
+  }
+  if (_cwp==1) { // D60
+    cwp = 1;
+    cwp_rng = _cwp_rng;
+  }
+  if (_cwp==2) { // D55
+    cwp = 2;
+    cwp_rng = _cwp_rng;
+  }
+  if (_cwp==3) { // D50
+    cwp = 3;
+    cwp_rng = _cwp_rng;
+  }
+  if (_cwp==4) { // Do nothing and use cwp and cwp_rng setting from the look preset
   }
 
   /*----------- DISPLAY ENCODING PRESETS -----------------*/
@@ -699,16 +742,17 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // RGB Hue Angles
   float3 ha_rgb = make_float3(
-    gauss_window(hue_offset(hue, 0.0f), 0.8f),
-    gauss_window(hue_offset(hue, 4.0f*PI/3.0f), 0.8f),
-    gauss_window(hue_offset(hue, 2.0f*PI/3.0f), 0.8f));
+    gauss_window(hue_offset(hue, 0.0f), 0.6f),
+    gauss_window(hue_offset(hue, 4.0f*PI/3.0f), 0.6f),
+    gauss_window(hue_offset(hue, 2.0f*PI/3.0f), 0.6f));
 
   // CMY Hue Angles
-  // Magenta would be PI/3.0f, but we rotate it slightly towards the red primary
+  // Exact alignment to Cyan/Magenta/Yellow secondaries would be PI, PI/3 and -PI/3, but
+  // we customize these a bit for creative purposes: M towards B, Y towards G, C towards G
   float3 ha_cmy = make_float3(
-    gauss_window(hue_offset(hue, PI), 0.6f),
-    gauss_window(hue_offset(hue, 0.9f), 0.6f),
-    gauss_window(hue_offset(hue, -PI/3.0f), 0.6f));
+    gauss_window(hue_offset(hue, 3.3f), 0.6f),
+    gauss_window(hue_offset(hue, 1.3f), 0.6f),
+    gauss_window(hue_offset(hue, -1.2), 0.6f));
 
 
   // Purity Compression Range: https://www.desmos.com/calculator/8ynarg1uxk
@@ -728,7 +772,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     brl_f = -brl_r*ha_rgb.x - brl_g*ha_rgb.y - brl_b*ha_rgb.z - brl_c*ha_cmy.x - brl_m*ha_cmy.y - brl_y*ha_cmy.z;
     brl_f = (1.0f - ach_d)*brl_f + 1.0f - brl_f;
     brl_f = softplus(brl_f, 0.25f, -100.0f, 0.0f); // Protect against over-darkening
-    float brl_lim = spowf(ts_pt, 1.0f - brl_rng); // Limit to high intensity range
+    
+    // Limit Brilliance adjustment by tonescale
+    float brl_ts = brl_f > 1.0f ? 1.0f - ts_pt : ts_pt; // Limit by inverse tonescale if positive Brilliance adjustment
+    float brl_lim = spowf(brl_ts, 1.0f - brl_rng);
     brl_f = brl_f*brl_lim + 1.0f - brl_lim;
     brl_f = _fmaxf(0.0f, _fminf(2.0f, brl_f)); // protect for shadow grain
   }
@@ -749,6 +796,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     // Mid Purity High
     ptm_ach_d = complement_power(ach_d, ptm_high_st)*(1.0f - ts_pt) + ach_d*ach_d*ts_pt;
     ptm_sc *= sigmoid_cubic(ptm_ach_d, ptm_high*ts_pt);
+    ptm_sc = _fmaxf(0.0f, ptm_sc); // Ensure no negative scale
   }
 
 
@@ -780,7 +828,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Hue Shift RGB by purity compress tonescale, shifting more as intensity increases
   if (hs_rgb_enable) {
-    float3 hs_rgb = ha_rgb*ts_pt*ts_pt;
+    float3 hs_rgb = ha_rgb*_powf(ts_pt, 1.0f/hs_rgb_rng);
     float3 hsf = make_float3(hs_rgb.x*hs_r, hs_rgb.y*-hs_g, hs_rgb.z*-hs_b);
     hsf = make_float3(hsf.z - hsf.y, hsf.x - hsf.z, hsf.y - hsf.x);
     rgb += hsf;
