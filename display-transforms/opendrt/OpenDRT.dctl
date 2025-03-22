@@ -556,7 +556,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     display_gamut = 2;
     eotf = 5;
   }
-  else if (display_encoding_preset==4) { // Dolby PQ
+  else if (display_encoding_preset==5) { // Dolby PQ
     display_gamut = 1;
     eotf = 4;
   }
