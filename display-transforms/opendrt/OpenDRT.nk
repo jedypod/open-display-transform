@@ -862,15 +862,15 @@ push $Nbd778150
   addUserKnob {7 c0 R -3 3}
   c0 0.1
   addUserKnob {7 c1 R -3 3}
-  c1 {{4*pi/3}}
+  c1 4.3
   addUserKnob {7 c2 R -3 3}
-  c2 {{2*pi/3}}
+  c2 2.3
   addUserKnob {7 w0 R 0 3}
   w0 0.9
   addUserKnob {7 w1 R 0 3}
-  w1 0.8
+  w1 0.9
   addUserKnob {7 w2 R 0 3}
-  w2 0.8
+  w2 0.9
  }
 set Nbd576870 [stack 0]
  MergeExpression {
