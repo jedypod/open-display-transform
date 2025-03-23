@@ -535,7 +535,7 @@ set Nbee73690 [stack 0]
   s {{x0*(pow(s0/m2,-1/tn_con)-1)}}
   addUserKnob {26 ""}
   addUserKnob {7 pt_hdr l "purity hdr"}
-  pt_hdr 1
+  pt_hdr 0.5
   addUserKnob {7 Lf}
   Lf {{pt_hdr*clamp((tn_Lp-100)/900)}}
   addUserKnob {7 s_Lp100 R 0 4}
