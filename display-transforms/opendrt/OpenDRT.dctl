@@ -16,8 +16,8 @@ DEFINE_UI_PARAMS(in_oetf, Input Transfer Function, DCTLUI_COMBO_BOX, 1, {ioetf_l
 
 // Tonescale Parameters
 DEFINE_UI_PARAMS(tn_Lp, Display Peak Luminance, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 0.0)
-DEFINE_UI_PARAMS(tn_gb, Grey Boost, DCTLUI_SLIDER_FLOAT, 0.13, 0.0, 1.0, 0.0)
-DEFINE_UI_PARAMS(pt_hdr, Purity HDR, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(tn_gb, HDR Grey Boost, DCTLUI_SLIDER_FLOAT, 0.13, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(pt_hdr, HDR Purity, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
 
 // Clamp
 DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
@@ -122,6 +122,8 @@ DEFINE_UI_PARAMS(display_encoding_preset, Display Encoding Preset, DCTLUI_COMBO_
 #if ((__RESOLVE_VER_MAJOR__ > 19)) || ((__RESOLVE_VER_MAJOR__ == 19) && (__RESOLVE_VER_MINOR__ >= 1))
 
 DEFINE_UI_TOOLTIP(Display Peak Luminance, "Peak display luminance in nits. In SDR, the max value stays pinned at 1.0. In HDR, the max value is adjusted to match peak luminance in the HDR container.")
+DEFINE_UI_TOOLTIP(HDR Grey Boost, "Amount of stops to boost Grey Luminance, per stop of exposure increase of Peak Luminance. For example, if HDR Grey Boost is 0.1, middle grey will be boosted by 0.1 stops per stop of Peak Luminance increase.")
+DEFINE_UI_TOOLTIP(HDR Purity, "How much to affect purity compression as Peak Luminance increases. A value of 0.0 will keep the purity compression behavior exactly the same for SDR and HDR. A value of 1.0 will preserve more purity as peak luminance increases (at the risk of gradient disruptions in high purity high intensity light sources).")
 DEFINE_UI_TOOLTIP(Creative White, "Set the creative whitepoint of the display peak luminance. With D65 all channels are equal. With D50, the peak luminance value will match a D50 whitepoint. This can be creatively desireable. This adjustment is applied post-tonescale.")
 DEFINE_UI_TOOLTIP(Creative White Range, "The intensity range affected by the Creative White adjustment. At 1.0, the entire intensity range is affected. As Range is decreased, more of midtones and shadows are left unaffected. It can be creatively desireable to keep midtones more neutral while shifting highlights warmer.")
 DEFINE_UI_TOOLTIP(Clamp, "Clamp the final image into the final range supported by the display device.")
@@ -130,7 +132,6 @@ DEFINE_UI_TOOLTIP(Tonescale Preset, "Choose a preset for the tonescale function.
 DEFINE_UI_TOOLTIP(Display Encoding Preset, "Choose the target display standard.")
 
 DEFINE_UI_TOOLTIP(Grey Luminance, "Display luminance for middle grey (0.18) in nits. Sets the target value for middle grey within the available luminance range of the display device.")
-DEFINE_UI_TOOLTIP(Grey Boost, "Amount of stops to boost Grey Luminance, per stop of exposure increase of Peak Luminance. E.g., if Grey Boost is 0.1, middle grey will be boosted by 0.1 stops per stop of Peak Luminance increase.")
 DEFINE_UI_TOOLTIP(Contrast, "Adjusts contrast or slope. A constrained power function applied in display linear.")
 DEFINE_UI_TOOLTIP(Shoulder Clip, "Unitless control for the scene-linear value at which the tonescale system crosses the peak display linear value (1.0) and clips. This is not an exact constraint in order to keep the system simple, but corresponds to roughly 16 at Shoulder Clip = 0 and 1024 at Shoulder Clip = 1")
 DEFINE_UI_TOOLTIP(Toe, "Quadratic toe compression. Strongly compresses deep shadows. Helpful to have some amount to smooth the transition into display minimum. Higher values with a strong positive Offset also valid. Similar to common camera DRT tonescale strategies.")
@@ -153,7 +154,6 @@ DEFINE_UI_TOOLTIP(Purity Compress G, "Adjust the amount of purity compression as
 DEFINE_UI_TOOLTIP(Purity Compress B, "Adjust the amount of purity compression as intensity increases for Blue. A value of 0.0 will result in no purity compression and discontinuities in gradients in high purity high intensity light sources. A higher value will compress purity more as intensity increases.")
 DEFINE_UI_TOOLTIP(Purity Range Low, "Where over the intensity range the purity compression starts. Higher values will compress purity more for low intensity. For example a Purity Range Low value of 0.5 will result in desaturated looking midtones.")
 DEFINE_UI_TOOLTIP(Purity Range High, "Where over the intensity range the purity compression ends. Lower values will limit how much purity will be compressed at high intensities. For example a Purity Range High value of 0.5 will result in highly saturated looking highlights, at the risk of gradient discontinuities.")
-DEFINE_UI_TOOLTIP(Purity HDR, "How much to affect purity compression as Peak Luminance increases. A value of 0.0 will keep the purity compression behavior exactly the same for SDR and HDR. A value of 1.0 will preserve more purity as peak luminance increases (at the risk of gradient disruptions in high purity high intensity light sources).")
 DEFINE_UI_TOOLTIP(Enable Purity Compress Low , "Purity Compress Low increases tonality and smoothness in extremely pure input values that can not be adequately compressed into the display-referred gamut volume. The algorithm is tuned for common camera observer colorimetry sources. To keep the interface simple, this algorithm is exposed only as a boolean checkbox.")
 DEFINE_UI_TOOLTIP(Enable Mid Purity, "The Mid Purity module adjusts mid-range purity of midtones and highlights. Without this module enabled, it is likely that midtones will not appear colorful enough, and highlights will appear too colorful resulting in chaulky pasty looking images especially in yellows and cyans. ")
 DEFINE_UI_TOOLTIP(Mid Purity Low, "Amount to increase purity of midtones and shadows in mid-range purity areas. A value of 0.0 will have no effect. A value of 1.0 is the maximum possible value while preserving smoothness.")

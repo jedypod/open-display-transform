@@ -23,10 +23,12 @@ Group {
  addUserKnob {1 tn_preset_knobs l "" t "list of knobs to include in presets" +STARTLINE +HIDDEN}
  tn_preset_knobs "tn_Lg tn_con tn_sh tn_toe tn_off tn_hcon_enable tn_hcon tn_hcon_pv tn_hcon_st tn_lcon_enable tn_lcon tn_lcon_w tn_lcon_pc"
  addUserKnob {26 spacer04 l "" +STARTLINE}
- addUserKnob {26 lbl_ts l " " T "<b>Base Tonescale"}
+ addUserKnob {26 lbl_hdr l " " T "<b>HDR Parameters"}
  addUserKnob {41 tn_Lp l "Peak Luminance" t "Peak display luminance in nits. In SDR, the max value stays pinned at 1.0. In HDR, the max value is adjusted to match peak luminance in the HDR container." T TONESCALE_CTRL.tn_Lp}
+ addUserKnob {41 tn_gb l "HDR Grey Boost" t "Amount of stops to boost Grey Luminance, per stop of exposure increase of Peak Luminance. For example, if HDR Grey Boost is 0.1, middle grey will be boosted by 0.1 stops per stop of Peak Luminance increase." T TONESCALE_CTRL.tn_gb}
+ addUserKnob {41 pt_hdr l "HDR Purity" t "How much to affect purity compression as Peak Luminance increases. A value of 0.0 will keep the purity compression behavior exactly the same for SDR and HDR. A value of 1.0 will preserve more purity as peak luminance increases (at the risk of gradient disruptions in high purity high intensity light sources)." T TONESCALE_CTRL.pt_hdr}
+ addUserKnob {26 lbl_ts l " " T "<b>Tonescale Parameters"}
  addUserKnob {41 tn_Lg l "Grey Luminance" t "Display luminance for middle grey (0.18) in nits. Sets the target value for middle grey within the available luminance range of the display device." T TONESCALE_CTRL.tn_Lg}
- addUserKnob {41 tn_gb l "Grey Boost" t "Amount of stops to boost Grey Luminance, per stop of exposure increase of Peak Luminance. E.g., if Grey Boost is 0.1, middle grey will be boosted by 0.1 stops per stop of Peak Luminance increase." T TONESCALE_CTRL.tn_gb}
  addUserKnob {41 tn_con l Contrast t "Adjusts contrast or slope. A constrained power function applied in display linear." T TONESCALE_CTRL.tn_con}
  addUserKnob {41 tn_sh l "Shoulder Clip" t "Unitless control for the scene-linear value at which the tonescale system crosses the peak display linear value (1.0) and clips. This is not an exact constraint in order to keep the system simple, but corresponds to roughly 16 at Shoulder Clip = 0 and 1024 at Shoulder Clip = 1" T TONESCALE_CTRL.tn_sh}
  addUserKnob {41 tn_toe l Toe t "Quadratic toe compression. Strongly compresses deep shadows. Helpful to have some amount to smooth the transition into display minimum. Higher values with a strong positive Offset also valid. Similar to common camera DRT tonescale strategies." T TONESCALE_CTRL.tn_toe}
@@ -56,7 +58,6 @@ Group {
  addUserKnob {26 ""}
  addUserKnob {41 pt_rng_low l "Purity Range Low" t "Where over the intensity range the purity compression starts. Higher values will compress purity more for low intensity. For example a Purity Range Low value of 0.5 will result in desaturated looking midtones." T PurityRange.p0}
  addUserKnob {41 pt_rng_high l "Purity Range High" t "Where over the intensity range the purity compression ends. Lower values will limit how much  purity will be compressed at high intensities. For example a Purity Range High value of 0.5 will result in highly saturated looking highlights, at the risk of gradient discontinuities." T PurityRangeHigh.p}
- addUserKnob {41 pt_hdr l "Purity HDR" t "How much to affect purity compression as Peak Luminance increases. A value of 0.0 will keep the purity compression behavior exactly the same for SDR and HDR. A value of 1.0 will preserve more purity as peak luminance increases (at the risk of gradient disruptions in high purity high intensity light sources)." T TONESCALE_CTRL.pt_hdr}
  addUserKnob {6 ptl_enable l "<b>&nbsp;Enable Purity Compress Low " t "Purity Compress Low increases tonality and smoothness in extremely pure input values that can not be adequately compressed into the display-referred gamut volume. The algorithm is tuned for common camera observer colorimetry sources. To keep the interface simple, this algorithm is exposed only as a boolean checkbox." +STARTLINE}
  ptl_enable true
  addUserKnob {26 ""}
