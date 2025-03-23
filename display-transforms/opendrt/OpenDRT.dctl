@@ -732,9 +732,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // RGB Hue Angles
   float3 ha_rgb = make_float3(
-    gauss_window(hue_offset(hue, 0.0f), 0.6f),
-    gauss_window(hue_offset(hue, 4.0f*PI/3.0f), 0.6f),
-    gauss_window(hue_offset(hue, 2.0f*PI/3.0f), 0.6f));
+    gauss_window(hue_offset(hue, 0.1f), 0.9f), // R center slightly towards magenta and a bit wider
+    gauss_window(hue_offset(hue, 4.0f*PI/3.0f), 0.8f),
+    gauss_window(hue_offset(hue, 2.0f*PI/3.0f), 0.8f));
 
   // CMY Hue Angles
   // Exact alignment to Cyan/Magenta/Yellow secondaries would be PI, PI/3 and -PI/3, but
