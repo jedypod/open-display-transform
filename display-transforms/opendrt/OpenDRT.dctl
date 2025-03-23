@@ -558,25 +558,15 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (tonescale_preset==9) { // Umbra Tonescale
     tn_Lg = 5.0f, tn_con = 1.8f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f, tn_lcon_pc = 1.0f;
   }
+  
+  /*----------- CREATIVE WHITE PRESETS -----------------*/
+  // Use user creative whitepoint settings if custom whitepoint specified, otherwise use the one from the look preset
+  if (_cwp!=4) cwp_rng = _cwp_rng; 
+  if (_cwp==0) cwp = 0; // D65
+  else if (_cwp==1) cwp = 1; // D60
+  else if (_cwp==2) cwp = 2; // D55
+  else if (_cwp==3) cwp = 3; // D50
 
-  if (_cwp==0) { // D65
-    cwp = 0;
-    cwp_rng = _cwp_rng;
-  }
-  if (_cwp==1) { // D60
-    cwp = 1;
-    cwp_rng = _cwp_rng;
-  }
-  if (_cwp==2) { // D55
-    cwp = 2;
-    cwp_rng = _cwp_rng;
-  }
-  if (_cwp==3) { // D50
-    cwp = 3;
-    cwp_rng = _cwp_rng;
-  }
-  if (_cwp==4) { // Do nothing and use cwp and cwp_rng setting from the look preset
-  }
 
   /*----------- DISPLAY ENCODING PRESETS -----------------*/
   if (display_encoding_preset==0) { // Rec.1886
@@ -862,7 +852,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     rgb = vdot(matrix_p3_to_rec709_d65, rgb);
     if (cwp==0) cwp_rgb = rgb;
   }
-  else if (display_gamut==1) {
+  else if (display_gamut>=1) {
     if (cwp==1) cwp_rgb = vdot(matrix_p3_to_p3_d60, rgb);
     if (cwp==2) cwp_rgb = vdot(matrix_p3_to_p3_d55, rgb);
     if (cwp==3) cwp_rgb = vdot(matrix_p3_to_p3_d50, rgb);
