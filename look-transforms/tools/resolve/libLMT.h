@@ -109,6 +109,64 @@ __DEVICE__ float log_to_lin_lx(float x, float mn, float mx, float sps) {
 
 
 
+/* OETF Linearization Transfer Functions ---------------------------------------- */
+
+__DEVICE__ float oetf_davinci_intermediate(float x, int inv) {
+	if (inv==1) return x <= 0.02740668f ? x/10.44426855f : _exp2f(x/0.07329248f - 7.0f) - 0.0075f;
+	else return x <= 0.00262409f ? x*10.44426855f : (_log2f(x + 0.0075f) + 7.0f)*0.07329248f;
+}
+__DEVICE__ float oetf_acescct(float x, int inv) {
+  if (inv==1) return x <= 0.155251141552511f ? (x - 0.0729055341958355f)/10.5402377416545f : _exp2f(x*17.52f - 9.72f);
+  else return x <= 0.0078125f ? 10.5402377416545f*x + 0.0729055341958355f : (_log2f(x) + 9.72f)/17.52f;
+}
+__DEVICE__ float oetf_arri_logc3(float x, int inv) {
+  if (inv==1) return x < 5.367655f*0.010591f + 0.092809f ? (x - 0.092809f)/5.367655f : (_exp10f((x - 0.385537f)/0.247190f) - 0.052272f)/5.555556f;
+  else return x < 0.010591f ? 5.367655f*x + 0.092809f : 0.247190f*_log10f(5.555556f*x + 0.052272f) + 0.385537f;
+}
+__DEVICE__ float oetf_arri_logc4(float x, int inv) {
+  if (inv==1) return x < -0.7774983977293537f ? x*0.3033266726886969f - 0.7774983977293537f : (_exp2f(14.0f*(x - 0.09286412512218964f)/0.9071358748778103f + 6.0f) - 64.0f)/2231.8263090676883f;
+  else return x < -0.7774983977293537f ? (x - -0.7774983977293537f)/0.3033266726886969f : (_log2f(2231.8263090676883f*x + 64.0f) - 6.0f)/14.0f*0.9071358748778103f + 0.09286412512218964f;
+}
+__DEVICE__ float oetf_red_log3g10(float x, int inv) {
+  const float a = 0.224282f;
+  const float b = 155.975327f;
+  const float c = 0.01f;
+  const float g = 15.1927f;
+
+  if (inv == 1) {
+    return x < 0.0f ? (x/g) - c : (_exp10f(x/a) - 1.0f)/b - c;
+  } else {
+    return x < -c ? (x + c)*g : a*_log10f((x + c)*b + 1.0f);
+  }
+}
+
+__DEVICE__ float3 linearize(float3 rgb, int tf, int inv) {
+  if (tf==0) { // Linear
+    return rgb;
+  } else if (tf==1) { // Davinci Intermediate
+    rgb.x = oetf_davinci_intermediate(rgb.x, inv);
+    rgb.y = oetf_davinci_intermediate(rgb.y, inv);
+    rgb.z = oetf_davinci_intermediate(rgb.z, inv);
+  } else if (tf==2) { // Davinci Intermediate
+    rgb.x = oetf_acescct(rgb.x, inv);
+    rgb.y = oetf_acescct(rgb.y, inv);
+    rgb.z = oetf_acescct(rgb.z, inv);
+  } else if (tf==3) { // Davinci Intermediate
+    rgb.x = oetf_arri_logc3(rgb.x, inv);
+    rgb.y = oetf_arri_logc3(rgb.y, inv);
+    rgb.z = oetf_arri_logc3(rgb.z, inv);
+  } else if (tf==4) { // Davinci Intermediate
+    rgb.x = oetf_arri_logc4(rgb.x, inv);
+    rgb.y = oetf_arri_logc4(rgb.y, inv);
+    rgb.z = oetf_arri_logc4(rgb.z, inv);
+  } else if (tf==5) { // Davinci Intermediate
+    rgb.x = oetf_red_log3g10(rgb.x, inv);
+    rgb.y = oetf_red_log3g10(rgb.y, inv);
+    rgb.z = oetf_red_log3g10(rgb.z, inv);
+  }
+	return rgb;
+}
+
 /*  ##########################################################################
     Notorious Six Chroma Value
     v0.1.0
@@ -511,7 +569,7 @@ __DEVICE__ float3 zone_grade(float3 rgb,
     float he, float hp, float hf, float le, float lp, float lf, 
     float he2, float hp2, float hf2, float le2, float lp2, float lf2) {
   
-  float n;
+  // float n;
   
   // Global grade
   rgb = grade(rgb, ex, c, pv, off);

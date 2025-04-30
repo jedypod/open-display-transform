@@ -8,16 +8,17 @@ DEFINE_UI_PARAMS(lg, in log, DCTLUI_CHECK_BOX, 1)
 DEFINE_UI_PARAMS(ze, zone extract, DCTLUI_CHECK_BOX, 0)
 DEFINE_UI_PARAMS(zp, zone range, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
 DEFINE_UI_PARAMS(zone, zone, DCTLUI_COMBO_BOX, 1, {low, high}, {low, high})
-
+DEFINE_UI_PARAMS(tf, Transfer Function, DCTLUI_COMBO_BOX, 1, {ioetf_linear, ioetf_davinci_intermediate, ioetf_acescct, ioetf_arri_logc3, ioetf_arri_logc4, ioetf_redlog3g10}, {Linear, Davinci Intermediate, ACEScct, Arri LogC3, Arri LogC4, RedLog3G10})
 #include "libLMT.h"
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
 {
   float3 rgb = make_float3(p_R, p_G, p_B);
+  rgb = linearize(rgb, tf, 0);
 
   int zr = zone == high ? 0 : 1;
 
   rgb = saturation(rgb, sag, sah, ho, hw, wr, wb, lg, ze, zp, zr);
-
+  rgb = linearize(rgb, tf, 1);
   return rgb;
 }

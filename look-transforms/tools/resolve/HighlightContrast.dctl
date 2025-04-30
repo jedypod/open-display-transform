@@ -1,14 +1,17 @@
+#line 2 // Fix line numbers in resolve/logs/rollinglog.txt
+#include "libLMT.h"
+
 DEFINE_UI_PARAMS(ex, exposure, DCTLUI_SLIDER_FLOAT, 0, -4, 4, 0)
 DEFINE_UI_PARAMS(th, threshold, DCTLUI_SLIDER_FLOAT, -1, -4, 4, 0)
 DEFINE_UI_PARAMS(invert, invert, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(tf, Transfer Function, DCTLUI_COMBO_BOX, 1, {ioetf_linear, ioetf_davinci_intermediate, ioetf_acescct, ioetf_arri_logc3, ioetf_arri_logc4, ioetf_redlog3g10}, {Linear, Davinci Intermediate, ACEScct, Arri LogC3, Arri LogC4, RedLog3G10})
 
-#include "libLMT.h"
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
 {
   float3 rgb = make_float3(p_R, p_G, p_B);
-
+  rgb = linearize(rgb, tf, 0);
   rgb = hl_con(rgb, ex, th, invert);
-
+  rgb = linearize(rgb, tf, 1);
   return rgb;
 }

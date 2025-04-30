@@ -1,3 +1,4 @@
+#line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 #include "libLMT.h"
 
 DEFINE_UI_PARAMS(ex, exposure, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
@@ -16,11 +17,13 @@ DEFINE_UI_PARAMS(hf2, falloff - H2, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
 DEFINE_UI_PARAMS(le2, exposure - L2, DCTLUI_SLIDER_FLOAT, 0.0, -4.0, 4.0, 0.0)
 DEFINE_UI_PARAMS(lp2, pivot - L2, DCTLUI_SLIDER_FLOAT, -1.0, -4.0, 4.0, 0.0)
 DEFINE_UI_PARAMS(lf2, falloff - L2, DCTLUI_SLIDER_FLOAT, 0.6, 0.0, 1.0, 0.0)
-
+DEFINE_UI_PARAMS(tf, Transfer Function, DCTLUI_COMBO_BOX, 1, {ioetf_linear, ioetf_davinci_intermediate, ioetf_acescct, ioetf_arri_logc3, ioetf_arri_logc4, ioetf_redlog3g10}, {Linear, Davinci Intermediate, ACEScct, Arri LogC3, Arri LogC4, RedLog3G10})
 
 __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) 
 {
   float3 rgb = make_float3(p_R, p_G, p_B);
+  rgb = linearize(rgb, tf, 0);
   rgb = zone_grade(rgb, ex, c, pv, off, he, hp, hf, le, lp, lf, he2, hp2, hf2, le2, lp2, lf2);
+  rgb = linearize(rgb, tf, 1);
   return rgb;
 }
