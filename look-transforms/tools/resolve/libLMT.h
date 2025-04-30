@@ -144,25 +144,25 @@ __DEVICE__ float3 linearize(float3 rgb, int tf, int inv) {
   if (tf==0) { // Linear
     return rgb;
   } else if (tf==1) { // Davinci Intermediate
-    rgb.x = oetf_davinci_intermediate(rgb.x, inv);
-    rgb.y = oetf_davinci_intermediate(rgb.y, inv);
-    rgb.z = oetf_davinci_intermediate(rgb.z, inv);
+    rgb.x = oetf_davinci_intermediate(rgb.x, !inv);
+    rgb.y = oetf_davinci_intermediate(rgb.y, !inv);
+    rgb.z = oetf_davinci_intermediate(rgb.z, !inv);
   } else if (tf==2) { // Davinci Intermediate
-    rgb.x = oetf_acescct(rgb.x, inv);
-    rgb.y = oetf_acescct(rgb.y, inv);
-    rgb.z = oetf_acescct(rgb.z, inv);
+    rgb.x = oetf_acescct(rgb.x, !inv);
+    rgb.y = oetf_acescct(rgb.y, !inv);
+    rgb.z = oetf_acescct(rgb.z, !inv);
   } else if (tf==3) { // Davinci Intermediate
-    rgb.x = oetf_arri_logc3(rgb.x, inv);
-    rgb.y = oetf_arri_logc3(rgb.y, inv);
-    rgb.z = oetf_arri_logc3(rgb.z, inv);
+    rgb.x = oetf_arri_logc3(rgb.x, !inv);
+    rgb.y = oetf_arri_logc3(rgb.y, !inv);
+    rgb.z = oetf_arri_logc3(rgb.z, !inv);
   } else if (tf==4) { // Davinci Intermediate
-    rgb.x = oetf_arri_logc4(rgb.x, inv);
-    rgb.y = oetf_arri_logc4(rgb.y, inv);
-    rgb.z = oetf_arri_logc4(rgb.z, inv);
+    rgb.x = oetf_arri_logc4(rgb.x, !inv);
+    rgb.y = oetf_arri_logc4(rgb.y, !inv);
+    rgb.z = oetf_arri_logc4(rgb.z, !inv);
   } else if (tf==5) { // Davinci Intermediate
-    rgb.x = oetf_red_log3g10(rgb.x, inv);
-    rgb.y = oetf_red_log3g10(rgb.y, inv);
-    rgb.z = oetf_red_log3g10(rgb.z, inv);
+    rgb.x = oetf_red_log3g10(rgb.x, !inv);
+    rgb.y = oetf_red_log3g10(rgb.y, !inv);
+    rgb.z = oetf_red_log3g10(rgb.z, !inv);
   }
 	return rgb;
 }
