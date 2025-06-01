@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 
-/* OpenDRT v1.0.0 -------------------------------------------------
+/* OpenDRT v1.0.1 -------------------------------------------------
 
 
   Written by Jed Smith
@@ -469,13 +469,21 @@ __DEVICE__ float contrast_high(float x, float p, float pv, float pv_lx, int inv)
     return x > x1 ? k1*(x - x1) + y1 : s0*_powf(x, p) + o;
 }
 
-__DEVICE__ float softplus(float x, float s, float x0, float y0) {
-  // Softplus https://www.desmos.com/calculator/doipi4u0ce
+__DEVICE__ float softplus_constraint(float x, float s, float x0, float y0) {
+  // Softplus with (x0, y0) intersection constraint
+  // https://www.desmos.com/calculator/doipi4u0ce
   if (x > 10.0f*s + y0 || s < 1e-3f) return x;
   float m = 1.0f;
   if (_fabs(y0) > 1e-6f) m = _expf(y0/s);
   m -= _expf(x0/s);
   return s*_logf(_fmaxf(0.0f, m + _expf(x/s)));
+}
+
+__DEVICE__ float softplus(float x, float s) {
+  // Softplus unconstrained
+  // https://www.desmos.com/calculator/mr9rmujsmn
+  if (x > 10.0f*s || s < 1e-3f) return x;
+  return s*_logf(_fmaxf(0.0f, 1.0f + _expf(x/s)));
 }
 
 __DEVICE__ float gauss_window(float x, float w) {
@@ -759,7 +767,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   if (brl_enable) {
     brl_f = -brl_r*ha_rgb.x - brl_g*ha_rgb.y - brl_b*ha_rgb.z - brl_c*ha_cmy.x - brl_m*ha_cmy.y - brl_y*ha_cmy.z;
     brl_f = (1.0f - ach_d)*brl_f + 1.0f - brl_f;
-    brl_f = softplus(brl_f, 0.25f, -100.0f, 0.0f); // Protect against over-darkening
+    brl_f = softplus(brl_f, 0.25f); // Protect against over-darkening
     
     // Limit Brilliance adjustment by tonescale
     float brl_ts = brl_f > 1.0f ? 1.0f - ts_pt : ts_pt; // Limit by inverse tonescale if positive Brilliance adjustment
@@ -862,10 +870,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Purity Compress Low
   if (ptl_enable) {
-    float sum0 = softplus(rgb.x, 0.2f, -100.0f, -0.3f) + rgb.y + softplus(rgb.z, 0.2f, -100.0f, -0.3f);
-    rgb.x = softplus(rgb.x, 0.04f, -0.3f, 0.0f);
-    rgb.y = softplus(rgb.y, 0.06f, -0.3f, 0.0f);
-    rgb.z = softplus(rgb.z, 0.01f, -0.05f, 0.0f);
+    float sum0 = softplus_constraint(rgb.x, 0.2f, -100.0f, -0.3f) + rgb.y + softplus_constraint(rgb.z, 0.2f, -100.0f, -0.3f);
+    rgb.x = softplus(rgb.x, 0.06f);
+    rgb.y = softplus(rgb.y, 0.06f);
+    rgb.z = softplus(rgb.z, 0.04f);
 
     float ptl_norm = _fminf(1.0f, sdivf(sum0, rgb.x + rgb.y + rgb.z));
     rgb *= ptl_norm;
