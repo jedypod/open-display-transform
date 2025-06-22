@@ -1,0 +1,35 @@
+# OpenDRT
+
+## Overview
+
+OpenDRT is an open-source [Picture Formation](https://github.com/sobotka/scise/wiki/Picture-Formation) Transform, designed to create an aesthetically pleasing picture out of raw camera image data. It enables image authors by allowing creative control over image appearance. This is accomplished through both a simple preset system, and a more extensive set of look development modules.
+
+
+## Installation
+
+OpenDRT is available as a DaVinci Resolve DCTL and as a node for The Foundry's Nuke.
+
+### Nuke
+
+OpenDRT for Nuke is provided as a group node. To load it, just drag and drop the `.nk` file into the node graph, or copy paste the contents using a text editor. All modules and parameters are available and split into a tabbed interface.
+![OpenDRT_nuke_helen-john](https://github.com/user-attachments/assets/327953b2-fc38-4efd-bc96-b24d8f81dd22)
+
+
+### DaVinci Resolve
+
+1. Open your DaVinci Resolve LUT folder:
+    * **macOS:** `/Library/Application Support/Blackmagic Design/DaVinci Resolve/LUT/`
+    * **Windows:** `C:\ProgramData\Blackmagic Design\DaVinci Resolve\Support\LUT\`
+    * **Linux:** `~/.config/Blackmagic Design/LUT/`
+2. Copy the DCTL files into this location.
+3. Restart Resolve.
+4. OpenDRT will be now available to apply with a DCTL node.
+
+Due to the limited user interface capabilities of DCTL, by default OpenDRT for Resolve only includes look presets and user parameters to control HDR image rendering. For access to the full parameter set, the user can load the so-called "StickShift" version of OpenDRT (included in the [releases](https://github.com/jedypod/open-display-transform/releases)). Use with caution however, as the user experience will be extremely unweildy. Consider designing a preset in Nuke and adding it to the DCTL code instead.
+![OpenDRT_resolve_helen-john](https://github.com/user-attachments/assets/e63ca335-79d9-48f1-a2b8-7c590289649d)
+
+
+
+## [More Information](docs/)
+
+For more information, [continue reading the documentation](docs/).
