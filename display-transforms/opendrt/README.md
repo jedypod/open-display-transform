@@ -23,15 +23,22 @@ OpenDRT is available as a DaVinci Resolve DCTL and as a node for The Foundry's N
 Due to the limited user interface capabilities of DCTL, by default OpenDRT for Resolve only includes look presets and user parameters to control HDR image rendering. For access to the full parameter set, the user can load the so-called "StickShift" version of OpenDRT (included in the [releases](https://github.com/jedypod/open-display-transform/releases)). Use with caution however, as the user experience will be extremely unweildy. Consider designing a preset in Nuke and adding it to the DCTL code instead.
 ![OpenDRT_resolve_helen-john](https://github.com/user-attachments/assets/e63ca335-79d9-48f1-a2b8-7c590289649d)
 
+[![OpenDRT Resolve Installation and Usage](https://github.com/user-attachments/assets/97282cab-d59c-4846-ac18-62f413e96ea5)](https://www.youtube.com/watch?v=RpadynEOGRI)
+
 
 ### Nuke
 
 OpenDRT for Nuke is provided as a group node. To load it, just drag and drop the `.nk` file into the node graph, or copy paste the contents using a text editor. All modules and parameters are available and split into a tabbed interface.
 ![OpenDRT_nuke_helen-john](https://github.com/user-attachments/assets/327953b2-fc38-4efd-bc96-b24d8f81dd22)
 
+[![OpenDRT Nuke Installation and Usage](https://github.com/user-attachments/assets/1394dab3-4bdc-4e19-9b1a-497889b9b171)](https://www.youtube.com/watch?v=RYmANRwCNc4)
+
 
 ### OpenColorIO
 OpenDRT is also provided as an OCIO config in the [releases](https://github.com/jedypod/open-display-transform/releases), for use in VFX DCC software such as Nuke, Maya, Houdini, Gaffer, etc.
+
+[![OpenDRT OCIO Installation and Usage](https://github.com/user-attachments/assets/4cd6f256-d61b-4d62-88af-5fa9333786ac)](https://www.youtube.com/watch?v=pKddV18pSMA)
+
 
 ## [More Information](docs/)
 
