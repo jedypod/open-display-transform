@@ -18,7 +18,6 @@ OpenDRT's functionality is organized into the following modules:
     * *Options:* Linear, Davinci Intermediate, Filmlight T-Log, ACEScct, Arri LogC3/LogC4, RedLog3G10, Panasonic V-Log, Sony S-Log3, Fuji F-Log2.
 
 ### Tonescale Parameters 
-([Desmos Plot of base tonescale model](https://www.desmos.com/calculator/aiicar4tjh))
 
 * **Display Peak Luminance (`tn_Lp`):** Peak display luminance in nits. In SDR, the max value stays pinned at 1.0. In HDR, the max value is adjusted to match peak luminance in the HDR container.
 * **HDR Grey Boost (`tn_gb`):** Amount of stops to boost Grey Luminance, per stop of exposure increase of Peak Luminance. For example, if HDR Grey Boost is 0.1, middle grey will be boosted by 0.1 stops per stop of Peak Luminance increase.
@@ -82,12 +81,14 @@ OpenDRT's functionality is organized into the following modules:
 ### Output Parameters
 
 * **Display Encoding Preset (`display_encoding_preset` / `display_presets`):** Selects a predefined combination of display gamut, inverse EOTF, and peak luminance.
-    * Rec.1886 (2.4 Power / Rec.709)
-    * sRGB Display (2.2 Power / Rec.709)
-    * Display P3 (2.2 Power / P3-D65)
-    * Rec.2100 PQ (PQ / Rec.2020 P3-Limited)
-    * Rec.2100 HLG (HLG / Rec.2020 P3-Limited)
-    * Dolby PQ (PQ / P3-D65)
+    * SDR
+      * Rec.1886 (2.4 Power / Rec.709)
+      * sRGB Display (2.2 Power / Rec.709)
+      * Display P3 (2.2 Power / P3-D65)
+    * HDR (Note: the peak luminance is creatively controllable with the Display Peak Luminance parameter)
+      * Rec.2100 PQ (PQ / Rec.2020 P3-Limited)
+      * Rec.2100 HLG (HLG / Rec.2020 P3-Limited)
+      * Dolby PQ (PQ / P3-D65)
 
 * **Clamp (`_clamp` / `clamp`):** If enabled, clamps the final RGB values to the range \[0, 1].
 

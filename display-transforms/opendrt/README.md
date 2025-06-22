@@ -9,11 +9,6 @@ OpenDRT is an open-source [Picture Formation](https://github.com/sobotka/scise/w
 
 OpenDRT is available as a DaVinci Resolve DCTL and as a node for The Foundry's Nuke.
 
-### Nuke
-
-OpenDRT for Nuke is provided as a group node. To load it, just drag and drop the `.nk` file into the node graph, or copy paste the contents using a text editor. All modules and parameters are available and split into a tabbed interface.
-![OpenDRT_nuke_helen-john](https://github.com/user-attachments/assets/327953b2-fc38-4efd-bc96-b24d8f81dd22)
-
 
 ### DaVinci Resolve
 
@@ -29,6 +24,14 @@ Due to the limited user interface capabilities of DCTL, by default OpenDRT for R
 ![OpenDRT_resolve_helen-john](https://github.com/user-attachments/assets/e63ca335-79d9-48f1-a2b8-7c590289649d)
 
 
+### Nuke
+
+OpenDRT for Nuke is provided as a group node. To load it, just drag and drop the `.nk` file into the node graph, or copy paste the contents using a text editor. All modules and parameters are available and split into a tabbed interface.
+![OpenDRT_nuke_helen-john](https://github.com/user-attachments/assets/327953b2-fc38-4efd-bc96-b24d8f81dd22)
+
+
+### OpenColorIO
+OpenDRT is also provided as an OCIO config in the [releases](https://github.com/jedypod/open-display-transform/releases), for use in VFX DCC software such as Nuke, Maya, Houdini, Gaffer, etc.
 
 ## [More Information](docs/)
 
