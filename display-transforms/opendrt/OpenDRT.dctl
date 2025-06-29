@@ -621,9 +621,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (in_gamut==15) in_to_xyz = matrix_davinciwg_to_xyz;
 
   float crv_val = 0.0f;
+  float2 pos = make_float2(p_X, p_Y);
+  float2 res = make_float2(p_Width, p_Height);
 
   // x-position based input value for tonescale overlay
-  if (crv_enable == 1) crv_val = oetf_filmlight_tlog(float(p_X) / float(p_Width));
+  if (crv_enable == 1) crv_val = oetf_filmlight_tlog(pos.x/res.x);
 
   // Linearize if a non-linear input oetf / transfer function is selected
   rgb = linearize(rgb, in_oetf);
@@ -958,10 +960,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   }
 
   if (crv_enable == 1) {
-    float3 crv_rgb_dst = make_float3(
-      float(p_Height-p_Y) - crv_rgb.x*float(p_Height), 
-      float(p_Height-p_Y) - crv_rgb.y*float(p_Height), 
-      float(p_Height-p_Y) - crv_rgb.z*float(p_Height));
+    float3 crv_rgb_dst = make_float3(res.y-pos.y-crv_rgb.x*res.y, res.y-pos.y-crv_rgb.y*res.y, res.y-pos.y-crv_rgb.z*res.y);
     float crv_w0 = 0.5f; // width of tonescale overlay
     crv_rgb_dst.x = _expf(-crv_rgb_dst.x*crv_rgb_dst.x*crv_w0);
     crv_rgb_dst.y = _expf(-crv_rgb_dst.y*crv_rgb_dst.y*crv_w0);
