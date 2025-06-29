@@ -22,6 +22,7 @@ DEFINE_UI_PARAMS(pt_hdr, HDR Purity, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 // Clamp
 DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
 
+DEFINE_UI_PARAMS(crv_enable, Tonescale Overlay, DCTLUI_CHECK_BOX, 0)
 
 
 
@@ -127,6 +128,7 @@ DEFINE_UI_TOOLTIP(HDR Purity, "How much to affect purity compression as Peak Lum
 DEFINE_UI_TOOLTIP(Creative White, "Set the creative whitepoint of the display peak luminance. With D65 all channels are equal. With D50, the peak luminance value will match a D50 whitepoint. This can be creatively desireable. This adjustment is applied post-tonescale.")
 DEFINE_UI_TOOLTIP(Creative White Range, "The intensity range affected by the Creative White adjustment. At 1.0, the entire intensity range is affected. As Range is decreased, more of midtones and shadows are left unaffected. It can be creatively desireable to keep midtones more neutral while shifting highlights warmer.")
 DEFINE_UI_TOOLTIP(Clamp, "Clamp the final image into the final range supported by the display device.")
+DEFINE_UI_TOOLTIP(Tonescale Overlay, "Draws a visualization of the tonescale curve. A semi-log plot over ~ -0.005 to 128, with display encoding added.")
 DEFINE_UI_TOOLTIP(Look Preset, "Choose a preset look. DEFAULT is an image formation that includes minimal adjustments for an aesthetically pleasing image. COLORFUL: A very saturated bright exhuberant look, a good fit for animation. UMBRA: A dark moody cinematic look with very low shadow contrast, strong color crosstalk, natural blues, and a warm D50 whitepoint. BASE: only the base components of the OpenDRT image rendering. Practically no preferential adjustements. Purity compression is chromaticity-linear and very minimal. Bright saturated highlights will clip. Mid-range purity is very strong. A good starting point for further look development if absolute control is desired._________________________________________________")
 DEFINE_UI_TOOLTIP(Tonescale Preset, "Presets specifically for the tonescale function. A number of creative options show the possibilities.  DEFAULT HIGH-CONTRAST:The default tonescale curve. Enough contrast to maybe be called a finished image, but also could be a good base to build on. LOW-CONTRAST: A low contrast tonescale curve that is intended as a starting point for further grading. Requires further contrast to be added in order to achieve something resembling a finished image (unless of course a very low contrast look is desired). ACES 1.x: A rough match of the ACES 1.x tonescale curve. One deviation is mapping 0.0 to 0.0 through the tonescale curve, rather than mapping +0.02 to 0.0... because that is moronic. ACES 2.0: An exact match to the ACES 2.0 tonescale function. Very low contrast in the highlights, and very strong shadow toe compression while mapping 0 to 0 through the tonescale function. Be careful with this one if adding additional shadow contrast upstream, without a strong positive offset. MARVELOUS TONESCAPE: A dark contrasty cinematic tonescale, which maps middle grey to 6 nits in SDR instead of the more typical camera DRT method of 11.1 nits following the Rec.709 OETF standard. Another way to think about this is that this tonescale is designed for a brighter SDR display. ARRIBA TONECALL: A low-contrast tonescale with an approach to shadows more typical of camera style DRTs, where there is a strong positive offset, and strong shadow toe compression. DAGRINCHI TONEGROAN: Another low-contrast tonescale designed as a starting point for further manipulations. Not as good as other options. AERY TONESCALE: An aery tonescale function. UMBRA TONESCALE: The tonescale from the Umbra look preset.")
 DEFINE_UI_TOOLTIP(Display Encoding Preset, "Choose the target display standard.")
@@ -618,6 +620,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (in_gamut==14) in_to_xyz = matrix_egamut2_to_xyz;
   else if (in_gamut==15) in_to_xyz = matrix_davinciwg_to_xyz;
 
+  float crv_val = 0.0f;
+
+  // x-position based input value for tonescale overlay
+  if (crv_enable == 1) crv_val = oetf_filmlight_tlog(float(p_X) / float(p_Width));
 
   // Linearize if a non-linear input oetf / transfer function is selected
   rgb = linearize(rgb, in_oetf);
@@ -662,6 +668,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Offset
   rgb += tn_off;
+  if (crv_enable == 1) crv_val += tn_off;
 
 
   /***************************************************
@@ -699,6 +706,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     else { // Just use ratio-preserving
       rgb = mcon_sc*rgb;
     }
+    
+    if (crv_enable == 1) {
+      crv_val *= mcon_cnst_sc;
+      crv_val = crv_val*(crv_val*crv_val + mcon_m*mcon_w)/(crv_val*crv_val + mcon_w);
+    }
   }
 
 
@@ -717,11 +729,15 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     float hcon_p = _powf(2.0f, tn_hcon);
     tsn = contrast_high(tsn, hcon_p, tn_hcon_pv, tn_hcon_st, 0);
     ts_pt = contrast_high(ts_pt, hcon_p, tn_hcon_pv, tn_hcon_st, 0);
+    
+    if (crv_enable == 1) crv_val = contrast_high(crv_val, hcon_p, tn_hcon_pv, tn_hcon_st, 0);
   }
 
   // Apply tonescale
   tsn = compress_hyperbolic_power(tsn, ts_s, tn_con);
   ts_pt = compress_hyperbolic_power(ts_pt, ts_s1, tn_con);
+  
+  if (crv_enable == 1) crv_val = compress_hyperbolic_power(crv_val, ts_s, tn_con);
 
 
   // Simple Cyan-Yellow / Green-Magenta opponent space for calculating smooth achromatic distance and hue angles
@@ -868,6 +884,28 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float cwp_f = _powf(tsn, 1.0f - cwp_rng);
   rgb = cwp_rgb*cwp_f + rgb*(1.0f - cwp_f);
 
+  // Tonescale overlay RGB
+  float3 crv_rgb = make_float3(crv_val, crv_val, crv_val);
+  float3 crv_rgb_cwp = crv_rgb;
+  if (crv_enable == 1) {
+    if (display_gamut==0) {
+      if (cwp==1) crv_rgb_cwp = vdot(matrix_p3_to_rec709_d60, crv_rgb);
+      if (cwp==2) crv_rgb_cwp = vdot(matrix_p3_to_rec709_d55, crv_rgb);
+      if (cwp==3) crv_rgb_cwp = vdot(matrix_p3_to_rec709_d50, crv_rgb);
+      crv_rgb = vdot(matrix_p3_to_rec709_d65, crv_rgb);
+      if (cwp==0) crv_rgb_cwp = crv_rgb;
+    }
+    else if (display_gamut>=1) {
+      if (cwp==1) crv_rgb_cwp = vdot(matrix_p3_to_p3_d60, crv_rgb);
+      if (cwp==2) crv_rgb_cwp = vdot(matrix_p3_to_p3_d55, crv_rgb);
+      if (cwp==3) crv_rgb_cwp = vdot(matrix_p3_to_p3_d50, crv_rgb);
+    }
+
+    float crv_rgb_cwp_f = _powf(crv_val, 1.0f - cwp_rng);
+    crv_rgb = crv_rgb_cwp*crv_rgb_cwp_f + crv_rgb*(1.0f - crv_rgb_cwp_f);
+  }
+
+
   // Purity Compress Low
   if (ptl_enable) {
     float sum0 = softplus_constraint(rgb.x, 0.2f, -100.0f, -0.3f) + rgb.y + softplus_constraint(rgb.z, 0.2f, -100.0f, -0.3f);
@@ -884,6 +922,16 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   tsn = compress_toe_quadratic(tsn, tn_toe, 0);
   tsn *= ts_dsc; // scale for display encoding
 
+  if (crv_enable == 1) {
+    crv_rgb *= ts_m2;
+    crv_rgb.x = compress_toe_quadratic(crv_rgb.x, tn_toe, 0);
+    crv_rgb.y = compress_toe_quadratic(crv_rgb.y, tn_toe, 0);
+    crv_rgb.z = compress_toe_quadratic(crv_rgb.z, tn_toe, 0);
+    crv_rgb *= ts_dsc;
+    // scale to 1.0 = 1000 nits for st2084 PQ
+    if (eotf == 4) crv_rgb *= 10.0f;
+  }
+
   // Return from RGB ratios
   rgb *= tsn;
 
@@ -899,14 +947,29 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Apply inverse Display EOTF
   float eotf_p = 2.0f + eotf * 0.2f;
-  if ((eotf > 0) && (eotf < 4)) {
-    rgb = spowf3(rgb, 1.0f/eotf_p);
-  } else if (eotf == 4) {
-    rgb = eotf_pq(rgb, 1);
-  } else if (eotf == 5) {
-    rgb = eotf_hlg(rgb, 1);
+  if ((eotf > 0) && (eotf < 4)) rgb = spowf3(rgb, 1.0f/eotf_p);
+  else if (eotf == 4) rgb = eotf_pq(rgb, 1);
+  else if (eotf == 5) rgb = eotf_hlg(rgb, 1);
+
+  if (crv_enable == 1) {
+    if ((eotf > 0) && (eotf < 4)) crv_rgb = spowf3(crv_rgb, 1.0f/eotf_p);
+    else if (eotf == 4) crv_rgb = eotf_pq(crv_rgb, 1);
+    else if (eotf == 5) crv_rgb = eotf_hlg(crv_rgb, 1);
   }
 
+  if (crv_enable == 1) {
+    float3 crv_rgb_dst = make_float3(
+      float(p_Height-p_Y) - crv_rgb.x*float(p_Height), 
+      float(p_Height-p_Y) - crv_rgb.y*float(p_Height), 
+      float(p_Height-p_Y) - crv_rgb.z*float(p_Height));
+    float crv_w0 = 0.5f; // width of tonescale overlay
+    crv_rgb_dst.x = _expf(-crv_rgb_dst.x*crv_rgb_dst.x*crv_w0);
+    crv_rgb_dst.y = _expf(-crv_rgb_dst.y*crv_rgb_dst.y*crv_w0);
+    crv_rgb_dst.z = _expf(-crv_rgb_dst.z*crv_rgb_dst.z*crv_w0);
+    float crv_lm = eotf < 4 ? 1.0f : 0.5f; // reduced luminance in hdr
+    crv_rgb_dst = clampf3(crv_rgb_dst, 0.0f, 1.0f);
+    rgb = rgb * (1.0f - crv_rgb_dst) + crv_lm*crv_rgb_dst*crv_rgb_dst;
+  }
 
   return rgb;
 }

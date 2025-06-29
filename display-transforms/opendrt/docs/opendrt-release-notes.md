@@ -4,6 +4,8 @@
 
 - **Fixes**
   - Increase Purity Compress Low strength for cyan and yellow. Some images had too much "gamut clipping" on the low end. This change should improve smoothness without sacrificing perceived saturation in a significant way.
+- **New Features**
+  - Add tonescale overlay visualization in the Resolve DCTL
 
 ## OpenDRT v1.0.0
 OpenDRT v1.0.0 adds updates and new features with the goal of improving the default image rendering capabilities so that additional look operations upstream are not necessarily required. Significant rewrites and improvements have also been made to improve gradient smoothness and overall image appearance.
