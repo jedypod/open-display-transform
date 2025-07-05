@@ -41,3 +41,8 @@ OpenDRT is also provided as an OCIO config in the [releases](https://github.com/
 ## [More Information](docs/)
 
 For more information, [continue reading the documentation](docs/).
+
+* [OpenDRT Modules and Parameters Overview](docs/opendrt-parameters.md)
+* [OpenDRT Tonescale](docs/opendrt-tonescale.md)
+* [Release Notes](docs/opendrt-release-notes.md) for all the various OpenDRT versions.
+
