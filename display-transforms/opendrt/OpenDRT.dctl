@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 
-/* OpenDRT v1.0.1 -------------------------------------------------
+/* OpenDRT v1.0.2 -------------------------------------------------
 
 
   Written by Jed Smith
@@ -529,7 +529,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     tn_Lg = 11.1f, tn_con = 1.3f, tn_sh = 0.5f, tn_toe = 0.005f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 0.75f, tn_lcon_w = 1.0f, tn_lcon_pc = 1.0f, cwp = 0, cwp_rng = 0.5f, rs_sa = 0.35f, rs_rw = 0.15f, rs_bw = 0.55f, pt_r = 0.5f, pt_g = 0.8f, pt_b = 0.5f, pt_rng_low = 0.25f, pt_rng_high = 0.5f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.5f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_st = 0.3f, brl_enable = 1, brl_r = -0.55f, brl_g = -0.5f, brl_b = 0.0f, brl_c = 0.0f, brl_m = 0.0f, brl_y = 0.1f, brl_rng = 0.5f, hs_rgb_enable = 1, hs_r = 0.4f, hs_g = 0.6f, hs_b = 0.5f, hs_rgb_rng = 0.6f, hs_cmy_enable = 1, hs_c = 0.2f, hs_m = 0.1f, hs_y = 0.2f, hc_enable = 1, hc_r = 0.8f;
   }
   else if (look_preset==2) { // Umbra
-    tn_Lg = 6.0f, tn_con = 1.8f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f, tn_lcon_pc = 1.0f, cwp = 3, cwp_rng = 0.8f, rs_sa = 0.45f, rs_rw = 0.1f, rs_bw = 0.35f, pt_r = 0.1f, pt_g = 0.4f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 0.8f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.4f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_st = 0.3f, brl_enable = 1, brl_r = -0.7f, brl_g = -0.6f, brl_b = -0.2f, brl_c = 0.0f, brl_m = -0.25f, brl_y = 0.1f, brl_rng = 0.9f, hs_rgb_enable = 1, hs_r = 0.4f, hs_g = 0.8f, hs_b = 0.4f, hs_rgb_rng = 1.0f, hs_cmy_enable = 1, hs_c = 1.0f, hs_m = 0.6f, hs_y = 1.0f, hc_enable = 1, hc_r = 0.8f;
+    tn_Lg = 6.0f, tn_con = 1.8f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f, tn_lcon_pc = 1.0f, cwp = 3, cwp_rng = 0.8f, rs_sa = 0.45f, rs_rw = 0.1f, rs_bw = 0.35f, pt_r = 0.1f, pt_g = 0.4f, pt_b = 2.5f, pt_rng_low = 0.2f, pt_rng_high = 0.8f, ptl_enable = 1, ptm_enable = 1, ptm_low = 0.4f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_st = 0.3f, brl_enable = 1, brl_r = -0.62f, brl_g = -0.56f, brl_b = -0.2f, brl_c = 0.0f, brl_m = -0.25f, brl_y = 0.1f, brl_rng = 0.9f, hs_rgb_enable = 1, hs_r = 0.4f, hs_g = 0.8f, hs_b = 0.4f, hs_rgb_rng = 1.0f, hs_cmy_enable = 1, hs_c = 1.0f, hs_m = 0.6f, hs_y = 1.0f, hc_enable = 1, hc_r = 0.8f;
   }
   else if (look_preset==3) { // Base
     tn_Lg = 11.1f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.0f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f, tn_lcon_pc = 1.0f, cwp = 0, cwp_rng = 0.5f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.5f, pt_r = 1.0f, pt_g = 2.0f, pt_b = 2.5f, pt_rng_low = 0.25f, pt_rng_high = 0.25f, ptl_enable = 1, ptm_enable = 0, ptm_low = 0.0f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_st = 0.3f, brl_enable = 0, brl_r = 0.0f, brl_g = 0.0f, brl_b = 0.0f, brl_c = 0.0f, brl_m = 0.0f, brl_y = 0.0f, brl_rng = 0.5f, hs_rgb_enable = 0, hs_r = 0.0f, hs_g = 0.0f, hs_b = 0.0f, hs_rgb_rng = 0.5f, hs_cmy_enable = 0, hs_c = 0.0f, hs_m = 0.0f, hs_y = 0.0f, hc_enable = 0, hc_r = 0.0f;
@@ -785,7 +785,6 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   if (brl_enable) {
     brl_f = -brl_r*ha_rgb.x - brl_g*ha_rgb.y - brl_b*ha_rgb.z - brl_c*ha_cmy.x - brl_m*ha_cmy.y - brl_y*ha_cmy.z;
     brl_f = (1.0f - ach_d)*brl_f + 1.0f - brl_f;
-    brl_f = softplus(brl_f, 0.25f); // Protect against over-darkening
     
     // Limit Brilliance adjustment by tonescale
     float brl_ts = brl_f > 1.0f ? 1.0f - ts_pt : ts_pt; // Limit by inverse tonescale if positive Brilliance adjustment
