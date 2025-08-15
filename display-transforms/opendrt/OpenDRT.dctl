@@ -968,13 +968,13 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   if (crv_enable == 1) {
     float3 crv_rgb_dst = make_float3(res.y-pos.y-crv_rgb.x*res.y, res.y-pos.y-crv_rgb.y*res.y, res.y-pos.y-crv_rgb.z*res.y);
-    float crv_w0 = 0.5f; // width of tonescale overlay
+    float crv_w0 = 0.35f; // width of tonescale overlay
     crv_rgb_dst.x = _expf(-crv_rgb_dst.x*crv_rgb_dst.x*crv_w0);
     crv_rgb_dst.y = _expf(-crv_rgb_dst.y*crv_rgb_dst.y*crv_w0);
     crv_rgb_dst.z = _expf(-crv_rgb_dst.z*crv_rgb_dst.z*crv_w0);
     float crv_lm = eotf < 4 ? 1.0f : 0.5f; // reduced luminance in hdr
     crv_rgb_dst = clampf3(crv_rgb_dst, 0.0f, 1.0f);
-    rgb = rgb * (1.0f - crv_rgb_dst) + crv_lm*crv_rgb_dst*crv_rgb_dst;
+    rgb = rgb * (1.0f - crv_rgb_dst) + make_float3(crv_lm, crv_lm, crv_lm)*crv_rgb_dst;
   }
 
   return rgb;
