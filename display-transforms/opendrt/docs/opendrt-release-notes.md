@@ -275,3 +275,11 @@ Also changed the density method so that positive density values will switch to r
 First version I would consider a beta release after about 100 iterations of improvements from 0.3.5.
 First draft of look modules added, midrange purity added, reworked density, hueshift. Reworked tonescale system, with offset and mid contrast.
 
+
+
+## OpenDRT v1.1.0b1: Bring back surround compensation model from v0.1.3
+  - Move default tn_Lg (middle grey) value down to 10 nits. When tn_su is "dark", this value isn't changed. If tn_su is "dim" or "bright", middle grey is mapped higher accordingly with an unconstrained power function.
+
+## OpenDRT v1.1.0b2: Add DCI display encoding presets - fixes #34
+  - DCI - 2.6 Power / P3-D60, DCI - 2.6 Power / P3-DCI, DCI - 2.6 Power / XYZ
+  - Rework creative white system to work with varying display technical whitepoints.
