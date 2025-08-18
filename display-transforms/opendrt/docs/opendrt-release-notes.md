@@ -1,5 +1,14 @@
 # Release Notes
 
+## OpenDRT v1.1.0b1: Bring back surround compensation model from v0.1.3
+
+- Move default tn_Lg (middle grey) value down to 10 nits. When tn_su is "dark", this value isn't changed. If tn_su is "dim" or "bright", middle grey is mapped higher accordingly with an unconstrained power function.
+
+## OpenDRT v1.1.0b2: Add DCI display encoding presets - fixes #34
+
+- DCI - 2.6 Power / P3-D60, DCI - 2.6 Power / P3-DCI, DCI - 2.6 Power / XYZ
+- Rework creative white system to work with varying display technical whitepoints.
+
 ## OpenDRT v1.0.1
 
 - **Fixes**
@@ -8,9 +17,11 @@
   - Add tonescale overlay visualization in the Resolve DCTL
 
 ## OpenDRT v1.0.0
+
 OpenDRT v1.0.0 adds updates and new features with the goal of improving the default image rendering capabilities so that additional look operations upstream are not necessarily required. Significant rewrites and improvements have also been made to improve gradient smoothness and overall image appearance.
 
 ### New Features
+
 - Improve **Tonescale**
   - Add **Midtone Contrast** to the tonescale functions. This operation allows creative control over "contrast" in the midtones and shadows, and enables opendrt to form a more finished image out of the box, if desired. It can be applied per-channel or in an RGB ratio preserving manner.
   - Add **High Contrast** to the tonescale functions. This operation allows creative control over the slope of the shoulder in the tonescale, allowing higher "highlight" contrast like ACES 1.x, or more "filmic" low-slope shoulder tonescale looks.
@@ -43,22 +54,26 @@ OpenDRT v1.0.0 adds updates and new features with the goal of improving the defa
 
 
 ### Improvements
+
 - Re-engineer mid-range purity low and high to be more robust.
 - Re-engineer density method to have RGBCMY controls, and to avoid folding.
 - Reduce density of blue. Combined with the new Hue Shift design, this improves presentation of saturated blue colors.
 
 ### Bug Fixes
+
 - The Nuke implementation's HLG output had incorrect HDR scaling for peak luminances other than 1000 nits.
 
 
 # DCTL Notes
 Due to the limited nature of DCTL, I've made the choice to only expose the presets and not the full parameter space. For those of you who are more technically minded and interested in experimenting, you can access the full parameter set with the following steps:
+
 1. Un-comment lines 66 to 128 below to expose the DCTL parameters.
 2. Set the Look preset and Tonescale preset to "Custom (Check DCTL)"
 
 
 
 ## OpenDRT v1.0.0b45
+
 - Add two new look presets: 
   - Colorful: A very saturated bright exhuberant look, maybe a good fit for animation.
   - Aery: A low contrast colorful look with strong preservation of color in highlights and strong mid-range purity reduction.
@@ -78,6 +93,7 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b44
+
 - Fix tooltip for Creative White Range - it was backwards.
 - Improve Mid Purity
   - `Mid Purity High` is now significantly stronger and affects more of the purity range at the top end.
@@ -100,6 +116,7 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b43
+
 - Refine Parameters:
   - Remove most of Hue Contrast, only keep R
   - Remove Hue Shift RGB and CMY Ranges
@@ -129,6 +146,7 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b42
+
 - Improve smoothness:
   - Add smoothing to tent window rgb / cmy hue extractions
   - Add smoothing at achromatic for min(r,g,b) "saturation"
@@ -154,6 +172,7 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b41
+
 - Limit Purity High Range to only affect reds->Oranges, rename parameter to Purity Range High R
 - Rebalance Default preset to improve rendering of saturated greens and blues
 - Rebalance Filmish preset to be less stupid
@@ -166,12 +185,14 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b40
+
 - Refine Mid Purity High Compression algorithm to improve gradient smoothness through achromatic.
 - Expose Mid Purity High Range parameter. This is fiddly and users might find this necessary to tweak. Reduce default value from 0.5 to 0.4
 - Bring back Purity Range High parameter. It actually helps fire and sunsets quite significantly to not compress all the way to achromatic, keeping some color. Setting it to 0.8 by default (Purity Range Low and High are basically biases for where along the input intensity axis purity is compressed. See https://www.desmos.com/calculator/8ynarg1uxk)
 
 
 ## OpenDRT v1.0.0b39
+
 - Rename "Hue Focus" to "Hue Contrast"
 - Refine Hue Contrast algorithm 
   - Smoother behavior near peak achromatic
@@ -185,11 +206,13 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b38
+
 - Refine presets
 - Change high contrast parameter space to be -1 to 1 
 
 
 ## OpenDRT v1.0.0b37
+
 - Add creative whitepoint range slider to allow user control of whitepoint mapping over luminance range. For example to keep middle grey at D65 but push peak luminance to D50.
 - Improve accuracy of "shoulder clip" solution in tonescale system. Now it doesn't shift as much with varying contrast values. https://www.desmos.com/calculator/1c4fhzy3bw
 - Avoid invoking the spector of "density": change name to value.
@@ -203,6 +226,7 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b36
+
 - Rewrite midrange purity... again. Reverting back to a simpler method, because the hue-dependent method from b33 and b34 introduced discontinuities in gradients through achromatic. 
   - midPurityLow now increases saturation limiting the amount by ~luminance weights of inverse rgb ratios, so that yellow saturatio nis increased less than red and blue. The target remains 1.0 in rgb ratios (will result in darker intensity when increasing saturation). The amount remains limited by distance from achromatic to avoid artifacts and discontinuities in pure stimuli.
   - midPurityHigh now desaturates mid-range purities in all hue angles. This actually looks better and avoids discontinuities along gradients through achromatic. Added a MaxRGBDivide on CMY / inverse rgb ratios, which helps. The strength is hard coded at min(r,g,b) squared, but an additional strength parameter was exposed which allows the intensity of the desaturation, and the range simultaneously to be adjusted.
@@ -212,6 +236,7 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b35
+
 - Bugfix HueFocus:
   - The tonescale "range" factor was biased too much in highlights leading to artifacts. Changing to purity compress tonescale squared.
   - The huefocus "strength" factor was biased in the wrong direction (sqrt instead of squared), contributing to artifacts.
@@ -223,15 +248,17 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b34
+
 - bring back C and Y midrange purity high adjustments, and strength
 
 
 ## OpenDRT v1.0.0b33
+
 - simplify midrange purity to two parameters, improve algorithm to be hue-dependent (high affects CMY, low affects RGB)
 - midrange purity high now has stronger effect
- 
 
 ## OpenDRT v1.0.0b32
+
 - Redesign mid-range purity module. 
   - more complicated now with more sliders, but result is better I think. 
   - Controls for cyan and yellow high purity reduction (these are the two hue regions where this seems to need to happen).
@@ -241,12 +268,14 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b31
+
 - the weighted yellow butt-cheeks norm is a bad idea. You can get pretty much the same result with a much simpler approach.
 - I've been screwing around with midrange purity approaches all afternoon
 - I should probably stop screwing around and release something at some point
 
 
 ## OpenDRT v1.0.0b30
+
 - Exposing the "render space" as creative parameters was a bad idea so i've removed it
 - I also figured out how to set the blue weight on the render space lower (now matching P3 luminance so it's just a properly weighted luminance adjustment): by using a different weighted norm for purity compression 😃
 - This allows separate adjustment for the purity compression weights compared to the rest of the transform, which allows you to better creatively adjust the purity compression separate from the rest which is great
@@ -255,6 +284,7 @@ Due to the limited nature of DCTL, I've made the choice to only expose the prese
 
 
 ## OpenDRT v1.0.0b28
+
 - Expose controls for the "Rendering space" (How "desaturated" we are from P3, with custom weights.)
 
 I think I have a much better solution for the blues now. I've decided to expose the controls for the "rendering space" since it does allow some interesting creative options. I've exposed the controls on the purity tab and called the main control "color contrast" - though it could probably be called "saturation" since boosting it increases colorfulness (and introduces top end display cube escapes which are then brought back in control by the density parameters)...
@@ -266,20 +296,16 @@ Actually, reducing B weight also changes the luminance of yellow which is not gr
 
 
 ## OpenDRT v1.0.0b26
-Added two buttons for saving and deleting presets.
-Also changed quite a few knob names so they are more consistent as I work on the DCTL
-Also changed the density method so that positive density values will switch to reducing by the inverse tonescale instead of the forward tonescale, so that mid-range will be boosted more than high range values rather than the opposite. Positive Density values are probably a bad idea though.
+
+- Added two buttons for saving and deleting presets.
+- Also changed quite a few knob names so they are more consistent as I work on the DCTL
+- Also changed the density method so that positive density values will switch to reducing by the inverse tonescale instead of the forward tonescale, so that mid-range will be boosted more than high range values rather than the opposite. Positive Density values are probably a bad idea though.
 
 
 ## OpenDRT v1.0.0b13
+
 First version I would consider a beta release after about 100 iterations of improvements from 0.3.5.
 First draft of look modules added, midrange purity added, reworked density, hueshift. Reworked tonescale system, with offset and mid contrast.
 
 
 
-## OpenDRT v1.1.0b1: Bring back surround compensation model from v0.1.3
-  - Move default tn_Lg (middle grey) value down to 10 nits. When tn_su is "dark", this value isn't changed. If tn_su is "dim" or "bright", middle grey is mapped higher accordingly with an unconstrained power function.
-
-## OpenDRT v1.1.0b2: Add DCI display encoding presets - fixes #34
-  - DCI - 2.6 Power / P3-D60, DCI - 2.6 Power / P3-DCI, DCI - 2.6 Power / XYZ
-  - Rework creative white system to work with varying display technical whitepoints.
