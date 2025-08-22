@@ -796,7 +796,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   const float ts_x0 = 0.18f + tn_off;
   const float ts_y0 = tn_Lg/100.0f*(1.0f + tn_gb*_log2f(ts_y1));
   const float ts_s0 = compress_toe_quadratic(ts_y0, tn_toe, 1);
-  const float ts_p = tn_con/(1.0f + float(tn_su)*0.05f); // unconstrained surround compensation
+  const float ts_p = tn_con/(1.0f + (float)tn_su*0.05f); // unconstrained surround compensation
   const float ts_s10 = ts_x0*(_powf(ts_s0, -1.0f/tn_con) - 1.0f);
   const float ts_m1 = ts_y1/_powf(ts_x1/(ts_x1 + ts_s10), tn_con);
   const float ts_m2 = compress_toe_quadratic(ts_m1, tn_toe, 1);
