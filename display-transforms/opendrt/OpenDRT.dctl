@@ -608,7 +608,8 @@ __DEVICE__ float3 display_gamut_whitepoint(float3 rgb, float tsn, float cwp_rng,
     display_gamut == 4 ? ( cwp == 0 ? 1.148670f : cwp == 1 ? 1.121888f : cwp == 2 ? 1.169142f : cwp == 3 ? 1.227647f : 1.0f ) : 1.0f;
   
   if (cwp_norm != 1.0f) {
-    rgb /= cwp_norm;
+    // only normalize values affected by range control
+    rgb *= 1.0f/cwp_norm*cwp_f + 1.0f - cwp_f;
   }
 
   return rgb;
