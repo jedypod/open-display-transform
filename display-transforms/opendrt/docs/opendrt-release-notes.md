@@ -1,5 +1,22 @@
 # Release Notes
 
+## OpenDRT v1.1.0b45: Big rewrite after 44 beta versions of testing and refinements.
+
+Generally, redesign many aspects to improve smoothness and rework some problematic and over-complicated design choices.
+
+- Brilliance: Now split into pre-tonescale and post-tonescale brilliance adjustments. This improves smoothness and makes folding less likely than with the previous design.
+- Purity Compression: Complete redesign. Remove second norm and tonescale previously used for purity compression control. Now use tonescale as a base purity compression factor and limit that in different ways. Add checkbox to completely disable purity compression if desired for some reason.
+- Mid Purity: Simplify design overall design. Modify parameter space to have controls for intensity range and purity range (strength), instead of an ambiguous strength control.
+- Hue Shift RGB: now using a separate hue extraction, so R is more oriented towards orange and B is more oriented towards Cyan. Expose range controls for these as well as it might be creatively desireable to have blue hueshift affect more of the intensity range for example.
+- Look Presets: Refine all presets. Default preset is gone. Base preset is gone (moved to initial state of "StickShift Mode" for the tinkerers). New look presets: Arriba, Sylvan, Dystopic, Aery. See tooltip description for more information.
+- Tonescale Presets: Misc tweaks and fixes to all tonescale presets. Lock Display Grey Luminance to 10 nits on all so that they are more easily comparable.
+- Creative Whitepoint: Add cooler D75 and D93 creative whitepoints and integrate them into the DCI display encoding presets.
+- Purity Compress Low: rename to Purity Softclip and expose CMY sliders for more control.
+- Contrast Low: remove per-channel functionality. Location is now down in the same section as the rest of the tonescale functions and complexity is significantly reduced. Same look can more or less be achieved using mid purity low adjustments, and smoothness is improved. Tonescale is not completely independent from "color" adjustment. And at the same time intimately tied to the look, because a normal looking saturation presented through a high contrast tonescale might look way too saturated through a low contrast tonescale. Keep this in mind when building presets.
+- Remove HDR Purity control. This was adding complexity to the algorithm, and the problem can be better solved by adjusting the purity compression behavior of the look.
+- Hard-code HDR Grey Boost in presets mode. Was too confusing for the younglings. Still accessible in Stickshit mode.
+
+
 ## OpenDRT v1.1.0b1: Bring back surround compensation model from v0.1.3
 
 - Move default tn_Lg (middle grey) value down to 10 nits. When tn_su is "dark", this value isn't changed. If tn_su is "dim" or "bright", middle grey is mapped higher accordingly with an unconstrained power function.
