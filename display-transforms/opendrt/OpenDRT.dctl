@@ -118,10 +118,10 @@ DEFINE_UI_PARAMS(crv_enable, Tonescale Overlay, DCTLUI_CHECK_BOX, 0)
 /* Optionally Enable the Base Preset
     If you really want the Base preset, you can enable the look_preset definition below and disable the other one.
     Leaving it disabled by default as it is a perilous undertaking to create a nice picture using this as a starting point.
-DEFINE_UI_PARAMS(look_preset, Look Preset, DCTLUI_COMBO_BOX, 0, {look0, look1, look2, look3, look4, look5, look6}, {Arriba, Sylvan, Colorful, Aery, Dystopic, Umbra, Base})
 */
-
+// DEFINE_UI_PARAMS(look_preset, Look Preset, DCTLUI_COMBO_BOX, 0, {look0, look1, look2, look3, look4, look5, look6}, {Arriba, Sylvan, Colorful, Aery, Dystopic, Umbra, Base})
 DEFINE_UI_PARAMS(look_preset, Look Preset, DCTLUI_COMBO_BOX, 0, {look0, look1, look2, look3, look4, look5}, {Arriba, Sylvan, Colorful, Aery, Dystopic, Umbra})
+
 DEFINE_UI_PARAMS(tonescale_preset, Tonescale Preset, DCTLUI_COMBO_BOX, 0, {tsprst0, tsprst1, tsprst2, tsprst3, tsprst4, tsprst5, tsprst6, tsprst7, tsprst8, tsprst9, tsprst10, tsprst11, tsprst12, tsprst13}, {USE LOOK PRESET, Low Contrast, Medium Contrast, High Contrast, Arriba Tonescale, Sylvan Tonescale, Colorful Tonescale, Aery Tonescale, Dystopic Tonescale, Umbra Tonescale, ACES-1.x, ACES-2.0, Marvelous Tonescape, DaGrinchi ToneGroan})
 DEFINE_UI_PARAMS(_cwp, Creative White, DCTLUI_COMBO_BOX, 0, {_cwp0, _cwp1, _cwp2, _cwp3, _cwp4, _cwp5, _cwp6}, {USE LOOK PRESET, D93, D75, D65, D60, D55, D50})
 DEFINE_UI_PARAMS(_cwp_lm, Creative White Limit, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.0)
