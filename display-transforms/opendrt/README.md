@@ -7,7 +7,7 @@ OpenDRT is an open-source [Picture Formation](https://github.com/sobotka/scise/w
 
 ## Installation
 
-OpenDRT is available as a DaVinci Resolve DCTL and as a node for The Foundry's Nuke.
+OpenDRT is available as a DaVinci Resolve DCTL and as a node for The Foundry's Nuke. The latest stable version can be found in the [releases](https://github.com/jedypod/open-display-transform/releases), or if you like living dangerously, feel free to download from [the latest commit](https://github.com/jedypod/open-display-transform/commits/main/display-transforms/opendrt).
 
 
 ### DaVinci Resolve
