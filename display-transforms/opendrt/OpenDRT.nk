@@ -4,29 +4,30 @@ Group {
  name OpenDRT
  label "\[value display_name]"
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> <br>v1.1.0b46 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> <br>v1.1.0b47 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
  addUserKnob {41 in_gamut l "in gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer01 l "" +STARTLINE}
- addUserKnob {35 look_presets l "" t "Select from a list of presets. You can create your own and store them using the Add Preset button. \n\n<b>Arriba</b>: A minimal smooth starting look with natural color rendition and minimal adjustments to create an aesthetically pleasing image. \n\n<b>Sylvan</b>: A smooth starting look with slightly stronger contrast and stronger hue distortions which may be preferential for skin.\n\n<b>Colorful</b>: A low contrast saturated bright look. Might be a good fit for animation.\n\n<b>Aery</b>: A low contrast look with cool highlights and more pure color rendered quite bright. It features strong desaturation near the grey axis, and darkening of only the most pure colors.\n\n<b>Dystopic</b>: A high contrast look with very low saturation and strong filmish hue distortions.\n\n<b>Umbra</b>: A dark moody cinematic look. Features low shadow contrast, warm whites, strong filmic hue distortions, cyan blues, and more saturated colors that render very dark. Works well with a Display Peak Luminance of 200 nits or above.\n\n<b>Base</b>: only the base components of the OpenDRT image rendering. Practically no preferential adjustements. Purity compression is mostly chromaticity-linear and very minimal. Mid-range purity is very strong. A good starting point for further look development if absolute control is required (do not underestimate the complexity of this undertaking)." +STARTLINE M {"Look Presets/Arriba" "knobs this \{tn_Lg 10.0 tn_con 1.05 tn_sh 0.5 tn_toe 0.1 tn_off 0.013 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 0.0 tn_hcon_st 2.0 tn_lcon_enable 1 tn_lcon 2.0 tn_lcon_w 0.2 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.25 pt_lml_r 0.25 pt_lml_g 0.15 pt_lml_b 0.1 pt_lmh 0.25 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.8 ptm_low_rng 0.5 ptm_low_st 0.5 ptm_high -0.5 ptm_high_rng 0.5 ptm_high_st 0.5 brl_enable 1 brl 0.0 brl_r -2.5 brl_g -2.5 brl_b -2.5 brl_rng 0.5 brl_st 0.4 brlp_enable 1 brlp 0.0 brlp_r -1.5 brlp_g -2.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.3 hs_rgb_enable 1 hs_r 0.5 hs_r_rng 0.75 hs_g 0.35 hs_g_rng 1.0 hs_b 0.66 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 1.0 hs_m 0.25 hs_m_rng 1.0 hs_y 0.25 hs_y_rng 0.5\}" "Look Presets/Sylvan" "knobs this \{tn_Lg 10.0 tn_con 1.6 tn_sh 0.5 tn_toe 0.006 tn_off 0.01 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.35 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.25 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.15 pt_lml_r 0.5 pt_lml_g 0.15 pt_lml_b 0.1 pt_lmh 0.3 pt_lmh_r 0.5 pt_lmh_b 0.25 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.5 ptm_low_rng 0.5 ptm_low_st 0.5 ptm_high -0.6 ptm_high_rng 0.5 ptm_high_st 0.5 brl_enable 1 brl -1.0 brl_r -2.0 brl_g -2.0 brl_b -0.5 brl_rng 0.25 brl_st 0.25 brlp_enable 1 brlp -0.5 brlp_r -1.0 brlp_g -1.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.4 hs_rgb_enable 1 hs_r 0.55 hs_r_rng 1.15 hs_g 0.75 hs_g_rng 1.25 hs_b 0.66 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 0.25 hs_m 0.25 hs_m_rng 1.0 hs_y 0.35 hs_y_rng 1.0\}" "Look Presets/Colorful" "knobs this \{tn_Lg 10.0 tn_con 1.5 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.4 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.25 pt_lml_r 0.5 pt_lml_g 0.0 pt_lml_b 0.5 pt_lmh 0.25 pt_lmh_r 0.5 pt_lmh_b 0.5 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.8 ptm_low_rng 0.4 ptm_low_st 0.4 ptm_high -0.8 ptm_high_rng 0.25 ptm_high_st 0.4 brl_enable 1 brl 0.0 brl_r -1.5 brl_g -1.7 brl_b -0.5 brl_rng 0.3 brl_st 0.5 brlp_enable 1 brlp -0.5 brlp_r -1.0 brlp_g -1.0 brlp_b 0.0 hc_enable 1 hc_r 0.85 hc_r_rng 0.4 hs_rgb_enable 1 hs_r 0.5 hs_r_rng 1.0 hs_g 0.35 hs_g_rng 1.0 hs_b 0.66 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.25 hs_y_rng 1.0\}" "Look Presets/Aery" "knobs this \{tn_Lg 10.0 tn_con 1.15 tn_sh 0.5 tn_toe 0.04 tn_off 0.006 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 0.0 tn_hcon_st 0.5 tn_lcon_enable 1 tn_lcon 0.5 tn_lcon_w 2.0 cwp 1 cwp_lm 0.25 rs_sa 0.25 rs_rw 0.2 rs_bw 0.5 pt_enable 1 pt_lml 0.0 pt_lml_r 0.35 pt_lml_g 0.15 pt_lml_b 0.15 pt_lmh 0.0 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.8 ptm_low_rng 0.35 ptm_low_st 0.6 ptm_high -0.9 ptm_high_rng 0.5 ptm_high_st 0.2 brl_enable 1 brl -3.0 brl_r 0.0 brl_g 0.0 brl_b 1.5 brl_rng 0.8 brl_st 0.15 brlp_enable 1 brlp -1.0 brlp_r -1.0 brlp_g -1.0 brlp_b -1.0 hc_enable 1 hc_r 0.5 hc_r_rng 0.25 hs_rgb_enable 1 hs_r 0.5 hs_r_rng 1.0 hs_g 0.35 hs_g_rng 2.0 hs_b 0.5 hs_b_rng 1.5 hs_cmy_enable 1 hs_c 0.35 hs_c_rng 1.0 hs_m 0.25 hs_m_rng 1.0 hs_y 0.35 hs_y_rng 0.5\}" "Look Presets/Dystopic" "knobs this \{tn_Lg 10.0 tn_con 1.6 tn_sh 0.5 tn_toe 0.01 tn_off 0.008 tn_hcon_enable 1 tn_hcon 0.25 tn_hcon_pv 0.0 tn_hcon_st 1.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 0.75 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.0 pt_lml_r 0.25 pt_lml_g 0.0 pt_lml_b 0.25 pt_lmh 0.0 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.25 ptm_low_rng 0.25 ptm_low_st 0.8 ptm_high -0.8 ptm_high_rng 0.8 ptm_high_st 0.25 brl_enable 1 brl -2.0 brl_r -3.0 brl_g -2.0 brl_b -2.0 brl_rng 0.35 brl_st 0.35 brlp_enable 1 brlp 0.0 brlp_r -1.0 brlp_g -1.0 brlp_b -1.0 hc_enable 1 hc_r 1.0 hc_r_rng 0.25 hs_rgb_enable 1 hs_r 0.7 hs_r_rng 1.33 hs_g 1.0 hs_g_rng 2.0 hs_b 0.75 hs_b_rng 2.0 hs_cmy_enable 1 hs_c 1.0 hs_c_rng 0.5 hs_m 1.0 hs_m_rng 1.0 hs_y 1.0 hs_y_rng 0.765\}" "Look Presets/Umbra" "knobs this \{tn_Lg 10.0 tn_con 1.8 tn_sh 0.5 tn_toe 0.001 tn_off 0.015 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 1.0 cwp 5 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.0 pt_lml_r 0.5 pt_lml_g 0.0 pt_lml_b 0.15 pt_lmh 0.25 pt_lmh_r 0.25 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.4 ptm_low_rng 0.35 ptm_low_st 0.66 ptm_high -0.5 ptm_high_rng 0.5 ptm_high_st 0.35 brl_enable 1 brl -2.0 brl_r -4.5 brl_g -3.0 brl_b -4.0 brl_rng 0.35 brl_st 0.3 brlp_enable 1 brlp 0.0 brlp_r -2.0 brlp_g -1.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.35 hs_rgb_enable 1 hs_r 0.66 hs_r_rng 1.0 hs_g 0.5 hs_g_rng 2.0 hs_b 0.85 hs_b_rng 2.0 hs_cmy_enable 1 hs_c 0.0 hs_c_rng 1.0 hs_m 0.25 hs_m_rng 1.0 hs_y 0.66 hs_y_rng 0.66\}" "Look Presets/Base" "knobs this \{tn_Lg 10.0 tn_con 1.66 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.5 pt_lml_r 0.5 pt_lml_g 0.15 pt_lml_b 0.15 pt_lmh 0.8 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 0 ptm_low 0.0 ptm_low_rng 0.5 ptm_low_st 0.5 ptm_high 0.0 ptm_high_rng 0.5 ptm_high_st 0.5 brl_enable 0 brl 0.0 brl_r 0.0 brl_g 0.0 brl_b 0.0 brl_rng 0.5 brl_st 0.35 brlp_enable 1 brlp -0.5 brlp_r -1.6 brlp_g -1.6 brlp_b -0.8 hc_enable 0 hc_r 0.0 hc_r_rng 0.25 hs_rgb_enable 0 hs_r 0.0 hs_r_rng 1.0 hs_g 0.0 hs_g_rng 1.0 hs_b 0.0 hs_b_rng 1.0 hs_cmy_enable 0 hs_c 0.0 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.0 hs_y_rng 1.0\}"}}
+ addUserKnob {35 look_presets l "" t "Select from a list of presets. You can create your own and store them using the Add Preset button. \n\n<b>Arriba</b>: A minimal smooth starting look with natural color rendition and minimal adjustments to create an aesthetically pleasing image. \n\n<b>Sylvan</b>: A smooth starting look with slightly stronger contrast and stronger hue distortions which may be preferential for skin.\n\n<b>Colorful</b>: A low contrast saturated bright look. Might be a good fit for animation.\n\n<b>Aery</b>: A low contrast look with cool highlights and more pure color rendered quite bright. It features strong desaturation near the grey axis, and darkening of only the most pure colors.\n\n<b>Dystopic</b>: A high contrast look with very low saturation and strong filmish hue distortions.\n\n<b>Umbra</b>: A dark moody cinematic look. Features low shadow contrast, warm whites, strong filmic hue distortions, cyan blues, and more saturated colors that render very dark. Works well with a Display Peak Luminance of 200 nits or above.\n\n<b>Base</b>: only the base components of the OpenDRT image rendering. Practically no preferential adjustements. Purity compression is mostly chromaticity-linear and very minimal. Mid-range purity is very strong. A good starting point for further look development if absolute control is required (do not underestimate the complexity of this undertaking)." +STARTLINE M {"Look Presets/Arriba" "knobs this \{tn_con 1.05 tn_sh 0.5 tn_toe 0.1 tn_off 0.013 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 0.0 tn_hcon_st 2.0 tn_lcon_enable 1 tn_lcon 2.0 tn_lcon_w 0.2 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.25 pt_lml_r 0.25 pt_lml_g 0.15 pt_lml_b 0.1 pt_lmh 0.25 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.8 ptm_low_rng 0.5 ptm_low_st 0.5 ptm_high -0.5 ptm_high_rng 0.5 ptm_high_st 0.5 brl_enable 1 brl 0.0 brl_r -2.5 brl_g -2.5 brl_b -2.5 brl_rng 0.5 brl_st 0.4 brlp_enable 1 brlp 0.0 brlp_r -1.5 brlp_g -2.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.3 hs_rgb_enable 1 hs_r 0.5 hs_r_rng 0.75 hs_g 0.35 hs_g_rng 1.0 hs_b 0.66 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 1.0 hs_m 0.25 hs_m_rng 1.0 hs_y 0.25 hs_y_rng 0.5\}" "Look Presets/Sylvan" "knobs this \{tn_con 1.6 tn_sh 0.5 tn_toe 0.006 tn_off 0.01 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.35 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.25 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.15 pt_lml_r 0.5 pt_lml_g 0.15 pt_lml_b 0.1 pt_lmh 0.3 pt_lmh_r 0.5 pt_lmh_b 0.25 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.5 ptm_low_rng 0.5 ptm_low_st 0.5 ptm_high -0.6 ptm_high_rng 0.5 ptm_high_st 0.5 brl_enable 1 brl -1.0 brl_r -2.0 brl_g -2.0 brl_b -0.5 brl_rng 0.25 brl_st 0.25 brlp_enable 1 brlp -0.5 brlp_r -1.0 brlp_g -1.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.4 hs_rgb_enable 1 hs_r 0.55 hs_r_rng 1.15 hs_g 0.75 hs_g_rng 1.25 hs_b 0.66 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 0.25 hs_m 0.25 hs_m_rng 1.0 hs_y 0.35 hs_y_rng 1.0\}" "Look Presets/Colorful" "knobs this \{tn_con 1.5 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.4 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.2 pt_lml_r 0.25 pt_lml_g 0.0 pt_lml_b 0.5 pt_lmh 0.25 pt_lmh_r 0.5 pt_lmh_b 0.5 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.8 ptm_low_rng 0.5 ptm_low_st 0.4 ptm_high -0.8 ptm_high_rng 0.25 ptm_high_st 0.4 brl_enable 1 brl 0.0 brl_r -1.5 brl_g -1.7 brl_b -0.25 brl_rng 0.3 brl_st 0.5 brlp_enable 1 brlp -0.5 brlp_r -1.5 brlp_g -1.5 brlp_b 0.0 hc_enable 1 hc_r 0.85 hc_r_rng 0.4 hs_rgb_enable 1 hs_r 0.5 hs_r_rng 1.0 hs_g 0.35 hs_g_rng 1.0 hs_b 0.66 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.25 hs_y_rng 1.0\}" "Look Presets/Aery" "knobs this \{tn_con 1.15 tn_sh 0.5 tn_toe 0.04 tn_off 0.006 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 0.0 tn_hcon_st 0.5 tn_lcon_enable 1 tn_lcon 0.5 tn_lcon_w 2.0 cwp 1 cwp_lm 0.25 rs_sa 0.25 rs_rw 0.2 rs_bw 0.5 pt_enable 1 pt_lml 0.0 pt_lml_r 0.35 pt_lml_g 0.15 pt_lml_b 0.15 pt_lmh 0.0 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.8 ptm_low_rng 0.35 ptm_low_st 0.6 ptm_high -0.9 ptm_high_rng 0.5 ptm_high_st 0.2 brl_enable 1 brl -3.0 brl_r 0.0 brl_g 0.0 brl_b 1.5 brl_rng 0.8 brl_st 0.15 brlp_enable 1 brlp -1.0 brlp_r -1.0 brlp_g -1.0 brlp_b -1.0 hc_enable 1 hc_r 0.5 hc_r_rng 0.25 hs_rgb_enable 1 hs_r 0.5 hs_r_rng 1.0 hs_g 0.35 hs_g_rng 2.0 hs_b 0.5 hs_b_rng 1.5 hs_cmy_enable 1 hs_c 0.35 hs_c_rng 1.0 hs_m 0.25 hs_m_rng 1.0 hs_y 0.35 hs_y_rng 0.5\}" "Look Presets/Dystopic" "knobs this \{tn_con 1.6 tn_sh 0.5 tn_toe 0.01 tn_off 0.008 tn_hcon_enable 1 tn_hcon 0.25 tn_hcon_pv 0.0 tn_hcon_st 1.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 0.75 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.0 pt_lml_r 0.25 pt_lml_g 0.0 pt_lml_b 0.25 pt_lmh 0.0 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.25 ptm_low_rng 0.25 ptm_low_st 0.8 ptm_high -0.8 ptm_high_rng 0.8 ptm_high_st 0.25 brl_enable 1 brl -2.0 brl_r -3.0 brl_g -2.0 brl_b -2.0 brl_rng 0.35 brl_st 0.35 brlp_enable 1 brlp 0.0 brlp_r -1.0 brlp_g -1.0 brlp_b -1.0 hc_enable 1 hc_r 1.0 hc_r_rng 0.25 hs_rgb_enable 1 hs_r 0.7 hs_r_rng 1.33 hs_g 1.0 hs_g_rng 2.0 hs_b 0.75 hs_b_rng 2.0 hs_cmy_enable 1 hs_c 1.0 hs_c_rng 0.5 hs_m 1.0 hs_m_rng 1.0 hs_y 1.0 hs_y_rng 0.765\}" "Look Presets/Umbra" "knobs this \{tn_con 1.8 tn_sh 0.5 tn_toe 0.001 tn_off 0.015 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 1.0 cwp 5 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.0 pt_lml_r 0.5 pt_lml_g 0.0 pt_lml_b 0.15 pt_lmh 0.25 pt_lmh_r 0.25 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.4 ptm_low_rng 0.35 ptm_low_st 0.66 ptm_high -0.5 ptm_high_rng 0.5 ptm_high_st 0.35 brl_enable 1 brl -2.0 brl_r -4.5 brl_g -3.0 brl_b -4.0 brl_rng 0.35 brl_st 0.3 brlp_enable 1 brlp 0.0 brlp_r -2.0 brlp_g -1.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.35 hs_rgb_enable 1 hs_r 0.66 hs_r_rng 1.0 hs_g 0.5 hs_g_rng 2.0 hs_b 0.85 hs_b_rng 2.0 hs_cmy_enable 1 hs_c 0.0 hs_c_rng 1.0 hs_m 0.25 hs_m_rng 1.0 hs_y 0.66 hs_y_rng 0.66\}" "Look Presets/Base" "knobs this \{tn_con 1.66 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.5 pt_lml_r 0.5 pt_lml_g 0.15 pt_lml_b 0.15 pt_lmh 0.8 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 0 ptm_low 0.0 ptm_low_rng 0.5 ptm_low_st 0.5 ptm_high 0.0 ptm_high_rng 0.5 ptm_high_st 0.5 brl_enable 0 brl 0.0 brl_r 0.0 brl_g 0.0 brl_b 0.0 brl_rng 0.5 brl_st 0.35 brlp_enable 1 brlp -0.5 brlp_r -1.6 brlp_g -1.6 brlp_b -0.8 hc_enable 0 hc_r 0.0 hc_r_rng 0.25 hs_rgb_enable 0 hs_r 0.0 hs_r_rng 1.0 hs_g 0.0 hs_g_rng 1.0 hs_b 0.0 hs_b_rng 1.0 hs_cmy_enable 0 hs_c 0.0 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.0 hs_y_rng 1.0\}" "" ""}}
  addUserKnob {22 add_preset l "Add Preset" t "Add current settings as a preset with the specified name." -STARTLINE T "def get_existing_presets(pk):\n  pdict = \{\}\n  for i in range(pk.numValues()):\n    pdict\[pk.itemName(i)] = pk.commands(i)\n  return pdict\n\n\ndef get_preset_cmd(n):\n  preset_knobs = n\['look_preset_knobs'].getValue().split(' ')\n  preset_cmd = 'knobs this \{'\n  for k_name in preset_knobs:\n    k = n\[k_name]\n    if isinstance(k, nuke.Enumeration_Knob) or isinstance(k, nuke.Boolean_Knob):\n      preset_cmd += (f'\{k_name\} \{int(k.getValue())\} ')\n    else:\n      preset_cmd += (f'\{k_name\} \{k.getValue()\} ')\n  preset_cmd = preset_cmd\[:-1]\n  preset_cmd += '\}'\n  return preset_cmd\n\n\nn = nuke.thisNode()\npreset_knob = n\['look_presets']\npreset_dict = get_existing_presets(preset_knob)\npreset_cmd = get_preset_cmd(n)\npreset_name = nuke.getInput('Enter Preset Name:')\nif preset_name:\n  preset_name = f'Look Presets/\{preset_name\}'\n  if preset_name:\n    if preset_name in preset_dict.keys():\n      if nuke.ask(f'Preset \"\{preset_name\}\" exists. Replace it?'):\n        preset_dict\[preset_name] = preset_cmd\n    else:\n      preset_dict\[preset_name] = preset_cmd\n  preset_knob.setValues(preset_dict)"}
  addUserKnob {22 remove_preset l "Remove Preset" t "Remove selected preset." -STARTLINE T "# Remove selected preset\nn = nuke.thisNode()\npk = n\['look_presets']\npdict = \{\}\nfor i in range(pk.numValues()):\n  pdict\[pk.itemName(i)] = pk.commands(i)\npreset_names = \[p.split('/')\[-1].replace(' ', '\\ ') for p in pdict.keys()]\np = nuke.Panel('Delete Preset')\np.addEnumerationPulldown('preset', ' '.join(preset_names))\nif p.show():\n  selected_preset = p.value('preset')\n  del pdict\[f'Look Presets/\{selected_preset\}']\n  pk.setValues(pdict)"}
  addUserKnob {22 show_dctl l "Show DCTL" t "Show DCTL code for the current settings" -STARTLINE T "n = nuke.thisNode()\n\npreset_knobs = n\['look_preset_knobs'].getValue().split(' ')\n\npresetStr = ''\n\nfor k_name in preset_knobs:\n  k = n\[k_name]\n  k_link = n.knobs()\[k_name]\n\n  kVal = k.getValue()\n  classId = k.ClassID()\n  if classId==4:\n    presetStr += (f'\{k_name\} = \{int(k.getValue())\}, ')\n  elif classId==7:\n    presetStr += (f'\{k_name\} = \{k.getValue()\}f, ')\n  elif classId==6:\n    presetStr += (f'\{k_name\} = \{int(k.getValue())\}, ')\n\npresetStr = f'\{presetStr\[:-2]\};'\nnuke.message(presetStr)"}
  addUserKnob {22 show_dctl_params l "Show DCTL (params and tooltips)" t "Show DCTL code for parameter definitions and tooltips" -STARTLINE T "n = nuke.thisNode()\n\npreset_knobs = n\['look_preset_knobs'].getValue().split(' ')\n\nparamStr = ''\ntooltipStr = ''\n\nfor k_name in preset_knobs:\n  k = n\[k_name]\n  k_link = n.knobs()\[k_name]\n\n  kVal = k.getValue()\n  kMin = k.min()\n  kMax = k.max()\n  if kMin>kMax:\n    _tmp = kMax\n    kMax = kMin\n    kMin = _tmp\n  kLabel = k_link.label()\n  if ';' in kLabel:\n    kLabel = kLabel.split(';')\[-1]\n  classId = k.ClassID()\n  if classId==4:\n    vals = \[v for v in k.values() if v != '']\n    pVals = \[f\"_\{k_name\}\{i\}\" for i in range(len(vals))]\n    paramStr += f'DEFINE_UI_PARAMS(_\{k_name\}, \{kLabel\}, DCTLUI_COMBO_BOX, \{int(kVal)\}, \{\{\{\", \".join(pVals)\}\}\}, \{\{\{\", \".join(vals)\}\}\})\\n'\n  elif classId==7:\n    paramStr += f'DEFINE_UI_PARAMS(_\{k_name\}, \{kLabel\}, DCTLUI_SLIDER_FLOAT, \{kVal\}, \{kMin\}, \{kMax\}, 0.0)\\n'\n  elif classId==6:\n    paramStr += f'DEFINE_UI_PARAMS(_\{k_name\}, \{kLabel\}, DCTLUI_CHECK_BOX, \{int(kVal)\})\\n'\n  \n  tooltipStr += f'DEFINE_UI_TOOLTIP(\{kLabel\}, \"\{k_link.tooltip()\}\")\\n'\n\nnuke.message(paramStr + '\\n\\n\\n' + tooltipStr)"}
  addUserKnob {1 look_preset_knobs l "" t "list of knobs to include in presets" +STARTLINE +INVISIBLE}
- look_preset_knobs "tn_Lg tn_con tn_sh tn_toe tn_off tn_hcon_enable tn_hcon tn_hcon_pv tn_hcon_st tn_lcon_enable tn_lcon tn_lcon_w cwp cwp_lm rs_sa rs_rw rs_bw pt_enable pt_lml pt_lml_r pt_lml_g pt_lml_b pt_lmh pt_lmh_r pt_lmh_b ptl_enable ptl_c ptl_m ptl_y ptm_enable ptm_low ptm_low_rng ptm_low_st ptm_high ptm_high_rng ptm_high_st brl_enable brl brl_r brl_g brl_b brl_rng brl_st brlp_enable brlp brlp_r brlp_g brlp_b hc_enable hc_r hc_r_rng hs_rgb_enable hs_r hs_r_rng hs_g hs_g_rng hs_b hs_b_rng hs_cmy_enable hs_c hs_c_rng hs_m hs_m_rng hs_y hs_y_rng"
+ look_preset_knobs "tn_con tn_sh tn_toe tn_off tn_hcon_enable tn_hcon tn_hcon_pv tn_hcon_st tn_lcon_enable tn_lcon tn_lcon_w cwp cwp_lm rs_sa rs_rw rs_bw pt_enable pt_lml pt_lml_r pt_lml_g pt_lml_b pt_lmh pt_lmh_r pt_lmh_b ptl_enable ptl_c ptl_m ptl_y ptm_enable ptm_low ptm_low_rng ptm_low_st ptm_high ptm_high_rng ptm_high_st brl_enable brl brl_r brl_g brl_b brl_rng brl_st brlp_enable brlp brlp_r brlp_g brlp_b hc_enable hc_r hc_r_rng hs_rgb_enable hs_r hs_r_rng hs_g hs_g_rng hs_b hs_b_rng hs_cmy_enable hs_c hs_c_rng hs_m hs_m_rng hs_y hs_y_rng"
  addUserKnob {26 spacer02 l " " T " "}
  addUserKnob {20 grp_outer l "" +STARTLINE n -2}
  addUserKnob {20 grp_tone l Tonescale t "Settings related to the tonescale function."}
- addUserKnob {35 tn_presets l "" t "Presets specifically for the tonescale function. A number of creative options show the possibilities. \n\n<b>Low Contrast</b> A low contrast tonescale curve that is intended as a starting point for further grading. Requires further contrast to be added in order to achieve something resembling a \"finished\" image, unless a very low contrast look is desired.\n\n<b>Medium Contrast</b>: Slightly stronger contrast. Still quite minimal and suitable as a starting point for further grading. Still a good base to build on.\n\n<b>High Contrast</b>: High contrast tonescale curve. Enough contrast to maybe be called a \"finished\" image, but also could be a good base to build on for other types of looks.\n\n<b>Arriba Tonescale</b>: Tonescale curve used in the Arriba look preset. A relatively low-contrast tonescale with a smooth transition into shadows. Uses an approach to the toe more typical of camera style DRTs, where there is a strong positive offset, and strong shadow toe compression.\n\n<b>Sylvan Tonescale</b>: Tonescale curve used in the Sylvan look preset. Slightly higher contrast especially in shadows while still being a good starting point for further grading or look development.\n\n<b>Colorful Tonescale</b>: Tonescale curve used in the Colorful look preset. Similar to the High Contrast tonescale curve with reduced shadow contrast.\n\n<b>Aery Tonescale</b>:  Tonescale curve used in the Aery look preset. A low contrast curve utilizing the Contrast Low module in a different way, pushing the width very high to act more as a highlight contrast control.\n\n<b>Umbra Tonescale</b>: A dark cinematic tonescale preset with deep low contrast shadows and strong midtone contrast. Works well with a 200 nit peak luminance.\n\n<b>ACES 1.x</b>: A rough match of the ACES 1.x tonescale curve. One deviation is mapping 0.0 to 0.0 through the tonescale curve, rather than mapping +0.02 to 0.0... because that is moronic. Also places the peak intersection constraint a bit higher than the original ~16 to be a bit more modern and compatible with modern camera dynamic ranges.\n\n<b>ACES 2.0</b>: An exact match to the ACES 2.0 tonescale function. Very low contrast in the highlights, and very strong shadow toe compression while mapping 0 to 0 through the tonescale function. Be careful with this one if adding additional shadow contrast upstream, without a strong positive offset.\n\n<b>Marvelous Tonescape</b>: A contrasty cinematic tonescale with strong highlight contrast. Similar to ACES 1.x but with reduced shadow contrast and softer rolloff in the highlights. Works well with higher display peak luminance.\n\n<b>DaGrinchi ToneGroan</b>: Another low-contrast tonescale designed as a starting point for further manipulations. Questionable choices make it not as good as other options." +STARTLINE M {"Tonescale Presets/Low Contrast" "knobs this \{tn_Lg 10.0 tn_con 1.4 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.5\}" "Tonescale Presets/Medium Contrast" "knobs this \{tn_Lg 10.0 tn_con 1.66 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.5\}" "Tonescale Presets/High Contrast" "knobs this \{tn_Lg 10.0 tn_con 1.4 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 0.5\}" "Tonescale Presets/Arriba Tonescale" "knobs this \{tn_Lg 10.0 tn_con 1.05 tn_sh 0.5 tn_toe 0.1 tn_off 0.013 tn_hcon_enable 0 tn_hcon 0.5 tn_hcon_pv 2.0 tn_hcon_st 2.0 tn_lcon_enable 1 tn_lcon 2.0 tn_lcon_w 0.2\}" "Tonescale Presets/Sylvan Tonescale" "knobs this \{tn_Lg 10.0 tn_con 1.6 tn_sh 0.5 tn_toe 0.006 tn_off 0.01 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.35 tn_lcon_w 0.5\}" "Tonescale Presets/Colorful Tonescale" "knobs this \{tn_Lg 10.0 tn_con 1.5 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.4 tn_lcon_w 0.5\}" "Tonescale Presets/Aery Tonescale" "knobs this \{tn_Lg 10.0 tn_con 1.15 tn_sh 0.5 tn_toe 0.04 tn_off 0.006 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 0.0 tn_hcon_st 0.5 tn_lcon_enable 1 tn_lcon 0.5 tn_lcon_w 2.0\}" "Tonescale Presets/Dystopic Tonescale" "knobs this \{tn_Lg 10.0 tn_con 1.6 tn_sh 0.5 tn_toe 0.01 tn_off 0.008 tn_hcon_enable 1 tn_hcon 0.25 tn_hcon_pv 0.0 tn_hcon_st 1.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 0.75\}" "Tonescale Presets/Umbra Tonescale" "knobs this \{tn_Lg 10.0 tn_con 1.8 tn_sh 0.5 tn_toe 0.001 tn_off 0.015 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 1.0\}" "Tonescale Presets/ACES-1.x" "knobs this \{tn_Lg 10.0 tn_con 1.0 tn_sh 0.35 tn_toe 0.02 tn_off 0.0 tn_hcon_enable 1 tn_hcon 0.55 tn_hcon_pv 0.0 tn_hcon_st 2.0 tn_lcon_enable 1 tn_lcon 1.13 tn_lcon_w 1.0\}" "Tonescale Presets/ACES-2.0" "knobs this \{tn_Lg 10.0  tn_con 1.15 tn_sh 0.5 tn_toe 0.04 tn_off 0.0 tn_hcon_enable 0 tn_hcon 1.0 tn_hcon_pv 1.0 tn_hcon_st 1.0 tn_lcon_enable 0 tn_lcon 1.0 tn_lcon_w 0.6\}" "Tonescale Presets/Marvelous Tonescape" "knobs this \{tn_Lg 10.0 tn_con 1.5 tn_sh 0.5 tn_toe 0.003 tn_off 0.01 tn_hcon_enable 1 tn_hcon 0.25 tn_hcon_pv 0.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 1.0\}" "Tonescale Presets/DaGrinchi Tonegroan" "knobs this \{tn_Lg 10.0 tn_con 1.2 tn_sh 0.5 tn_toe 0.02 tn_off 0.0 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 1.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.6\}" ""}}
+ addUserKnob {35 tn_presets l "" t "Presets specifically for the tonescale function. A number of creative options show the possibilities. \n\n<b>Low Contrast</b> A low contrast tonescale curve that is intended as a starting point for further grading. Requires further contrast to be added in order to achieve something resembling a \"finished\" image, unless a very low contrast look is desired.\n\n<b>Medium Contrast</b>: Slightly stronger contrast. Still quite minimal and suitable as a starting point for further grading. Still a good base to build on.\n\n<b>High Contrast</b>: High contrast tonescale curve. Enough contrast to maybe be called a \"finished\" image, but also could be a good base to build on for other types of looks.\n\n<b>Arriba Tonescale</b>: Tonescale curve used in the Arriba look preset. A relatively low-contrast tonescale with a smooth transition into shadows. Uses an approach to the toe more typical of camera style DRTs, where there is a strong positive offset, and strong shadow toe compression.\n\n<b>Sylvan Tonescale</b>: Tonescale curve used in the Sylvan look preset. Slightly higher contrast especially in shadows while still being a good starting point for further grading or look development.\n\n<b>Colorful Tonescale</b>: Tonescale curve used in the Colorful look preset. Similar to the High Contrast tonescale curve with reduced shadow contrast.\n\n<b>Aery Tonescale</b>:  Tonescale curve used in the Aery look preset. A low contrast curve utilizing the Contrast Low module in a different way, pushing the width very high to act more as a highlight contrast control.\n\n<b>Umbra Tonescale</b>: A dark cinematic tonescale preset with deep low contrast shadows and strong midtone contrast. Works well with a 200 nit peak luminance.\n\n<b>ACES 1.x</b>: A rough match of the ACES 1.x tonescale curve. One deviation is mapping 0.0 to 0.0 through the tonescale curve, rather than mapping +0.02 to 0.0... because that is moronic. Also places the peak intersection constraint a bit higher than the original ~16 to be a bit more modern and compatible with modern camera dynamic ranges.\n\n<b>ACES 2.0</b>: An exact match to the ACES 2.0 tonescale function. Very low contrast in the highlights, and very strong shadow toe compression while mapping 0 to 0 through the tonescale function. Be careful with this one if adding additional shadow contrast upstream, without a strong positive offset.\n\n<b>Marvelous Tonescape</b>: A contrasty cinematic tonescale with strong highlight contrast. Similar to ACES 1.x but with reduced shadow contrast and softer rolloff in the highlights. Works well with higher display peak luminance.\n\n<b>DaGrinchi ToneGroan</b>: Another low-contrast tonescale designed as a starting point for further manipulations. Questionable choices make it not as good as other options." +STARTLINE M {"Tonescale Presets/Low Contrast" "knobs this \{tn_con 1.4 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.5\}" "Tonescale Presets/Medium Contrast" "knobs this \{tn_con 1.66 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.5\}" "Tonescale Presets/High Contrast" "knobs this \{tn_con 1.4 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 0.5\}" "Tonescale Presets/Arriba Tonescale" "knobs this \{tn_con 1.05 tn_sh 0.5 tn_toe 0.1 tn_off 0.013 tn_hcon_enable 0 tn_hcon 0.5 tn_hcon_pv 2.0 tn_hcon_st 2.0 tn_lcon_enable 1 tn_lcon 2.0 tn_lcon_w 0.2\}" "Tonescale Presets/Sylvan Tonescale" "knobs this \{tn_con 1.6 tn_sh 0.5 tn_toe 0.006 tn_off 0.01 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.35 tn_lcon_w 0.5\}" "Tonescale Presets/Colorful Tonescale" "knobs this \{tn_con 1.5 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.4 tn_lcon_w 0.5\}" "Tonescale Presets/Aery Tonescale" "knobs this \{tn_con 1.15 tn_sh 0.5 tn_toe 0.04 tn_off 0.006 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 0.0 tn_hcon_st 0.5 tn_lcon_enable 1 tn_lcon 0.5 tn_lcon_w 2.0\}" "Tonescale Presets/Dystopic Tonescale" "knobs this \{tn_con 1.6 tn_sh 0.5 tn_toe 0.01 tn_off 0.008 tn_hcon_enable 1 tn_hcon 0.25 tn_hcon_pv 0.0 tn_hcon_st 1.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 0.75\}" "Tonescale Presets/Umbra Tonescale" "knobs this \{tn_con 1.8 tn_sh 0.5 tn_toe 0.001 tn_off 0.015 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 1.0\}" "Tonescale Presets/ACES-1.x" "knobs this \{tn_con 1.0 tn_sh 0.35 tn_toe 0.02 tn_off 0.0 tn_hcon_enable 1 tn_hcon 0.55 tn_hcon_pv 0.0 tn_hcon_st 2.0 tn_lcon_enable 1 tn_lcon 1.13 tn_lcon_w 1.0\}" "Tonescale Presets/ACES-2.0" "knobs this \{ tn_con 1.15 tn_sh 0.5 tn_toe 0.04 tn_off 0.0 tn_hcon_enable 0 tn_hcon 1.0 tn_hcon_pv 1.0 tn_hcon_st 1.0 tn_lcon_enable 0 tn_lcon 1.0 tn_lcon_w 0.6\}" "Tonescale Presets/Marvelous Tonescape" "knobs this \{tn_con 1.5 tn_sh 0.5 tn_toe 0.003 tn_off 0.01 tn_hcon_enable 1 tn_hcon 0.25 tn_hcon_pv 0.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 1.0\}" "Tonescale Presets/DaGrinchi Tonegroan" "knobs this \{tn_con 1.2 tn_sh 0.5 tn_toe 0.02 tn_off 0.0 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 1.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.6\}" ""}}
  addUserKnob {22 tn_add_preset l "Add Preset" t "Click to add current settings as a preset with a specified name." -STARTLINE T "def get_existing_presets(pk):\n  pdict = \{\}\n  for i in range(pk.numValues()):\n    pdict\[pk.itemName(i)] = pk.commands(i)\n  return pdict\n\n\ndef get_preset_cmd(n):\n  preset_knobs = n\['tn_preset_knobs'].getValue().split(' ')\n  preset_cmd = 'knobs this \{'\n  for k_name in preset_knobs:\n    k = n\[k_name]\n    if isinstance(k, nuke.Enumeration_Knob) or isinstance(k, nuke.Boolean_Knob):\n      preset_cmd += (f'\{k_name\} \{int(k.getValue())\} ')\n    else:\n      preset_cmd += (f'\{k_name\} \{k.getValue()\} ')\n  preset_cmd = preset_cmd\[:-1]\n  preset_cmd += '\}'\n  return preset_cmd\n\n\nn = nuke.thisNode()\npreset_knob = n\['tn_presets']\npreset_dict = get_existing_presets(preset_knob)\npreset_cmd = get_preset_cmd(n)\npreset_name = nuke.getInput('Enter Preset Name:')\nif preset_name:\n  preset_name = f'Tonescale Presets/\{preset_name\}'\n  if preset_name:\n    if preset_name in preset_dict.keys():\n      if nuke.ask(f'Preset \"\{preset_name\}\" exists. Replace it?'):\n        preset_dict\[preset_name] = preset_cmd\n    else:\n      preset_dict\[preset_name] = preset_cmd\n  preset_knob.setValues(preset_dict)"}
  addUserKnob {22 tn_remove_preset l "Remove Preset" t "Remove selected preset." -STARTLINE T "# Remove selected preset\nn = nuke.thisNode()\npk = n\['tn_presets']\npdict = \{\}\nfor i in range(pk.numValues()):\n  pdict\[pk.itemName(i)] = pk.commands(i)\npreset_names = \[p.split('/')\[-1].replace(' ', '\\ ') for p in pdict.keys()]\np = nuke.Panel('Delete Preset')\np.addEnumerationPulldown('preset', ' '.join(preset_names))\nif p.show():\n  selected_preset = p.value('preset')\n  del pdict\[f'Tonescale Presets/\{selected_preset\}']\n  pk.setValues(pdict)"}
  addUserKnob {22 tn_show_dctl l "Show DCTL" t "Show DCTL code for the current settings" -STARTLINE T "n = nuke.thisNode()\n\npreset_knobs = n\['tn_preset_knobs'].getValue().split(' ')\n\ndctl_str = ''\nfor k_name in preset_knobs:\n    k = n\[k_name]\n    if isinstance(k, nuke.Enumeration_Knob) or isinstance(k, nuke.Boolean_Knob):\n        dctl_str += (f'\{k_name\} = \{int(k.getValue())\}, ')\n    else:\n        dctl_str += (f'\{k_name\} = \{k.getValue()\}f, ')\n\ndctl_str = f'\{dctl_str\[:-2]\};'\nnuke.message(dctl_str)"}
  addUserKnob {1 tn_preset_knobs l "" t "list of knobs to include in presets" +STARTLINE +HIDDEN}
- tn_preset_knobs "tn_Lg tn_con tn_sh tn_toe tn_off tn_hcon_enable tn_hcon tn_hcon_pv tn_hcon_st tn_lcon_enable tn_lcon tn_lcon_w"
+ tn_preset_knobs "tn_con tn_sh tn_toe tn_off tn_hcon_enable tn_hcon tn_hcon_pv tn_hcon_st tn_lcon_enable tn_lcon tn_lcon_w"
  addUserKnob {26 spacer04 l "" +STARTLINE}
  addUserKnob {26 lbl_ts l " " T "<b>Tonescale Parameters"}
  addUserKnob {41 tn_Lp l "Display Peak Luminance" t "Peak display luminance in nits. In SDR, the max value stays pinned at 1.0. In HDR, the max value is adjusted to match peak luminance in the HDR container." T TONESCALE_CTRL.tn_Lp}
  addUserKnob {41 tn_gb l "HDR Grey Boost" t "Amount of stops to boost Grey Luminance, per stop of exposure increase of Peak Luminance. For example, if HDR Grey Boost is 0.1, middle grey will be boosted by 0.1 stops per stop of Peak Luminance increase." T TONESCALE_CTRL.tn_gb}
+ addUserKnob {41 pt_hdr l "HDR Purity" t "How much to affect purity compression and hue shift as Peak Luminance increases. A value of 0.0 will keep the purity compression and hue shift behavior the same for SDR and HDR. A value of 1.0 will preserve more purity as peak luminance increases (at the risk of gradient disruptions in high purity high intensity light sources), and will reduce hue shift amount in highlights." T TONESCALE_CTRL.pt_hdr}
  addUserKnob {41 tn_Lg l "Display Grey Luminance" t "Display luminance for middle grey (0.18) in nits. Sets the target value for middle grey within the available luminance range of the display device." T TONESCALE_CTRL.tn_Lg}
  addUserKnob {41 tn_con l Contrast t "Adjusts contrast or slope. A constrained power function applied in display linear." T TONESCALE_CTRL.tn_con}
  addUserKnob {41 tn_sh l "Shoulder Clip" t "Unitless control for the scene-linear value at which the tonescale system crosses the peak display linear value (1.0) and clips. This is not an exact constraint in order to keep the system simple, but corresponds to roughly 16 at Shoulder Clip = 0 and 1024 at Shoulder Clip = 1" T TONESCALE_CTRL.tn_sh}
@@ -151,7 +152,7 @@ Group {
    xpos 324
    ypos -534
   }
-set N842f78a0 [stack 0]
+set N5d808140 [stack 0]
   ColorMatrix {
    matrix {
         {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -167,14 +168,14 @@ set N842f78a0 [stack 0]
    xpos 290
    ypos -250
   }
-push $N842f78a0
+push $N5d808140
   Dot {
    name Dot391
    label " *RGB to XYZ D65 CAT: XYZ Scaling"
    xpos 434
    ypos -534
   }
-set N21525180 [stack 0]
+set N539c90 [stack 0]
   ColorMatrix {
    matrix {
         {0.7006223202 0.1487748027 0.101058729}
@@ -186,7 +187,7 @@ set N21525180 [stack 0]
    xpos 1610
    ypos -473
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.7364777002 0.1307396511 0.08323857578}
@@ -198,7 +199,7 @@ push $N21525180
    xpos 1500
    ypos -472
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.705396831 0.1640413404 0.08101775497}
@@ -210,7 +211,7 @@ push $N21525180
    xpos 1390
    ypos -472
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.5990839005 0.2489254922 0.1024464965}
@@ -222,7 +223,7 @@ push $N21525180
    xpos 1280
    ypos -472
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.735275209 0.06860940903 0.1465712786}
@@ -234,7 +235,7 @@ push $N21525180
    xpos 1170
    ypos -472
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.7048583204 0.1297602952 0.1158373115}
@@ -246,7 +247,7 @@ push $N21525180
    xpos 1060
    ypos -471
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.6380076408 0.2147038132 0.09774445742}
@@ -258,7 +259,7 @@ push $N21525180
    xpos 950
    ypos -472
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.4123909175 0.3575843573 0.1804807931}
@@ -270,7 +271,7 @@ push $N21525180
    xpos 840
    ypos -472
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.6369581223 0.1446169168 0.1688809693}
@@ -282,7 +283,7 @@ push $N21525180
    xpos 730
    ypos -472
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.4865711331 0.2656677067 0.1982173175}
@@ -294,7 +295,7 @@ push $N21525180
    xpos 620
    ypos -472
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.6609312296 0.1336961389 0.1558285803}
@@ -306,7 +307,7 @@ push $N21525180
    xpos 510
    ypos -472
   }
-push $N21525180
+push $N539c90
   ColorMatrix {
    matrix {
         {0.9503623843 0 9.346324805e-05}
@@ -373,7 +374,7 @@ push $N21525180
   xpos 324
   ypos -990
  }
-set N257781b0 [stack 0]
+set N87c53d0 [stack 0]
  Dot {
   name Dot433
   xpos -446
@@ -398,7 +399,7 @@ set N257781b0 [stack 0]
   ypos -942
   addUserKnob {20 Params}
   addUserKnob {7 tn_Lp l "peak luminance" R 100 1000}
-  tn_Lp 100
+  tn_Lp 1000
   addUserKnob {7 tn_Lg l "grey luminance" R 25 3}
   tn_Lg 10
   addUserKnob {7 tn_gb l "grey boost"}
@@ -435,11 +436,20 @@ set N257781b0 [stack 0]
   addUserKnob {7 s R 0 4}
   s {{x0*(pow(s0/m2,-1/tn_con)-1)}}
   addUserKnob {26 ""}
+  addUserKnob {7 pt_hdr l "purity hdr"}
+  pt_hdr 1
+  addUserKnob {7 Lf}
+  Lf {{pt_hdr*clamp((tn_Lp-100)/900)}}
+  addUserKnob {7 s_Lp100 R 0 4}
+  s_Lp100 {{x0*(pow((tn_Lg/100),-1/tn_con)-1)}}
+  addUserKnob {7 s1 R 0 4}
+  s1 {{s*Lf+s_Lp100*(1-Lf)}}
+  addUserKnob {26 ""}
   addUserKnob {7 dsc l "display scale" t "final scaling for output display encoding" R 0 4}
   dsc {{eotf==4?0.01:eotf==5?0.1:100/tn_Lp}}
  }
-set N25e78260 [stack 0]
-push $N257781b0
+set N85837030 [stack 0]
+push $N87c53d0
  MergeExpression {
   inputs 2
   expr0 Ar==0?0:Br/Ar
@@ -454,7 +464,7 @@ push $N257781b0
   xpos 324
   ypos -894
  }
-set N26478890 [stack 0]
+set N48358c00 [stack 0]
  Expression {
   temp_name0 cy
   temp_expr0 r-b
@@ -482,7 +492,7 @@ set N26478890 [stack 0]
   addUserKnob {7 t0}
   t0 0.25
  }
-set N26271e70 [stack 0]
+set N5b63f1e0 [stack 0]
  Dot {
   name Dot8
   xpos -116
@@ -521,8 +531,8 @@ set N26271e70 [stack 0]
   xpos -116
   ypos -828
  }
-set Nd87ecd00 [stack 0]
-push $N25e78260
+set Nf14770f0 [stack 0]
+push $N85837030
  MergeExpression {
   inputs 2
   temp_name0 tsf
@@ -644,24 +654,30 @@ push $N25e78260
   addUserKnob {6 invert +STARTLINE}
  }
  Expression {
-  channel0 rgba
+  channel0 {rgba.red -rgba.green -rgba.blue none}
   expr0 pow(r/(r+s),p)
+  expr1 pow(r/(r+s1),p)
+  expr2 pow(r/(r+s_Lp100),p)
   name MMGreyPowerSigmoid
   label https://www.desmos.com/calculator/ofwtcmzc3w
   xpos -480
-  ypos -711
+  ypos -709
   addUserKnob {20 Params}
   addUserKnob {7 p R 1 4}
   p {{parent.TONESCALE_CTRL.p}}
   addUserKnob {7 s R 0 4}
   s {{parent.TONESCALE_CTRL.s}}
+  addUserKnob {7 s1 R 0 4}
+  s1 {{parent.TONESCALE_CTRL.s1}}
+  addUserKnob {7 s_Lp100 R 0 4}
+  s_Lp100 {{parent.TONESCALE_CTRL.s_Lp100}}
  }
  Dot {
   name Dot1
   xpos -446
   ypos -654
  }
-set Nfb281220 [stack 0]
+set N9b292b60 [stack 0]
  Expression {
   channel0 rgb
   expr0 r*m
@@ -698,44 +714,57 @@ set Nfb281220 [stack 0]
   xpos -446
   ypos -174
  }
-push $Nfb281220
+push $N9b292b60
+push $Nf14770f0
+ Dot {
+  name Dot3
+  xpos -116
+  ypos -534
+ }
+set Ndd78820 [stack 0]
+ Dot {
+  name Dot7
+  xpos -116
+  ypos -438
+ }
+set N66c71a0 [stack 0]
+ Premult {
+  name Premult1
+  xpos -150
+  ypos -346
+ }
+set N3051dfa0 [stack 0]
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 rgba.alpha
+  name Copy3
+  xpos 180
+  ypos -262
+ }
+push $N9b292b60
  Dot {
   name Dot6
   xpos -336
   ypos -654
  }
-set N21d27e70 [stack 0]
- Dot {
-  name Dot10
-  tile_color 0x666666ff
-  xpos -226
-  ypos -654
+set N7b37fa00 [stack 0]
+ Expression {
+  channel0 rgba
+  expr0 b
+  name Expression2
+  tile_color 0x8e00
+  xpos -260
+  ypos -658
  }
-set N2191e720 [stack 0]
+set N5c045820 [stack 0]
  Dot {
   name Dot17
   tile_color 0x666666ff
   xpos -226
   ypos -294
  }
-push $Nd87ecd00
- Dot {
-  name Dot3
-  xpos -116
-  ypos -534
- }
-set N2192b2f0 [stack 0]
- Dot {
-  name Dot7
-  xpos -116
-  ypos -438
- }
-set N21e21a60 [stack 0]
- Premult {
-  name Premult1
-  xpos -150
-  ypos -346
- }
+push $N3051dfa0
  Copy {
   inputs 2
   from0 rgba.red
@@ -749,22 +778,14 @@ set N21e21a60 [stack 0]
   xpos 214
   ypos -294
  }
-set N21826980 [stack 0]
-push $N21826980
-push $N2191e720
+push $N5c045820
  Dot {
   name Dot4
   xpos -6
   ypos -654
  }
-set N2182cbe0 [stack 0]
- Dot {
-  name Dot13
-  xpos -6
-  ypos -558
- }
-set N21a232a0 [stack 0]
-push $N21e21a60
+set Nf1ddb70 [stack 0]
+push $N66c71a0
  MergeExpression {
   inputs 2
   temp_name0 f0
@@ -790,14 +811,14 @@ push $N21e21a60
   addUserKnob {7 w1 R 0.1 1}
   w1 0.5
  }
-push $N2192b2f0
-push $N26271e70
+push $Ndd78820
+push $N5b63f1e0
  Dot {
   name Dot12
   xpos 104
   ypos -643
  }
-set Nfccf1340 [stack 0]
+set N2fd1b7d0 [stack 0]
  Expression {
   temp_name0 h0
   temp_expr0 (r-c0+pi)%(2*pi)-pi
@@ -826,8 +847,17 @@ set Nfccf1340 [stack 0]
   addUserKnob {7 w2 R 0 3}
   w2 0.66
  }
-set Nfccf70c0 [stack 0]
-push $N21d27e70
+set Ne4794d0 [stack 0]
+push $N7b37fa00
+ Expression {
+  channel0 rgba
+  expr0 g
+  name Expression1
+  tile_color 0x7a0000
+  xpos -370
+  ypos -636
+ }
+set N238940 [stack 0]
  MergeExpression {
   inputs 2
   temp_name0 _p
@@ -837,7 +867,7 @@ push $N21d27e70
   name PurityLimitLow
   label https://www.desmos.com/calculator/adtzkjofgn
   xpos -370
-  ypos -636
+  ypos -597
   addUserKnob {20 Params}
   addUserKnob {7 p}
   p 0.25
@@ -887,14 +917,20 @@ push $N21d27e70
   ypos -393
   disable {{!ptm_enable}}
  }
-push $N21a232a0
+push $N238940
+ Dot {
+  name Dot13
+  xpos 104
+  ypos -560
+ }
+set N13296100 [stack 0]
  Invert {
   channels rgba
   name Invert1
   xpos 70
   ypos -442
  }
-push $Nfccf1340
+push $N2fd1b7d0
  Expression {
   temp_name0 h0
   temp_expr0 (r-c0+pi)%(2*pi)-pi
@@ -946,8 +982,8 @@ push $Nfccf1340
   xpos 180
   ypos -447
  }
-push $N21a232a0
-push $Nfccf70c0
+push $N13296100
+push $Ne4794d0
  Expression {
   expr0 r*a**p0
   expr1 g*a**p1
@@ -971,8 +1007,8 @@ push $Nfccf70c0
   xpos 180
   ypos -569
  }
-push $N2182cbe0
-push $Nd87ecd00
+push $Nf1ddb70
+push $Nf14770f0
  MergeExpression {
   inputs 2
   temp_name0 ts
@@ -990,7 +1026,7 @@ push $Nd87ecd00
   addUserKnob {7 p}
   p 0.3
  }
-push $N26478890
+push $N48358c00
  MergeExpression {
   inputs 2
   temp_name0 f0
@@ -1134,8 +1170,8 @@ push $N26478890
    xpos -6
    ypos -777
   }
-set Nfa9f0100 [stack 0]
-push $Nfa9f0100
+set N1202b4b0 [stack 0]
+push $N1202b4b0
   Dot {
    name Dot5
    tile_color 0x666666ff
@@ -1174,21 +1210,21 @@ add_layer {white white.red white.green white.blue}
    xpos 434
    ypos -966
   }
-set Nfacf1700 [stack 0]
+set N86932730 [stack 0]
   Dot {
    name Dot173
    tile_color 0x666666ff
    xpos 1204
    ypos -966
   }
-set Nfacf7b90 [stack 0]
+set N26d1fc70 [stack 0]
   Dot {
    name Dot2
    tile_color 0x666666ff
    xpos 1974
    ypos -966
   }
-set Nfacfe2c0 [stack 0]
+set N26d26350 [stack 0]
   ColorMatrix {
    channels all
    matrix {
@@ -1201,7 +1237,7 @@ set Nfacfe2c0 [stack 0]
    xpos 1940
    ypos -886
   }
-set Nfadf4ca0 [stack 0]
+set N6442c280 [stack 0]
   Copy {
    inputs 2
    from0 rgba.red
@@ -1210,8 +1246,8 @@ set Nfadf4ca0 [stack 0]
    xpos 1720
    ypos -780
   }
-push $Nfa9f0100
-push $Nfacf1700
+push $N1202b4b0
+push $N86932730
   Copy {
    inputs 2
    from0 rgba.red
@@ -1227,7 +1263,7 @@ push $Nfacf1700
    xpos 146
    ypos -643
   }
-push $Nfacfe2c0
+push $N26d26350
   ColorMatrix {
    channels all
    matrix {
@@ -1240,7 +1276,7 @@ push $Nfacfe2c0
    xpos 2270
    ypos -885
   }
-push $Nfacfe2c0
+push $N26d26350
   ColorMatrix {
    channels all
    matrix {
@@ -1253,7 +1289,7 @@ push $Nfacfe2c0
    xpos 2160
    ypos -885
   }
-push $Nfacfe2c0
+push $N26d26350
   ColorMatrix {
    channels all
    matrix {
@@ -1266,8 +1302,8 @@ push $Nfacfe2c0
    xpos 2050
    ypos -885
   }
-push $Nfadf4ca0
-push $Nfacfe2c0
+push $N6442c280
+push $N26d26350
   ColorMatrix {
    channels all
    matrix {
@@ -1280,7 +1316,7 @@ push $Nfacfe2c0
    xpos 1830
    ypos -888
   }
-push $Nfacfe2c0
+push $N26d26350
   ColorMatrix {
    channels all
    matrix {
@@ -1300,7 +1336,7 @@ push $Nfacfe2c0
    xpos 1940
    ypos -752
   }
-push $Nfacf7b90
+push $N26d1fc70
   ColorMatrix {
    channels all
    matrix {
@@ -1313,7 +1349,7 @@ push $Nfacf7b90
    xpos 1500
    ypos -885
   }
-push $Nfacf7b90
+push $N26d1fc70
   ColorMatrix {
    channels all
    matrix {
@@ -1326,14 +1362,14 @@ push $Nfacf7b90
    xpos 1390
    ypos -885
   }
-push $Nfacf7b90
+push $N26d1fc70
   Dot {
    name Dot172
    tile_color 0x666666ff
    xpos 1314
    ypos -870
   }
-push $Nfacf7b90
+push $N26d1fc70
   ColorMatrix {
    channels all
    matrix {
@@ -1346,7 +1382,7 @@ push $Nfacf7b90
    xpos 1170
    ypos -885
   }
-push $Nfacf7b90
+push $N26d1fc70
   ColorMatrix {
    channels all
    matrix {
@@ -1359,7 +1395,7 @@ push $Nfacf7b90
    xpos 1060
    ypos -888
   }
-push $Nfacf7b90
+push $N26d1fc70
   ColorMatrix {
    channels all
    matrix {
@@ -1379,7 +1415,7 @@ push $Nfacf7b90
    xpos 1170
    ypos -753
   }
-push $Nfacf1700
+push $N86932730
   ColorMatrix {
    channels all
    matrix {
@@ -1392,7 +1428,7 @@ push $Nfacf1700
    xpos 730
    ypos -885
   }
-push $Nfacf1700
+push $N86932730
   ColorMatrix {
    channels all
    matrix {
@@ -1405,7 +1441,7 @@ push $Nfacf1700
    xpos 620
    ypos -885
   }
-push $Nfacf1700
+push $N86932730
   ColorMatrix {
    channels all
    matrix {
@@ -1418,8 +1454,8 @@ push $Nfacf1700
    xpos 510
    ypos -886
   }
-push $Nfacf1700
-push $Nfacf1700
+push $N86932730
+push $N86932730
   ColorMatrix {
    channels all
    matrix {
@@ -1432,7 +1468,7 @@ push $Nfacf1700
    xpos 290
    ypos -888
   }
-push $Nfacf1700
+push $N86932730
   ColorMatrix {
    channels all
    matrix {
@@ -1475,14 +1511,14 @@ push $Nfacf1700
    xpos 434
    ypos -462
   }
-set Nfc0f4090 [stack 0]
+set N5943bc70 [stack 0]
   Dot {
    name Dot6
    tile_color 0x666666ff
    xpos 544
    ypos -462
   }
-set Nfc0fa630 [stack 0]
+set N59441eb0 [stack 0]
   Dot {
    name Dot9
    tile_color 0x666666ff
@@ -1510,7 +1546,7 @@ set Nfc0fa630 [stack 0]
    ypos -373
    disable {{parent.cwp<2}}
   }
-push $Nfc0fa630
+push $N59441eb0
   ColorMatrix {
    channels all
    matrix {
@@ -1530,7 +1566,7 @@ push $Nfc0fa630
    xpos 510
    ypos -321
   }
-push $Nfc0f4090
+push $N5943bc70
   ColorMatrix {
    channels all
    matrix {
@@ -1556,7 +1592,7 @@ push $Nfc0f4090
    xpos 434
    ypos -258
   }
-set Nfc6fb9b0 [stack 0]
+set N57031f20 [stack 0]
   Shuffle {
    in white
    name Shuffle9
@@ -1580,7 +1616,7 @@ set Nfc6fb9b0 [stack 0]
    xpos 193
    ypos -174
   }
-push $Nfc6fb9b0
+push $N57031f20
   Merge2 {
    inputs 2
    operation multiply
@@ -1612,7 +1648,7 @@ push $Nfc6fb9b0
   expr2 b*ex
   name BrilliancePost
   xpos 290
-  ypos -247
+  ypos -256
   disable {{!brlp_enable}}
   addUserKnob {20 Params}
   addUserKnob {7 m R -1 0}
@@ -1658,7 +1694,7 @@ push $Nfc6fb9b0
   xpos 324
   ypos -102
  }
-set Neb5c6ac0 [stack 0]
+set N4b522fb0 [stack 0]
  Clamp {
   channels rgb
   maximum_enable false
@@ -1677,7 +1713,7 @@ set Neb5c6ac0 [stack 0]
   xpos 400
   ypos -87
  }
-push $Neb5c6ac0
+push $N4b522fb0
  Switch {
   inputs 2
   which {{parent.DisplayGamut.gamut==2}}
@@ -1706,7 +1742,7 @@ push $Neb5c6ac0
    xpos 400
    ypos -129
   }
-set Neb0cace0 [stack 0]
+set N46424f60 [stack 0]
   Expression {
    temp_name0 Yd
    temp_expr0 0.2627*r+0.6780*g+0.0593*b
@@ -1736,7 +1772,7 @@ set Neb0cace0 [stack 0]
    addUserKnob {7 _c}
    _c {{0.5-_a*log(4*_a)}}
   }
-push $Neb0cace0
+push $N46424f60
   Expression {
    temp_name0 rp
    temp_expr0 pow(r,m_1)
@@ -1762,7 +1798,7 @@ push $Neb0cace0
    addUserKnob {7 c_3}
    c_3 {{2392/128}}
   }
-push $Neb0cace0
+push $N46424f60
   Expression {
    expr0 sign(r)*pow(fabs(r),1/p)
    expr1 sign(g)*pow(fabs(g),1/p)

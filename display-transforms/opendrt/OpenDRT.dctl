@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 
-/* OpenDRT v1.1.0b46 -------------------------------------------------
+/* OpenDRT v1.1.0b47 -------------------------------------------------
 
   Written by Jed Smith
   https://github.com/jedypod/open-display-transform
@@ -15,6 +15,9 @@ DEFINE_UI_PARAMS(in_oetf, Input Transfer Function, DCTLUI_COMBO_BOX, 1, {ioetf_l
 
 // Tonescale Parameters
 DEFINE_UI_PARAMS(tn_Lp, Display Peak Luminance, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 0.0)
+DEFINE_UI_PARAMS(tn_gb, HDR Grey Boost, DCTLUI_SLIDER_FLOAT, 0.13, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(pt_hdr, HDR Purity, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
+DEFINE_UI_PARAMS(tn_Lg, Display Grey Luminance, DCTLUI_SLIDER_FLOAT, 10.0, 3.0, 25.0, 0.0)
 DEFINE_UI_PARAMS(crv_enable, Tonescale Overlay, DCTLUI_CHECK_BOX, 0)
 
 
@@ -37,10 +40,6 @@ DEFINE_UI_PARAMS(crv_enable, Tonescale Overlay, DCTLUI_CHECK_BOX, 0)
 
 // #define INIT_PARAMS
 
-// DEFINE_UI_PARAMS(_tn_gb, HDR Grey Boost, DCTLUI_SLIDER_FLOAT, 0.13, 0.0, 1.0, 0.0)
-// DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
-
-// DEFINE_UI_PARAMS(_tn_Lg, Display Grey Luminance, DCTLUI_SLIDER_FLOAT, 10.0, 3.0, 25.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_con, Contrast, DCTLUI_SLIDER_FLOAT, 1.66, 1.0, 2.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_sh, Shoulder Clip, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_tn_toe, Toe, DCTLUI_SLIDER_FLOAT, 0.003, 0.0, 0.1, 0.0)
@@ -106,6 +105,7 @@ DEFINE_UI_PARAMS(crv_enable, Tonescale Overlay, DCTLUI_CHECK_BOX, 0)
 // DEFINE_UI_PARAMS(_hs_y, Hueshift Y, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 1.0, 0.0)
 // DEFINE_UI_PARAMS(_hs_y_rng, Hueshift Y Range, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.0)
 
+// DEFINE_UI_PARAMS(_clamp, Clamp, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_tn_su, Surround, DCTLUI_COMBO_BOX, 1, {_Dark, _Dim, _Bright}, {Dark, Dim, Bright})
 // DEFINE_UI_PARAMS(_display_gamut, Display Gamut, DCTLUI_COMBO_BOX, 0, {Rec709, P3D65, Rec2020, P3D60, P3DCI, XYZ}, {Rec.709, P3-D65, Rec.2020 (P3 Limited), P3-D60, P3-DCI, XYZ})
 // DEFINE_UI_PARAMS(_eotf, Display EOTF, DCTLUI_COMBO_BOX, 2, {eotf0, eotf1, eotf2, eotf3, eotf4, eotf5}, {Linear, 2.2 Power sRGB Display, 2.4 Power Rec.1886, 2.6 Power DCI, ST 2084 PQ, HLG})
@@ -137,6 +137,7 @@ DEFINE_UI_PARAMS(display_encoding_preset, Display Encoding Preset, DCTLUI_COMBO_
 
 DEFINE_UI_TOOLTIP(Display Peak Luminance, "Peak display luminance in nits. In SDR, the max value stays pinned at 1.0. In HDR, the max value is adjusted to match peak luminance in the HDR container.")
 DEFINE_UI_TOOLTIP(HDR Grey Boost, "Amount of stops to boost Grey Luminance, per stop of exposure increase of Peak Luminance. For example, if HDR Grey Boost is 0.1, middle grey will be boosted by 0.1 stops per stop of Peak Luminance increase.")
+DEFINE_UI_TOOLTIP(HDR Purity, "How much to affect purity compression and hue shift as Peak Luminance increases. A value of 0.0 will keep the purity compression and hue shift behavior the same for SDR and HDR. A value of 1.0 will preserve more purity as peak luminance increases (at the risk of gradient disruptions in high purity high intensity light sources), and will reduce hue shift amount in highlights.")
 DEFINE_UI_TOOLTIP(Display Grey Luminance, "Display luminance for middle grey (0.18) in nits. Sets the target value for middle grey within the available luminance range of the display device.")
 DEFINE_UI_TOOLTIP(Creative White, "Set the creative whitepoint of the display peak luminance. With D65 all channels are equal. With D50, the peak luminance value will match a D50 whitepoint. This can be creatively desireable. This adjustment is applied post-tonescale.")
 DEFINE_UI_TOOLTIP(Creative White Range, "The intensity range affected by the Creative White adjustment. At 1.0, the entire intensity range is affected. As Range is decreased, more of midtones and shadows are left unaffected. It can be creatively desireable to keep midtones more neutral while shifting highlights warmer.")
@@ -739,36 +740,36 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Init look preset variables
   int tn_hcon_enable, tn_lcon_enable, pt_enable, ptl_enable, ptm_enable, brl_enable, brlp_enable, hc_enable, hs_rgb_enable, hs_cmy_enable, cwp, tn_su, clamp, display_gamut, eotf;
   
-  float tn_con, tn_sh, tn_toe, tn_off, tn_hcon, tn_hcon_pv, tn_hcon_st, tn_lcon, tn_lcon_w, cwp_lm, tn_Lg, tn_gb, rs_sa, rs_rw, rs_bw, pt_lml, pt_lml_r, pt_lml_g, pt_lml_b, pt_lmh, pt_lmh_r, pt_lmh_b, ptl_c, ptl_m, ptl_y, ptm_low, ptm_low_rng, ptm_low_st, ptm_high, ptm_high_rng, ptm_high_st, brl, brl_r, brl_g, brl_b, brl_rng, brl_st, brlp, brlp_r, brlp_g, brlp_b, hc_r, hc_r_rng, hs_r, hs_r_rng, hs_g, hs_g_rng, hs_b, hs_b_rng, hs_c, hs_c_rng, hs_m, hs_m_rng, hs_y, hs_y_rng;
+  float tn_con, tn_sh, tn_toe, tn_off, tn_hcon, tn_hcon_pv, tn_hcon_st, tn_lcon, tn_lcon_w, cwp_lm, rs_sa, rs_rw, rs_bw, pt_lml, pt_lml_r, pt_lml_g, pt_lml_b, pt_lmh, pt_lmh_r, pt_lmh_b, ptl_c, ptl_m, ptl_y, ptm_low, ptm_low_rng, ptm_low_st, ptm_high, ptm_high_rng, ptm_high_st, brl, brl_r, brl_g, brl_b, brl_rng, brl_st, brlp, brlp_r, brlp_g, brlp_b, hc_r, hc_r_rng, hs_r, hs_r_rng, hs_g, hs_g_rng, hs_b, hs_b_rng, hs_c, hs_c_rng, hs_m, hs_m_rng, hs_y, hs_y_rng;
 
   
   #ifdef INIT_PARAMS  // Set all parameters to the user-controllable ones instead of presets if INIT_PARAMS defined by user.
 
-  tn_con=_tn_con, tn_sh=_tn_sh, tn_toe=_tn_toe, tn_off=_tn_off, tn_hcon_enable=_tn_hcon_enable, tn_hcon=_tn_hcon, tn_hcon_pv=_tn_hcon_pv, tn_hcon_st=_tn_hcon_st, tn_lcon_enable=_tn_lcon_enable, tn_lcon=_tn_lcon, tn_lcon_w=_tn_lcon_w, rs_sa=_rs_sa, rs_rw=_rs_rw, rs_bw=_rs_bw, pt_enable=_pt_enable, pt_lml=_pt_lml, pt_lml_r=_pt_lml_r, pt_lml_g=_pt_lml_g, pt_lml_b=_pt_lml_b, pt_lmh=_pt_lmh, pt_lmh_r=_pt_lmh_r, pt_lmh_b=_pt_lmh_b, ptl_enable=_ptl_enable, ptl_c=_ptl_c, ptl_m=_ptl_m, ptl_y=_ptl_y, ptm_enable=_ptm_enable, ptm_low=_ptm_low, ptm_low_rng=_ptm_low_rng, ptm_low_st=_ptm_low_st, ptm_high=_ptm_high, ptm_high_rng=_ptm_high_rng, ptm_high_st=_ptm_high_st, brl_enable=_brl_enable, brl=_brl, brl_r=_brl_r, brl_g=_brl_g, brl_b=_brl_b, brl_rng=_brl_rng, brl_st=_brl_st, brlp_enable=_brlp_enable, brlp=_brlp, brlp_r=_brlp_r, brlp_g=_brlp_g, brlp_b=_brlp_b, hc_enable=_hc_enable, hc_r=_hc_r, hc_r_rng=_hc_r_rng, hs_rgb_enable=_hs_rgb_enable, hs_r=_hs_r, hs_r_rng=_hs_r_rng, hs_g=_hs_g, hs_g_rng=_hs_g_rng, hs_b=_hs_b, hs_b_rng=_hs_b_rng, hs_cmy_enable=_hs_cmy_enable, hs_c=_hs_c, hs_c_rng=_hs_c_rng, hs_m=_hs_m, hs_m_rng=_hs_m_rng, hs_y=_hs_y, hs_y_rng=_hs_y_rng, tn_Lg=_tn_Lg, tn_gb=_tn_gb, tn_su=_tn_su, display_gamut=_display_gamut, eotf=_eotf, clamp=_clamp, cwp=_cwp, cwp_lm=_cwp_lm;
+  tn_con=_tn_con, tn_sh=_tn_sh, tn_toe=_tn_toe, tn_off=_tn_off, tn_hcon_enable=_tn_hcon_enable, tn_hcon=_tn_hcon, tn_hcon_pv=_tn_hcon_pv, tn_hcon_st=_tn_hcon_st, tn_lcon_enable=_tn_lcon_enable, tn_lcon=_tn_lcon, tn_lcon_w=_tn_lcon_w, rs_sa=_rs_sa, rs_rw=_rs_rw, rs_bw=_rs_bw, pt_enable=_pt_enable, pt_lml=_pt_lml, pt_lml_r=_pt_lml_r, pt_lml_g=_pt_lml_g, pt_lml_b=_pt_lml_b, pt_lmh=_pt_lmh, pt_lmh_r=_pt_lmh_r, pt_lmh_b=_pt_lmh_b, ptl_enable=_ptl_enable, ptl_c=_ptl_c, ptl_m=_ptl_m, ptl_y=_ptl_y, ptm_enable=_ptm_enable, ptm_low=_ptm_low, ptm_low_rng=_ptm_low_rng, ptm_low_st=_ptm_low_st, ptm_high=_ptm_high, ptm_high_rng=_ptm_high_rng, ptm_high_st=_ptm_high_st, brl_enable=_brl_enable, brl=_brl, brl_r=_brl_r, brl_g=_brl_g, brl_b=_brl_b, brl_rng=_brl_rng, brl_st=_brl_st, brlp_enable=_brlp_enable, brlp=_brlp, brlp_r=_brlp_r, brlp_g=_brlp_g, brlp_b=_brlp_b, hc_enable=_hc_enable, hc_r=_hc_r, hc_r_rng=_hc_r_rng, hs_rgb_enable=_hs_rgb_enable, hs_r=_hs_r, hs_r_rng=_hs_r_rng, hs_g=_hs_g, hs_g_rng=_hs_g_rng, hs_b=_hs_b, hs_b_rng=_hs_b_rng, hs_cmy_enable=_hs_cmy_enable, hs_c=_hs_c, hs_c_rng=_hs_c_rng, hs_m=_hs_m, hs_m_rng=_hs_m_rng, hs_y=_hs_y, hs_y_rng=_hs_y_rng, tn_su=_tn_su, display_gamut=_display_gamut, eotf=_eotf, clamp=_clamp, cwp=_cwp, cwp_lm=_cwp_lm;
   
   #else // Otherwise, drive everything based on the preset combo box parameters.
 
   /*----------- LOOK PRESETS -----------------*/
   if (look_preset==0) { // Arriba
-    tn_Lg = 10.0f, tn_con = 1.05f, tn_sh = 0.5f, tn_toe = 0.1f, tn_off = 0.013f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 2.0f, tn_lcon_enable = 1, tn_lcon = 2.0f, tn_lcon_w = 0.2f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.25f, pt_lml_r = 0.25f, pt_lml_g = 0.15f, pt_lml_b = 0.1f, pt_lmh = 0.25f, pt_lmh_r = 0.5f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.8f, ptm_low_rng = 0.5f, ptm_low_st = 0.5f, ptm_high = -0.5f, ptm_high_rng = 0.5f, ptm_high_st = 0.5f, brl_enable = 1, brl = 0.0f, brl_r = -2.5f, brl_g = -2.5f, brl_b = -2.5f, brl_rng = 0.5f, brl_st = 0.4f, brlp_enable = 1, brlp = 0.0f, brlp_r = -1.5f, brlp_g = -2.0f, brlp_b = -0.5f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.3f, hs_rgb_enable = 1, hs_r = 0.5f, hs_r_rng = 0.75f, hs_g = 0.35f, hs_g_rng = 1.0f, hs_b = 0.66f, hs_b_rng = 1.0f, hs_cmy_enable = 1, hs_c = 0.25f, hs_c_rng = 1.0f, hs_m = 0.25f, hs_m_rng = 1.0f, hs_y = 0.25f, hs_y_rng = 0.5f;
+    tn_con = 1.05f, tn_sh = 0.5f, tn_toe = 0.1f, tn_off = 0.013f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 2.0f, tn_lcon_enable = 1, tn_lcon = 2.0f, tn_lcon_w = 0.2f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.25f, pt_lml_r = 0.25f, pt_lml_g = 0.15f, pt_lml_b = 0.1f, pt_lmh = 0.25f, pt_lmh_r = 0.5f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.8f, ptm_low_rng = 0.5f, ptm_low_st = 0.5f, ptm_high = -0.5f, ptm_high_rng = 0.5f, ptm_high_st = 0.5f, brl_enable = 1, brl = 0.0f, brl_r = -2.5f, brl_g = -2.5f, brl_b = -2.5f, brl_rng = 0.5f, brl_st = 0.4f, brlp_enable = 1, brlp = 0.0f, brlp_r = -1.5f, brlp_g = -2.0f, brlp_b = -0.5f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.3f, hs_rgb_enable = 1, hs_r = 0.5f, hs_r_rng = 0.75f, hs_g = 0.35f, hs_g_rng = 1.0f, hs_b = 0.66f, hs_b_rng = 1.0f, hs_cmy_enable = 1, hs_c = 0.25f, hs_c_rng = 1.0f, hs_m = 0.25f, hs_m_rng = 1.0f, hs_y = 0.25f, hs_y_rng = 0.5f;
   }
   else if (look_preset==1) { // Sylvan
-    tn_Lg = 10.0f, tn_con = 1.6f, tn_sh = 0.5f, tn_toe = 0.006f, tn_off = 0.01f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 0.35f, tn_lcon_w = 0.5f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.15f, pt_lml_r = 0.5f, pt_lml_g = 0.15f, pt_lml_b = 0.1f, pt_lmh = 0.3f, pt_lmh_r = 0.5f, pt_lmh_b = 0.25f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.5f, ptm_low_rng = 0.5f, ptm_low_st = 0.5f, ptm_high = -0.6f, ptm_high_rng = 0.5f, ptm_high_st = 0.5f, brl_enable = 1, brl = -1.0f, brl_r = -2.0f, brl_g = -2.0f, brl_b = -0.5f, brl_rng = 0.25f, brl_st = 0.25f, brlp_enable = 1, brlp = -0.5f, brlp_r = -1.0f, brlp_g = -1.0f, brlp_b = -0.5f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.4f, hs_rgb_enable = 1, hs_r = 0.55f, hs_r_rng = 1.15f, hs_g = 0.75f, hs_g_rng = 1.25f, hs_b = 0.66f, hs_b_rng = 1.0f, hs_cmy_enable = 1, hs_c = 0.25f, hs_c_rng = 0.25f, hs_m = 0.25f, hs_m_rng = 1.0f, hs_y = 0.35f, hs_y_rng = 1.0f;
+    tn_con = 1.6f, tn_sh = 0.5f, tn_toe = 0.006f, tn_off = 0.01f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 0.35f, tn_lcon_w = 0.5f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.25f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.15f, pt_lml_r = 0.5f, pt_lml_g = 0.15f, pt_lml_b = 0.1f, pt_lmh = 0.3f, pt_lmh_r = 0.5f, pt_lmh_b = 0.25f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.5f, ptm_low_rng = 0.5f, ptm_low_st = 0.5f, ptm_high = -0.6f, ptm_high_rng = 0.5f, ptm_high_st = 0.5f, brl_enable = 1, brl = -1.0f, brl_r = -2.0f, brl_g = -2.0f, brl_b = -0.5f, brl_rng = 0.25f, brl_st = 0.25f, brlp_enable = 1, brlp = -0.5f, brlp_r = -1.0f, brlp_g = -1.0f, brlp_b = -0.5f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.4f, hs_rgb_enable = 1, hs_r = 0.55f, hs_r_rng = 1.15f, hs_g = 0.75f, hs_g_rng = 1.25f, hs_b = 0.66f, hs_b_rng = 1.0f, hs_cmy_enable = 1, hs_c = 0.25f, hs_c_rng = 0.25f, hs_m = 0.25f, hs_m_rng = 1.0f, hs_y = 0.35f, hs_y_rng = 1.0f;
   }
   else if (look_preset==2) { // Colorful
-    tn_Lg = 10.0f, tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 0.4f, tn_lcon_w = 0.5f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.25f, pt_lml_r = 0.5f, pt_lml_g = 0.0f, pt_lml_b = 0.5f, pt_lmh = 0.25f, pt_lmh_r = 0.5f, pt_lmh_b = 0.5f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.8f, ptm_low_rng = 0.4f, ptm_low_st = 0.4f, ptm_high = -0.8f, ptm_high_rng = 0.25f, ptm_high_st = 0.4f, brl_enable = 1, brl = 0.0f, brl_r = -1.5f, brl_g = -1.7f, brl_b = -0.5f, brl_rng = 0.3f, brl_st = 0.5f, brlp_enable = 1, brlp = -0.5f, brlp_r = -1.0f, brlp_g = -1.0f, brlp_b = 0.0f, hc_enable = 1, hc_r = 0.85f, hc_r_rng = 0.4f, hs_rgb_enable = 1, hs_r = 0.5f, hs_r_rng = 1.0f, hs_g = 0.35f, hs_g_rng = 1.0f, hs_b = 0.66f, hs_b_rng = 1.0f, hs_cmy_enable = 1, hs_c = 0.25f, hs_c_rng = 1.0f, hs_m = 0.0f, hs_m_rng = 1.0f, hs_y = 0.25f, hs_y_rng = 1.0f;
+    tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 0.4f, tn_lcon_w = 0.5f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.2f, pt_lml_r = 0.25f, pt_lml_g = 0.0f, pt_lml_b = 0.5f, pt_lmh = 0.25f, pt_lmh_r = 0.5f, pt_lmh_b = 0.5f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.8f, ptm_low_rng = 0.5f, ptm_low_st = 0.4f, ptm_high = -0.8f, ptm_high_rng = 0.25f, ptm_high_st = 0.4f, brl_enable = 1, brl = 0.0f, brl_r = -1.5f, brl_g = -1.7f, brl_b = -0.25f, brl_rng = 0.3f, brl_st = 0.5f, brlp_enable = 1, brlp = -0.5f, brlp_r = -1.5f, brlp_g = -1.5f, brlp_b = 0.0f, hc_enable = 1, hc_r = 0.85f, hc_r_rng = 0.4f, hs_rgb_enable = 1, hs_r = 0.5f, hs_r_rng = 1.0f, hs_g = 0.35f, hs_g_rng = 1.0f, hs_b = 0.66f, hs_b_rng = 1.0f, hs_cmy_enable = 1, hs_c = 0.25f, hs_c_rng = 1.0f, hs_m = 0.0f, hs_m_rng = 1.0f, hs_y = 0.25f, hs_y_rng = 1.0f;
   }
   else if (look_preset==3) { // Aery
-    tn_Lg = 10.0f, tn_con = 1.15f, tn_sh = 0.5f, tn_toe = 0.04f, tn_off = 0.006f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 0.5f, tn_lcon_enable = 1, tn_lcon = 0.5f, tn_lcon_w = 2.0f, cwp = 1, cwp_lm = 0.25f, rs_sa = 0.25f, rs_rw = 0.2f, rs_bw = 0.5f, pt_enable = 1, pt_lml = 0.0f, pt_lml_r = 0.35f, pt_lml_g = 0.15f, pt_lml_b = 0.15f, pt_lmh = 0.0f, pt_lmh_r = 0.5f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.8f, ptm_low_rng = 0.35f, ptm_low_st = 0.6f, ptm_high = -0.9f, ptm_high_rng = 0.5f, ptm_high_st = 0.2f, brl_enable = 1, brl = -3.0f, brl_r = 0.0f, brl_g = 0.0f, brl_b = 1.5f, brl_rng = 0.8f, brl_st = 0.15f, brlp_enable = 1, brlp = -1.0f, brlp_r = -1.0f, brlp_g = -1.0f, brlp_b = -1.0f, hc_enable = 1, hc_r = 0.5f, hc_r_rng = 0.25f, hs_rgb_enable = 1, hs_r = 0.5f, hs_r_rng = 1.0f, hs_g = 0.35f, hs_g_rng = 2.0f, hs_b = 0.5f, hs_b_rng = 1.5f, hs_cmy_enable = 1, hs_c = 0.35f, hs_c_rng = 1.0f, hs_m = 0.25f, hs_m_rng = 1.0f, hs_y = 0.35f, hs_y_rng = 0.5f;
+    tn_con = 1.15f, tn_sh = 0.5f, tn_toe = 0.04f, tn_off = 0.006f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 0.5f, tn_lcon_enable = 1, tn_lcon = 0.5f, tn_lcon_w = 2.0f, cwp = 1, cwp_lm = 0.25f, rs_sa = 0.25f, rs_rw = 0.2f, rs_bw = 0.5f, pt_enable = 1, pt_lml = 0.0f, pt_lml_r = 0.35f, pt_lml_g = 0.15f, pt_lml_b = 0.15f, pt_lmh = 0.0f, pt_lmh_r = 0.5f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.8f, ptm_low_rng = 0.35f, ptm_low_st = 0.6f, ptm_high = -0.9f, ptm_high_rng = 0.5f, ptm_high_st = 0.2f, brl_enable = 1, brl = -3.0f, brl_r = 0.0f, brl_g = 0.0f, brl_b = 1.5f, brl_rng = 0.8f, brl_st = 0.15f, brlp_enable = 1, brlp = -1.0f, brlp_r = -1.0f, brlp_g = -1.0f, brlp_b = -1.0f, hc_enable = 1, hc_r = 0.5f, hc_r_rng = 0.25f, hs_rgb_enable = 1, hs_r = 0.5f, hs_r_rng = 1.0f, hs_g = 0.35f, hs_g_rng = 2.0f, hs_b = 0.5f, hs_b_rng = 1.5f, hs_cmy_enable = 1, hs_c = 0.35f, hs_c_rng = 1.0f, hs_m = 0.25f, hs_m_rng = 1.0f, hs_y = 0.35f, hs_y_rng = 0.5f;
   }
   else if (look_preset==4) { // Dystopic
-    tn_Lg = 10.0f, tn_con = 1.6f, tn_sh = 0.5f, tn_toe = 0.01f, tn_off = 0.008f, tn_hcon_enable = 1, tn_hcon = 0.25f, tn_hcon_pv = 0.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.75f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.0f, pt_lml_r = 0.25f, pt_lml_g = 0.0f, pt_lml_b = 0.25f, pt_lmh = 0.0f, pt_lmh_r = 0.5f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.25f, ptm_low_rng = 0.25f, ptm_low_st = 0.8f, ptm_high = -0.8f, ptm_high_rng = 0.8f, ptm_high_st = 0.25f, brl_enable = 1, brl = -2.0f, brl_r = -3.0f, brl_g = -2.0f, brl_b = -2.0f, brl_rng = 0.35f, brl_st = 0.35f, brlp_enable = 1, brlp = 0.0f, brlp_r = -1.0f, brlp_g = -1.0f, brlp_b = -1.0f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.25f, hs_rgb_enable = 1, hs_r = 0.7f, hs_r_rng = 1.33f, hs_g = 1.0f, hs_g_rng = 2.0f, hs_b = 0.75f, hs_b_rng = 2.0f, hs_cmy_enable = 1, hs_c = 1.0f, hs_c_rng = 0.5f, hs_m = 1.0f, hs_m_rng = 1.0f, hs_y = 1.0f, hs_y_rng = 0.765f;
+    tn_con = 1.6f, tn_sh = 0.5f, tn_toe = 0.01f, tn_off = 0.008f, tn_hcon_enable = 1, tn_hcon = 0.25f, tn_hcon_pv = 0.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.75f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.0f, pt_lml_r = 0.25f, pt_lml_g = 0.0f, pt_lml_b = 0.25f, pt_lmh = 0.0f, pt_lmh_r = 0.5f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.25f, ptm_low_rng = 0.25f, ptm_low_st = 0.8f, ptm_high = -0.8f, ptm_high_rng = 0.8f, ptm_high_st = 0.25f, brl_enable = 1, brl = -2.0f, brl_r = -3.0f, brl_g = -2.0f, brl_b = -2.0f, brl_rng = 0.35f, brl_st = 0.35f, brlp_enable = 1, brlp = 0.0f, brlp_r = -1.0f, brlp_g = -1.0f, brlp_b = -1.0f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.25f, hs_rgb_enable = 1, hs_r = 0.7f, hs_r_rng = 1.33f, hs_g = 1.0f, hs_g_rng = 2.0f, hs_b = 0.75f, hs_b_rng = 2.0f, hs_cmy_enable = 1, hs_c = 1.0f, hs_c_rng = 0.5f, hs_m = 1.0f, hs_m_rng = 1.0f, hs_y = 1.0f, hs_y_rng = 0.765f;
   }
   else if (look_preset==5) { // Umbra
-    tn_Lg = 10.0f, tn_con = 1.8f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f, cwp = 5, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.0f, pt_lml_r = 0.5f, pt_lml_g = 0.0f, pt_lml_b = 0.15f, pt_lmh = 0.25f, pt_lmh_r = 0.25f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.4f, ptm_low_rng = 0.35f, ptm_low_st = 0.66f, ptm_high = -0.5f, ptm_high_rng = 0.5f, ptm_high_st = 0.35f, brl_enable = 1, brl = -2.0f, brl_r = -4.5f, brl_g = -3.0f, brl_b = -4.0f, brl_rng = 0.35f, brl_st = 0.3f, brlp_enable = 1, brlp = 0.0f, brlp_r = -2.0f, brlp_g = -1.0f, brlp_b = -0.5f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.35f, hs_rgb_enable = 1, hs_r = 0.66f, hs_r_rng = 1.0f, hs_g = 0.5f, hs_g_rng = 2.0f, hs_b = 0.85f, hs_b_rng = 2.0f, hs_cmy_enable = 1, hs_c = 0.0f, hs_c_rng = 1.0f, hs_m = 0.25f, hs_m_rng = 1.0f, hs_y = 0.66f, hs_y_rng = 0.66f;
+    tn_con = 1.8f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f, cwp = 5, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.0f, pt_lml_r = 0.5f, pt_lml_g = 0.0f, pt_lml_b = 0.15f, pt_lmh = 0.25f, pt_lmh_r = 0.25f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 1, ptm_low = 0.4f, ptm_low_rng = 0.35f, ptm_low_st = 0.66f, ptm_high = -0.5f, ptm_high_rng = 0.5f, ptm_high_st = 0.35f, brl_enable = 1, brl = -2.0f, brl_r = -4.5f, brl_g = -3.0f, brl_b = -4.0f, brl_rng = 0.35f, brl_st = 0.3f, brlp_enable = 1, brlp = 0.0f, brlp_r = -2.0f, brlp_g = -1.0f, brlp_b = -0.5f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.35f, hs_rgb_enable = 1, hs_r = 0.66f, hs_r_rng = 1.0f, hs_g = 0.5f, hs_g_rng = 2.0f, hs_b = 0.85f, hs_b_rng = 2.0f, hs_cmy_enable = 1, hs_c = 0.0f, hs_c_rng = 1.0f, hs_m = 0.25f, hs_m_rng = 1.0f, hs_y = 0.66f, hs_y_rng = 0.66f;
   }
   else if (look_preset==6) { // Base
-    tn_Lg = 10.0f, tn_con = 1.66f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.5f, pt_lml_r = 0.5f, pt_lml_g = 0.15f, pt_lml_b = 0.15f, pt_lmh = 0.8f, pt_lmh_r = 0.5f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 0, ptm_low = 0.0f, ptm_low_rng = 0.5f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_rng = 0.5f, ptm_high_st = 0.5f, brl_enable = 0, brl = 0.0f, brl_r = 0.0f, brl_g = 0.0f, brl_b = 0.0f, brl_rng = 0.5f, brl_st = 0.35f, brlp_enable = 1, brlp = -0.5f, brlp_r = -1.6f, brlp_g = -1.6f, brlp_b = -0.8f, hc_enable = 0, hc_r = 0.0f, hc_r_rng = 0.25f, hs_rgb_enable = 0, hs_r = 0.0f, hs_r_rng = 1.0f, hs_g = 0.0f, hs_g_rng = 1.0f, hs_b = 0.0f, hs_b_rng = 1.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_c_rng = 1.0f, hs_m = 0.0f, hs_m_rng = 1.0f, hs_y = 0.0f, hs_y_rng = 1.0f;
+    tn_con = 1.66f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.5f, pt_lml_r = 0.5f, pt_lml_g = 0.15f, pt_lml_b = 0.15f, pt_lmh = 0.8f, pt_lmh_r = 0.5f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.05f, ptl_m = 0.06f, ptl_y = 0.05f, ptm_enable = 0, ptm_low = 0.0f, ptm_low_rng = 0.5f, ptm_low_st = 0.5f, ptm_high = 0.0f, ptm_high_rng = 0.5f, ptm_high_st = 0.5f, brl_enable = 0, brl = 0.0f, brl_r = 0.0f, brl_g = 0.0f, brl_b = 0.0f, brl_rng = 0.5f, brl_st = 0.35f, brlp_enable = 1, brlp = -0.5f, brlp_r = -1.6f, brlp_g = -1.6f, brlp_b = -0.8f, hc_enable = 0, hc_r = 0.0f, hc_r_rng = 0.25f, hs_rgb_enable = 0, hs_r = 0.0f, hs_r_rng = 1.0f, hs_g = 0.0f, hs_g_rng = 1.0f, hs_b = 0.0f, hs_b_rng = 1.0f, hs_cmy_enable = 0, hs_c = 0.0f, hs_c_rng = 1.0f, hs_m = 0.0f, hs_m_rng = 1.0f, hs_y = 0.0f, hs_y_rng = 1.0f;
   }
  
  
@@ -776,47 +777,46 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // if (tonescale_preset==0) // Do nothing and use tonescale settings from the look preset
   
   if (tonescale_preset==1) { // Low Contrast
-    tn_Lg = 10.0f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f;
+    tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f;
   }
   if (tonescale_preset==2) { // Medium Contrast
-    tn_Lg = 10.0f, tn_con = 1.66f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f;
+    tn_con = 1.66f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f;
   }
   if (tonescale_preset==3) { // High Contrast
-    tn_Lg = 10.0f, tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f;
+    tn_con = 1.4f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.5f;
   }
   else if (tonescale_preset==4) { // Arriba Tonescale
-    tn_Lg = 10.0f, tn_con = 1.05f, tn_sh = 0.5f, tn_toe = 0.1f, tn_off = 0.013f, tn_hcon_enable = 0, tn_hcon = 0.5f, tn_hcon_pv = 2.0f, tn_hcon_st = 2.0f, tn_lcon_enable = 1, tn_lcon = 2.0f, tn_lcon_w = 0.2f;
+    tn_con = 1.05f, tn_sh = 0.5f, tn_toe = 0.1f, tn_off = 0.013f, tn_hcon_enable = 0, tn_hcon = 0.5f, tn_hcon_pv = 2.0f, tn_hcon_st = 2.0f, tn_lcon_enable = 1, tn_lcon = 2.0f, tn_lcon_w = 0.2f;
   }
   else if (tonescale_preset==5) { // Sylvan Tonescale
-    tn_Lg = 10.0f, tn_con = 1.6f, tn_sh = 0.5f, tn_toe = 0.006f, tn_off = 0.01f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 0.35f, tn_lcon_w = 0.5f;
+    tn_con = 1.6f, tn_sh = 0.5f, tn_toe = 0.006f, tn_off = 0.01f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 0.35f, tn_lcon_w = 0.5f;
   }
   else if (tonescale_preset==6) { // Colorful Tonescale
-    tn_Lg = 10.0f, tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 0.4f, tn_lcon_w = 0.5f;
+    tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 0.4f, tn_lcon_w = 0.5f;
   }
   else if (tonescale_preset==7) { // Aery Tonescale
-    tn_Lg = 10.0f, tn_con = 1.15f, tn_sh = 0.5f, tn_toe = 0.04f, tn_off = 0.006f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 0.5f, tn_lcon_enable = 1, tn_lcon = 0.5f, tn_lcon_w = 2.0f;
+    tn_con = 1.15f, tn_sh = 0.5f, tn_toe = 0.04f, tn_off = 0.006f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 0.0f, tn_hcon_st = 0.5f, tn_lcon_enable = 1, tn_lcon = 0.5f, tn_lcon_w = 2.0f;
   }
   else if (tonescale_preset==8) { // Dystopic Tonescale
-    tn_Lg = 10.0f, tn_con = 1.6f, tn_sh = 0.5f, tn_toe = 0.01f, tn_off = 0.008f, tn_hcon_enable = 1, tn_hcon = 0.25f, tn_hcon_pv = 0.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.75f;
+    tn_con = 1.6f, tn_sh = 0.5f, tn_toe = 0.01f, tn_off = 0.008f, tn_hcon_enable = 1, tn_hcon = 0.25f, tn_hcon_pv = 0.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 0.75f;
   }
   else if (tonescale_preset==9) { // Umbra Tonescale
-    tn_Lg = 10.0f, tn_con = 1.8f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f;
+    tn_con = 1.8f, tn_sh = 0.5f, tn_toe = 0.001f, tn_off = 0.015f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f;
   }
   else if (tonescale_preset==10) { // ACES-1.x
-    tn_Lg = 10.0f, tn_con = 1.0f, tn_sh = 0.35f, tn_toe = 0.02f, tn_off = 0.0f, tn_hcon_enable = 1, tn_hcon = 0.55f, tn_hcon_pv = 0.0f, tn_hcon_st = 2.0f, tn_lcon_enable = 1, tn_lcon = 1.13f, tn_lcon_w = 1.0f;
+    tn_con = 1.0f, tn_sh = 0.35f, tn_toe = 0.02f, tn_off = 0.0f, tn_hcon_enable = 1, tn_hcon = 0.55f, tn_hcon_pv = 0.0f, tn_hcon_st = 2.0f, tn_lcon_enable = 1, tn_lcon = 1.13f, tn_lcon_w = 1.0f;
   }
   else if (tonescale_preset==11) { // ACES-2.0
-    tn_Lg = 10.0f, tn_con = 1.15f, tn_sh = 0.5f, tn_toe = 0.04f, tn_off = 0.0f, tn_hcon_enable = 0, tn_hcon = 1.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 0, tn_lcon = 1.0f, tn_lcon_w = 0.6f;
+    tn_con = 1.15f, tn_sh = 0.5f, tn_toe = 0.04f, tn_off = 0.0f, tn_hcon_enable = 0, tn_hcon = 1.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 0, tn_lcon = 1.0f, tn_lcon_w = 0.6f;
   }
   else if (tonescale_preset==12) { // Marvelous Tonescape
-    tn_Lg = 10.0f, tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.01f, tn_hcon_enable = 1, tn_hcon = 0.25f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f;
+    tn_con = 1.5f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.01f, tn_hcon_enable = 1, tn_hcon = 0.25f, tn_hcon_pv = 0.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.0f, tn_lcon_w = 1.0f;
   }
   else if (tonescale_preset==13) { // DaGrinchi Tonegroan
-    tn_Lg = 10.0f, tn_con = 1.2f, tn_sh = 0.5f, tn_toe = 0.02f, tn_off = 0.0f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.6f;
+    tn_con = 1.2f, tn_sh = 0.5f, tn_toe = 0.02f, tn_off = 0.0f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 1.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.6f;
   }
   
-  // Hard-code tn_gb and clamp if in presets mode
-  tn_gb = 0.13f; // Places middle grey at about 14 nits at 1000nits peak luminance in HDR
+  // Hard-code clamp if in presets mode
   clamp = 1;
   
   /*----------- CREATIVE WHITE PRESETS -----------------*/
@@ -945,6 +945,12 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   const float ts_s = ts_x0*(_powf(ts_s0/ts_m2, -1.0f/tn_con) - 1.0f);
   const float ts_dsc = eotf==4 ? 0.01 : eotf==5 ? 0.1 : 100.0f/tn_Lp;
 
+  // Lerp from pt_cmp at 100 nits to pt_cmp_hdr at 1000 nits
+  const float pt_cmp_Lf = pt_hdr*_fminf(1.0f, (tn_Lp - 100.0f)/900.0f);
+  // Approximate scene-linear scale at Lp=100 nits
+  const float s_Lp100 = ts_x0*(_powf((tn_Lg/100.0f), -1.0f/tn_con) - 1.0f);
+  const float ts_s1 = ts_s*pt_cmp_Lf + s_Lp100*(1.0f - pt_cmp_Lf);
+
 
   // Convert from input gamut into P3-D65
   rgb = vdot(in_to_xyz, rgb);
@@ -1031,18 +1037,23 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   }
 
   // Hyperbolic Compression
+  float tsn_pt = compress_hyperbolic_power(tsn, ts_s1, ts_p);
+  float tsn_const = compress_hyperbolic_power(tsn, s_Lp100, ts_p);
   tsn = compress_hyperbolic_power(tsn, ts_s, ts_p);
   
-  if (crv_enable == 1) crv_tsn = compress_hyperbolic_power(crv_tsn, ts_s, ts_p);
+  float crv_tsn_const = 0.0f;
+  if (crv_enable == 1) {
+    crv_tsn_const = compress_hyperbolic_power(crv_tsn, s_Lp100, ts_p);
+    crv_tsn = compress_hyperbolic_power(crv_tsn, ts_s, ts_p);
+  }
 
 
 
   /***************************************************
     Hue Contrast R
   --------------------------------------------------*/
-  float tsn_compl = 1.0f - tsn;
   if (hc_enable) {
-    float hc_ts = tsn_compl;
+    float hc_ts = 1.0f - tsn_const;
     // Limit high purity on bottom end and low purity on top end by ach_d.
     // This helps reduce artifacts and over-saturation.
     float hc_c = hc_ts*(1.0f - ach_d) + ach_d*(1.0f - hc_ts);
@@ -1061,9 +1072,9 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   // Hue Shift RGB by purity compress tonescale, shifting more as intensity increases
   if (hs_rgb_enable) {
     float3 hs_rgb = make_float3(
-      ha_rgb_hs.x*ach_d*_powf(tsn, 1.0f/hs_r_rng),
-      ha_rgb_hs.y*ach_d*_powf(tsn, 1.0f/hs_g_rng),
-      ha_rgb_hs.z*ach_d*_powf(tsn, 1.0f/hs_b_rng));
+      ha_rgb_hs.x*ach_d*_powf(tsn_pt, 1.0f/hs_r_rng),
+      ha_rgb_hs.y*ach_d*_powf(tsn_pt, 1.0f/hs_g_rng),
+      ha_rgb_hs.z*ach_d*_powf(tsn_pt, 1.0f/hs_b_rng));
     float3 hsf = make_float3(hs_rgb.x*hs_r, hs_rgb.y*-hs_g, hs_rgb.z*-hs_b);
     hsf = make_float3(hsf.z - hsf.y, hsf.x - hsf.z, hsf.y - hsf.x);
     rgb += hsf;
@@ -1071,10 +1082,11 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   // Hue Shift CMY by tonescale, shifting less as intensity increases
   if (hs_cmy_enable) {
+    float tsn_pt_compl = 1.0f - tsn_pt;
     float3 hs_cmy = make_float3(
-      ha_cmy.x*ach_d*_powf(tsn_compl, 1.0f/hs_c_rng),
-      ha_cmy.y*ach_d*_powf(tsn_compl, 1.0f/hs_m_rng),
-      ha_cmy.z*ach_d*_powf(tsn_compl, 1.0f/hs_y_rng));
+      ha_cmy.x*ach_d*_powf(tsn_pt_compl, 1.0f/hs_c_rng),
+      ha_cmy.y*ach_d*_powf(tsn_pt_compl, 1.0f/hs_m_rng),
+      ha_cmy.z*ach_d*_powf(tsn_pt_compl, 1.0f/hs_y_rng));
     float3 hsf = make_float3(hs_cmy.x*-hs_c, hs_cmy.y*hs_m, hs_cmy.z*hs_y);
     hsf = make_float3(hsf.z - hsf.y, hsf.x - hsf.z, hsf.y - hsf.x);
     rgb += hsf;
@@ -1087,8 +1099,8 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
       https://www.desmos.com/calculator/adtzkjofgn
   --------------------------------------------------*/
   // Purity Limit Low
-  float pt_lml_p = 1.0f + 4.0f*(1.0f - tsn)*(pt_lml + pt_lml_r*ha_rgb_hs.x + pt_lml_g*ha_rgb_hs.y + pt_lml_b*ha_rgb_hs.z);
-  float ptf = 1.0f - _powf(tsn, pt_lml_p);
+  float pt_lml_p = 1.0f + 4.0f*(1.0f - tsn_pt)*(pt_lml + pt_lml_r*ha_rgb_hs.x + pt_lml_g*ha_rgb_hs.y + pt_lml_b*ha_rgb_hs.z);
+  float ptf = 1.0f - _powf(tsn_pt, pt_lml_p);
   
   // Purity Limit High
   float pt_lmh_p = (1.0f - ach_d*(pt_lmh_r*ha_rgb.x + pt_lmh_b*ha_rgb.z))*(1.0f - pt_lmh*ach_d);
@@ -1103,10 +1115,10 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   if (ptm_enable) {
     float ptm_low_f;
     if (ptm_low_st == 0.0f || ptm_low_rng == 0.0f) ptm_low_f = 1.0f;
-    else ptm_low_f = 1.0f + ptm_low*_expf(-2.0f*ach_d*ach_d/ptm_low_st*(1.0f + ha_rgb.z/4.0f))*_powf(1.0f - tsn, 1.0f/ptm_low_rng);
+    else ptm_low_f = 1.0f + ptm_low*_expf(-2.0f*ach_d*ach_d/ptm_low_st*(1.0f + ha_rgb.z/4.0f))*_powf(1.0f - tsn_const, 1.0f/ptm_low_rng);
     float ptm_high_f;
     if (ptm_high_st == 0.0f || ptm_high_rng == 0.0f) ptm_high_f = 1.0f;
-    else ptm_high_f = 1.0f + ptm_high*_expf(-2.0f*ach_d*ach_d/ptm_high_st)*_powf(tsn, 1.0f/(4.0f*ptm_high_rng));
+    else ptm_high_f = 1.0f + ptm_high*_expf(-2.0f*ach_d*ach_d/ptm_high_st)*_powf(tsn_const, 1.0f/(4.0f*ptm_high_rng));
     ptf *= ptm_low_f*ptm_high_f;
   }
 
@@ -1118,7 +1130,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   rgb = (sat_L*rs_sa - rgb)/(rs_sa - 1.0f);
 
   // Convert to final display gamut and set whitepoint
-  rgb = display_gamut_whitepoint(rgb, tsn, cwp_lm, display_gamut, cwp);
+  rgb = display_gamut_whitepoint(rgb, tsn_const, cwp_lm, display_gamut, cwp);
   
   // Post Brilliance
   if (brlp_enable) {
@@ -1149,7 +1161,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   }
 
   float3 crv_rgb = make_float3(crv_tsn, crv_tsn, crv_tsn);
-  if (crv_enable == 1) crv_rgb = display_gamut_whitepoint(crv_rgb, crv_tsn, cwp_lm, display_gamut, cwp);
+  if (crv_enable == 1) crv_rgb = display_gamut_whitepoint(crv_rgb, crv_tsn_const, cwp_lm, display_gamut, cwp);
 
   // Return from RGB ratios
   rgb *= tsn;

@@ -1,5 +1,13 @@
 # Release Notes
 
+## OpenDRT v1.1.0b47
+
+- Improve HDR/SDR behavior by using variations of the hyprbolic compression tonescale for different look modules.
+- Bring back HDR Purity user control.
+- Expose Display Grey Luminance as a user control. Since it was always set to 10 in all the presets it makes sense to put this in the hands of the user.
+- Re-Expose HDR Grey Boost parameter... I guess this was useful for people.
+- Refine Colorful preset - there was some halos around saturated light sources that was possible to improve.
+
 ## OpenDRT v1.1.0b45: Big rewrite after 44 beta versions of testing and refinements.
 
 Generally, redesign many aspects to improve smoothness and rework some problematic and over-complicated design choices.
