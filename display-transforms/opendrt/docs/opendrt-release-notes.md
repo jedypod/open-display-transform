@@ -1,5 +1,10 @@
 # Release Notes
 
+## OpenDRT v1.1.0b48
+
+- Refine presets
+- Remove limit on mid purity low blue weight.
+
 ## OpenDRT v1.1.0b47
 
 - Improve HDR/SDR behavior by using variations of the hyprbolic compression tonescale for different look modules.
