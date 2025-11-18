@@ -1,6 +1,6 @@
 #line 2 // Fix line numbers in resolve/logs/rollinglog.txt
 
-/* OpenDRT v1.1.0b49 -------------------------------------------------
+/* OpenDRT v1.1.0b50 -------------------------------------------------
 
   Written by Jed Smith
   https://github.com/jedypod/open-display-transform
@@ -58,23 +58,23 @@ DEFINE_UI_PARAMS(crv_enable, Tonescale Overlay, DCTLUI_CHECK_BOX, 0)
 // DEFINE_UI_PARAMS(_rs_bw, Render Space Weight B, DCTLUI_SLIDER_FLOAT, 0.55, 0.0, 0.8, 0.008)
 // DEFINE_UI_PARAMS(_pt_enable, Enable Purity Compress High, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_pt_lml, Purity Limit Low, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.01)
-// DEFINE_UI_PARAMS(_pt_lml_r, Purity Limit Low R, DCTLUI_SLIDER_FLOAT, 0.45, 0.0, 1.0, 0.01)
+// DEFINE_UI_PARAMS(_pt_lml_r, Purity Limit Low R, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_pt_lml_g, Purity Limit Low G, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_pt_lml_b, Purity Limit Low B, DCTLUI_SLIDER_FLOAT, 0.1, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_pt_lmh, Purity Limit High, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.01)
-// DEFINE_UI_PARAMS(_pt_lmh_r, Purity Limit High R, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.01)
+// DEFINE_UI_PARAMS(_pt_lmh_r, Purity Limit High R, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_pt_lmh_b, Purity Limit High B, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_ptl_enable, Enable Purity Softclip, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_ptl_c, Purity Softclip C, DCTLUI_SLIDER_FLOAT, 0.06, 0.0, 0.25, 0.0025)
 // DEFINE_UI_PARAMS(_ptl_m, Purity Softclip M, DCTLUI_SLIDER_FLOAT, 0.08, 0.0, 0.25, 0.0025)
 // DEFINE_UI_PARAMS(_ptl_y, Purity Softclip Y, DCTLUI_SLIDER_FLOAT, 0.06, 0.0, 0.25, 0.0025)
 // DEFINE_UI_PARAMS(_ptm_enable, Enable Mid Purity, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_ptm_low, Mid Purity Low, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 2.0, 0.02)
+// DEFINE_UI_PARAMS(_ptm_low, Mid Purity Low, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 2.0, 0.02)
 // DEFINE_UI_PARAMS(_ptm_low_rng, Mid Purity Low Range, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_ptm_low_st, Mid Purity Low Strength, DCTLUI_SLIDER_FLOAT, 0.5, 0.1, 1.0, 0.01)
-// DEFINE_UI_PARAMS(_ptm_high, Mid Purity High, DCTLUI_SLIDER_FLOAT, -0.5, -0.9, 0.0, 0.01)
-// DEFINE_UI_PARAMS(_ptm_high_rng, Mid Purity High Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.01)
-// DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.6, 0.1, 1.0, 0.01)
+// DEFINE_UI_PARAMS(_ptm_high, Mid Purity High, DCTLUI_SLIDER_FLOAT, -0.8, -0.9, 0.0, 0.01)
+// DEFINE_UI_PARAMS(_ptm_high_rng, Mid Purity High Range, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.01)
+// DEFINE_UI_PARAMS(_ptm_high_st, Mid Purity High Strength, DCTLUI_SLIDER_FLOAT, 0.4, 0.1, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_brl_enable, Enable Brilliance, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_brl, Brilliance, DCTLUI_SLIDER_FLOAT, 0.0, -6.0, 2.0, 0.08)
 // DEFINE_UI_PARAMS(_brl_r, Brilliance R, DCTLUI_SLIDER_FLOAT, -2.5, -6.0, 2.0, 0.08)
@@ -83,10 +83,10 @@ DEFINE_UI_PARAMS(crv_enable, Tonescale Overlay, DCTLUI_CHECK_BOX, 0)
 // DEFINE_UI_PARAMS(_brl_rng, Brilliance Range, DCTLUI_SLIDER_FLOAT, 0.5, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_brl_st, Brilliance Strength, DCTLUI_SLIDER_FLOAT, 0.35, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_brlp_enable, Enable Post Brilliance, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_brlp, Brilliance Post, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 0.0, 0.01)
-// DEFINE_UI_PARAMS(_brlp_r, Post Brilliance R, DCTLUI_SLIDER_FLOAT, -1.7, -3.0, 0.0, 0.03)
-// DEFINE_UI_PARAMS(_brlp_g, Post Brilliance G, DCTLUI_SLIDER_FLOAT, -2.0, -3.0, 0.0, 0.03)
-// DEFINE_UI_PARAMS(_brlp_b, Post Brilliance B, DCTLUI_SLIDER_FLOAT, -0.5, -3.0, 0.0, 0.03)
+// DEFINE_UI_PARAMS(_brlp, Brilliance Post, DCTLUI_SLIDER_FLOAT, -0.5, -1.0, 0.0, 0.01)
+// DEFINE_UI_PARAMS(_brlp_r, Post Brilliance R, DCTLUI_SLIDER_FLOAT, -1.25, -3.0, 0.0, 0.03)
+// DEFINE_UI_PARAMS(_brlp_g, Post Brilliance G, DCTLUI_SLIDER_FLOAT, -1.25, -3.0, 0.0, 0.03)
+// DEFINE_UI_PARAMS(_brlp_b, Post Brilliance B, DCTLUI_SLIDER_FLOAT, -0.25, -3.0, 0.0, 0.03)
 // DEFINE_UI_PARAMS(_hc_enable, Enable Hue Contrast, DCTLUI_CHECK_BOX, 1)
 // DEFINE_UI_PARAMS(_hc_r, Hue Contrast R, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.02)
 // DEFINE_UI_PARAMS(_hc_r_rng, Hue Contrast R Range, DCTLUI_SLIDER_FLOAT, 0.3, 0.0, 1.0, 0.01)
@@ -98,7 +98,7 @@ DEFINE_UI_PARAMS(crv_enable, Tonescale Overlay, DCTLUI_CHECK_BOX, 0)
 // DEFINE_UI_PARAMS(_hs_b, Hueshift B, DCTLUI_SLIDER_FLOAT, 0.66, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_hs_b_rng, Hueshift B Range, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 2.0, 0.02)
 // DEFINE_UI_PARAMS(_hs_cmy_enable, Enable Hueshift CMY, DCTLUI_CHECK_BOX, 1)
-// DEFINE_UI_PARAMS(_hs_c, Hueshift C, DCTLUI_SLIDER_FLOAT, 0.15, 0.0, 1.0, 0.01)
+// DEFINE_UI_PARAMS(_hs_c, Hueshift C, DCTLUI_SLIDER_FLOAT, 0.25, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_hs_c_rng, Hueshift C Range, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_hs_m, Hueshift M, DCTLUI_SLIDER_FLOAT, 0.0, 0.0, 1.0, 0.01)
 // DEFINE_UI_PARAMS(_hs_m_rng, Hueshift M Range, DCTLUI_SLIDER_FLOAT, 1.0, 0.0, 1.0, 0.01)
@@ -751,7 +751,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
 
   /*----------- LOOK PRESETS -----------------*/
   if (look_preset==0) { // Standard
-    tn_con = 1.66f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.25f, pt_lml_r = 0.5f, pt_lml_g = 0.0f, pt_lml_b = 0.1f, pt_lmh = 0.25f, pt_lmh_r = 0.25f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.06f, ptl_m = 0.08f, ptl_y = 0.06f, ptm_enable = 1, ptm_low = 0.5f, ptm_low_rng = 0.25f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_rng = 0.3f, ptm_high_st = 0.4f, brl_enable = 1, brl = 0.0f, brl_r = -2.5f, brl_g = -1.5f, brl_b = -1.5f, brl_rng = 0.5f, brl_st = 0.35f, brlp_enable = 1, brlp = 0.0f, brlp_r = -1.7f, brlp_g = -2.0f, brlp_b = -0.5f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.3f, hs_rgb_enable = 1, hs_r = 0.6f, hs_r_rng = 0.7f, hs_g = 0.35f, hs_g_rng = 1.0f, hs_b = 0.66f, hs_b_rng = 1.0f, hs_cmy_enable = 1, hs_c = 0.25f, hs_c_rng = 1.0f, hs_m = 0.0f, hs_m_rng = 1.0f, hs_y = 0.0f, hs_y_rng = 1.0f;
+    tn_con = 1.66f, tn_sh = 0.5f, tn_toe = 0.003f, tn_off = 0.005f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 0, tn_lcon = 0.0f, tn_lcon_w = 0.5f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.25f, pt_lml_r = 0.5f, pt_lml_g = 0.0f, pt_lml_b = 0.1f, pt_lmh = 0.25f, pt_lmh_r = 0.5f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.06f, ptl_m = 0.08f, ptl_y = 0.06f, ptm_enable = 1, ptm_low = 0.5f, ptm_low_rng = 0.25f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_rng = 0.3f, ptm_high_st = 0.4f, brl_enable = 1, brl = 0.0f, brl_r = -2.5f, brl_g = -1.5f, brl_b = -1.5f, brl_rng = 0.5f, brl_st = 0.35f, brlp_enable = 1, brlp = -0.5f, brlp_r = -1.25f, brlp_g = -1.25f, brlp_b = -0.25f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.3f, hs_rgb_enable = 1, hs_r = 0.6f, hs_r_rng = 0.7f, hs_g = 0.35f, hs_g_rng = 1.0f, hs_b = 0.66f, hs_b_rng = 1.0f, hs_cmy_enable = 1, hs_c = 0.25f, hs_c_rng = 1.0f, hs_m = 0.0f, hs_m_rng = 1.0f, hs_y = 0.0f, hs_y_rng = 1.0f;
   }
   else if (look_preset==1) { // Arriba
     tn_con = 1.05f, tn_sh = 0.5f, tn_toe = 0.1f, tn_off = 0.01f, tn_hcon_enable = 0, tn_hcon = 0.0f, tn_hcon_pv = 1.0f, tn_hcon_st = 4.0f, tn_lcon_enable = 1, tn_lcon = 1.5f, tn_lcon_w = 0.2f, cwp = 2, cwp_lm = 0.25f, rs_sa = 0.35f, rs_rw = 0.25f, rs_bw = 0.55f, pt_enable = 1, pt_lml = 0.25f, pt_lml_r = 0.45f, pt_lml_g = 0.0f, pt_lml_b = 0.1f, pt_lmh = 0.25f, pt_lmh_r = 0.25f, pt_lmh_b = 0.0f, ptl_enable = 1, ptl_c = 0.06f, ptl_m = 0.08f, ptl_y = 0.06f, ptm_enable = 1, ptm_low = 1.0f, ptm_low_rng = 0.4f, ptm_low_st = 0.5f, ptm_high = -0.8f, ptm_high_rng = 0.66f, ptm_high_st = 0.6f, brl_enable = 1, brl = 0.0f, brl_r = -2.5f, brl_g = -1.5f, brl_b = -1.5f, brl_rng = 0.5f, brl_st = 0.35f, brlp_enable = 1, brlp = 0.0f, brlp_r = -1.7f, brlp_g = -2.0f, brlp_b = -0.5f, hc_enable = 1, hc_r = 1.0f, hc_r_rng = 0.3f, hs_rgb_enable = 1, hs_r = 0.6f, hs_r_rng = 0.8f, hs_g = 0.35f, hs_g_rng = 1.0f, hs_b = 0.66f, hs_b_rng = 1.0f, hs_cmy_enable = 1, hs_c = 0.15f, hs_c_rng = 1.0f, hs_m = 0.0f, hs_m_rng = 1.0f, hs_y = 0.0f, hs_y_rng = 1.0f;
@@ -1106,7 +1106,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   float ptf = 1.0f - _powf(tsn_pt, pt_lml_p);
   
   // Purity Limit High
-  float pt_lmh_p = (1.0f - ach_d*(pt_lmh_r*ha_rgb.x + pt_lmh_b*ha_rgb.z))*(1.0f - pt_lmh*ach_d);
+  float pt_lmh_p = (1.0f - ach_d*(pt_lmh_r*ha_rgb_hs.x + pt_lmh_b*ha_rgb_hs.z))*(1.0f - pt_lmh*ach_d);
   ptf = _powf(ptf, pt_lmh_p);
 
   

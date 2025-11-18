@@ -4,10 +4,10 @@ Group {
  name OpenDRT
  label "\[value display_name]\n\[value look_name]"
  addUserKnob {20 OpenDRT}
- addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> <br>v1.1.0b49 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
+ addUserKnob {26 about_label l " " T "<style> a:link \{ color: #ccc \}</style>\n<font color=#ccc>\n<b>OpenDRT</b> <br>v1.1.0b50 | part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>"}
  addUserKnob {41 in_gamut l "in gamut" T InGamut_to_XYZ.gamut}
  addUserKnob {26 spacer01 l "" +STARTLINE}
- addUserKnob {35 look_presets l "" t "Select from a list of presets. You can create your own and store them using the Add Preset button. \n\n<b>Standard</b>:A minimal smooth starting look with natural color rendition and minimal adjustments to create an aesthetically pleasing image. Uses the Medium Contrast tonescale preset.\n\n<b>Arriba</b>: A minimal smooth look with slightly stronger saturation and a soft rolloff in shadows similar to typical camera manufacturer picture formation approaches.\n\n<b>Sylvan</b>: A smooth starting look with slightly stronger contrast and stronger hue distortions which may be preferential for skin.\n\n<b>Colorful</b>: A low contrast saturated bright look. Might be a good fit for animation.\n\n<b>Aery</b>: A low contrast look with cool highlights and more pure color rendered quite bright. It features strong desaturation near the grey axis, and darkening of only the most pure colors.\n\n<b>Dystopic</b>: A high contrast look with very low saturation and strong filmish hue distortions.\n\n<b>Umbra</b>: A dark moody cinematic look. Features low shadow contrast, warm whites, strong filmic hue distortions, cyan blues, and more saturated colors that render very dark. Works well with a Display Peak Luminance of 200 nits or above.\n\n<b>Base</b>: only the base components of the OpenDRT image rendering. Practically no preferential adjustements. Purity compression is mostly chromaticity-linear and very minimal. Mid-range purity is very strong. A good starting point for further look development if absolute control is required (do not underestimate the complexity of this undertaking)." +STARTLINE M {"Look Presets/Standard" "knobs this \{tn_con 1.66 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.25 pt_lml_r 0.5 pt_lml_g 0.0 pt_lml_b 0.1 pt_lmh 0.25 pt_lmh_r 0.25 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.06 ptl_m 0.08 ptl_y 0.06 ptm_enable 1 ptm_low 0.5 ptm_low_rng 0.25 ptm_low_st 0.5 ptm_high -0.8 ptm_high_rng 0.3 ptm_high_st 0.4 brl_enable 1 brl 0.0 brl_r -2.5 brl_g -1.5 brl_b -1.5 brl_rng 0.5 brl_st 0.35 brlp_enable 1 brlp 0.0 brlp_r -1.7 brlp_g -2.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.3 hs_rgb_enable 1 hs_r 0.6 hs_r_rng 0.7 hs_g 0.35 hs_g_rng 1.0 hs_b 0.66 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.0 hs_y_rng 1.0 look_name Standard\}" "Look Presets/Arriba" "knobs this \{tn_con 1.05 tn_sh 0.5 tn_toe 0.1 tn_off 0.01 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.5 tn_lcon_w 0.2 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.25 pt_lml_r 0.45 pt_lml_g 0.0 pt_lml_b 0.1 pt_lmh 0.25 pt_lmh_r 0.25 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.06 ptl_m 0.08 ptl_y 0.06 ptm_enable 1 ptm_low 1.0 ptm_low_rng 0.4 ptm_low_st 0.5 ptm_high -0.8 ptm_high_rng 0.66 ptm_high_st 0.6 brl_enable 1 brl 0.0 brl_r -2.5 brl_g -1.5 brl_b -1.5 brl_rng 0.5 brl_st 0.35 brlp_enable 1 brlp 0.0 brlp_r -1.7 brlp_g -2.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.3 hs_rgb_enable 1 hs_r 0.6 hs_r_rng 0.8 hs_g 0.35 hs_g_rng 1.0 hs_b 0.66 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.15 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.0 hs_y_rng 1.0 look_name Arriba\}" "Look Presets/Sylvan" "knobs this \{look_name Sylvan tn_con 1.6 tn_sh 0.5 tn_toe 0.01 tn_off 0.01 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.25 tn_lcon_w 0.75 cwp 2 cwp_lm 0.25 rs_sa 0.25 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.15 pt_lml_r 0.5 pt_lml_g 0.15 pt_lml_b 0.1 pt_lmh 0.25 pt_lmh_r 0.15 pt_lmh_b 0.15 ptl_enable 1 ptl_c 0.05 ptl_m 0.08 ptl_y 0.05 ptm_enable 1 ptm_low 0.5 ptm_low_rng 0.5 ptm_low_st 0.5 ptm_high -0.8 ptm_high_rng 0.5 ptm_high_st 0.5 brl_enable 1 brl -1.0 brl_r -2.0 brl_g -2.0 brl_b 0.0 brl_rng 0.25 brl_st 0.25 brlp_enable 1 brlp -1.0 brlp_r -0.5 brlp_g -0.25 brlp_b -0.25 hc_enable 1 hc_r 1.0 hc_r_rng 0.4 hs_rgb_enable 1 hs_r 0.6 hs_r_rng 1.15 hs_g 0.8 hs_g_rng 1.25 hs_b 0.6 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 0.25 hs_m 0.25 hs_m_rng 0.5 hs_y 0.35 hs_y_rng 0.5\}" "Look Presets/Colorful" "knobs this \{tn_con 1.5 tn_sh 0.5 tn_toe 0.003 tn_off 0.003 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.4 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.5 pt_lml_r 1.0 pt_lml_g 0.0 pt_lml_b 0.5 pt_lmh 0.25 pt_lmh_r 0.25 pt_lmh_b 0.15 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.8 ptm_low_rng 0.5 ptm_low_st 0.4 ptm_high -0.8 ptm_high_rng 0.3 ptm_high_st 0.4 brl_enable 1 brl 0.0 brl_r -1.25 brl_g -1.25 brl_b -0.25 brl_rng 0.3 brl_st 0.5 brlp_enable 1 brlp -0.5 brlp_r -1.25 brlp_g -1.25 brlp_b 0.0 hc_enable 1 hc_r 1.0 hc_r_rng 0.4 hs_rgb_enable 1 hs_r 0.5 hs_r_rng 0.8 hs_g 0.35 hs_g_rng 1.0 hs_b 0.5 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.25 hs_y_rng 1.0 look_name Colorful\}" "Look Presets/Aery" "knobs this \{look_name Aery tn_con 1.15 tn_sh 0.5 tn_toe 0.04 tn_off 0.006 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 0.0 tn_hcon_st 0.5 tn_lcon_enable 1 tn_lcon 0.5 tn_lcon_w 2.0 cwp 1 cwp_lm 0.25 rs_sa 0.25 rs_rw 0.2 rs_bw 0.5 pt_enable 1 pt_lml 0.0 pt_lml_r 0.35 pt_lml_g 0.15 pt_lml_b 0.1 pt_lmh 0.0 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.08 ptl_y 0.05 ptm_enable 1 ptm_low 0.8 ptm_low_rng 0.35 ptm_low_st 0.5 ptm_high -0.9 ptm_high_rng 0.5 ptm_high_st 0.3 brl_enable 1 brl -3.0 brl_r 0.0 brl_g 0.0 brl_b 1.0 brl_rng 0.8 brl_st 0.15 brlp_enable 1 brlp -1.0 brlp_r -1.0 brlp_g -1.0 brlp_b 0.0 hc_enable 1 hc_r 0.5 hc_r_rng 0.25 hs_rgb_enable 1 hs_r 0.6 hs_r_rng 1.0 hs_g 0.35 hs_g_rng 2.0 hs_b 0.5 hs_b_rng 1.5 hs_cmy_enable 1 hs_c 0.35 hs_c_rng 1.0 hs_m 0.25 hs_m_rng 1.0 hs_y 0.35 hs_y_rng 0.5\}" "Look Presets/Dystopic" "knobs this \{look_name Dystopic tn_con 1.6 tn_sh 0.5 tn_toe 0.01 tn_off 0.008 tn_hcon_enable 1 tn_hcon 0.25 tn_hcon_pv 0.0 tn_hcon_st 1.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 0.75 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.0 pt_lml_r 0.25 pt_lml_g 0.0 pt_lml_b 0.25 pt_lmh 0.0 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.08 ptl_y 0.05 ptm_enable 1 ptm_low 0.25 ptm_low_rng 0.25 ptm_low_st 0.8 ptm_high -0.8 ptm_high_rng 0.8 ptm_high_st 0.25 brl_enable 1 brl -2.0 brl_r -3.0 brl_g -2.0 brl_b -2.0 brl_rng 0.35 brl_st 0.35 brlp_enable 1 brlp 0.0 brlp_r -1.0 brlp_g -1.0 brlp_b -1.0 hc_enable 1 hc_r 1.0 hc_r_rng 0.25 hs_rgb_enable 1 hs_r 0.7 hs_r_rng 1.33 hs_g 1.0 hs_g_rng 2.0 hs_b 0.75 hs_b_rng 2.0 hs_cmy_enable 1 hs_c 1.0 hs_c_rng 0.5 hs_m 1.0 hs_m_rng 1.0 hs_y 1.0 hs_y_rng 0.765\}" "Look Presets/Umbra" "knobs this \{look_name Umbra tn_con 1.8 tn_sh 0.5 tn_toe 0.001 tn_off 0.015 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 1.0 cwp 5 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.0 pt_lml_r 0.5 pt_lml_g 0.0 pt_lml_b 0.15 pt_lmh 0.25 pt_lmh_r 0.25 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.4 ptm_low_rng 0.35 ptm_low_st 0.66 ptm_high -0.5 ptm_high_rng 0.5 ptm_high_st 0.35 brl_enable 1 brl -2.0 brl_r -4.5 brl_g -3.0 brl_b -4.0 brl_rng 0.35 brl_st 0.3 brlp_enable 1 brlp 0.0 brlp_r -2.0 brlp_g -1.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.35 hs_rgb_enable 1 hs_r 0.66 hs_r_rng 1.0 hs_g 0.5 hs_g_rng 2.0 hs_b 0.85 hs_b_rng 2.0 hs_cmy_enable 1 hs_c 0.0 hs_c_rng 1.0 hs_m 0.25 hs_m_rng 1.0 hs_y 0.66 hs_y_rng 0.66\}" "Look Presets/Base" "knobs this \{look_name Base tn_con 1.66 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.5 pt_lml_r 0.5 pt_lml_g 0.15 pt_lml_b 0.15 pt_lmh 0.8 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 0 ptm_low 0.0 ptm_low_rng 0.5 ptm_low_st 0.5 ptm_high 0.0 ptm_high_rng 0.5 ptm_high_st 0.5 brl_enable 0 brl 0.0 brl_r 0.0 brl_g 0.0 brl_b 0.0 brl_rng 0.5 brl_st 0.35 brlp_enable 1 brlp -0.5 brlp_r -1.6 brlp_g -1.6 brlp_b -0.8 hc_enable 0 hc_r 0.0 hc_r_rng 0.25 hs_rgb_enable 0 hs_r 0.0 hs_r_rng 1.0 hs_g 0.0 hs_g_rng 1.0 hs_b 0.0 hs_b_rng 1.0 hs_cmy_enable 0 hs_c 0.0 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.0 hs_y_rng 1.0\}"}}
+ addUserKnob {35 look_presets l "" t "Select from a list of presets. You can create your own and store them using the Add Preset button. \n\n<b>Standard</b>:A minimal smooth starting look with natural color rendition and minimal adjustments to create an aesthetically pleasing image. Uses the Medium Contrast tonescale preset.\n\n<b>Arriba</b>: A minimal smooth look with slightly stronger saturation and a soft rolloff in shadows similar to typical camera manufacturer picture formation approaches.\n\n<b>Sylvan</b>: A smooth starting look with slightly stronger contrast and stronger hue distortions which may be preferential for skin.\n\n<b>Colorful</b>: A low contrast saturated bright look. Might be a good fit for animation.\n\n<b>Aery</b>: A low contrast look with cool highlights and more pure color rendered quite bright. It features strong desaturation near the grey axis, and darkening of only the most pure colors.\n\n<b>Dystopic</b>: A high contrast look with very low saturation and strong filmish hue distortions.\n\n<b>Umbra</b>: A dark moody cinematic look. Features low shadow contrast, warm whites, strong filmic hue distortions, cyan blues, and more saturated colors that render very dark. Works well with a Display Peak Luminance of 200 nits or above.\n\n<b>Base</b>: only the base components of the OpenDRT image rendering. Practically no preferential adjustements. Purity compression is mostly chromaticity-linear and very minimal. Mid-range purity is very strong. A good starting point for further look development if absolute control is required (do not underestimate the complexity of this undertaking)." +STARTLINE M {"Look Presets/Standard" "knobs this \{tn_con 1.66 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.25 pt_lml_r 0.5 pt_lml_g 0.0 pt_lml_b 0.1 pt_lmh 0.25 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.06 ptl_m 0.08 ptl_y 0.06 ptm_enable 1 ptm_low 0.5 ptm_low_rng 0.25 ptm_low_st 0.5 ptm_high -0.8 ptm_high_rng 0.3 ptm_high_st 0.4 brl_enable 1 brl 0.0 brl_r -2.5 brl_g -1.5 brl_b -1.5 brl_rng 0.5 brl_st 0.35 brlp_enable 1 brlp -0.5 brlp_r -1.25 brlp_g -1.25 brlp_b -0.25 hc_enable 1 hc_r 1.0 hc_r_rng 0.3 hs_rgb_enable 1 hs_r 0.6 hs_r_rng 0.7 hs_g 0.35 hs_g_rng 1.0 hs_b 0.66 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.0 hs_y_rng 1.0 look_name Standard\}" "Look Presets/Arriba" "knobs this \{tn_con 1.05 tn_sh 0.5 tn_toe 0.1 tn_off 0.01 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.5 tn_lcon_w 0.2 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.25 pt_lml_r 0.45 pt_lml_g 0.0 pt_lml_b 0.1 pt_lmh 0.25 pt_lmh_r 0.25 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.06 ptl_m 0.08 ptl_y 0.06 ptm_enable 1 ptm_low 1.0 ptm_low_rng 0.4 ptm_low_st 0.5 ptm_high -0.8 ptm_high_rng 0.66 ptm_high_st 0.6 brl_enable 1 brl 0.0 brl_r -2.5 brl_g -1.5 brl_b -1.5 brl_rng 0.5 brl_st 0.35 brlp_enable 1 brlp 0.0 brlp_r -1.7 brlp_g -2.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.3 hs_rgb_enable 1 hs_r 0.6 hs_r_rng 0.8 hs_g 0.35 hs_g_rng 1.0 hs_b 0.66 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.15 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.0 hs_y_rng 1.0 look_name Arriba\}" "Look Presets/Sylvan" "knobs this \{look_name Sylvan tn_con 1.6 tn_sh 0.5 tn_toe 0.01 tn_off 0.01 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.25 tn_lcon_w 0.75 cwp 2 cwp_lm 0.25 rs_sa 0.25 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.15 pt_lml_r 0.5 pt_lml_g 0.15 pt_lml_b 0.1 pt_lmh 0.25 pt_lmh_r 0.15 pt_lmh_b 0.15 ptl_enable 1 ptl_c 0.05 ptl_m 0.08 ptl_y 0.05 ptm_enable 1 ptm_low 0.5 ptm_low_rng 0.5 ptm_low_st 0.5 ptm_high -0.8 ptm_high_rng 0.5 ptm_high_st 0.5 brl_enable 1 brl -1.0 brl_r -2.0 brl_g -2.0 brl_b 0.0 brl_rng 0.25 brl_st 0.25 brlp_enable 1 brlp -1.0 brlp_r -0.5 brlp_g -0.25 brlp_b -0.25 hc_enable 1 hc_r 1.0 hc_r_rng 0.4 hs_rgb_enable 1 hs_r 0.6 hs_r_rng 1.15 hs_g 0.8 hs_g_rng 1.25 hs_b 0.6 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 0.25 hs_m 0.25 hs_m_rng 0.5 hs_y 0.35 hs_y_rng 0.5\}" "Look Presets/Colorful" "knobs this \{tn_con 1.5 tn_sh 0.5 tn_toe 0.003 tn_off 0.003 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 0.4 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.5 pt_lml_r 1.0 pt_lml_g 0.0 pt_lml_b 0.5 pt_lmh 0.25 pt_lmh_r 0.25 pt_lmh_b 0.15 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.8 ptm_low_rng 0.5 ptm_low_st 0.4 ptm_high -0.8 ptm_high_rng 0.3 ptm_high_st 0.4 brl_enable 1 brl 0.0 brl_r -1.25 brl_g -1.25 brl_b -0.25 brl_rng 0.3 brl_st 0.5 brlp_enable 1 brlp -0.5 brlp_r -1.25 brlp_g -1.25 brlp_b 0.0 hc_enable 1 hc_r 1.0 hc_r_rng 0.4 hs_rgb_enable 1 hs_r 0.5 hs_r_rng 0.8 hs_g 0.35 hs_g_rng 1.0 hs_b 0.5 hs_b_rng 1.0 hs_cmy_enable 1 hs_c 0.25 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.25 hs_y_rng 1.0 look_name Colorful\}" "Look Presets/Aery" "knobs this \{look_name Aery tn_con 1.15 tn_sh 0.5 tn_toe 0.04 tn_off 0.006 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 0.0 tn_hcon_st 0.5 tn_lcon_enable 1 tn_lcon 0.5 tn_lcon_w 2.0 cwp 1 cwp_lm 0.25 rs_sa 0.25 rs_rw 0.2 rs_bw 0.5 pt_enable 1 pt_lml 0.0 pt_lml_r 0.35 pt_lml_g 0.15 pt_lml_b 0.1 pt_lmh 0.0 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.08 ptl_y 0.05 ptm_enable 1 ptm_low 0.8 ptm_low_rng 0.35 ptm_low_st 0.5 ptm_high -0.9 ptm_high_rng 0.5 ptm_high_st 0.3 brl_enable 1 brl -3.0 brl_r 0.0 brl_g 0.0 brl_b 1.0 brl_rng 0.8 brl_st 0.15 brlp_enable 1 brlp -1.0 brlp_r -1.0 brlp_g -1.0 brlp_b 0.0 hc_enable 1 hc_r 0.5 hc_r_rng 0.25 hs_rgb_enable 1 hs_r 0.6 hs_r_rng 1.0 hs_g 0.35 hs_g_rng 2.0 hs_b 0.5 hs_b_rng 1.5 hs_cmy_enable 1 hs_c 0.35 hs_c_rng 1.0 hs_m 0.25 hs_m_rng 1.0 hs_y 0.35 hs_y_rng 0.5\}" "Look Presets/Dystopic" "knobs this \{look_name Dystopic tn_con 1.6 tn_sh 0.5 tn_toe 0.01 tn_off 0.008 tn_hcon_enable 1 tn_hcon 0.25 tn_hcon_pv 0.0 tn_hcon_st 1.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 0.75 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.0 pt_lml_r 0.25 pt_lml_g 0.0 pt_lml_b 0.25 pt_lmh 0.0 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.08 ptl_y 0.05 ptm_enable 1 ptm_low 0.25 ptm_low_rng 0.25 ptm_low_st 0.8 ptm_high -0.8 ptm_high_rng 0.8 ptm_high_st 0.25 brl_enable 1 brl -2.0 brl_r -3.0 brl_g -2.0 brl_b -2.0 brl_rng 0.35 brl_st 0.35 brlp_enable 1 brlp 0.0 brlp_r -1.0 brlp_g -1.0 brlp_b -1.0 hc_enable 1 hc_r 1.0 hc_r_rng 0.25 hs_rgb_enable 1 hs_r 0.7 hs_r_rng 1.33 hs_g 1.0 hs_g_rng 2.0 hs_b 0.75 hs_b_rng 2.0 hs_cmy_enable 1 hs_c 1.0 hs_c_rng 0.5 hs_m 1.0 hs_m_rng 1.0 hs_y 1.0 hs_y_rng 0.765\}" "Look Presets/Umbra" "knobs this \{look_name Umbra tn_con 1.8 tn_sh 0.5 tn_toe 0.001 tn_off 0.015 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 1 tn_lcon 1.0 tn_lcon_w 1.0 cwp 5 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.0 pt_lml_r 0.5 pt_lml_g 0.0 pt_lml_b 0.15 pt_lmh 0.25 pt_lmh_r 0.25 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 1 ptm_low 0.4 ptm_low_rng 0.35 ptm_low_st 0.66 ptm_high -0.5 ptm_high_rng 0.5 ptm_high_st 0.35 brl_enable 1 brl -2.0 brl_r -4.5 brl_g -3.0 brl_b -4.0 brl_rng 0.35 brl_st 0.3 brlp_enable 1 brlp 0.0 brlp_r -2.0 brlp_g -1.0 brlp_b -0.5 hc_enable 1 hc_r 1.0 hc_r_rng 0.35 hs_rgb_enable 1 hs_r 0.66 hs_r_rng 1.0 hs_g 0.5 hs_g_rng 2.0 hs_b 0.85 hs_b_rng 2.0 hs_cmy_enable 1 hs_c 0.0 hs_c_rng 1.0 hs_m 0.25 hs_m_rng 1.0 hs_y 0.66 hs_y_rng 0.66\}" "Look Presets/Base" "knobs this \{look_name Base tn_con 1.66 tn_sh 0.5 tn_toe 0.003 tn_off 0.005 tn_hcon_enable 0 tn_hcon 0.0 tn_hcon_pv 1.0 tn_hcon_st 4.0 tn_lcon_enable 0 tn_lcon 0.0 tn_lcon_w 0.5 cwp 2 cwp_lm 0.25 rs_sa 0.35 rs_rw 0.25 rs_bw 0.55 pt_enable 1 pt_lml 0.5 pt_lml_r 0.5 pt_lml_g 0.15 pt_lml_b 0.15 pt_lmh 0.8 pt_lmh_r 0.5 pt_lmh_b 0.0 ptl_enable 1 ptl_c 0.05 ptl_m 0.06 ptl_y 0.05 ptm_enable 0 ptm_low 0.0 ptm_low_rng 0.5 ptm_low_st 0.5 ptm_high 0.0 ptm_high_rng 0.5 ptm_high_st 0.5 brl_enable 0 brl 0.0 brl_r 0.0 brl_g 0.0 brl_b 0.0 brl_rng 0.5 brl_st 0.35 brlp_enable 1 brlp -0.5 brlp_r -1.6 brlp_g -1.6 brlp_b -0.8 hc_enable 0 hc_r 0.0 hc_r_rng 0.25 hs_rgb_enable 0 hs_r 0.0 hs_r_rng 1.0 hs_g 0.0 hs_g_rng 1.0 hs_b 0.0 hs_b_rng 1.0 hs_cmy_enable 0 hs_c 0.0 hs_c_rng 1.0 hs_m 0.0 hs_m_rng 1.0 hs_y 0.0 hs_y_rng 1.0\}"}}
  addUserKnob {1 look_preset_knobs l "" t "list of knobs to include in presets" +STARTLINE +INVISIBLE}
  look_preset_knobs "tn_con tn_sh tn_toe tn_off tn_hcon_enable tn_hcon tn_hcon_pv tn_hcon_st tn_lcon_enable tn_lcon tn_lcon_w cwp cwp_lm rs_sa rs_rw rs_bw pt_enable pt_lml pt_lml_r pt_lml_g pt_lml_b pt_lmh pt_lmh_r pt_lmh_b ptl_enable ptl_c ptl_m ptl_y ptm_enable ptm_low ptm_low_rng ptm_low_st ptm_high ptm_high_rng ptm_high_st brl_enable brl brl_r brl_g brl_b brl_rng brl_st brlp_enable brlp brlp_r brlp_g brlp_b hc_enable hc_r hc_r_rng hs_rgb_enable hs_r hs_r_rng hs_g hs_g_rng hs_b hs_b_rng hs_cmy_enable hs_c hs_c_rng hs_m hs_m_rng hs_y hs_y_rng"
  addUserKnob {1 look_name l "" t "currently loaded look preset" -STARTLINE}
@@ -156,7 +156,7 @@ Group {
    xpos 324
    ypos -534
   }
-set N5d808140 [stack 0]
+set N39ba91d0 [stack 0]
   ColorMatrix {
    matrix {
         {{"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"} {"SwitchGamut.input\[value SwitchGamut.which].matrix"}}
@@ -172,14 +172,14 @@ set N5d808140 [stack 0]
    xpos 290
    ypos -250
   }
-push $N5d808140
+push $N39ba91d0
   Dot {
    name Dot391
    label " *RGB to XYZ D65 CAT: XYZ Scaling"
    xpos 434
    ypos -534
   }
-set N539c90 [stack 0]
+set N39a3ce50 [stack 0]
   ColorMatrix {
    matrix {
         {0.7006223202 0.1487748027 0.101058729}
@@ -191,7 +191,7 @@ set N539c90 [stack 0]
    xpos 1610
    ypos -473
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.7364777002 0.1307396511 0.08323857578}
@@ -203,7 +203,7 @@ push $N539c90
    xpos 1500
    ypos -472
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.705396831 0.1640413404 0.08101775497}
@@ -215,7 +215,7 @@ push $N539c90
    xpos 1390
    ypos -472
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.5990839005 0.2489254922 0.1024464965}
@@ -227,7 +227,7 @@ push $N539c90
    xpos 1280
    ypos -472
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.735275209 0.06860940903 0.1465712786}
@@ -239,7 +239,7 @@ push $N539c90
    xpos 1170
    ypos -472
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.7048583204 0.1297602952 0.1158373115}
@@ -251,7 +251,7 @@ push $N539c90
    xpos 1060
    ypos -471
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.6380076408 0.2147038132 0.09774445742}
@@ -263,7 +263,7 @@ push $N539c90
    xpos 950
    ypos -472
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.4123909175 0.3575843573 0.1804807931}
@@ -275,7 +275,7 @@ push $N539c90
    xpos 840
    ypos -472
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.6369581223 0.1446169168 0.1688809693}
@@ -287,7 +287,7 @@ push $N539c90
    xpos 730
    ypos -472
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.4865711331 0.2656677067 0.1982173175}
@@ -299,7 +299,7 @@ push $N539c90
    xpos 620
    ypos -472
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.6609312296 0.1336961389 0.1558285803}
@@ -311,7 +311,7 @@ push $N539c90
    xpos 510
    ypos -472
   }
-push $N539c90
+push $N39a3ce50
   ColorMatrix {
    matrix {
         {0.9503623843 0 9.346324805e-05}
@@ -378,7 +378,7 @@ push $N539c90
   xpos 324
   ypos -990
  }
-set N87c53d0 [stack 0]
+set N39c95a10 [stack 0]
  Dot {
   name Dot433
   xpos -446
@@ -452,8 +452,8 @@ set N87c53d0 [stack 0]
   addUserKnob {7 dsc l "display scale" t "final scaling for output display encoding" R 0 4}
   dsc {{eotf==4?0.01:eotf==5?0.1:100/tn_Lp}}
  }
-set N85837030 [stack 0]
-push $N87c53d0
+set N39cb60b0 [stack 0]
+push $N39c95a10
  MergeExpression {
   inputs 2
   expr0 Ar==0?0:Br/Ar
@@ -468,7 +468,7 @@ push $N87c53d0
   xpos 324
   ypos -894
  }
-set N48358c00 [stack 0]
+set N39ce86d0 [stack 0]
  Expression {
   temp_name0 cy
   temp_expr0 r-b
@@ -496,7 +496,7 @@ set N48358c00 [stack 0]
   addUserKnob {7 t0}
   t0 0.25
  }
-set N5b63f1e0 [stack 0]
+set N39d02100 [stack 0]
  Dot {
   name Dot8
   xpos -116
@@ -535,8 +535,8 @@ set N5b63f1e0 [stack 0]
   xpos -116
   ypos -828
  }
-set Nf14770f0 [stack 0]
-push $N85837030
+set N39d32120 [stack 0]
+push $N39cb60b0
  MergeExpression {
   inputs 2
   temp_name0 tsf
@@ -681,7 +681,7 @@ push $N85837030
   xpos -446
   ypos -654
  }
-set N9b292b60 [stack 0]
+set N39dc0d00 [stack 0]
  Expression {
   channel0 rgb
   expr0 r*m
@@ -718,8 +718,8 @@ set N9b292b60 [stack 0]
   xpos -446
   ypos -174
  }
-push $N9b292b60
-push $Nf14770f0
+push $N39dc0d00
+push $N39d32120
  Dot {
   name Dot3
   xpos -116
@@ -731,13 +731,13 @@ set Ndd78820 [stack 0]
   xpos -116
   ypos -438
  }
-set N66c71a0 [stack 0]
+set N39e1f400 [stack 0]
  Premult {
   name Premult1
   xpos -150
   ypos -346
  }
-set N3051dfa0 [stack 0]
+set N39e25aa0 [stack 0]
  Copy {
   inputs 2
   from0 rgba.red
@@ -746,13 +746,13 @@ set N3051dfa0 [stack 0]
   xpos 180
   ypos -262
  }
-push $N9b292b60
+push $N39dc0d00
  Dot {
   name Dot6
   xpos -336
   ypos -654
  }
-set N7b37fa00 [stack 0]
+set N39e41e30 [stack 0]
  Expression {
   channel0 rgba
   expr0 b
@@ -761,14 +761,14 @@ set N7b37fa00 [stack 0]
   xpos -260
   ypos -658
  }
-set N5c045820 [stack 0]
+set N39e48390 [stack 0]
  Dot {
   name Dot17
   tile_color 0x666666ff
   xpos -226
   ypos -294
  }
-push $N3051dfa0
+push $N39e25aa0
  Copy {
   inputs 2
   from0 rgba.red
@@ -782,14 +782,14 @@ push $N3051dfa0
   xpos 214
   ypos -294
  }
-push $N5c045820
+push $N39e48390
  Dot {
   name Dot4
   xpos -6
   ypos -654
  }
-set Nf1ddb70 [stack 0]
-push $N66c71a0
+set N39e7b1d0 [stack 0]
+push $N39e1f400
  MergeExpression {
   inputs 2
   temp_name0 f0
@@ -809,20 +809,19 @@ push $N66c71a0
   addUserKnob {7 w0 R 0.1 1}
   w0 0.5
   addUserKnob {7 s1 R -0.9 0}
-  s1 -0.75
+  s1 -0.8
   addUserKnob {7 p1}
-  p1 0.25
+  p1 0.3
   addUserKnob {7 w1 R 0.1 1}
   w1 0.4
  }
-push $Ndd78820
-push $N5b63f1e0
+push $N39d02100
  Dot {
   name Dot12
   xpos 104
   ypos -643
  }
-set N2fd1b7d0 [stack 0]
+set N39e973f0 [stack 0]
  Expression {
   temp_name0 h0
   temp_expr0 (r-c0+pi)%(2*pi)-pi
@@ -851,8 +850,16 @@ set N2fd1b7d0 [stack 0]
   addUserKnob {7 w2 R 0 3}
   w2 0.66
  }
-set Ne4794d0 [stack 0]
-push $N7b37fa00
+set N39e9d010 [stack 0]
+ Dot {
+  name Dot10
+  tile_color 0x666666ff
+  xpos -183
+  ypos -587
+ }
+set N6da345e0 [stack 0]
+push $N6da345e0
+push $N39e41e30
  Expression {
   channel0 rgba
   expr0 g
@@ -861,7 +868,7 @@ push $N7b37fa00
   xpos -370
   ypos -636
  }
-set N238940 [stack 0]
+set N39eb2e50 [stack 0]
  MergeExpression {
   inputs 2
   temp_name0 _p
@@ -894,7 +901,7 @@ set N238940 [stack 0]
   addUserKnob {7 p}
   p 0.25
   addUserKnob {7 p0}
-  p0 0.25
+  p0 0.5
   addUserKnob {7 p1}
  }
  Fill {
@@ -920,20 +927,20 @@ set N238940 [stack 0]
   ypos -393
   disable {{!ptm_enable}}
  }
-push $N238940
+push $N39eb2e50
  Dot {
   name Dot13
   xpos 104
   ypos -560
  }
-set N13296100 [stack 0]
+set N39f25ba0 [stack 0]
  Invert {
   channels rgba
   name Invert1
   xpos 70
   ypos -442
  }
-push $N2fd1b7d0
+push $N39e973f0
  Expression {
   temp_name0 h0
   temp_expr0 (r-c0+pi)%(2*pi)-pi
@@ -985,8 +992,8 @@ push $N2fd1b7d0
   xpos 180
   ypos -447
  }
-push $N13296100
-push $Ne4794d0
+push $N39f25ba0
+push $N39e9d010
  Expression {
   expr0 r*a**p0
   expr1 g*a**p1
@@ -1010,8 +1017,8 @@ push $Ne4794d0
   xpos 180
   ypos -569
  }
-push $Nf1ddb70
-push $Nf14770f0
+push $N39e7b1d0
+push $N39d32120
  MergeExpression {
   inputs 2
   temp_name0 ts
@@ -1029,7 +1036,7 @@ push $Nf14770f0
   addUserKnob {7 p}
   p 0.3
  }
-push $N48358c00
+push $N39ce86d0
  MergeExpression {
   inputs 2
   temp_name0 f0
@@ -1100,7 +1107,6 @@ push $N48358c00
   addUserKnob {7 p1}
   p1 1
   addUserKnob {7 m2}
-  m2 0.15
   addUserKnob {7 p2}
   p2 1
  }
@@ -1172,8 +1178,8 @@ push $N48358c00
    xpos -6
    ypos -777
   }
-set N1202b4b0 [stack 0]
-push $N1202b4b0
+set N3a050020 [stack 0]
+push $N3a050020
   Dot {
    name Dot5
    tile_color 0x666666ff
@@ -1212,21 +1218,21 @@ add_layer {white white.red white.green white.blue}
    xpos 434
    ypos -966
   }
-set N86932730 [stack 0]
+set N3a07e540 [stack 0]
   Dot {
    name Dot173
    tile_color 0x666666ff
    xpos 1204
    ypos -966
   }
-set N26d1fc70 [stack 0]
+set N3a084a60 [stack 0]
   Dot {
    name Dot2
    tile_color 0x666666ff
    xpos 1974
    ypos -966
   }
-set N26d26350 [stack 0]
+set N3a08b190 [stack 0]
   ColorMatrix {
    channels all
    matrix {
@@ -1239,7 +1245,7 @@ set N26d26350 [stack 0]
    xpos 1940
    ypos -886
   }
-set N6442c280 [stack 0]
+set N3a0917e0 [stack 0]
   Copy {
    inputs 2
    from0 rgba.red
@@ -1248,8 +1254,8 @@ set N6442c280 [stack 0]
    xpos 1720
    ypos -780
   }
-push $N1202b4b0
-push $N86932730
+push $N3a050020
+push $N3a07e540
   Copy {
    inputs 2
    from0 rgba.red
@@ -1265,7 +1271,7 @@ push $N86932730
    xpos 146
    ypos -643
   }
-push $N26d26350
+push $N3a08b190
   ColorMatrix {
    channels all
    matrix {
@@ -1278,7 +1284,7 @@ push $N26d26350
    xpos 2270
    ypos -885
   }
-push $N26d26350
+push $N3a08b190
   ColorMatrix {
    channels all
    matrix {
@@ -1291,7 +1297,7 @@ push $N26d26350
    xpos 2160
    ypos -885
   }
-push $N26d26350
+push $N3a08b190
   ColorMatrix {
    channels all
    matrix {
@@ -1304,8 +1310,8 @@ push $N26d26350
    xpos 2050
    ypos -885
   }
-push $N6442c280
-push $N26d26350
+push $N3a0917e0
+push $N3a08b190
   ColorMatrix {
    channels all
    matrix {
@@ -1318,7 +1324,7 @@ push $N26d26350
    xpos 1830
    ypos -888
   }
-push $N26d26350
+push $N3a08b190
   ColorMatrix {
    channels all
    matrix {
@@ -1338,7 +1344,7 @@ push $N26d26350
    xpos 1940
    ypos -752
   }
-push $N26d1fc70
+push $N3a084a60
   ColorMatrix {
    channels all
    matrix {
@@ -1351,7 +1357,7 @@ push $N26d1fc70
    xpos 1500
    ypos -885
   }
-push $N26d1fc70
+push $N3a084a60
   ColorMatrix {
    channels all
    matrix {
@@ -1364,14 +1370,14 @@ push $N26d1fc70
    xpos 1390
    ypos -885
   }
-push $N26d1fc70
+push $N3a084a60
   Dot {
    name Dot172
    tile_color 0x666666ff
    xpos 1314
    ypos -870
   }
-push $N26d1fc70
+push $N3a084a60
   ColorMatrix {
    channels all
    matrix {
@@ -1384,7 +1390,7 @@ push $N26d1fc70
    xpos 1170
    ypos -885
   }
-push $N26d1fc70
+push $N3a084a60
   ColorMatrix {
    channels all
    matrix {
@@ -1397,7 +1403,7 @@ push $N26d1fc70
    xpos 1060
    ypos -888
   }
-push $N26d1fc70
+push $N3a084a60
   ColorMatrix {
    channels all
    matrix {
@@ -1417,7 +1423,7 @@ push $N26d1fc70
    xpos 1170
    ypos -753
   }
-push $N86932730
+push $N3a07e540
   ColorMatrix {
    channels all
    matrix {
@@ -1430,7 +1436,7 @@ push $N86932730
    xpos 730
    ypos -885
   }
-push $N86932730
+push $N3a07e540
   ColorMatrix {
    channels all
    matrix {
@@ -1443,7 +1449,7 @@ push $N86932730
    xpos 620
    ypos -885
   }
-push $N86932730
+push $N3a07e540
   ColorMatrix {
    channels all
    matrix {
@@ -1456,8 +1462,8 @@ push $N86932730
    xpos 510
    ypos -886
   }
-push $N86932730
-push $N86932730
+push $N3a07e540
+push $N3a07e540
   ColorMatrix {
    channels all
    matrix {
@@ -1470,7 +1476,7 @@ push $N86932730
    xpos 290
    ypos -888
   }
-push $N86932730
+push $N3a07e540
   ColorMatrix {
    channels all
    matrix {
@@ -1513,14 +1519,14 @@ push $N86932730
    xpos 434
    ypos -462
   }
-set N5943bc70 [stack 0]
+set N20767b10 [stack 0]
   Dot {
    name Dot6
    tile_color 0x666666ff
    xpos 544
    ypos -462
   }
-set N59441eb0 [stack 0]
+set N2076e010 [stack 0]
   Dot {
    name Dot9
    tile_color 0x666666ff
@@ -1548,7 +1554,7 @@ set N59441eb0 [stack 0]
    ypos -373
    disable {{parent.cwp<2}}
   }
-push $N59441eb0
+push $N2076e010
   ColorMatrix {
    channels all
    matrix {
@@ -1568,7 +1574,7 @@ push $N59441eb0
    xpos 510
    ypos -321
   }
-push $N5943bc70
+push $N20767b10
   ColorMatrix {
    channels all
    matrix {
@@ -1594,7 +1600,7 @@ push $N5943bc70
    xpos 434
    ypos -258
   }
-set N57031f20 [stack 0]
+set N207cec00 [stack 0]
   Shuffle {
    in white
    name Shuffle9
@@ -1618,7 +1624,7 @@ set N57031f20 [stack 0]
    xpos 193
    ypos -174
   }
-push $N57031f20
+push $N207cec00
   Merge2 {
    inputs 2
    operation multiply
@@ -1654,12 +1660,13 @@ push $N57031f20
   disable {{!brlp_enable}}
   addUserKnob {20 Params}
   addUserKnob {7 m R -1 0}
+  m -0.5
   addUserKnob {7 m0 R -3 0}
-  m0 -1.7
+  m0 -1.25
   addUserKnob {7 m1 R -3 0}
-  m1 -2
+  m1 -1.25
   addUserKnob {7 m2 R -3 0}
-  m2 -0.5
+  m2 -0.25
  }
  Expression {
   expr0 s0<1e-4?r:r>10*s0?r:s0*log(1+exp(r/s0))
@@ -1696,7 +1703,7 @@ push $N57031f20
   xpos 324
   ypos -102
  }
-set N4b522fb0 [stack 0]
+set N20675510 [stack 0]
  Clamp {
   channels rgb
   maximum_enable false
@@ -1715,7 +1722,7 @@ set N4b522fb0 [stack 0]
   xpos 400
   ypos -87
  }
-push $N4b522fb0
+push $N20675510
  Switch {
   inputs 2
   which {{parent.DisplayGamut.gamut==2}}
@@ -1744,7 +1751,7 @@ push $N4b522fb0
    xpos 400
    ypos -129
   }
-set N46424f60 [stack 0]
+set N206c8c10 [stack 0]
   Expression {
    temp_name0 Yd
    temp_expr0 0.2627*r+0.6780*g+0.0593*b
@@ -1774,7 +1781,7 @@ set N46424f60 [stack 0]
    addUserKnob {7 _c}
    _c {{0.5-_a*log(4*_a)}}
   }
-push $N46424f60
+push $N206c8c10
   Expression {
    temp_name0 rp
    temp_expr0 pow(r,m_1)
@@ -1800,7 +1807,7 @@ push $N46424f60
    addUserKnob {7 c_3}
    c_3 {{2392/128}}
   }
-push $N46424f60
+push $N206c8c10
   Expression {
    expr0 sign(r)*pow(fabs(r),1/p)
    expr1 sign(g)*pow(fabs(g),1/p)
