@@ -1121,7 +1121,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
     else ptm_low_f = 1.0f + ptm_low*_expf(-2.0f*ach_d*ach_d/ptm_low_st)*_powf(1.0f - tsn_const, 1.0f/ptm_low_rng);
     float ptm_high_f;
     if (ptm_high_st == 0.0f || ptm_high_rng == 0.0f) ptm_high_f = 1.0f;
-    else ptm_high_f = 1.0f + ptm_high*_expf(-2.0f*ach_d*ach_d/ptm_high_st)*_powf(tsn_const, 1.0f/(4.0f*ptm_high_rng));
+    else ptm_high_f = 1.0f + ptm_high*_expf(-2.0f*ach_d*ach_d/ptm_high_st)*_powf(tsn_pt, 1.0f/(4.0f*ptm_high_rng));
     ptf *= ptm_low_f*ptm_high_f;
   }
 

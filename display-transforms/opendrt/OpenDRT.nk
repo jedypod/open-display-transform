@@ -754,8 +754,9 @@ push $N39dc0d00
  }
 set N39e41e30 [stack 0]
  Expression {
-  channel0 rgba
+  channel0 {rgba.red -rgba.green rgba.blue rgba.alpha}
   expr0 b
+  expr1 g
   name Expression2
   tile_color 0x8e00
   xpos -260
@@ -795,7 +796,7 @@ push $N39e1f400
   temp_name0 f0
   temp_expr0 1+s0*exp(-2*a*a/w0)*(1-Ar)**(1/p0)
   temp_name1 f1
-  temp_expr1 1+s1*exp(-2*a*a/w1)*Ar**(1/(4*p1))
+  temp_expr1 1+s1*exp(-2*a*a/w1)*Ag**(1/(4*p1))
   channel0 rgb
   expr0 f0*f1
   name MidPurity
