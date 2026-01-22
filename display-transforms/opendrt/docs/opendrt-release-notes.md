@@ -1,5 +1,40 @@
 # Release Notes
 
+## OpenDRT v1.1.0
+
+Redesign many aspects of the OpenDRT picture formation algorithm to improve smoothness, simplicity, and creative control.
+
+### New Features
+
+- Add DCI display encoding presets.
+  - DCI - 2.6 Power / P3-D60
+  - DCI - 2.6 Power / P3-DCI
+  - DCI - 2.6 Power / XYZ
+- Rework creative white system to work with varying display technical whitepoints. This was extremely difficult to figure out so I hope you all appreciate this one!
+- Bring back surround illumination compensation model from v0.1.3. This adds a simple power function based adjustment to compensate for the perceived difference in image appearance between a display in a "dark" "dim" or "bright" surround environment. When an image is viewed in a brighter surround, the perceived contrast of the image is higher due to the Bartleson-Breneman effect. This adjustment "gammas up" a bit to compensate. The DCI Cinema display encoding presets use "dark" surround, the Rec.1886 preset uses "Dim" surround, and the sRGB Display preset uses "Bright" surround.
+- Expose Display Grey Luminance as a user control. Now that all tonescale presets use the same middle grey, this can be a user control.
+- Refine all look presets
+  - Standard: A minimal smooth starting look with natural color rendition and minimal adjustments to create an aesthetically pleasing image. Uses the Medium Contrast tonescale preset.
+  - Arriba: A minimal smooth look with slightly stronger saturation and a soft rolloff in shadows similar to typical camera manufacturer picture formation approaches.
+  - Sylvan: A smooth starting look with slightly stronger contrast and stronger hue distortions which may be preferential for skin.
+  - Colorful: A low contrast saturated bright look. Might be a good fit for animation.
+  - Aery: A low contrast look with cool highlights and more pure color rendered quite bright. It features strong desaturation near the grey axis, and darkening of only the most pure colors.
+  - Dystopic: A high contrast look with very low mid-purity-range saturation and strong filmish hue distortions.
+  - Umbra: A dark moody cinematic look. Features low shadow contrast, warm whites, strong filmic hue distortions, cyan blues, and more saturated colors that render very dark. Works well with a Display Peak Luminance of 200 nits or above.
+  - Base (disabled in the DCTL unless manually enabled in the code): only the base components of the OpenDRT image rendering. Practically no preferential adjustements. Purity compression is mostly RGB ratio preserving / chromaticity-linear and very minimal. Mid-range purity is very strong. A good starting point for further look evelopment if absolute control is required (do not underestimate the complexity of this undertaking).
+
+### Algorithm design changes
+- Brilliance: Split into pre-tonescale and post-tonescale brilliance modules. This improves smoothness and makes folding less likely than with the previous design. Pre-tonescale brilliance darkens more saturated stimuli _prior_ to the purity compression. So if you darken reds with pre-brilliance for example, you will also reduce purity compression. This feels natural. 
+- Completely redesign the purity compression approach. Removed the second norm and tonescale previously used for purity compression control. Now we use the tonescale as a base purity compression factor and limit that in different ways. Also added a checkbox to completely disable purity compression if desired for some reason.
+- Mid Purity: Simplify overall design. Modify parameter space for both to have controls for intensity range and purity range (strength), instead of a single ambiguous strength control.
+- Hue Shift RGB: now using a separate hue extraction, so R is more oriented towards orange and B is more oriented towards Cyan. Expose range controls for these as well as it might be creatively desireable to have blue hueshift affect more of the intensity range for example.
+- Creative Whitepoint: Add cooler D75 and D93 creative whitepoints and integrate them into the DCI display encoding presets. These could be creatively interesting if a cooler peak luminance is desired.
+- Contrast Low: remove per-channel functionality. Location is now down in the same section as the rest of the tonescale functions and complexity is significantly reduced. Same looks can more or less be achieved using mid purity low adjustments, and smoothness is improved. Tonescale is now completely independent from "color" adjustments, but at the same time intimately tied to the look, because a normal looking saturation presented through a high contrast tonescale might look way too saturated through a low contrast tonescale. Keep this in mind when building presets.
+- Improve HDR/SDR behavior by using variations of the hyprbolic compression tonescale for different look modules.
+
+
+
+
 ## OpenDRT v1.1.0b48
 
 - Refine presets
