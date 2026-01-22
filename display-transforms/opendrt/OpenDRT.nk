@@ -1081,7 +1081,7 @@ push $N39ce86d0
   p1 1
   addUserKnob {7 m2}
   m2 0.66
-  addUserKnob {7 p2 R 0 2}
+  addUserKnob {7 p2 R 0 4}
   p2 1
  }
  MergeExpression {
