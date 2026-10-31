@@ -383,23 +383,24 @@ print('%s pq viewing condition / fallback: %s / %s' % ('PASS' if (cond, fb) == (
 if (cond, fb) != ('cinema1000', 'pq_rec2020_display'):   # dark surround = cinema, wide gamut implied
     failures.append('pq condition/fallback')
 
-# DCDM X'Y'Z' 2.6: published ID earned by the 48/52.37 conforming scale
+# DCDM X'Y'Z' 2.6: OpenDRT's X'Y'Z' output already carries DCDM's 48/52.37 headroom
+# (its DCDM_Normalize node), so the codes are the published encoding with no conform
 d4['eotf'].setValue('2.6 Power DCI')
 d4['display_gamut'].setValue("X'Y'Z'")
 d4['tn_Lp'].setValue(100)
 clf_xyz = os.path.join(OUT, 'test_xyz.clf')
 g3['file'].setValue(clf_xyz)
 g3['generate'].execute()
-meta_checks('dcdm xyz 2.6', clf_xyz, d4, 'g26_xyzd65_display', ('10', '17'), None, in_id='lin_ap1_scene',
-            conform=(48.0 / 52.37) ** (1 / 2.6), tail=d4)
-# linear CIE XYZ D65 at 1000 nit peak: OCIO display interchange, 1.0 = 100 cd/m2, so scale 10
+meta_checks('dcdm xyz 2.6', clf_xyz, d4, 'g26_xyzd65_display', ('10', '17'), None, in_id='lin_ap1_scene')
+# linear CIE XYZ D65 at 1000 nit peak: OCIO display interchange, 1.0 = 100 cd/m2, so scale 10,
+# with OpenDRT's 48/52.37 headroom undone
 d4['eotf'].setValue('Linear')
 d4['tn_Lp'].setValue(1000)
 clf_lx = os.path.join(OUT, 'test_linxyz.clf')
 g3['file'].setValue(clf_lx)
 g3['generate'].execute()
 meta_checks('linear xyz 1000nit', clf_lx, d4, 'ocio:lin_ciexyzd65_display', ('10', '8'), None, in_id='lin_ap1_scene',
-            conform=10.0, tail=d4)
+            conform=10.0 * 52.37 / 48.0, tail=d4)
 
 # --- 10. automatic file name and the parameter string --------------------------------
 
@@ -755,17 +756,16 @@ print('   full-ramp neutral spread %.2e' % spread_all)
 print('   ', os.path.basename(g3['file'].value()))
 d4['cwp'].setValue('D65')
 
-# (f) DCDM X'Y'Z' 2.6 at 48 cd/m2 -> lin_ciexyzd65_display: through the CIF g26_xyzd65_display
-#     definition (2.6 power, 52.37/48), which cancels the 48/52.37 conform of OpenDRT's codes,
-#     so the decode is a bare Exponent (plus the white adaptation if the node's white is not D65)
-#     and reference white (48 cd/m2) is 1.0
+# (f) DCDM X'Y'Z' 2.6 at 48 cd/m2 -> lin_ciexyzd65_display: the CIF g26_xyzd65_display decode,
+#     a 2.6 power then 52.37/48, which undoes the headroom OpenDRT's X'Y'Z' output carries, so
+#     reference white (48 cd/m2) is Y = 1.0
 d4['eotf'].setValue('2.6 Power DCI'); d4['display_gamut'].setValue("X'Y'Z'"); d4['tn_Lp'].setValue(48)
 g3['output'].setValue('lin_ciexyzd65_display'); g3['file'].setValue(OUT + '/')
 g3['generate'].execute()
 clf_dcdm = g3['file'].value()
 tags = node_tags(clf_dcdm)
 adapt_f = ET.parse(clf_dcdm).getroot().find('Info/CLFBake/Interop').get('adaptation')
-ok_f = tags[:3] == ['Log[cameraLinToLog]', 'LUT3D', 'Exponent[basicFwd]'] and tags[3:] == (['Matrix'] if adapt_f else []) \
+ok_f = tags == ['Log[cameraLinToLog]', 'LUT3D', 'Exponent[basicFwd]', 'Matrix'] \
     and '__to__lin_ciexyzd65__' in os.path.basename(clf_dcdm)
 print('%s decode DCDM X\'Y\'Z\' 48 nit -> lin_ciexyzd65 structure: %s adaptation: %s' % ('PASS' if ok_f else 'FAIL', tags, adapt_f))
 if not ok_f:
@@ -773,12 +773,10 @@ if not ok_f:
 for n in (img, shaper, d4, g3):
     n.sample('red', 0.5, 0.5)
 live_f = sample(g3, W, H)
-exp_f = [[max(c, 0.0) ** 2.6 for c in p] for p in live_f]      # XYZ, 1.0 = 48 cd/m2 reference white
-check('decode DCDM: CLF vs codes^2.6 (rel to 1.0)', rel_err(apply_clf(clf_dcdm, lin), exp_f, 1.0), IMAGE_TOL) if not adapt_f else \
-    print('   (adapted: value check is the white below)')
+exp_f = [[max(c, 0.0) ** 2.6 * 52.37 / 48 for c in p] for p in live_f]   # XYZ, 1.0 = 48 cd/m2 reference white
+check('decode DCDM: CLF vs codes^2.6 x 52.37/48 (rel to 1.1)', rel_err(apply_clf(clf_dcdm, lin), exp_f, 1.1), IMAGE_TOL)
 white_f = apply_clf(clf_dcdm, [[1e6] * 3])[0]
-print('   peak white XYZ %.4f %.4f %.4f (Y ~ 1 = 48 cd/m2; x,y %.4f %.4f)' % (white_f[0], white_f[1], white_f[2],
-      white_f[0] / sum(white_f), white_f[1] / sum(white_f)))
+check('decode DCDM: peak white is Y = 1 (48 cd/m2)', abs(white_f[1] - 1.0), 1e-2)
 
 # (e) HLG cannot be decoded: falls back to codes with a note
 d4['eotf'].setValue('HLG'); d4['display_gamut'].setValue('Rec.2020 (P3 Limited)'); d4['tn_Lp'].setValue(1000)
@@ -871,8 +869,8 @@ for i, d in enumerate(clfbake.DISPLAYS):
     if max(e_f, e_i) > 2e-4:
         print('FAIL odt %s: forward %.2e inverse %.2e' % (d[0], e_f, e_i))
         failures.append('odt ' + d[0])
-print('%s odt node vs OCIO, 16 displays forward and inverse: worst %.2e (%s) (tol 2e-4)' % (
-    'PASS' if worst[0] <= 2e-4 else 'FAIL', worst[0], worst[1]))
+print('%s odt node vs OCIO, %d displays forward and inverse: worst %.2e (%s) (tol 2e-4)' % (
+    'PASS' if worst[0] <= 2e-4 else 'FAIL', len(clfbake.DISPLAYS), worst[0], worst[1]))
 
 # (b) ODT nodes at the end of a chain are written as exact process nodes. OpenDRT
 #     Rec.1886 -> ODT inverse -> ODT forward lin_rec709 equals the output menu's lin_rec709
@@ -933,8 +931,49 @@ ok = node_tags(g3['file'].value()) == ['Log[cameraLinToLog]', 'LUT3D'] \
 print('%s odt HLG is baked and names the output: %s' % ('PASS' if ok else 'FAIL', os.path.basename(g3['file'].value())))
 if not ok:
     failures.append('odt HLG')
+# (e) the ODT agrees with OpenDRT's own encoders on neutrals: OpenDRT to a display (clamp
+#     off) equals OpenDRT to linear X'Y'Z' at the same peak, then ODT forward. Only neutrals:
+#     OpenDRT compresses purity toward the display gamut it renders for, so saturated colours
+#     rendered to X'Y'Z' and re-encoded differ from a render to that display, by design.
+#     And an ODT to gamma 2.2 P3-D65, not a published CIF display, gets OpenDRT's ID for it
+nramp = nuke.nodes.Expression(inputs=[img], expr0='0.18*pow(2,18*(x/width-0.6))', expr1='0.18*pow(2,18*(x/width-0.6))',
+                              expr2='0.18*pow(2,18*(x/width-0.6))')   # an input: sourceless images sample black on 15.1
+o1['direction'].setValue('forward')
+worst, extra = 0.0, []
+for eotf, gamut, lp, disp in (('2.2 Power - sRGB Display', 'P3-D65', 100, 'g22_p3d65_display'),
+                              ('2.4 Power - Rec.1886', 'Rec.709', 100, 'g24_rec709_display'),
+                              ('2.6 Power DCI', 'P3-D65', 48, 'g26_p3d65_display')):
+    # fresh nodes, knobs set before their first sample: in nuke -t 15.1 an OpenDRT node
+    # sampled straight after a knob change reads black
+    pair = []
+    for e, g in ((eotf, gamut), ('Linear', "X'Y'Z'")):
+        n = paste(OPENDRT)[0]
+        n['clamp'].setValue(False); n['tn_Lp'].setValue(lp); n['eotf'].setValue(e); n['display_gamut'].setValue(g)
+        n.setInput(0, nramp)
+        pair.append(n)
+    undo = nuke.nodes.Multiply(inputs=[pair[1]], value=52.37 / 48)   # OpenDRT's X'Y'Z' headroom
+    o1.setInput(0, undo)
+    o1['display'].setValue(ix[disp])
+    worst = max(worst, rel_floor(sample(o1, W, H), sample(pair[0], W, H)))
+    extra += pair + [undo]
+# 2e-3: OpenDRT's X'Y'Z' white sits about 2e-4 off D65 in xy
+check('odt forward = OpenDRT\'s own encoders on neutrals (g22 P3-D65, g24 Rec.709, g26 P3-D65)', worst, 2e-3)
+o2['display'].setValue(ix['g22_p3d65_display']); o2['direction'].setValue('forward')
+o1['display'].setValue(ix['g24_rec709_display']); o1['direction'].setValue('inverse')
+o1.setInput(0, drt); gen.setInput(0, o2)
+gen['file'].setValue(OUT + '/')
+gen['generate'].execute()
+r = ET.parse(gen['file'].value()).getroot()
+out_o = r.find('Info/CLFBake/Interop').get('output')
+cicp = r.find('Info/CLFBake/Mastering/CICP')
+ok = out_o == 'opendrt-v1.1:g22_p3d65_display' and node_tags(gen['file'].value()) == \
+    ['Log[cameraLinToLog]', 'LUT3D', 'Exponent[basicMirrorFwd]', 'Matrix', 'Exponent[basicMirrorRev]'] \
+    and (cicp.get('primaries'), cicp.get('transfer')) == ('12', '4')
+print('%s odt to gamma 2.2 P3-D65: output %s, %s' % ('PASS' if ok else 'FAIL', out_o, node_tags(gen['file'].value())))
+if not ok:
+    failures.append('odt g22 p3d65')
 gen.setInput(0, drt); g3.setInput(0, d4)
-for n in (o1, o2, psrc, pc):
+for n in [o1, o2, psrc, pc, nramp] + extra:
     nuke.delete(n)
 
 

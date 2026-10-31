@@ -263,6 +263,15 @@ def fold_matrices(ops):
                                                    for i in range(3) for k in range(3)))]
 
 
+# OpenDRT's X'Y'Z' output carries DCDM's headroom: XYZ x 48/52.37 (its DCDM_Normalize
+# node), unless the creative white is cooler than D65 (D93, D75).
+XYZ_HEADROOM = 48 / 52.37
+
+
+def xyz_headroom(node):
+    return node['display_gamut'].value() == "X'Y'Z'" and node['cwp'].getValue() >= 2
+
+
 def container_npm(gamut):
     """RGB -> XYZ for a container as OpenDRT encodes it: P3-D65 for all P3 containers."""
     if gamut == "X'Y'Z'":
@@ -308,6 +317,8 @@ def decode_ops(dec, fixed_ok):
     # OpenDRT encodes every P3 container with the P3-D65 matrix (the container
     # and creative white are a chromatic adaptation in XYZ before it), so the
     # P3-D60 and P3-DCI containers decode with P3-D65 too.
+    if dec.get('headroom'):
+        scale /= XYZ_HEADROOM
     m = mat_scale(container_npm(gamut), scale)
     note = None
     white = dec.get('white_xy')   # chromaticity of the LUT's white corner, decoded
@@ -319,20 +330,23 @@ def decode_ops(dec, fixed_ok):
     if d[2]:
         m = mat_mul(display_matrix(d), m)
     unit = '1.0 = 100 cd/m2' if eotf in ('PQ', 'Linear') else 'code 1.0 = 1.0 (display white, CIF scale)'
+    if dec.get('headroom'):
+        unit += ", OpenDRT's 48/52.37 X'Y'Z' headroom undone"
     if any(abs(m[i][k] - IDENTITY[i][k]) > 1e-9 for i in range(3) for k in range(3)):
         ops.append(op_matrix(m, 'decode to %s, %s%s' % (d[0], unit, '; ' + note if note else '')))
     return ops, version, note
 
 
 # --- ODT: lin_ciexyzd65_display <-> the display colorspaces of the CIF core display
-# config (OCIO 2). (interop id, label, primaries (None: XYZ), encoding, exponent,
-# linear scale before encoding, H.273 primaries/transfer or None)
+# config (OCIO 2), plus OpenDRT's gamma 2.2 P3-D65. (interop id, label, primaries
+# (None: XYZ), encoding, exponent, linear scale before encoding, H.273 primaries/transfer)
 DISPLAYS = (
     ('srgb_rec709_display', 'sRGB', 'Rec.709', 'srgb', 2.4, 1.0, (1, 13)),
     ('g24_rec709_display', 'Rec.1886 Rec.709', 'Rec.709', 'gamma', 2.4, 1.0, (1, 1)),
     ('g22_rec709_display', 'Gamma 2.2 Rec.709', 'Rec.709', 'gamma', 2.2, 1.0, (1, 4)),
     ('srgb_p3d65_display', 'Display P3', 'P3-D65', 'srgb', 2.4, 1.0, (12, 13)),
     ('srgbe_p3d65_display', 'Display P3 HDR', 'P3-D65', 'srgb', 2.4, 1.0, None),
+    ('g22_p3d65_display', 'Gamma 2.2 P3-D65', 'P3-D65', 'gamma', 2.2, 1.0, (12, 4)),   # OpenDRT's, not published
     ('g26_p3d65_display', 'Gamma 2.6 P3-D65', 'P3-D65', 'gamma', 2.6, 1.0, None),
     ('pq_p3d65_display', 'ST2084-P3-D65', 'P3-D65', 'pq', None, 1.0, (12, 16)),
     ('pq_rec2020_display', 'Rec.2100-PQ', 'Rec.2020', 'pq', None, 1.0, (9, 16)),
@@ -497,8 +511,9 @@ PUBLISHED_OUT = {
     'g26_xyzd65_display': (48.0 / 52.37) ** (1 / 2.6),
     'ocio:lin_ciexyzd65_display': 'lp/100',
 }
-for _d in DISPLAYS:   # every CIF display ID is published
-    PUBLISHED_OUT.setdefault(_d[0], None)
+for _d in DISPLAYS:   # every CIF display ID is published; gamma 2.2 P3-D65 is not
+    if _d[0] != 'g22_p3d65_display':
+        PUBLISHED_OUT.setdefault(_d[0], None)
 OUT_ALIAS = {'lin_xyzd65_display': 'ocio:lin_ciexyzd65_display'}
 # ITU-T H.273 code points for the output encoding (RGB, full range)
 CICP_PRIMARIES = {'Rec.709': 1, 'P3-D65': 12, 'Rec.2020 (P3 Limited)': 9, 'P3-DCI': 11, "X'Y'Z'": 10}
@@ -745,6 +760,13 @@ def to_nits(v, eotf, lp):
     return lp * v ** {'2.2 Power - sRGB Display': 2.2, '2.4 Power - Rec.1886': 2.4, '2.6 Power DCI': 2.6}[eotf]
 
 
+def measured_nits(rgb, node):
+    """Luminance of a measured neutral from the node's output codes."""
+    eotf, lp = node['eotf'].value(), node['tn_Lp'].value()
+    xyz = node['display_gamut'].value() == "X'Y'Z'"
+    return to_nits(rgb[1] if xyz else sum(rgb) / 3.0, eotf, lp) / (XYZ_HEADROOM if xyz_headroom(node) else 1.0)
+
+
 def interop_ids(node, ns, log_input, shaper, measured):
     """(input id, input fallback, output id, output fallback, conform scale or None)."""
     gam, eotf, cont = node['in_gamut'].value(), node['eotf'].value(), node['display_gamut'].value()
@@ -769,15 +791,20 @@ def interop_ids(node, ns, log_input, shaper, measured):
     if target:
         base = DISPLAY[target][0]
     conform = None if target else PUBLISHED_OUT.get(base)
+    headroom = xyz_headroom(node)
+    if base == 'g26_xyzd65_display' and headroom:
+        conform = None   # OpenDRT's X'Y'Z' 2.6 already is the DCDM encoding
     if conform == 'lp/100':
-        conform = lp / 100.0
+        conform = lp / 100.0 / (XYZ_HEADROOM if headroom else 1.0)
     mods = []
     if cont == 'Rec.2020 (P3 Limited)':
         mods.append('p3lim')
     if cwp != 'D65':
         mods.append(cwp.lower() + 'sim')
     if eotf in ('PQ', 'HLG') and measured:
-        mods.append('dw%d' % int(round(to_nits(sum(measured[1]) / 3.0, eotf, lp))))
+        mods.append('dw%d' % int(round(measured_nits(measured[1], node))))
+    if base == 'pq_xyzd65_display' and headroom and not target:
+        mods.append('dcdm')   # PQ of XYZ x 48/52.37: OpenDRT's, not the published encoding
     if not node['clamp'].value():
         mods.append('clamp0')
     levels = ('L' if (log_input and shaper.get('legal_in')) else 'E') + ('L' if (shaper.get('legal_out') and not target.startswith('lin_')) else 'E')
@@ -837,8 +864,8 @@ def describe_opendrt(nb, node, log_input, measured, shaper):
                         greyNominal='%.6g' % (lg * (1.0 + gb * math.log(lp / 100.0, 2))))
     if measured:
         grey, white = measured
-        lum.set('greyMeasured', '%.4g' % to_nits(sum(grey) / 3.0, eotf, lp))
-        lum.set('diffuseWhiteMeasured', '%.4g' % to_nits(sum(white) / 3.0, eotf, lp))
+        lum.set('greyMeasured', '%.4g' % measured_nits(grey, node))
+        lum.set('diffuseWhiteMeasured', '%.4g' % measured_nits(white, node))
         lum.set('measuredFrom', 'chain output for neutral 0.18 and 1.0, decoded with the output EOTF')
     su = node['tn_su'].value()
     # viewing condition token in the FilmLight style: <class><wide?><peak nits>
@@ -864,8 +891,8 @@ def describe_opendrt(nb, node, log_input, measured, shaper):
     if conform is not None:
         inter.set('outputConform', repr(conform))
         inter.set('outputConformNote', 'Matrix appended after the LUT3D so the output matches the published '
-                  'definition: DCDM 48/52.37 headroom for g26_xyzd65_display, 1.0 = 100 cd/m2 for '
-                  'ocio:lin_ciexyzd65_display')
+                  'definition: DCDM 48/52.37 headroom for g26_xyzd65_display when OpenDRT has not applied it, '
+                  '1.0 = 100 cd/m2 for ocio:lin_ciexyzd65_display')
     params = opendrt_string(node, version)
     ET.SubElement(nb, 'Params', syntax="name{key{value}group{key{'text'}}}; apply with Apply Params / Restore").text = params
     return dict(conform=conform, in_id=in_id, out_id=out_id, condition=condition, version=version,
@@ -1185,7 +1212,8 @@ def bake_chain(gen, nodes, shaper_node, odt):
             decode_note = ', HLG cannot be decoded (the node applies 20.5% of the inverse OOTF, not a standard operator): display codes'
         else:
             decode = dict(eotf=drt_node['eotf'].value(), gamut=drt_node['display_gamut'].value(),
-                          lp=drt_node['tn_Lp'].value(), target=target, pq_fixed=(gen['ocio'].value() == '2.4'))
+                          lp=drt_node['tn_Lp'].value(), target=target, pq_fixed=(gen['ocio'].value() == '2.4'),
+                          headroom=xyz_headroom(drt_node))
             shaper['target'] = target
     log_input = bool(gen['log_input'].value())
 

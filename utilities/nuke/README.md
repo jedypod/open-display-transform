@@ -46,9 +46,12 @@ CLF, and a `params` field with Apply Params.
 and the 16 display colorspaces of the Color Interop Forum's display config,
 OCIO 2-style: sRGB, Rec.1886, gamma 2.2, Display P3 (and HDR), gamma 2.6
 P3-D65, PQ P3-D65 and Rec.2100, HLG, AdobeRGB, both DCDMs, and the linear
-Rec.709, P3-D65 and Rec.2020 displays. `forward` encodes from XYZ, `inverse`
-decodes to it. It is Expression and ColorMatrix nodes, and matches OCIO
-evaluating that config to 6e-5. ODT nodes at the end of a chain are not baked:
+Rec.709, P3-D65 and Rec.2020 displays. It also has OpenDRT's gamma 2.2 P3-D65,
+which the CIF does not publish and which therefore gets OpenDRT's namespaced
+ID. `forward` encodes from XYZ, `inverse` decodes to it. It is Expression and
+ColorMatrix nodes, and matches OCIO evaluating that config to 6e-5. It
+re-encodes colorimetrically and does not redo OpenDRT's gamut compression, so
+render OpenDRT for the display you deliver where saturated colours matter. ODT nodes at the end of a chain are not baked:
 CLFGenerate writes them as exact CLF operations after the cube. So
 `OpenDRT -> ODT inverse -> ODT forward` reaches any display, or a linear one,
 from the same code-value cube. HLG has no CLF operator and is baked instead.
@@ -64,7 +67,9 @@ with two OpenDRT-specific additions. The cube is always baked code value to
 code value; exact decode nodes follow it (`Exponent`, PQ `LUT1D` or
 `PQ_TO_Lin`, one `Matrix`).
 The scale is the CIF one: power EOTFs decode code 1.0 to 1.0, PQ to 1.0 = 100
-cd/m². DCDM goes through `g26_xyzd65_display`. The render white is
+cd/m². OpenDRT's X'Y'Z' output already carries DCDM's 48/52.37 headroom
+(unless the creative white is cooler than D65), and decodes undo it, so a
+DCDM white decodes to Y = 1. The render white is
 Bradford-adapted to D65, so a white patch is D65 whatever the container or
 creative white, and OpenDRT's P3-D60 and P3-DCI containers decode too. HLG is
 refused, because OpenDRT.nk applies only 20.5% of the BT.2100 inverse OOTF
@@ -105,12 +110,14 @@ After the `Log` (unless log input), optional `Range` and `LUT3D` nodes,
   white, H.273 code points.
 - **Interop**: Color Interop IDs, published ones bare when exact, otherwise
   `opendrt-v1.1:<base>|<modifiers>` with a fallback. The modifiers are
-  `p3lim`, `d60sim` and similar, `dw<nits>`, `clamp0`, `EE`/`LL` and
-  `codes0to1.19`.
+  `p3lim`, `d60sim` and similar, `dw<nits>`, `clamp0`, `EE`/`LL`,
+  `codes0to1.19`, and `dcdm` for PQ X'Y'Z' carrying OpenDRT's headroom.
 - **Script**: the baked nodes, for From CLF.
 
-`g26_xyzd65_display` (DCDM headroom) and `ocio:lin_ciexyzd65_display`
-(peak/100) are reached by a conforming `Matrix`, recorded as `outputConform`.
+OpenDRT's X'Y'Z' 2.6 already is `g26_xyzd65_display`; only a creative white
+cooler than D65 needs a conforming `Matrix` to earn it. `ocio:lin_ciexyzd65_display`
+is reached by one too, peak/100 × 52.37/48. Both are recorded as
+`outputConform`.
 
 ## Testing
 
@@ -118,7 +125,7 @@ From this directory, with PyOpenColorIO (bundled with Nuke) as the independent
 reader:
 
 ```
-nuke -t test_clfbake.py                        # 53 checks, ~2 minutes; run on 15.1 too
+nuke -t test_clfbake.py                        # 56 checks, ~2 minutes; run on 15.1 too
 nuke -t sweep_clfbake.py                       # every look, tonescale and display preset
 CLFBAKE_DOMAIN=auto nuke -t sweep_clfbake.py
 ```
