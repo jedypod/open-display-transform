@@ -31,6 +31,8 @@ OpenDRT for Nuke is provided as a group node. To load it, just drag and drop the
 
 [![OpenDRT Nuke Installation and Usage](https://github.com/user-attachments/assets/6e0e91c8-d9f2-4568-8840-19e00f94103b)](https://www.youtube.com/watch?v=RYmANRwCNc4)
 
+The Nuke node's "CLF Helpers" bake its settings to a CLF (T-LogE, 48³, as in the OCIO config below) and restore them. They need [utilities/nuke](../../utilities/nuke/README.md) on `NUKE_PATH`, which also has a tool for other shapers, sizes and node chains.
+
 
 ### OpenColorIO
 OpenDRT is also provided as an OCIO config in the [releases](https://github.com/jedypod/open-display-transform/releases), for use in VFX DCC software such as Nuke, Maya, Houdini, Gaffer, etc.
