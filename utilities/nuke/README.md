@@ -75,11 +75,30 @@ creative white, and OpenDRT's P3-D60 and P3-DCI containers decode too. HLG is
 refused, because OpenDRT.nk applies only 20.5% of the BT.2100 inverse OOTF
 (`mix 0.205`) where the DCTL applies all of it.
 
-**Cinespace.** Written directly: the shaper as a 4096-point prelut with
-every point on the curve, then the cube through the same operations the CLF
-applies after its LUT3D. OCIO's own csp reader resamples that prelut uniformly
-and loses shadows, so for OCIO use a log-input csp (T-LogE in the config,
-tetrahedral `FileTransform`), which equals the CLF exactly, or use the CLF.
+**Which format.**
+
+- `clf`, the Academy/ASC Common LUT Format, is the standard and the default:
+  the shaper is an exact parametric node, and OCIO and most colour tools read it.
+- `ctf` is OpenColorIO's native superset of CLF. With `ctf target` 2.4 it uses
+  OCIO's built-in PQ functions instead of a sampled LUT1D.
+- `csp`, Cinespace, is the shaper-LUT format FFmpeg's `lut3d` filter reads,
+  for hosts without CLF. It carries the shaper as a 4096-point prelut with every
+  point on the curve. Both OCIO and FFmpeg resample that prelut into a uniform
+  table, which loses up to 4.5e-3 code below scene 0.01. FFmpeg 8.1 also
+  interpolates between prelut points without dividing by their spacing, which
+  costs another 1.6e-3 between scene 1 and 10.
+
+For FFmpeg, bake the csp with **log input**: set CLFShaper to the footage's own
+log curve and OpenDRT's input gamut to the camera's. The csp then takes camera
+codes directly. With full-range levels its prelut is at most a two-point
+scale, which is what an `auto`-extended code range adds. In FFmpeg 8.1 it then
+matches the CLF to 1e-6. Legal-range input needs a sampled prelut instead,
+which FFmpeg gets wrong by up to 1.6e-3, so bake full range for FFmpeg; its
+`lut3d` receives full-range RGB anyway. For OCIO, the CLF itself is simplest.
+
+```
+ffmpeg -i in.mov -vf lut3d=file=OpenDRT-v1.1.0_….csp:interp=tetrahedral …
+```
 
 **File names**
 

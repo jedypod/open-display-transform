@@ -503,7 +503,7 @@ csp_rows = [[float(v) for v in l.split()] for l in txt[size_line + 1:size_line +
 N = 48
 csp_bf = [csp_rows[r + N * g + N * N * b] for r in range(N) for g in range(N) for b in range(N)]
 cube_err = max(abs(a - b) for ra, rb in zip(csp_bf, clf_core(auto_path)[1]) for a, b in zip(ra, [float(v) for v in rb]))
-check('csp: cube vs CLF lattice (Baker)', cube_err, 1e-5)
+check('csp: cube vs CLF lattice', cube_err, 1e-5)
 print('%s csp: %d cube rows, prelut %d points' % ('PASS' if len(csp_rows) == N ** 3 and n_pre == 4096 else 'FAIL', len(csp_rows), n_pre))
 if not (len(csp_rows) == N ** 3 and n_pre == 4096):
     failures.append('csp cube rows')
@@ -538,7 +538,7 @@ lin_r = sample(img_r, W, H)
 logpix = [[lin_to_log(shaper, c) for c in p] for p in lin_r]
 assert max(max(p) for p in logpix) > 1.0, 'range image must exceed code 1.0'
 check('log input range: CLF vs Nuke', max_err(apply_clf(clf_rng, logpix), sample(gen, W, H)), IMAGE_TOL)
-# the same bake as csp: Baker with Range + no Log in the shaper
+# the same bake as csp: the code range as a two-point prelut, no shaper curve
 gen['format'].setValue('csp')
 gen['file'].setValue(OUT + '/')
 gen['generate'].execute()

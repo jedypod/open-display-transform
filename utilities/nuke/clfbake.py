@@ -395,8 +395,10 @@ def write_csp(path, n, rows_rf, shaper, log_input, post, meta):
     cube (red-fastest, as GenerateLUT writes it) through whatever follows it in the CLF."""
     c0, c1 = float(shaper.get('code_min', 0.0)), float(shaper.get('code_max', 1.0))
     legal = log_input and shaper.get('legal_in')
-    if log_input and not legal and (c0, c1) == (0.0, 1.0):
-        us, xs = [0.0, 1.0], [0.0, 1.0]
+    if log_input and not legal and c0 == 0.0:
+        # a scale from zero: the two-point form, which FFmpeg's lut3d reads exactly (it
+        # misreads a two-point prelut with a nonzero minimum, and sampled ones between points)
+        us, xs = [0.0, 1.0], [0.0, c1]
     else:
         us = [i / (CSP_PRELUT - 1.0) for i in range(CSP_PRELUT)]
         codes = [c0 + u * (c1 - c0) for u in us]
