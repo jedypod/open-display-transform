@@ -1,0 +1,137 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name CLFShaper
+ knobChanged "n = nuke.thisNode()\nif nuke.thisKnob().name() in ('preset', 'showPanel'):\n    x = n\['preset'].getValue() == 8\n    for k in ('w0', 'o', 'x0', 'y0', 'k'):\n        n\[k].setVisible(x)\n"
+ tile_color 0x4a3a7aff
+ label "\[value preset]"
+ xpos 0
+ addUserKnob {20 CLFShaper}
+ addUserKnob {4 preset l shaper t "Log encoding for the lattice, written to the CLF as an exact Log node. T-LogE is what the released OpenDRT OCIO config uses." M {"Filmlight T-LogE" "Filmlight T-Log" ACEScct "Arri LogC3" "Arri LogC4" "Sony S-Log3" "Red Log3G10" "DaVinci Intermediate" XLog}}
+ addUserKnob {7 w0 t "XLog: linear value that maps to 1.0" +HIDDEN R 10 256}
+ w0 128
+ addUserKnob {7 o t "XLog: log asymptote offset, as 2^-o" +HIDDEN R 0 12}
+ o 7.5
+ addUserKnob {7 x0 t "XLog: lower intersection constraint x" +HIDDEN R 0 0.5}
+ addUserKnob {7 y0 t "XLog: lower intersection constraint y" +HIDDEN R 0 0.5}
+ y0 0.075
+ addUserKnob {7 k t "XLog: slope of the linear extension" +HIDDEN R 0 0.2}
+ k 0.06
+ addUserKnob {3 cube_size l "cube size" t "Lattice size. 48 as in the released OpenDRT config; 65 halves the error."}
+ cube_size 48
+ addUserKnob {7 code_min l "code range" t "Shaper codes the lattice spans. T-LogE code 1 is scene 512; raise the top for brighter content. CLFGenerate's auto sets it." R -0.5 2}
+ addUserKnob {7 code_max l "" t "Shaper codes the lattice spans. T-LogE code 1 is scene 512; raise the top for brighter content. CLFGenerate's auto sets it." -STARTLINE R -0.5 2}
+ code_max 1
+ addUserKnob {6 pattern l "show pattern" t "Show the shaped test pattern instead of the input." +STARTLINE}
+ addUserKnob {20 Params}
+ addUserKnob {7 o0 t "x offset: the y asymptote of the log curve" +DISABLED}
+ o0 {{-(2**-o)}}
+ addUserKnob {7 s0 t "s0 = scale factor to satisfy intersection constraint at (x0, y0)" +DISABLED}
+ s0 {{(1-y0)/log((w0-o0)/(x0-o0))}}
+ addUserKnob {7 o1 t "y offset to satisfy intersection constraint at (w0, 1)" +DISABLED}
+ o1 {{1-s0*log(w0-o0)}}
+ addUserKnob {7 x1 t "x1 is x coordinate of linear extension intercept" +DISABLED}
+ x1 {{s0*log(k*s0*exp(o1/s0))}}
+ addUserKnob {7 y1 t "y1 is y coordinate of linear extension intercept" +DISABLED}
+ y1 {{exp((x1-o1)/s0)+o0}}
+ addUserKnob {26 div1 l "" +STARTLINE}
+ addUserKnob {7 gs l logSideSlope t "OCIO LogCameraTransform logSideSlope (base 2)" +DISABLED}
+ gs {{preset==0?0.055459048831000002:(preset==1?0.063997604032021899:(preset==2?0.057077625570776301:(preset==3?0.074411604628179501:(preset==4?0.064795419634129298:(preset==5?0.076949505245484703:(preset==6?0.067515609487508996:(preset==7?0.073292479999999993:(s0*log(2)))))))))}}
+ addUserKnob {7 go l logSideOffset t "OCIO LogCameraTransform logSideOffset" +DISABLED}
+ go {{preset==0?0.50086779795500003:(preset==1?0.55201265686066503:(preset==2?0.55479452054794498:(preset==3?0.38553700000000002:(preset==4?-0.29590839268258601:(preset==5?0.410557184750733:(preset==6?0:(preset==7?0.51304735999999995:(o1))))))))}}
+ addUserKnob {7 ls l linSideSlope t "OCIO LogCameraTransform linSideSlope" +DISABLED}
+ ls {{preset==0?1:(preset==1?1:(preset==2?1:(preset==3?5.5555560000000002:(preset==4?2231.8263090676901:(preset==5?5.2631578947368398:(preset==6?155.97532699999999:(preset==7?1:(1))))))))}}
+ addUserKnob {7 lo l linSideOffset t "OCIO LogCameraTransform linSideOffset" +DISABLED}
+ lo {{preset==0?0.0048798088598100003:(preset==1?0.0057048244042473802:(preset==2?0:(preset==3?0.052271999999999999:(preset==4?64:(preset==5?0.052631578947368397:(preset==6?2.5597532699999999:(preset==7?0.0074999999999999997:(-o0))))))))}}
+ addUserKnob {7 lb l linSideBreak t "OCIO LogCameraTransform linSideBreak" +DISABLED}
+ lb {{preset==0?0:(preset==1?0:(preset==2?0.0078125:(preset==3?0.010591:(preset==4?-0.018056996119911298:(preset==5?0.01125:(preset==6?-0.01:(preset==7?0.0026240899999999999:(y1))))))))}}
+ addUserKnob {7 sl l linearSlope t "OCIO LogCameraTransform linearSlope" +DISABLED}
+ sl {{preset==0?16.396235389436512:(preset==1?16.184376489665894:(preset==2?10.540237741654536:(preset==3?5.3676735864473013:(preset==4?8.8030332103317619:(preset==5?6.6219437117758204:(preset==6?15.192688598850596:(preset==7?10.444266835878933:(1/k))))))))}}
+ addUserKnob {7 logbreak l "log break" t "log-side value at the break" +DISABLED}
+ logbreak {{gs*log(ls*lb+lo)/log(2)+go}}
+ addUserKnob {7 linoff l "linear offset" t "offset of the linear segment" +DISABLED}
+ linoff {{logbreak-sl*lb}}
+ addUserKnob {1 clfbake_shaper l "" +STARTLINE +INVISIBLE}
+ clfbake_shaper 1
+ addUserKnob {6 probe -STARTLINE +INVISIBLE}
+ addUserKnob {20 About}
+ addUserKnob {26 about l " " T "<font color=#ccc><b>CLFShaper</b> | CLFBake, part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>Head of the chain to bake; CLFGenerate goes at the tail.<br>Docs: utilities/nuke/README.md</font>"}
+}
+ Constant {
+  inputs 0
+  format "1024 8 0 0 1024 8 1 clfbake_probe"
+  name ProbeFormat
+ }
+ Expression {
+  temp_name0 t
+  temp_expr0 0.18*pow(2,-20+44*x/width)
+  temp_name1 n
+  temp_expr1 0.18*pow(2,-20+26*x/width)
+  temp_name2 v
+  temp_expr2 floor(y/height*8)
+  expr0 v==0?t:v==1?t:v==2?0.2*t:v==3?0.2*t:v==4?-n:v==7?(x<width/2?0.18:1):0.18
+  expr1 v==0?t:v==1?0.2*t:v==2?t:v==3?0.2*t:v==5?-n:v==7?(x<width/2?0.18:1):0.18
+  expr2 v==0?t:v==1?0.2*t:v==2?0.2*t:v==3?t:v==6?-n:v==7?(x<width/2?0.18:1):0.18
+  name ProbeRamp
+ }
+ CMSTestPattern {
+  inputs 0
+  cube_size {{parent.cube_size}}
+  name CMSTestPattern1
+ }
+ Expression {
+  expr0 (parent.code_min+r*(parent.code_max-parent.code_min))<=parent.logbreak?((parent.code_min+r*(parent.code_max-parent.code_min))-parent.linoff)/parent.sl:(pow(2,((parent.code_min+r*(parent.code_max-parent.code_min))-parent.go)/parent.gs)-parent.lo)/parent.ls
+  expr1 (parent.code_min+g*(parent.code_max-parent.code_min))<=parent.logbreak?((parent.code_min+g*(parent.code_max-parent.code_min))-parent.linoff)/parent.sl:(pow(2,((parent.code_min+g*(parent.code_max-parent.code_min))-parent.go)/parent.gs)-parent.lo)/parent.ls
+  expr2 (parent.code_min+b*(parent.code_max-parent.code_min))<=parent.logbreak?((parent.code_min+b*(parent.code_max-parent.code_min))-parent.linoff)/parent.sl:(pow(2,((parent.code_min+b*(parent.code_max-parent.code_min))-parent.go)/parent.gs)-parent.lo)/parent.ls
+  name InverseShaper
+ }
+ Input {
+  inputs 0
+  name Input1
+ }
+ Switch {
+  inputs 3
+  which {{parent.pattern?1:(parent.probe?2:0)}}
+  name Switch1
+ }
+ Output {
+  name Output1
+ }
+end_group
+Group {
+ name CLFGenerate
+ tile_color 0x4a3a7aff
+ xpos 0
+ ypos 200
+ addUserKnob {20 CLFGenerate}
+ addUserKnob {2 file t "Output path, or a directory (empty: the script's) to name the file automatically."}
+ addUserKnob {4 format t "File format. csp carries the shaper as a 4096-point prelut, for hosts without CLF." M {clf ctf csp}}
+ addUserKnob {4 interpolation t "Interpolation recorded in the LUT3D." M {tetrahedral trilinear}}
+ addUserKnob {4 output t "display codes: the node's output. lin_*: exact decode nodes after the same cube, to a linear display target with a D65 white. Needs an OpenDRT node; not for HLG." M {"display codes" lin_ciexyzd65_display lin_rec709_display lin_p3d65_display}}
+ addUserKnob {4 ocio l "ctf target" t "2.4: PQ decodes use the PQ_TO_Lin FixedFunction. 2.1: a half-domain LUT1D that OCIO 2.2 reads." M {2.1 2.4}}
+ addUserKnob {4 levels t "legal: 64-940 as unclamped Range nodes first and/or last; delete one to convert. legal in needs log input." M {full "legal in" "legal out" "legal in and out"}}
+ addUserKnob {6 log_input l "log input" t "Leave out the Log node: the file takes the shaper's log codes, as the released config does." -STARTLINE}
+ addUserKnob {6 embed_script l "embed node script" t "Store the baked nodes in the file so From CLF can rebuild them." -STARTLINE}
+ embed_script true
+ addUserKnob {4 domain t "preset: CLFShaper as set. auto: if the chain still responds above the shaper's top, extend the code range to cover it." M {preset auto}}
+ addUserKnob {22 generate l Generate t "Bake the chain between CLFShaper and this node." T "try:\n    import clfbake\nexcept ImportError:\n    nuke.message('CLFBake: put utilities/nuke (open-display-transform) on NUKE_PATH')\nelse:\n    clfbake.generate(nuke.thisNode())\n" +STARTLINE}
+ addUserKnob {22 restore l Restore t "Apply the file's recorded knob values to the selected nodes, or the upstream chain." -STARTLINE T "try:\n    import clfbake\nexcept ImportError:\n    nuke.message('CLFBake: put utilities/nuke (open-display-transform) on NUKE_PATH')\nelse:\n    clfbake.restore(nuke.thisNode())\n"}
+ addUserKnob {22 from_clf l "From CLF" t "Rebuild the baked nodes from the file, between the upstream CLFShaper and this node." -STARTLINE T "try:\n    import clfbake\nexcept ImportError:\n    nuke.message('CLFBake: put utilities/nuke (open-display-transform) on NUKE_PATH')\nelse:\n    clfbake.from_clf(nuke.thisNode())\n"}
+ addUserKnob {26 status l " "}
+ addUserKnob {20 About}
+ addUserKnob {26 about l " " T "<font color=#ccc><b>CLFGenerate</b> | CLFBake, part of <a href=https://github.com/jedypod/open-display-transform>open-display-transform</a><br>Bakes everything between the upstream CLFShaper and this node.<br>Docs: utilities/nuke/README.md</font>"}
+}
+ Input {
+  inputs 0
+  name Input1
+ }
+set Nf6f33700 [stack 0]
+ GenerateLUT {
+  file_type .cube
+  name GenerateLUT1
+ }
+push $Nf6f33700
+ Output {
+  name Output1
+ }
+end_group
